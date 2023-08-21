@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { getDBClient } from '../../lib/db-connector';
+import { NextApiRequest, NextApiResponse } from "next";
+import { getDBClient } from "../../lib/db-connector";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
@@ -15,5 +15,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(200).json(r.rows[0]);
   } catch (err) {
     res.status(err.response.status).json({ message: err.response.data });
-  } 
-}
+  }
+};
