@@ -83,6 +83,7 @@ CREATE TABLE class_students(
   time_updated TIMESTAMP
 );
 
+CREATE TYPE day_of_week AS ENUM ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
 CREATE TABLE schedules(
   id SERIAL PRIMARY KEY,
   class_id int REFERENCES classes(id) NOT NULL,
@@ -92,5 +93,3 @@ CREATE TABLE schedules(
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
-
-CREATE TYPE day_of_week AS ENUM ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');

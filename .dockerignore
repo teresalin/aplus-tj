@@ -33,4 +33,4 @@ yarn-error.log*
 # vercel
 .vercel
 
-/.db_data/
+.db_data
