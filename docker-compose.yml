@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  pg:
+    image: postgres:latest
+    volumes:
+      - ./.db_data/data:/var/lib/postgresql/data/
+      - ./db:/docker-entrypoint-initdb.d/
+    environment:
+      - POSTGRES_PASSWORD=password
+  web:
+    build: .
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST=pg
+    command: [ "npm", "run", "dev" ]
+    ports:
+      - 3000:3000
+    depends_on:
+      - "pg"
