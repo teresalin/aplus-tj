@@ -34,7 +34,7 @@ const Root = styled("div")({
 });
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  backgroundColor: "#e85a4b",
+  backgroundColor: "#08194d",
 }));
 const Title = styled(Typography)(({ theme }) => ({
   flexGrow: 1,
@@ -43,7 +43,6 @@ const Title = styled(Typography)(({ theme }) => ({
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
   width: 250,
   flexShrink: 0,
-  backgroundColor: "#eff8fa",
 }));
 const StyledDrawerContainer = styled("div")(({ theme }) => ({
   overflow: "auto",

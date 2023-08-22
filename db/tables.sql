@@ -1,78 +1,60 @@
-CREATE TABLE users(
+CREATE TABLE persons (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(50),
+  name VARCHAR(30),
   phone VARCHAR(30) UNIQUE,
   email VARCHAR(256) UNIQUE,
-  teacher BOOLEAN,
+  date_of_birth DATE,
+  notes VARCHAR(256),
   active BOOLEAN,
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
 
-CREATE TABLE classes(
+CREATE TABLE staffs (
+  id SERIAL PRIMARY KEY,
+  person_id int REFERENCES persons(id) NOT NULL,
+  role_id int REFERENCES staff_roles(id) NOT NULL,
+  join_date DATE,
+  leave_date DATE,
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+
+-- allow DELETE
+CREATE TABLE staff_roles (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50),
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+
+CREATE TABLE parents (
+  id SERIAL PRIMARY KEY,
+  person_id int REFERENCES persons(id) NOT NULL,
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+
+CREATE TABLE students (
+  id SERIAL PRIMARY KEY,
+  person_id int REFERENCES persons(id) NOT NULL,
+  join_date DATE,
+  leave_date DATE,
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+
+CREATE TABLE classes (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50) UNIQUE,
-  teacher int REFERENCES users(id) NOT NULL,
+  teacher int REFERENCES staffs(id) NOT NULL,
   capacity INTEGER,
   active BOOLEAN,
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
 
-CREATE TABLE sessions(
-  id SERIAL PRIMARY KEY,
-  class_id int REFERENCES classes(id) NOT NULL,
-  session_date DATE,
-  start_time TIME,
-  end_time TIME,
-  time_created TIMESTAMP,
-  time_updated TIMESTAMP
-);
-
-CREATE TABLE assignments(
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(50),
-  description VARCHAR(256),
-  due_date DATE,
-  active BOOLEAN,
-  time_created TIMESTAMP,
-  time_updated TIMESTAMP
-);
-
-CREATE TABLE class_assignments(
-  id SERIAL PRIMARY KEY,
-  class_id int REFERENCES classes(id) NOT NULL,
-  assignment_id int REFERENCES assignments(id) NOT NULL,
-  active BOOLEAN,
-  time_created TIMESTAMP,
-  time_updated TIMESTAMP
-);
-
-CREATE TABLE parents(
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(50),
-  phone VARCHAR(30) UNIQUE,
-  email VARCHAR(256) UNIQUE,
-  active BOOLEAN,
-  time_created TIMESTAMP,
-  time_updated TIMESTAMP
-);
-
-CREATE TABLE students(
-  id SERIAL PRIMARY KEY,
-  parent_id int REFERENCES parents(id) NOT NULL,
-  name VARCHAR(50),
-  phone VARCHAR(30) UNIQUE,
-  email VARCHAR(256) UNIQUE,
-  birthday DATE,
-  join_date DATE,
-  leave_date DATE,
-  active BOOLEAN,
-  time_created TIMESTAMP,
-  time_updated TIMESTAMP
-);
-
-CREATE TABLE class_students(
+CREATE TABLE class_students (
   id SERIAL PRIMARY KEY,
   class_id int REFERENCES classes(id) NOT NULL,
   student_id int REFERENCES students(id) NOT NULL,
@@ -83,8 +65,37 @@ CREATE TABLE class_students(
   time_updated TIMESTAMP
 );
 
+CREATE TABLE sessions (
+  id SERIAL PRIMARY KEY,
+  class_id int REFERENCES classes(id) NOT NULL,
+  session_date DATE,
+  start_time TIME,
+  end_time TIME,
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+
+CREATE TABLE assignments (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50),
+  description VARCHAR(256),
+  due_date DATE,
+  active BOOLEAN,
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+
+CREATE TABLE class_assignments (
+  id SERIAL PRIMARY KEY,
+  class_id int REFERENCES classes(id) NOT NULL,
+  assignment_id int REFERENCES assignments(id) NOT NULL,
+  active BOOLEAN,
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+
 CREATE TYPE day_of_week AS ENUM ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
-CREATE TABLE schedules(
+CREATE TABLE schedules (
   id SERIAL PRIMARY KEY,
   class_id int REFERENCES classes(id) NOT NULL,
   day_of_week day_of_week,
