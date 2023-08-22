@@ -35,6 +35,7 @@ import { Student } from "../api/students";
 import Chip from "@mui/material/Chip";
 import CheckIcon from "@mui/icons-material/Check";
 import { alpha } from "@mui/system";
+import { formatDate } from "../../utils/formatDate";
 
 function Row(props: { row: any }) {
   const { row } = props;
@@ -46,9 +47,9 @@ function Row(props: { row: any }) {
           {row.id}
         </TableCell>
         <TableCell align="left">{row.name}</TableCell>
-        <TableCell align="left">{row.dateOfBirth}</TableCell>
+        <TableCell align="left">{formatDate(row.dateOfBirth)}</TableCell>
         <TableCell align="left">{row.phone}</TableCell>
-        <TableCell align="left">{row.joinDate}</TableCell>
+        <TableCell align="left">{formatDate(row.joinDate)}</TableCell>
         <TableCell align="left">
           {row.active ? (
             <Chip
@@ -179,17 +180,18 @@ const headCells: readonly HeadCell[] = [
     label: "Name",
   },
   {
-    id: "phone",
-    numeric: false,
-    disablePadding: false,
-    label: "Phone",
-  },
-  {
     id: "dateOfBirth",
     numeric: false,
     disablePadding: false,
     label: "Date of Birth",
   },
+  {
+    id: "phone",
+    numeric: false,
+    disablePadding: false,
+    label: "Phone",
+  },
+
   {
     id: "joinDate",
     numeric: false,

@@ -6,7 +6,7 @@ async function getStudent(client, studentID) {
   try {
     const getQuery = {
       text: `
-          SELECT s.id AS student_id, s.join_date, s.leave_date, p.*
+          SELECT s.id AS student_id, s.joinDate, s.leave_date, p.*
           FROM students s
           INNER JOIN persons p ON s.person_id = p.id
           WHERE s.id = $1;
@@ -24,7 +24,7 @@ async function getStudent(client, studentID) {
 
 async function createPerson(
   client,
-  { name, phone, email, date_of_birth, notes, active }
+  { name, phone, email, dateOfBirth, notes }
 ) {
   const insertQuery = {
     text: `
@@ -32,21 +32,21 @@ async function createPerson(
         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
         RETURNING id;
       `,
-    values: [name, phone, email, date_of_birth, notes, active],
+    values: [name, phone, email, dateOfBirth, notes, "t"],
   };
 
   const result = await client.query(insertQuery);
   return result.rows[0].id;
 }
 
-async function createStudent(client, personID, { join_date, leave_date }) {
+async function createStudent(client, personID, { joinDate, leaveDate }) {
   const insertQuery = {
     text: `
         INSERT INTO students(person_id, join_date, leave_date, time_created, time_updated) 
         VALUES ($1, $2, $3, NOW(), NOW())
         RETURNING id;
       `,
-    values: [personID, join_date, leave_date],
+    values: [personID, joinDate, leaveDate],
   };
 
   const result = await client.query(insertQuery);
@@ -72,15 +72,15 @@ async function updatePerson(
   return result.rows[0].id;
 }
 
-async function updateStudent(client, personID, { join_date, leave_date }) {
+async function updateStudent(client, personID, { joinDate, leaveDate }) {
   const updateQuery = {
     text: `
         UPDATE students 
-        SET join_date = COALESCE($2, join_date), leave_date = COALESCE($3, leave_date), time_updated = NOW()
+        SET joinDate = COALESCE($2, join_date), leave_date = COALESCE($3, leave_date), time_updated = NOW()
         WHERE person_id = $1
         RETURNING id;
       `,
-    values: [personID, join_date, leave_date],
+    values: [personID, joinDate, leaveDate],
   };
 
   const result = await client.query(updateQuery);
@@ -102,34 +102,32 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "POST":
       try {
-        const {
-          name,
-          phone,
-          email,
-          date_of_birth,
-          notes,
-          join_date,
-          leave_date,
-          active,
-        } = req.body;
+        const { name, phone, email, dateOfBirth, notes, joinDate, leaveDate } =
+          req.body;
 
         const personID = await createPerson(client, {
           name,
           phone,
           email,
-          date_of_birth,
+          dateOfBirth,
           notes,
-          active,
         });
-        await createStudent(client, personID, { join_date, leave_date });
+        await createStudent(client, personID, { joinDate, leaveDate });
         res.status(200).json({ message: "Success" });
       } catch (err) {
-        res.status(500).json({ message: "Something went wrong" });
+        if (err.code === "23505") {
+          // PostgreSQL unique constraint violation error
+          res
+            .status(409)
+            .json({ message: "A person with the same details already exists" });
+        } else {
+          res.status(500).json({ message: "Something went wrong" });
+        }
       }
       break;
     case "PUT":
       try {
-        const { name, phone, email, notes, join_date, leave_date, active } =
+        const { name, phone, email, notes, joinDate, leaveDate, active } =
           req.body;
 
         const fetchPersonIdQuery = {
@@ -147,8 +145,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           active,
         });
         await updateStudent(client, personID, {
-          join_date,
-          leave_date,
+          joinDate,
+          leaveDate,
         });
         res.status(200).json({ message: "Success" });
       } catch (err) {

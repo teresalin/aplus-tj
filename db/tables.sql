@@ -1,13 +1,16 @@
 CREATE TABLE persons (
   id SERIAL PRIMARY KEY,
   name VARCHAR(30),
-  phone VARCHAR(30) UNIQUE,
-  email VARCHAR(256) UNIQUE,
+  phone VARCHAR(30),
+  email VARCHAR(256),
   date_of_birth DATE,
   notes VARCHAR(256),
   active BOOLEAN,
   time_created TIMESTAMP,
-  time_updated TIMESTAMP
+  time_updated TIMESTAMP,
+
+  -- Create a unique constraint on the combination of name, phone, and date_of_birth
+  CONSTRAINT unique_person_details UNIQUE (name, phone, date_of_birth)
 );
 
 CREATE TABLE staffs (
