@@ -85,7 +85,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         </Head>
         <StyledAppBar position="fixed">
           <Toolbar>
-            <Logo src="/logo2.png" alt="A Plus" />
+            <Logo src="/logo.png" alt="A Plus" />
             <Title variant="h6">
               <Link href="/">A Plus</Link>
             </Title>

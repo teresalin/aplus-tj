@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 
 import { FormEvent, FormEventHandler } from "react";
 import { formatDate } from "../../utils/formatDate";
+import DatePicker from "./DatePicker";
 
 function RedBar() {
   return (
@@ -104,6 +105,7 @@ export default function NewStudentDialog() {
               fullWidth
               variant="outlined"
             />
+            {/* TODO format date in yyyy-mm-dd format */}
             <TextField
               required
               margin="dense"
@@ -127,6 +129,7 @@ export default function NewStudentDialog() {
               InputLabelProps={{ shrink: true }}
             />
             <RedBar />
+            {/* TODO lowercase before storing into db */}
             <Typography variant="body2" display="block">
               Contact Information
             </Typography>
@@ -144,7 +147,7 @@ export default function NewStudentDialog() {
               margin="dense"
               id="phone"
               label="Phone Number"
-              type="phone"
+              type="tel"
               fullWidth
               variant="outlined"
             />

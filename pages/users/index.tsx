@@ -1,41 +1,38 @@
+import { alpha } from "@mui/system";
+import { formatDate } from "../../utils/formatDate";
+import { Student } from "../api/students";
+import { useState } from "react";
+import { visuallyHidden } from "@mui/utils";
 import * as React from "react";
 import Box from "@mui/material/Box";
+import CheckIcon from "@mui/icons-material/Check";
+import Chip from "@mui/material/Chip";
+import CloseIcon from "@mui/icons-material/Close";
 import Collapse from "@mui/material/Collapse";
+import fetcher from "../../utils/fetcher";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import NewStudentDialog from "../../src/components/NewStudentDialog";
+import Paper from "@mui/material/Paper";
+import SearchIcon from "@mui/icons-material/Search";
+import Switch from "@mui/material/Switch";
+import Tab from "@mui/material/Tab";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import TextField from "@mui/material/TextField";
-import SearchIcon from "@mui/icons-material/Search";
-import { useState } from "react";
 import TablePagination from "@mui/material/TablePagination";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Toolbar from "@mui/material/Toolbar";
-import Tooltip from "@mui/material/Tooltip";
+import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import Checkbox from "@mui/material/Checkbox";
-import DeleteIcon from "@mui/icons-material/Delete";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import Switch from "@mui/material/Switch";
-import { visuallyHidden } from "@mui/utils";
-import InputAdornment from "@mui/material/InputAdornment";
-import CloseIcon from "@mui/icons-material/Close";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import NewStudentDialog from "../../src/components/NewStudentDialog";
-import fetcher from "../../utils/fetcher";
+import Tabs from "@mui/material/Tabs";
+import TextField from "@mui/material/TextField";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
 import useSWR from "swr";
-import { Student } from "../api/students";
-import Chip from "@mui/material/Chip";
-import CheckIcon from "@mui/icons-material/Check";
-import { alpha } from "@mui/system";
-import { formatDate } from "../../utils/formatDate";
 
 function Row(props: { row: any }) {
   const { row } = props;
@@ -281,7 +278,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         id="tableTitle"
         component="div"
       >
-        Students
+        Users
       </Typography>
       <SearchBar setSearchQuery={undefined} />
       <NewStudentDialog />
@@ -308,7 +305,7 @@ const SearchBar = ({ setSearchQuery }) => (
       endAdornment: (
         <InputAdornment position="end">
           <IconButton
-            aria-label="toggle password visibility"
+            aria-label="clear search bar"
             // onClick={handleClickShowPassword}
             // onMouseDown={handleMouseDownPassword}
             edge="end"
@@ -321,9 +318,14 @@ const SearchBar = ({ setSearchQuery }) => (
   />
 );
 
+function a11yProps(key: string) {
+  return {
+    id: `simple-tab-${key}`,
+    "aria-controls": `simple-tabpanel-${key}`,
+  };
+}
+
 export default function CollapsibleTable() {
-  const { data } = useSWR("api/students", fetcher);
-  const rows = data || ([] as Student[]);
   const [searchQuery, setSearchQuery] = useState("");
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Student>("joinDate");
@@ -332,6 +334,15 @@ export default function CollapsibleTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [value, setValue] = React.useState("persons");
+  const { data } = useSWR(`api/${value}`, fetcher);
+  const rows = data || [];
+
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue);
+  };
+
+  const personTypes = ["persons", "staffs", "parents", "students"];
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -396,7 +407,14 @@ export default function CollapsibleTable() {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }}>
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Tabs value={value} onChange={handleChange} aria-label="users tabs">
+          {personTypes.map((key) => (
+            <Tab value={key} label={key} {...a11yProps(key)} />
+          ))}
+        </Tabs>
+      </Box>
+      <Paper sx={{ width: "100%" }}>
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer>
           <Table
@@ -412,9 +430,16 @@ export default function CollapsibleTable() {
               rowCount={rows.length}
             />
             <TableBody>
-              {rows.map((row) => (
+              {/* {rows.map((row) => (
                 <Row key={row.id} row={row} />
-              ))}
+              ))} */}
+              {/* if you don't need to support IE11, you can replace the `stableSort` call with:
+                  rows.slice().sort(getComparator(order, orderBy)) */}
+              {stableSort(rows, getComparator(order, orderBy))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row, index: any) => {
+                  return <Row key={row.id} row={row} />;
+                })}
               {emptyRows > 0 && (
                 <TableRow
                   style={{

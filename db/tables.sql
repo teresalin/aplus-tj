@@ -1,8 +1,8 @@
 CREATE TABLE persons (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(30),
-  phone VARCHAR(30),
-  email VARCHAR(256),
+  name VARCHAR(50),
+  phone VARCHAR(50),
+  email VARCHAR(50),
   date_of_birth DATE,
   notes VARCHAR(256),
   active BOOLEAN,
@@ -78,10 +78,18 @@ CREATE TABLE sessions (
   time_updated TIMESTAMP
 );
 
+CREATE TABLE attendance (
+  id SERIAL PRIMARY KEY,
+  session_id int REFERENCES sessions(id) NOT NULL,
+  student_id int REFERENCES students(id) NOT NULL,
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+
 CREATE TABLE assignments (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50),
-  description VARCHAR(256),
+  description VARCHAR(255),
   due_date DATE,
   active BOOLEAN,
   time_created TIMESTAMP,
@@ -104,6 +112,14 @@ CREATE TABLE schedules (
   day_of_week day_of_week,
   start_time TIMESTAMP,
   end_time TIMESTAMP,
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+
+CREATE TABLE holidays (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50),
+  holiday_date DATE UNIQUE,
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
