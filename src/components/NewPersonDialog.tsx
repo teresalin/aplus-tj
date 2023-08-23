@@ -12,7 +12,12 @@ import Typography from "@mui/material/Typography";
 
 import { FormEvent, FormEventHandler } from "react";
 import { formatDate } from "../../utils/formatDate";
-import DatePicker from "./DatePicker";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import useSWR from "swr";
+import { Role } from "../../pages/api/staffs/roles";
+import fetcher from "../../utils/fetcher";
+import { StringDecoder } from "string_decoder";
 
 function RedBar() {
   return (
@@ -24,8 +29,18 @@ function RedBar() {
   );
 }
 
-export default function NewStudentDialog() {
+export default function NewPersonDialog(props: { personType }) {
+  const { personType } = props;
+  const [role, setRole] = React.useState("");
   const [open, setOpen] = React.useState(false);
+  const { data } = useSWR("/api/staffs/roles", fetcher);
+  const roles = data || ([] as Role[]);
+
+  const personIdParam = `[${personType.slice(0, -1)}_id]`;
+
+  const handleRoleChange = (event: SelectChangeEvent) => {
+    setRole(event.target.value);
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -40,6 +55,7 @@ export default function NewStudentDialog() {
 
     const target = event.target as typeof event.target & {
       name: { value: string };
+
       phone: { value: string };
       email: { value: string };
       dateOfBirth: { value: string };
@@ -56,6 +72,7 @@ export default function NewStudentDialog() {
 
     const data = {
       name: target.name.value,
+      roleId: role,
       phone: target.phone.value,
       email: target.email.value,
       dateOfBirth: formatDate(dateOfBirth),
@@ -65,7 +82,7 @@ export default function NewStudentDialog() {
     };
 
     try {
-      const response = await fetch("/api/students/[student_id]", {
+      const response = await fetch(`/api/${personType}/${personIdParam}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +108,7 @@ export default function NewStudentDialog() {
       </IconButton>
       <Dialog disablePortal open={open} onClose={handleClose}>
         <form onSubmit={handleSubmit}>
-          <DialogTitle>New Student</DialogTitle>
+          <DialogTitle>New {personType.slice(0, -1)}</DialogTitle>
           <DialogContent>
             <Typography variant="body2" display="block">
               Basic Information
@@ -129,6 +146,28 @@ export default function NewStudentDialog() {
               InputLabelProps={{ shrink: true }}
             />
             <RedBar />
+            {personType === "staffs" && (
+              <div>
+                <Typography variant="body2" display="block">
+                  Role
+                </Typography>
+                {/* TODO fix default value */}
+                <Select
+                  fullWidth
+                  // labelId="demo-simple-select-label"
+                  id="roleId"
+                  value={role}
+                  label="Role"
+                  displayEmpty
+                  onChange={handleRoleChange}
+                >
+                  {roles.map((role: Role) => (
+                    <MenuItem value={role.id}>{role.name}</MenuItem>
+                  ))}
+                </Select>
+                <RedBar />
+              </div>
+            )}
             {/* TODO lowercase before storing into db */}
             <Typography variant="body2" display="block">
               Contact Information
@@ -152,28 +191,32 @@ export default function NewStudentDialog() {
               variant="outlined"
             />
             <RedBar />
-            <Typography variant="body2" display="block">
-              Enrollment Period
-            </Typography>
-            <TextField
-              required
-              margin="dense"
-              id="joinDate"
-              label="Join Date"
-              type="date"
-              fullWidth
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              margin="dense"
-              id="leaveDate"
-              label="Leave Date"
-              type="date"
-              fullWidth
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-            />
+            {personType !== "parents" && (
+              <div>
+                <Typography variant="body2" display="block">
+                  Enrollment Period
+                </Typography>
+                <TextField
+                  required
+                  margin="dense"
+                  id="joinDate"
+                  label="Join Date"
+                  type="date"
+                  fullWidth
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                />
+                <TextField
+                  margin="dense"
+                  id="leaveDate"
+                  label="Leave Date"
+                  type="date"
+                  fullWidth
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                />
+              </div>
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>

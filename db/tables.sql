@@ -1,6 +1,8 @@
+CREATE TYPE gender AS ENUM ('Male', 'Female', 'Other');
 CREATE TABLE persons (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50),
+  gender gender,
   phone VARCHAR(50),
   email VARCHAR(50),
   date_of_birth DATE,
@@ -50,7 +52,7 @@ CREATE TABLE students (
 CREATE TABLE classes (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50) UNIQUE,
-  teacher int REFERENCES staffs(id) NOT NULL,
+  teacher_id int REFERENCES staffs(id) NOT NULL,
   capacity INTEGER,
   active BOOLEAN,
   time_created TIMESTAMP,
@@ -96,11 +98,11 @@ CREATE TABLE assignments (
   time_updated TIMESTAMP
 );
 
+-- allow DELETE
 CREATE TABLE class_assignments (
   id SERIAL PRIMARY KEY,
   class_id int REFERENCES classes(id) NOT NULL,
   assignment_id int REFERENCES assignments(id) NOT NULL,
-  active BOOLEAN,
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );

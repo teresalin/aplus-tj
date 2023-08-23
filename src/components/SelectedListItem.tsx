@@ -11,26 +11,19 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { useRouter } from "next/router";
 
 export default function SelectedListItem() {
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const router = useRouter();
+  const { pathname } = router;
 
-  // TODO fix selectedIndex
-  const handleListItemClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    index: number
-  ) => {
-    setSelectedIndex(index);
-  };
+  const isActive = (path: string) => pathname === path;
 
   return (
     <Box sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
       <List component="nav" aria-label="main navigations">
         <Link href="/overview">
-          <ListItemButton
-            selected={selectedIndex === 0}
-            onClick={(event) => handleListItemClick(event, 0)}
-          >
+          <ListItemButton selected={isActive("/overview")}>
             <ListItemIcon>
               <GridViewIcon />
             </ListItemIcon>
@@ -38,10 +31,7 @@ export default function SelectedListItem() {
           </ListItemButton>
         </Link>
         <Link href="/classes">
-          <ListItemButton
-            selected={selectedIndex === 1}
-            onClick={(event) => handleListItemClick(event, 1)}
-          >
+          <ListItemButton selected={isActive("/classes")}>
             <ListItemIcon>
               <ClassIcon />
             </ListItemIcon>
@@ -49,21 +39,15 @@ export default function SelectedListItem() {
           </ListItemButton>
         </Link>
         <Link href="/assignments">
-          <ListItemButton
-            selected={selectedIndex === 2}
-            onClick={(event) => handleListItemClick(event, 2)}
-          >
+          <ListItemButton selected={isActive("/assignments")}>
             <ListItemIcon>
               <AssignmentIcon />
             </ListItemIcon>
             <ListItemText primary="Assignments" />
           </ListItemButton>
         </Link>
-        <Link href="/users">
-          <ListItemButton
-            selected={selectedIndex === 3}
-            onClick={(event) => handleListItemClick(event, 3)}
-          >
+        <Link href="/persons">
+          <ListItemButton selected={isActive("/persons")}>
             <ListItemIcon>
               <GroupIcon />
             </ListItemIcon>
@@ -73,20 +57,11 @@ export default function SelectedListItem() {
       </List>
       <Divider />
       <List component="nav" aria-label="secondary navigations">
-        <ListItemButton
-          selected={selectedIndex === 4}
-          onClick={(event) => handleListItemClick(event, 4)}
-        >
+        <ListItemButton selected={isActive("/settings")}>
           <ListItemIcon>
             <SettingsIcon />
           </ListItemIcon>
           <ListItemText primary="Settings" />
-        </ListItemButton>
-        <ListItemButton
-          selected={selectedIndex === 5}
-          onClick={(event) => handleListItemClick(event, 5)}
-        >
-          <ListItemText primary="Placeholder 2" />
         </ListItemButton>
       </List>
     </Box>

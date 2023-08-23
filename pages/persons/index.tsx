@@ -33,6 +33,7 @@ import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
+import NewPersonDialog from "../../src/components/NewPersonDialog";
 
 function Row(props: { row: any }) {
   const { row } = props;
@@ -253,10 +254,11 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface EnhancedTableToolbarProps {
   numSelected: number;
+  personType: string;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected } = props;
+  const { numSelected, personType } = props;
 
   return (
     <Toolbar
@@ -281,7 +283,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         Users
       </Typography>
       <SearchBar setSearchQuery={undefined} />
-      <NewStudentDialog />
+      <NewPersonDialog personType={personType} />
     </Toolbar>
   );
 }
@@ -415,7 +417,10 @@ export default function CollapsibleTable() {
         </Tabs>
       </Box>
       <Paper sx={{ width: "100%" }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          personType={value}
+        />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}

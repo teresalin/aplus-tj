@@ -1,16 +1,16 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../../lib/db-connector";
 
-async function getStudent(client, studentID) {
+async function getStaff(client, staffID) {
   try {
     const getQuery = {
       text: `
-          SELECT s.id AS student_id, s.join_date, s.leave_date, p.*
+          SELECT s.id AS student_id, s.role_id, s.join_date, s.leave_date, p.*
           FROM students s
           INNER JOIN persons p ON s.person_id = p.id
           WHERE s.id = $1;
         `,
-      values: [studentID],
+      values: [staffID],
     };
 
     const result = await client.query(getQuery);
@@ -38,14 +38,14 @@ async function createPerson(
   return result.rows[0].id;
 }
 
-async function createStudent(client, personID, { joinDate, leaveDate }) {
+async function createStaff(client, personID, { roleId, joinDate, leaveDate }) {
   const insertQuery = {
     text: `
-        INSERT INTO students(person_id, join_date, leave_date, time_created, time_updated) 
-        VALUES ($1, $2, $3, NOW(), NOW())
+        INSERT INTO staffs(person_id, role_id, join_date, leave_date, time_created, time_updated) 
+        VALUES ($1, $2, $3, $4, NOW(), NOW())
         RETURNING id;
       `,
-    values: [personID, joinDate, leaveDate],
+    values: [personID, roleId, joinDate, leaveDate],
   };
 
   const result = await client.query(insertQuery);
@@ -71,15 +71,15 @@ async function updatePerson(
   return result.rows[0].id;
 }
 
-async function updateStudent(client, personID, { joinDate, leaveDate }) {
+async function updateStaff(client, personID, { roleId, joinDate, leaveDate }) {
   const updateQuery = {
     text: `
-        UPDATE students 
-        SET join_date = COALESCE($2, join_date), leave_date = COALESCE($3, leave_date), time_updated = NOW()
+        UPDATE staffs 
+        SET role_id = $2 ,join_date = COALESCE($3, join_date), leave_date = COALESCE($4, leave_date), time_updated = NOW()
         WHERE person_id = $1
         RETURNING id;
       `,
-    values: [personID, joinDate, leaveDate],
+    values: [personID, roleId, joinDate, leaveDate],
   };
 
   const result = await client.query(updateQuery);
@@ -87,13 +87,13 @@ async function updateStudent(client, personID, { joinDate, leaveDate }) {
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const studentID = req.query.student_id;
+  const staffID = req.query.student_id;
   const client = await getDBClient();
 
   switch (req.method) {
     case "GET":
       try {
-        const result = await getStudent(client, studentID);
+        const result = await getStaff(client, staffID);
         res.status(200).json(result);
       } catch (err) {
         res.status(500).json({ message: "Something went wrong" });
@@ -101,8 +101,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "POST":
       try {
-        const { name, phone, email, dateOfBirth, notes, joinDate, leaveDate } =
-          req.body;
+        const {
+          name,
+          phone,
+          email,
+          dateOfBirth,
+          notes,
+          roleId,
+          joinDate,
+          leaveDate,
+        } = req.body;
 
         const personID = await createPerson(client, {
           name,
@@ -111,7 +119,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           dateOfBirth,
           notes,
         });
-        await createStudent(client, personID, { joinDate, leaveDate });
+        await createStaff(client, personID, { roleId, joinDate, leaveDate });
         res.status(200).json({ message: "Success" });
       } catch (err) {
         if (err.code === "23505") {
@@ -126,12 +134,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "PUT":
       try {
-        const { name, phone, email, notes, joinDate, leaveDate, active } =
-          req.body;
+        const {
+          name,
+          phone,
+          email,
+          notes,
+          roleId,
+          joinDate,
+          leaveDate,
+          active,
+        } = req.body;
 
         const fetchPersonIdQuery = {
           text: "SELECT person_id FROM students WHERE id = $1;",
-          values: [studentID],
+          values: [staffID],
         };
         const personIdResult = await client.query(fetchPersonIdQuery);
         const personID = personIdResult.rows[0].person_id;
@@ -143,7 +159,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           notes,
           active,
         });
-        await updateStudent(client, personID, {
+        await updateStaff(client, personID, {
+          roleId,
           joinDate,
           leaveDate,
         });
@@ -157,10 +174,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         text: `
           DELETE FROM students WHERE id = $1;
         `,
-        values: [studentID],
+        values: [staffID],
       };
       await client.query(deleteQuery);
-      res.status(200).json({ message: "OK", id: studentID });
+      res.status(200).json({ message: "OK", id: staffID });
       break;
     default:
       res.setHeader("Allow", ["GET", "POST", "DELETE"]);
