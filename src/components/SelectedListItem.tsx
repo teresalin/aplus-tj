@@ -12,6 +12,36 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useRouter } from "next/router";
+import { styled } from "@mui/material/styles";
+
+const StyledLink = styled(Link)(({ theme }) => ({
+  textDecoration: "none",
+  color: "inherit",
+}));
+
+const Logo = styled("img")(({ theme }) => ({
+  maxWidth: 30,
+  marginRight: theme.spacing(1),
+}));
+
+// const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
+//   "&&.Mui-selected": {
+//     color: "#4741e0",
+//     "&&& .MuiTypography-root": {
+//       // fontWeight: "Montserrat, sans-serif",
+//       color: "#4741e0",
+//     },
+//   },
+// }));
+
+const StyledListItemText = styled(ListItemText)(({ theme }) => ({
+  "&&.Mui-selected": {
+    color: "red",
+    "&:hover": {
+      backgroundColor: "yellow",
+    },
+  },
+}));
 
 export default function SelectedListItem() {
   const router = useRouter();
@@ -22,38 +52,59 @@ export default function SelectedListItem() {
   return (
     <Box sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
       <List component="nav" aria-label="main navigations">
-        <Link href="/overview">
+        <StyledLink href="/">
+          <ListItemButton selected={isActive("/")}>
+            <ListItemIcon>
+              <Logo src="/owl.png" alt="A Plus" />
+            </ListItemIcon>
+            <ListItemText
+              sx={{ my: 1 }}
+              primary="A Plus"
+              primaryTypographyProps={{
+                fontSize: 20,
+                fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+                fontWeight: 800,
+                color: "#434260",
+                letterSpacing: 0,
+              }}
+            />
+          </ListItemButton>
+        </StyledLink>
+        <StyledLink
+          href="/overview"
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
           <ListItemButton selected={isActive("/overview")}>
             <ListItemIcon>
               <GridViewIcon />
             </ListItemIcon>
             <ListItemText primary="Dashboard" />
           </ListItemButton>
-        </Link>
-        <Link href="/classes">
+        </StyledLink>
+        <StyledLink href="/classes">
           <ListItemButton selected={isActive("/classes")}>
             <ListItemIcon>
               <ClassIcon />
             </ListItemIcon>
             <ListItemText primary="Classes" />
           </ListItemButton>
-        </Link>
-        <Link href="/assignments">
+        </StyledLink>
+        <StyledLink href="/assignments">
           <ListItemButton selected={isActive("/assignments")}>
             <ListItemIcon>
               <AssignmentIcon />
             </ListItemIcon>
             <ListItemText primary="Assignments" />
           </ListItemButton>
-        </Link>
-        <Link href="/persons">
+        </StyledLink>
+        <StyledLink href="/persons">
           <ListItemButton selected={isActive("/persons")}>
             <ListItemIcon>
               <GroupIcon />
             </ListItemIcon>
             <ListItemText primary="Users" />
           </ListItemButton>
-        </Link>
+        </StyledLink>
       </List>
       <Divider />
       <List component="nav" aria-label="secondary navigations">

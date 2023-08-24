@@ -1,26 +1,13 @@
-import React from "react";
-import { AppProps } from "next/app";
-import { styled } from "@mui/material/styles";
-import { useRouter } from "next/navigation";
-import AppBar from "@mui/material/AppBar";
-import Drawer from "@mui/material/Drawer";
-import Head from "next/head";
-import HomeIcon from "@mui/icons-material/Home";
-import PeopleIcon from "@mui/icons-material/People";
-import Link from "next/link";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import ListItemButton from "@mui/material/ListItemButton";
-import Divider from "@mui/material/Divider";
-
-import fetcher from "../utils/fetcher";
-
 import "../styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { AppProps } from "next/app";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import Head from "next/head";
+import React from "react";
 import SelectedListItem from "../src/components/SelectedListItem";
 
 declare global {
@@ -32,25 +19,21 @@ declare global {
 const Root = styled("div")({
   display: "flex",
 });
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  backgroundColor: "#08194d",
-}));
-const Title = styled(Typography)(({ theme }) => ({
-  flexGrow: 1,
-  lineHeight: "normal",
-}));
+
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
   width: 250,
   flexShrink: 0,
 }));
+
 const StyledDrawerContainer = styled("div")(({ theme }) => ({
   overflow: "auto",
 }));
+
 const Content = styled("main")(({ theme }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
 }));
+
 const Logo = styled("img")(({ theme }) => ({
   maxWidth: 30,
   marginRight: theme.spacing(1),
@@ -72,7 +55,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   //
   return (
     <div>
-      <Root>
+      <Root style={{ backgroundColor: "#f3f2f0" }}>
         <Head>
           <title>A Plus</title>
           <link rel="icon" type="image/x-icon" href="/favicon.ico?" />
@@ -82,15 +65,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
           ></script>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossOrigin="anonymous"
+          />
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap"
+          />
         </Head>
-        <StyledAppBar position="fixed">
-          <Toolbar>
-            <Logo src="/logo.png" alt="A Plus" />
-            <Title variant="h6">
-              <Link href="/">A Plus</Link>
-            </Title>
-          </Toolbar>
-        </StyledAppBar>
         <StyledDrawer
           variant="permanent"
           PaperProps={{
@@ -99,14 +84,16 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             },
           }}
         >
-          <Toolbar />
           <StyledDrawerContainer>
             <SelectedListItem />
           </StyledDrawerContainer>
         </StyledDrawer>
         <Content>
-          <Toolbar />
-          <Component {...pageProps} />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+              <Component {...pageProps} />
+            </Box>
+          </LocalizationProvider>
         </Content>
       </Root>
     </div>

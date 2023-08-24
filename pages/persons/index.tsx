@@ -15,7 +15,6 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import NewStudentDialog from "../../src/components/NewStudentDialog";
 import Paper from "@mui/material/Paper";
 import SearchIcon from "@mui/icons-material/Search";
 import Switch from "@mui/material/Switch";
@@ -412,7 +411,7 @@ export default function CollapsibleTable() {
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleChange} aria-label="users tabs">
           {personTypes.map((key) => (
-            <Tab value={key} label={key} {...a11yProps(key)} />
+            <Tab key={key} value={key} label={key} {...a11yProps(key)} />
           ))}
         </Tabs>
       </Box>

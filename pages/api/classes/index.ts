@@ -9,7 +9,7 @@ export interface Class {
   teacherName: string;
 }
 
-function parsePerson(row: any): Class {
+function parseClass(row: any): Class {
   return {
     id: row.class_id,
     name: row.class_name,
@@ -31,15 +31,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             COUNT(cs.id) AS student_count,
             p.name AS teacher_name
         FROM classes AS c
-        JOIN staffs AS s ON c.teacher = s.id
+        JOIN staffs AS s ON c.teacher_id = s.id
         JOIN persons AS p ON s.person_id = p.id
         LEFT JOIN class_students AS cs ON c.id = cs.class_id AND cs.active = true
         GROUP BY c.id, c.name, c.capacity, p.name
-        ORDER BY c.id;    
+        ORDER BY c.id;
         `,
     };
     const result = await client.query(getQuery);
-    res.status(200).json(result.rows.map(parsePerson));
+    res.status(200).json(result.rows.map(parseClass));
   } catch (error) {
     // Handle the error or rethrow it if needed
     throw error;
