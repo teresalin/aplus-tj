@@ -19,6 +19,8 @@ import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { Person } from "../../pages/api/persons";
 
 function RedBar() {
   return (
@@ -31,11 +33,28 @@ function RedBar() {
 }
 
 export default function UpdateClassDetailsDialog() {
-  const assignmentID = useRouter().query.assignment_id;
+  const classID = useRouter().query.class_id;
+  console.log("classID: ", classID);
+
   const [role, setRole] = React.useState("");
   const [open, setOpen] = React.useState(false);
-  const { data } = useSWR("/api/staffs/roles", fetcher);
-  const roles = data || ([] as Role[]);
+  const { data: staffsData } = useSWR(open ? "/api/staffs" : null, fetcher);
+  const { data: classData } = useSWR(
+    open && classID ? `/api/classes/${classID}` : null,
+    fetcher
+  );
+  const { data: dayOfWeekData } = useSWR(
+    open ? "/api/day-of-week" : null,
+    fetcher
+  );
+  const staffs = staffsData || ([] as Person[]);
+  const classDetail = classData || ([] as Person[]);
+  const dayOfWeek = dayOfWeekData as string[] | null;
+
+  // console.log("open: ", open);
+  // console.log("classDetail: ", classDetail);
+  // console.log("dayOfWeek: ", dayOfWeek);
+  // console.log("dayOfWeek type: ", typeof dayOfWeek);
 
   const handleRoleChange = (event: SelectChangeEvent) => {
     setRole(event.target.value);
@@ -81,7 +100,7 @@ export default function UpdateClassDetailsDialog() {
     };
 
     try {
-      const response = await fetch(`/api/assignment/${assignmentID}`, {
+      const response = await fetch(`/api/assignment/${classID}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -112,7 +131,7 @@ export default function UpdateClassDetailsDialog() {
       </Button>
       <Dialog disablePortal open={open} onClose={handleClose}>
         <form onSubmit={handleSubmit}>
-          <DialogTitle>Update Assignment Details</DialogTitle>
+          <DialogTitle>Update Class Details</DialogTitle>
           <DialogContent>
             <Typography variant="body2" display="block">
               Name
@@ -123,6 +142,7 @@ export default function UpdateClassDetailsDialog() {
               id="name"
               label="Class Name"
               type="text"
+              defaultValue={classDetail.name}
               fullWidth
               variant="outlined"
             />
@@ -130,25 +150,33 @@ export default function UpdateClassDetailsDialog() {
             <Typography variant="body2" display="block">
               Schedule
             </Typography>
-            <Grid container>
-              <Grid item xs={12} md={2}>
-                <Switch />
-              </Grid>
-              <Grid item xs={12} md={5}>
-                <TimePicker label="Basic time picker" />
-              </Grid>
-              <Grid item xs={12} md={5}>
-                <TextField
-                  required
-                  margin="dense"
-                  id="dateOfBirth"
-                  label="Date of Birth"
-                  type="date"
-                  fullWidth
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
+            <Grid container spacing={1}>
+              {dayOfWeek &&
+                dayOfWeek.map((day) => (
+                  <Grid
+                    container
+                    item
+                    key={day}
+                    spacing={1}
+                    alignItems="center"
+                  >
+                    <Grid item xs={12} md={4}>
+                      <FormControlLabel control={<Switch />} label={day} />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <TimePicker
+                        label="Start Time"
+                        slotProps={{ textField: { size: "small" } }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <TimePicker
+                        label="End Time"
+                        slotProps={{ textField: { size: "small" } }}
+                      />
+                    </Grid>
+                  </Grid>
+                ))}
             </Grid>
             <RedBar />
             <Typography variant="body2" display="block">
@@ -164,8 +192,10 @@ export default function UpdateClassDetailsDialog() {
               displayEmpty
               onChange={handleRoleChange}
             >
-              {roles.map((role: Role) => (
-                <MenuItem value={role.id}>{role.name}</MenuItem>
+              {staffs.map((role: Role) => (
+                <MenuItem key={role.id} value={role.id}>
+                  {role.name}
+                </MenuItem>
               ))}
             </Select>
             <RedBar />

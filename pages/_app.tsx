@@ -59,13 +59,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <Head>
           <title>A Plus</title>
           <link rel="icon" type="image/x-icon" href="/favicon.ico?" />
-          <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.13/ace.js"
-            integrity="sha512-OMjy8oWtPbx9rJmoprdaQdS2rRovgTetHjiBf7RL7LvRSouoMLks5aIcgqHb6vGEAduuPdBTDCoztxLR+nv45g=="
-            crossOrigin="anonymous"
-            referrerPolicy="no-referrer"
-          ></script>
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link
             rel="preconnect"
             href="https://fonts.gstatic.com"
@@ -74,7 +68,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap"
-          />
+          /> */}
         </Head>
         <StyledDrawer
           variant="permanent"

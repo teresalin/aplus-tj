@@ -45,7 +45,7 @@ export default function Classes() {
       <Grid item xs={12}>
         <Typography>All Classes</Typography>
         {classes.map((row: Class) => (
-          <Link href={`classes/${classes.id}`} key={classes.id}>
+          <Link href={`classes/${row.id}`} key={row.id}>
             <StyledCard key={row.id}>
               <StyledCardContent>
                 <Grid container spacing={2}>

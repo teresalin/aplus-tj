@@ -112,8 +112,8 @@ CREATE TABLE schedules (
   id SERIAL PRIMARY KEY,
   class_id int REFERENCES classes(id) NOT NULL,
   day_of_week day_of_week,
-  start_time TIMESTAMP,
-  end_time TIMESTAMP,
+  start_time TIME,
+  end_time TIME,
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );

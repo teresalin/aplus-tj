@@ -1,22 +1,14 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../lib/db-connector";
+import { Schedule } from "./[class_id]/schedules";
 
 export interface Class {
   id: number;
   name: string;
-  capacity: string;
-  studentCount: number;
   teacherName: string;
-}
-
-function parseClass(row: any): Class {
-  return {
-    id: row.class_id,
-    name: row.class_name,
-    capacity: row.capacity,
-    studentCount: row.student_count,
-    teacherName: row.teacher_name,
-  };
+  studentCount: number;
+  capacity: string;
+  schedules: Schedule[];
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -25,11 +17,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const getQuery = {
       text: `
         SELECT
-            c.id AS class_id,
-            c.name AS class_name,
+            c.id,
+            c.name,
             c.capacity,
-            COUNT(cs.id) AS student_count,
-            p.name AS teacher_name
+            COUNT(cs.id) AS "studentCount",
+            p.name AS "teacherName"
         FROM classes AS c
         JOIN staffs AS s ON c.teacher_id = s.id
         JOIN persons AS p ON s.person_id = p.id
@@ -39,7 +31,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         `,
     };
     const result = await client.query(getQuery);
-    res.status(200).json(result.rows.map(parseClass));
+    res.status(200).json(result.rows as Class[]);
   } catch (error) {
     // Handle the error or rethrow it if needed
     throw error;

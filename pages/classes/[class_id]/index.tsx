@@ -17,7 +17,6 @@ const FlexGrid = styled(Grid)(({ theme }) => ({
 }));
 
 const StyledCard = styled(Card)(({ theme }) => ({
-  cursor: "pointer",
   boxShadow: "none",
   marginTop: "0.7em",
   marginBottom: "0.7em",
