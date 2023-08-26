@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../lib/db-connector";
+import { NextApiRequest, NextApiResponse } from "next";
 import { Schedule } from "./[class_id]/schedules";
 
 export interface Class {
@@ -17,11 +17,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const getQuery = {
       text: `
         SELECT
-            c.id,
-            c.name,
-            c.capacity,
-            COUNT(cs.id) AS "studentCount",
-            p.name AS "teacherName"
+          c.id,
+          c.name,
+          c.capacity,
+          COUNT(cs.id) AS "studentCount",
+          p.name AS "teacherName"
         FROM classes AS c
         JOIN staffs AS s ON c.teacher_id = s.id
         JOIN persons AS p ON s.person_id = p.id

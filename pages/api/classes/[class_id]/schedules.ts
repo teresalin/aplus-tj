@@ -4,17 +4,8 @@ import { getDBClient } from "../../../../lib/db-connector";
 export interface Schedule {
   id: number;
   dayOfWeek: string;
-  startTime: Date;
-  endTime: Date;
-}
-
-function parseSchedule(row: any): Schedule {
-  return {
-    id: row.class_id,
-    dayOfWeek: row.day_of_week,
-    startTime: row.start_time,
-    endTime: row.end_time,
-  };
+  startTime: string;
+  endTime: string;
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -23,7 +14,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const getQuery = {
       text: `
         SELECT
-            schedules.id, schedules.day_of_week, schedules.start_time, schedules.end_time,
+            schedules.id, 
+            schedules.day_of_week AS "dayOfWeek", 
+            schedules.start_time AS "startTime", 
+            schedules.end_time AS "endTime,
         FROM
             schedules
         INNER JOIN
@@ -32,7 +26,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         `,
     };
     const result = await client.query(getQuery);
-    res.status(200).json(result.rows.map(parseSchedule));
+    res.status(200).json(result.rows as Schedule[]);
   } catch (error) {
     // Handle the error or rethrow it if needed
     throw error;

@@ -23,21 +23,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const getQuery = {
       text: `
         SELECT
-            persons.id,
-            persons.name,
-            persons.gender,
-            persons.phone,
-            persons.email,
-            persons.date_of_birth,
-            persons.notes,
-            persons.active,
-            staffs.join_date,
-            staffs.leave_date
-        FROM
-            staffs
-        JOIN
-            persons ON staffs.person_id = persons.id;
-        `,
+          persons.id,
+          persons.name,
+          persons.gender,
+          persons.phone,
+          persons.email,
+          persons.date_of_birth,
+          persons.notes,
+          persons.active,
+          staffs.join_date,
+          staffs.leave_date
+      FROM
+          staffs
+      JOIN
+          persons ON staffs.person_id = persons.id;
+      `,
     };
     const result = await client.query(getQuery);
     res.status(200).json(result.rows.map(parsePerson));

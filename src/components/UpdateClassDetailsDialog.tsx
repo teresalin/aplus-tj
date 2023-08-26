@@ -1,26 +1,36 @@
 import { formatDate } from "../../utils/formatDate";
 import { FormEvent, FormEventHandler } from "react";
+import { Person } from "../../pages/api/persons";
 import { Role } from "../../pages/api/staffs/roles";
+import { Schedule } from "../../pages/api/classes/[class_id]/schedules";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { useRouter } from "next/router";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import dayjs from "dayjs";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import EditIcon from "@mui/icons-material/Edit";
 import fetcher from "../../utils/fetcher";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
-import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import { Person } from "../../pages/api/persons";
+
+const dayOfWeek = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
 
 function RedBar() {
   return (
@@ -32,33 +42,13 @@ function RedBar() {
   );
 }
 
-export default function UpdateClassDetailsDialog() {
+export default function UpdateClassDetailsDialog(props: { classDetails: any }) {
+  const { classDetails } = props;
   const classID = useRouter().query.class_id;
-  console.log("classID: ", classID);
-
-  const [role, setRole] = React.useState("");
+  const [value, setValue] = React.useState(null);
   const [open, setOpen] = React.useState(false);
-  const { data: staffsData } = useSWR(open ? "/api/staffs" : null, fetcher);
-  const { data: classData } = useSWR(
-    open && classID ? `/api/classes/${classID}` : null,
-    fetcher
-  );
-  const { data: dayOfWeekData } = useSWR(
-    open ? "/api/day-of-week" : null,
-    fetcher
-  );
-  const staffs = staffsData || ([] as Person[]);
-  const classDetail = classData || ([] as Person[]);
-  const dayOfWeek = dayOfWeekData as string[] | null;
-
-  // console.log("open: ", open);
-  // console.log("classDetail: ", classDetail);
-  // console.log("dayOfWeek: ", dayOfWeek);
-  // console.log("dayOfWeek type: ", typeof dayOfWeek);
-
-  const handleRoleChange = (event: SelectChangeEvent) => {
-    setRole(event.target.value);
-  };
+  const { data } = useSWR(open ? "/api/staffs" : null, fetcher);
+  const staffs = data as Person[] | null;
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -68,12 +58,19 @@ export default function UpdateClassDetailsDialog() {
     setOpen(false);
   };
 
+  const hasSchedule = (schedule: Schedule) => {
+    const emptyTime = "00:00:00";
+    if (schedule) {
+      return schedule.startTime !== emptyTime && schedule.endTime !== emptyTime;
+    }
+    return false;
+  };
+
   const handleSubmit: FormEventHandler = async (event: FormEvent) => {
     event.preventDefault();
 
     const target = event.target as typeof event.target & {
       name: { value: string };
-
       phone: { value: string };
       email: { value: string };
       dateOfBirth: { value: string };
@@ -90,7 +87,6 @@ export default function UpdateClassDetailsDialog() {
 
     const data = {
       name: target.name.value,
-      roleId: role,
       phone: target.phone.value,
       email: target.email.value,
       dateOfBirth: formatDate(dateOfBirth),
@@ -142,7 +138,7 @@ export default function UpdateClassDetailsDialog() {
               id="name"
               label="Class Name"
               type="text"
-              defaultValue={classDetail.name}
+              defaultValue={classDetails ? classDetails.name : null}
               fullWidth
               variant="outlined"
             />
@@ -151,7 +147,7 @@ export default function UpdateClassDetailsDialog() {
               Schedule
             </Typography>
             <Grid container spacing={1}>
-              {dayOfWeek &&
+              {classDetails &&
                 dayOfWeek.map((day) => (
                   <Grid
                     container
@@ -161,18 +157,47 @@ export default function UpdateClassDetailsDialog() {
                     alignItems="center"
                   >
                     <Grid item xs={12} md={4}>
-                      <FormControlLabel control={<Switch />} label={day} />
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={hasSchedule(classDetails.schedules[day])}
+                          />
+                        }
+                        label={day}
+                      />
                     </Grid>
                     <Grid item xs={12} md={4}>
                       <TimePicker
                         label="Start Time"
                         slotProps={{ textField: { size: "small" } }}
+                        value={
+                          classDetails.schedules[day]
+                            ? classDetails.schedules[day].startTime ===
+                              "00:00:00"
+                              ? null
+                              : dayjs(
+                                  classDetails.schedules[day].startTime,
+                                  "HH:mm:ss"
+                                )
+                            : null
+                        }
+                        onChange={(newValue) => setValue(newValue)}
                       />
                     </Grid>
                     <Grid item xs={12} md={4}>
                       <TimePicker
                         label="End Time"
                         slotProps={{ textField: { size: "small" } }}
+                        value={
+                          classDetails.schedules[day]
+                            ? classDetails.schedules[day].endTime === "00:00:00"
+                              ? null
+                              : dayjs(
+                                  classDetails.schedules[day].endTime,
+                                  "HH:mm:ss"
+                                )
+                            : null
+                        }
                       />
                     </Grid>
                   </Grid>
@@ -183,7 +208,7 @@ export default function UpdateClassDetailsDialog() {
               Teacher
             </Typography>
             {/* TODO fix default value */}
-            <Select
+            {/* <Select
               fullWidth
               // labelId="demo-simple-select-label"
               id="roleId"
@@ -197,7 +222,7 @@ export default function UpdateClassDetailsDialog() {
                   {role.name}
                 </MenuItem>
               ))}
-            </Select>
+            </Select> */}
             <RedBar />
             <Typography variant="body2" display="block">
               Capacity

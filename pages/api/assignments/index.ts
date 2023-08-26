@@ -11,18 +11,6 @@ export interface Assignment {
   active: boolean;
 }
 
-// function parsePerson(row: any): Assignment {
-//   return {
-//     id: row.id,
-//     name: row.name,
-//     description: row.description,
-//     email: row.email,
-//     dateOfBirth: row.date_of_birth,
-//     notes: row.notes,
-//     active: row.active,
-//   };
-// }
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
   try {

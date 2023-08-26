@@ -15,8 +15,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       .substring(1, enumRangeString.length - 1)
       .split(",");
     res.status(200).json(enumRangeArray);
-    // const result = await client.query(query);
-    // res.status(200).json(result.rows[0]["enum_range"]);
   } catch (error) {
     // Handle the error or rethrow it if needed
     throw error;

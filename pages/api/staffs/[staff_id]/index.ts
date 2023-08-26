@@ -5,11 +5,11 @@ async function getStaff(client, staffID) {
   try {
     const getQuery = {
       text: `
-          SELECT s.id AS student_id, s.role_id, s.join_date, s.leave_date, p.*
-          FROM students s
-          INNER JOIN persons p ON s.person_id = p.id
-          WHERE s.id = $1;
-        `,
+        SELECT s.id AS student_id, s.role_id, s.join_date, s.leave_date, p.*
+        FROM students s
+        INNER JOIN persons p ON s.person_id = p.id
+        WHERE s.id = $1;
+      `,
       values: [staffID],
     };
 
@@ -27,10 +27,10 @@ async function createPerson(
 ) {
   const insertQuery = {
     text: `
-        INSERT INTO persons(name, phone, email, date_of_birth, notes, active, time_created, time_updated) 
-        VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
-        RETURNING id;
-      `,
+      INSERT INTO persons(name, phone, email, date_of_birth, notes, active, time_created, time_updated) 
+      VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+      RETURNING id;
+    `,
     values: [name, phone, email, dateOfBirth, notes, "t"],
   };
 
@@ -41,10 +41,10 @@ async function createPerson(
 async function createStaff(client, personID, { roleId, joinDate, leaveDate }) {
   const insertQuery = {
     text: `
-        INSERT INTO staffs(person_id, role_id, join_date, leave_date, time_created, time_updated) 
-        VALUES ($1, $2, $3, $4, NOW(), NOW())
-        RETURNING id;
-      `,
+      INSERT INTO staffs(person_id, role_id, join_date, leave_date, time_created, time_updated) 
+      VALUES ($1, $2, $3, $4, NOW(), NOW())
+      RETURNING id;
+    `,
     values: [personID, roleId, joinDate, leaveDate],
   };
 
@@ -59,11 +59,11 @@ async function updatePerson(
 ) {
   const updateQuery = {
     text: `
-        UPDATE persons 
-        SET name = $2, phone = $3, email = $4, notes = $5, active = $6, time_updated = NOW()
-        WHERE id = $1
-        RETURNING id;
-      `,
+      UPDATE persons 
+      SET name = $2, phone = $3, email = $4, notes = $5, active = $6, time_updated = NOW()
+      WHERE id = $1
+      RETURNING id;
+    `,
     values: [personID, name, phone, email, notes, active],
   };
 
@@ -74,11 +74,11 @@ async function updatePerson(
 async function updateStaff(client, personID, { roleId, joinDate, leaveDate }) {
   const updateQuery = {
     text: `
-        UPDATE staffs 
-        SET role_id = $2 ,join_date = COALESCE($3, join_date), leave_date = COALESCE($4, leave_date), time_updated = NOW()
-        WHERE person_id = $1
-        RETURNING id;
-      `,
+      UPDATE staffs 
+      SET role_id = $2 ,join_date = COALESCE($3, join_date), leave_date = COALESCE($4, leave_date), time_updated = NOW()
+      WHERE person_id = $1
+      RETURNING id;
+    `,
     values: [personID, roleId, joinDate, leaveDate],
   };
 

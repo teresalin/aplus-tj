@@ -6,13 +6,6 @@ export interface Role {
   name: string;
 }
 
-function parseRole(row: any): Role {
-  return {
-    id: row.id,
-    name: row.name,
-  };
-}
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
   try {
@@ -22,7 +15,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         `,
     };
     const result = await client.query(getQuery);
-    res.status(200).json(result.rows.map(parseRole));
+    res.status(200).json(result.rows as Role[]);
   } catch (error) {
     // Handle the error or rethrow it if needed
     throw error;

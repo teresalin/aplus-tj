@@ -27,10 +27,10 @@ async function createPerson(
 ) {
   const insertQuery = {
     text: `
-        INSERT INTO persons(name, phone, email, date_of_birth, notes, active, time_created, time_updated) 
-        VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
-        RETURNING id;
-      `,
+      INSERT INTO persons(name, phone, email, date_of_birth, notes, active, time_created, time_updated) 
+      VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+      RETURNING id;
+    `,
     values: [name, phone, email, dateOfBirth, notes, "t"],
   };
 
@@ -41,10 +41,10 @@ async function createPerson(
 async function createStudent(client, personID, { joinDate, leaveDate }) {
   const insertQuery = {
     text: `
-        INSERT INTO students(person_id, join_date, leave_date, time_created, time_updated) 
-        VALUES ($1, $2, $3, NOW(), NOW())
-        RETURNING id;
-      `,
+      INSERT INTO students(person_id, join_date, leave_date, time_created, time_updated) 
+      VALUES ($1, $2, $3, NOW(), NOW())
+      RETURNING id;
+    `,
     values: [personID, joinDate, leaveDate],
   };
 
@@ -59,11 +59,11 @@ async function updatePerson(
 ) {
   const updateQuery = {
     text: `
-        UPDATE persons 
-        SET name = $2, phone = $3, email = $4, notes = $5, active = $6, time_updated = NOW()
-        WHERE id = $1
-        RETURNING id;
-      `,
+      UPDATE persons 
+      SET name = $2, phone = $3, email = $4, notes = $5, active = $6, time_updated = NOW()
+      WHERE id = $1
+      RETURNING id;
+    `,
     values: [personID, name, phone, email, notes, active],
   };
 
@@ -74,11 +74,11 @@ async function updatePerson(
 async function updateStudent(client, personID, { joinDate, leaveDate }) {
   const updateQuery = {
     text: `
-        UPDATE students 
-        SET join_date = COALESCE($2, join_date), leave_date = COALESCE($3, leave_date), time_updated = NOW()
-        WHERE person_id = $1
-        RETURNING id;
-      `,
+      UPDATE students 
+      SET join_date = COALESCE($2, join_date), leave_date = COALESCE($3, leave_date), time_updated = NOW()
+      WHERE person_id = $1
+      RETURNING id;
+    `,
     values: [personID, joinDate, leaveDate],
   };
 

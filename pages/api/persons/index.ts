@@ -34,8 +34,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const getQuery = {
       text: `
-          SELECT * from persons;
-        `,
+        SELECT * from persons;
+      `,
     };
     const result = await client.query(getQuery);
     res.status(200).json(result.rows.map(parsePerson));

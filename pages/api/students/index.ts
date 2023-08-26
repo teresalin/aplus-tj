@@ -32,10 +32,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const getQuery = {
       text: `
-          SELECT s.id, s.join_date, s.leave_date, p.*
-          FROM students s
-          INNER JOIN persons p ON s.person_id = p.id;
-        `,
+        SELECT s.id, s.join_date, s.leave_date, p.*
+        FROM students s
+        INNER JOIN persons p ON s.person_id = p.id;
+      `,
     };
     const result = await client.query(getQuery);
     res.status(200).json(result.rows.map(parseStudent));
