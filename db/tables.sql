@@ -70,6 +70,7 @@ CREATE TABLE class_students (
   time_updated TIMESTAMP
 );
 
+-- TODO capture subjects and notes?
 CREATE TABLE sessions (
   id SERIAL PRIMARY KEY,
   class_id int REFERENCES classes(id) NOT NULL,

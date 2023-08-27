@@ -91,18 +91,17 @@ function Row(props: { row: any }) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {/* {row.history.map((historyRow) => (
-                    <TableRow key={historyRow.date}>
-                      <TableCell component="th" scope="row">
-                        {historyRow.date}
-                      </TableCell>
-                      <TableCell>{historyRow.customerId}</TableCell>
-                      <TableCell align="right">{historyRow.amount}</TableCell>
-                      <TableCell align="right">
-                        {Math.round(historyRow.amount * row.price * 100) / 100}
-                      </TableCell>
-                    </TableRow>
-                  ))} */}
+                  <TableRow>
+                    <TableCell component="th" scope="row">
+                      {row.gender}
+                    </TableCell>
+                    <TableCell>{row.phone}</TableCell>
+                    <TableCell align="right">{row.email}</TableCell>
+                    <TableCell align="right">{row.dateOfBirth}</TableCell>
+                    <TableCell align="right">{row.notes}</TableCell>
+                    <TableCell align="right">{row.joinDate}</TableCell>
+                    <TableCell align="right">{row.leaveDate}</TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </Box>

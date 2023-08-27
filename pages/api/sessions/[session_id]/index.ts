@@ -1,0 +1,1 @@
+// TODO query session details on demand
