@@ -45,7 +45,7 @@ export default function ClassDetails() {
               <Typography variant="h6" gutterBottom>
                 Details
               </Typography>
-              <UpdateClassDetailsDialog classDetails={details} />
+              {details && <UpdateClassDetailsDialog classDetails={details} />}
             </Grid>
             <Grid
               container

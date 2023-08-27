@@ -1,14 +1,13 @@
 import { formatDate } from "../../utils/formatDate";
-import { FormEvent, FormEventHandler } from "react";
+import { FormEvent, FormEventHandler, useEffect, useState } from "react";
 import { Person } from "../../pages/api/persons";
-import { Role } from "../../pages/api/staffs/roles";
 import { Schedule } from "../../pages/api/classes/[class_id]/schedules";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { useRouter } from "next/router";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -25,10 +24,10 @@ import useSWR from "swr";
 const dayOfWeek = [
   "Monday",
   "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
+  // "Wednesday",
+  // "Thursday",
+  // "Friday",
+  // "Saturday",
   "Sunday",
 ];
 
@@ -42,13 +41,27 @@ function RedBar() {
   );
 }
 
-export default function UpdateClassDetailsDialog(props: { classDetails: any }) {
-  const { classDetails } = props;
+export default function UpdateClassDetailsDialog({ classDetails }) {
   const classID = useRouter().query.class_id;
-  const [value, setValue] = React.useState(null);
-  const [open, setOpen] = React.useState(false);
+  const [updatedSchedules, setUpdatedSchedules] = useState(
+    classDetails.schedules
+  );
+  const [open, setOpen] = useState(false);
   const { data } = useSWR(open ? "/api/staffs" : null, fetcher);
   const staffs = data as Person[] | null;
+
+  const handleTimeChange = (day: string, newValue) => {
+    console.log(dayjs(newValue).format("HH:mm:ss"));
+    setUpdatedSchedules((prevSchedules: any) => ({
+      ...prevSchedules,
+      [day]: {
+        ...prevSchedules[day],
+        startTime: newValue
+          ? dayjs(newValue).format("HH:mm:ss")
+          : dayjs().format("HH:mm:ss"),
+      },
+    }));
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -96,7 +109,7 @@ export default function UpdateClassDetailsDialog(props: { classDetails: any }) {
     };
 
     try {
-      const response = await fetch(`/api/assignment/${classID}`, {
+      const response = await fetch(`/api/classes/${classID}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -171,17 +184,14 @@ export default function UpdateClassDetailsDialog(props: { classDetails: any }) {
                         label="Start Time"
                         slotProps={{ textField: { size: "small" } }}
                         value={
-                          classDetails.schedules[day]
-                            ? classDetails.schedules[day].startTime ===
-                              "00:00:00"
-                              ? null
-                              : dayjs(
-                                  classDetails.schedules[day].startTime,
-                                  "HH:mm:ss"
-                                )
+                          updatedSchedules &&
+                          updatedSchedules[day].startTime !== "00:00:00"
+                            ? dayjs(updatedSchedules[day].startTime, "HH:mm:ss")
                             : null
                         }
-                        onChange={(newValue) => setValue(newValue)}
+                        onChange={(newValue: Dayjs | null) =>
+                          handleTimeChange(day, newValue)
+                        }
                       />
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -189,14 +199,13 @@ export default function UpdateClassDetailsDialog(props: { classDetails: any }) {
                         label="End Time"
                         slotProps={{ textField: { size: "small" } }}
                         value={
-                          classDetails.schedules[day]
-                            ? classDetails.schedules[day].endTime === "00:00:00"
-                              ? null
-                              : dayjs(
-                                  classDetails.schedules[day].endTime,
-                                  "HH:mm:ss"
-                                )
+                          updatedSchedules &&
+                          updatedSchedules[day].endTime !== "00:00:00"
+                            ? dayjs(updatedSchedules[day].endTime, "HH:mm:ss")
                             : null
+                        }
+                        onChange={(newValue: Dayjs | null) =>
+                          handleTimeChange(day, newValue)
                         }
                       />
                     </Grid>

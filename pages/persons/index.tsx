@@ -1,6 +1,5 @@
 import { alpha } from "@mui/system";
 import { formatDate } from "../../utils/formatDate";
-import { Student } from "../api/students";
 import { useState } from "react";
 import { visuallyHidden } from "@mui/utils";
 import * as React from "react";
@@ -33,6 +32,7 @@ import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
+import { Person } from "../api/persons";
 
 function Row(props: { row: any }) {
   const { row } = props;
@@ -157,7 +157,7 @@ function stableSort<T>(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof Student;
+  id: keyof Person;
   label: string;
   numeric: boolean;
 }
@@ -206,7 +206,7 @@ interface EnhancedTableProps {
   numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof Student
+    property: keyof Person
   ) => void;
   order: Order;
   orderBy: string;
@@ -216,7 +216,7 @@ interface EnhancedTableProps {
 function EnhancedTableHead(props: EnhancedTableProps) {
   const { order, orderBy, numSelected, rowCount, onRequestSort } = props;
   const createSortHandler =
-    (property: keyof Student) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof Person) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
@@ -328,7 +328,7 @@ function a11yProps(key: string) {
 export default function CollapsibleTable() {
   const [searchQuery, setSearchQuery] = useState("");
   const [order, setOrder] = React.useState<Order>("asc");
-  const [orderBy, setOrderBy] = React.useState<keyof Student>("joinDate");
+  const [orderBy, setOrderBy] = React.useState<keyof Person>("joinDate");
 
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
@@ -346,7 +346,7 @@ export default function CollapsibleTable() {
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: keyof Student
+    property: keyof Person
   ) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
