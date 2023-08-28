@@ -1,5 +1,5 @@
 CREATE TYPE gender AS ENUM ('Male', 'Female', 'Other');
-CREATE TABLE persons (
+CREATE TABLE person (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50),
   gender gender,
@@ -15,10 +15,10 @@ CREATE TABLE persons (
   CONSTRAINT unique_person_details UNIQUE (name, phone, date_of_birth)
 );
 
-CREATE TABLE staffs (
+CREATE TABLE staff (
   id SERIAL PRIMARY KEY,
-  person_id int REFERENCES persons(id) NOT NULL,
-  role_id int REFERENCES staff_roles(id) NOT NULL,
+  person_id int REFERENCES person(id) NOT NULL,
+  role_id int REFERENCES staff_role(id) NOT NULL,
   join_date DATE,
   leave_date DATE,
   time_created TIMESTAMP,
@@ -26,43 +26,55 @@ CREATE TABLE staffs (
 );
 
 -- allow DELETE
-CREATE TABLE staff_roles (
+CREATE TABLE staff_role (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50),
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
 
-CREATE TABLE parents (
+CREATE TABLE parent (
   id SERIAL PRIMARY KEY,
-  person_id int REFERENCES persons(id) NOT NULL,
+  person_id int REFERENCES person(id) NOT NULL,
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
 
-CREATE TABLE students (
+CREATE TABLE student (
   id SERIAL PRIMARY KEY,
-  person_id int REFERENCES persons(id) NOT NULL,
+  person_id int REFERENCES person(id) NOT NULL,
+  english_name VARCHAR(50),
+  current_school VARCHAR(50),
+  textbook_publisher VARCHAR(50),
+  grade_id int REFERENCES grade(id) NOT NULL,
   join_date DATE,
   leave_date DATE,
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
 
-CREATE TABLE classes (
+CREATE TABLE class (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50) UNIQUE,
-  teacher_id int REFERENCES staffs(id) NOT NULL,
+  teacher_id int REFERENCES staff(id) NOT NULL,
+  grade_id int REFERENCES grade(id) NOT NULL,
   capacity INTEGER,
   active BOOLEAN,
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
 
-CREATE TABLE class_students (
+CREATE TABLE grade (
   id SERIAL PRIMARY KEY,
-  class_id int REFERENCES classes(id) NOT NULL,
-  student_id int REFERENCES students(id) NOT NULL,
+  name VARCHAR(50) UNIQUE,
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+
+CREATE TABLE class_student (
+  id SERIAL PRIMARY KEY,
+  class_id int REFERENCES class(id) NOT NULL,
+  student_id int REFERENCES student(id) NOT NULL,
   start_date DATE,
   end_date DATE,
   active BOOLEAN,
@@ -71,9 +83,9 @@ CREATE TABLE class_students (
 );
 
 -- TODO capture subjects and notes?
-CREATE TABLE sessions (
+CREATE TABLE session (
   id SERIAL PRIMARY KEY,
-  class_id int REFERENCES classes(id) NOT NULL,
+  class_id int REFERENCES class(id) NOT NULL,
   session_date DATE,
   start_time TIME,
   end_time TIME,
@@ -83,35 +95,35 @@ CREATE TABLE sessions (
 
 CREATE TABLE attendance (
   id SERIAL PRIMARY KEY,
-  session_id int REFERENCES sessions(id) NOT NULL,
-  student_id int REFERENCES students(id) NOT NULL,
+  session_id int REFERENCES session(id) NOT NULL,
+  student_id int REFERENCES student(id) NOT NULL,
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
 
-CREATE TABLE assignments (
+-- allow DELETE; auto delete any thing beyond 30 days
+CREATE TABLE assignment (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50),
   description VARCHAR(255),
   due_date DATE,
-  active BOOLEAN,
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
 
 -- allow DELETE
-CREATE TABLE class_assignments (
+CREATE TABLE class_assignment (
   id SERIAL PRIMARY KEY,
-  class_id int REFERENCES classes(id) NOT NULL,
-  assignment_id int REFERENCES assignments(id) NOT NULL,
+  class_id int REFERENCES class(id) NOT NULL,
+  assignment_id int REFERENCES assignment(id) NOT NULL,
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
 
 CREATE TYPE day_of_week AS ENUM ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
-CREATE TABLE schedules (
+CREATE TABLE schedule (
   id SERIAL PRIMARY KEY,
-  class_id int REFERENCES classes(id) NOT NULL,
+  class_id int REFERENCES class(id) NOT NULL,
   day_of_week day_of_week,
   start_time TIME,
   end_time TIME,
@@ -119,7 +131,7 @@ CREATE TABLE schedules (
   time_updated TIMESTAMP
 );
 
-CREATE TABLE holidays (
+CREATE TABLE holiday (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50),
   holiday_date DATE UNIQUE,

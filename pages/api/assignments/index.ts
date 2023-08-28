@@ -3,12 +3,12 @@ import { getDBClient } from "../../../lib/db-connector";
 
 export interface Assignment {
   id: number;
+  classId: number;
   name: string;
   description: string;
-  email: string;
-  dateOfBirth: Date;
-  notes: string;
+  dueDate: Date;
   active: boolean;
+  timeCreated: Date;
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -16,7 +16,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const getQuery = {
       text: `
-          SELECT * from assignments;
+          SELECT * from assignment;
         `,
     };
     const result = await client.query(getQuery);

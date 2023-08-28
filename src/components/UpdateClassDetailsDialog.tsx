@@ -20,6 +20,9 @@ import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { Role } from "../../pages/api/staffs/roles";
 
 const dayOfWeek = [
   "Monday",
@@ -43,12 +46,21 @@ function RedBar() {
 
 export default function UpdateClassDetailsDialog({ classDetails }) {
   const classID = useRouter().query.class_id;
+  const [open, setOpen] = useState(false);
+  const [teacher, setTeacher] = useState(classDetails.teacherName);
   const [updatedSchedules, setUpdatedSchedules] = useState(
     classDetails.schedules
   );
-  const [open, setOpen] = useState(false);
   const { data } = useSWR(open ? "/api/staffs" : null, fetcher);
   const staffs = data as Person[] | null;
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleTimeChange = (day: string, newValue) => {
     console.log(dayjs(newValue).format("HH:mm:ss"));
@@ -63,13 +75,7 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
     }));
   };
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const handleTeacherChange = () => {};
 
   const hasSchedule = (schedule: Schedule) => {
     const emptyTime = "00:00:00";
@@ -80,32 +86,16 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
   };
 
   const handleSubmit: FormEventHandler = async (event: FormEvent) => {
-    event.preventDefault();
+    // event.preventDefault();
 
     const target = event.target as typeof event.target & {
       name: { value: string };
-      phone: { value: string };
-      email: { value: string };
-      dateOfBirth: { value: string };
-      notes: { value: string };
-      joinDate: { value: string };
-      leaveDate: { value: string };
+      capacity: { value: string };
     };
-
-    const dateOfBirth = new Date(target.dateOfBirth.value);
-    const joinDate = new Date(target.joinDate.value);
-    const leaveDate = target.leaveDate.value
-      ? new Date(target.leaveDate.value)
-      : null;
 
     const data = {
       name: target.name.value,
-      phone: target.phone.value,
-      email: target.email.value,
-      dateOfBirth: formatDate(dateOfBirth),
-      notes: target.notes.value,
-      joinDate: formatDate(joinDate),
-      leaveDate: leaveDate ? formatDate(leaveDate) : null,
+      capacity: target.capacity.value,
     };
 
     try {
@@ -217,21 +207,22 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
               Teacher
             </Typography>
             {/* TODO fix default value */}
-            {/* <Select
+            <Select
               fullWidth
               // labelId="demo-simple-select-label"
-              id="roleId"
-              value={role}
-              label="Role"
+              id="teacher"
+              value={teacher}
+              label="Teacher"
               displayEmpty
-              onChange={handleRoleChange}
+              onChange={handleTeacherChange}
             >
-              {staffs.map((role: Role) => (
-                <MenuItem key={role.id} value={role.id}>
-                  {role.name}
-                </MenuItem>
-              ))}
-            </Select> */}
+              {staffs &&
+                staffs.map((staff: Person) => (
+                  <MenuItem key={staff.id} value={staff.id}>
+                    {staff.name}
+                  </MenuItem>
+                ))}
+            </Select>
             <RedBar />
             <Typography variant="body2" display="block">
               Capacity
@@ -244,6 +235,7 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
               type="number"
               fullWidth
               variant="outlined"
+              value={classDetails.capacity}
             />
           </DialogContent>
           <DialogActions>

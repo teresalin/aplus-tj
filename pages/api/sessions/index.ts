@@ -17,18 +17,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const query = {
       text: `
         SELECT
-            persons.id,
-            persons.name,
-            persons.gender,
-            persons.phone,
-            persons.email,
-            persons.date_of_birth,
-            persons.notes,
-            persons.active
+            person.id,
+            person.name,
+            person.gender,
+            person.phone,
+            person.email,
+            person.date_of_birth,
+            person.notes,
+            person.active
         FROM
-            parents
+            parent
         JOIN
-            persons ON parents.person_id = persons.id;
+            person ON parents.person_id = person.id;
         `,
     };
     const result = await client.query(query);

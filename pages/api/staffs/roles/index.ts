@@ -11,7 +11,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const getQuery = {
       text: `
-          SELECT id, name from staff_roles;
+          SELECT id, name from staff_role;
         `,
     };
     const result = await client.query(getQuery);

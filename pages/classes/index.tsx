@@ -30,6 +30,11 @@ const StyledCardContent = styled(CardContent)(({ theme }) => ({
   padding: "24px", // mui defaults CardContent bottom-padding to 24px
 }));
 
+const StyledLink = styled(Link)(({ theme }) => ({
+  textDecoration: "none",
+  color: "inherit",
+}));
+
 export default function Classes() {
   const { data } = useSWR("api/classes", fetcher);
   const classes = data || [];
@@ -45,21 +50,26 @@ export default function Classes() {
       <Grid item xs={12}>
         <Typography>All Classes</Typography>
         {classes.map((row: Class) => (
-          <Link href={`classes/${row.id}`} key={row.id}>
+          <StyledLink href={`classes/${row.id}`} key={row.id}>
             <StyledCard key={row.id}>
               <StyledCardContent>
-                <Grid container spacing={2}>
-                  <Grid item xs={7}>
-                    <Typography>{row.name}</Typography>
+                <Grid
+                  container
+                  spacing={2}
+                  direction="row"
+                  justifyContent="space-between"
+                >
+                  <Grid container item xs="auto">
+                    <Typography>{row.className}</Typography>
                   </Grid>
-                  <FlexGrid item xs={5}>
-                    <FlexGrid sx={{ paddingX: 1.5 }}>
+                  <Grid container item xs="auto">
+                    <FlexGrid item sx={{ paddingX: 1.5 }}>
                       <Tooltip title="Teacher">
                         <SupportAgentIcon />
                       </Tooltip>
                       <Typography>{row.teacherName}</Typography>
                     </FlexGrid>
-                    <FlexGrid sx={{ paddingX: 1.5 }}>
+                    <FlexGrid item sx={{ paddingX: 1.5 }}>
                       <Tooltip title="Students">
                         <ChildCareIcon />
                       </Tooltip>
@@ -67,17 +77,17 @@ export default function Classes() {
                         {row.studentCount}/{row.capacity}
                       </Typography>
                     </FlexGrid>
-                    <FlexGrid sx={{ paddingX: 1.5 }}>
+                    <FlexGrid item sx={{ paddingX: 1.5 }}>
                       <Tooltip title="Assignments">
                         <AssignmentIcon />
                       </Tooltip>
                       <Typography>Assignments</Typography>
                     </FlexGrid>
-                  </FlexGrid>
+                  </Grid>
                 </Grid>
               </StyledCardContent>
             </StyledCard>
-          </Link>
+          </StyledLink>
         ))}
       </Grid>
     </Grid>

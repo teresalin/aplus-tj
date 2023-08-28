@@ -14,15 +14,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const getQuery = {
       text: `
         SELECT
-            schedules.id, 
-            schedules.day_of_week AS "dayOfWeek", 
-            schedules.start_time AS "startTime", 
-            schedules.end_time AS "endTime,
+          schedule.id, 
+          schedule.day_of_week AS "dayOfWeek", 
+          schedule.start_time AS "startTime", 
+          schedule.end_time AS "endTime,
         FROM
-            schedules
+            schedule
         INNER JOIN
-            classes ON classes.id = schedules.class_id
-        WHERE classes.id = $1;
+            class ON class.id = schedule.class_id
+        WHERE class.id = $1;
         `,
     };
     const result = await client.query(getQuery);

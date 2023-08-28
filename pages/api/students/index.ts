@@ -23,8 +23,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const getQuery = {
       text: `
         SELECT s.id, s.join_date, s.leave_date, p.*
-        FROM students s
-        INNER JOIN persons p ON s.person_id = p.id;
+        FROM student s
+        INNER JOIN person p ON s.person_id = p.id;
       `,
     };
     const result = await client.query(getQuery);

@@ -9,6 +9,8 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import UpdateClassDetailsDialog from "../../../src/components/UpdateClassDetailsDialog";
 import useSWR from "swr";
+import Button from "@mui/material/Button";
+import dayjs from "dayjs";
 
 // import "@fontsource/roboto/300.css";
 // import "@fontsource/roboto/400.css";
@@ -23,8 +25,9 @@ const StyledCard = styled(Card)(({ theme }) => ({
   boxShadow: "none",
   marginTop: "0.7em",
   marginBottom: "0.7em",
-  border: "#fff",
-  borderRadius: 12,
+  border: "2px solid",
+  borderColor: "#f3f2f0",
+  borderRadius: 7,
 }));
 
 const StyledCardContent = styled(CardContent)(({ theme }) => ({
@@ -53,9 +56,7 @@ export default function ClassDetails() {
               columnSpacing={{ xs: 1, sm: 2, md: 3 }}
             >
               <Grid item xs={12} md={4}>
-                <StyledCard
-                  style={{ color: "#fff", backgroundColor: "#9188e5" }}
-                >
+                <StyledCard variant="outlined">
                   <StyledCardContent>
                     <Typography variant="subtitle1">Schedule</Typography>
                     <Typography>MWF</Typography>
@@ -63,9 +64,7 @@ export default function ClassDetails() {
                 </StyledCard>
               </Grid>
               <Grid item xs={12} md={4}>
-                <StyledCard
-                  style={{ color: "#fff", backgroundColor: "#83caf6" }}
-                >
+                <StyledCard variant="outlined">
                   <StyledCardContent>
                     <Typography variant="subtitle1">Teacher</Typography>
                     <Typography>
@@ -75,12 +74,10 @@ export default function ClassDetails() {
                 </StyledCard>
               </Grid>
               <Grid item xs={12} md={4}>
-                <StyledCard
-                  style={{ color: "#fff", backgroundColor: "#ffc15d" }}
-                >
+                <StyledCard variant="outlined">
                   <StyledCardContent>
-                    <Typography variant="subtitle1">Capacity</Typography>
-                    <Typography>{details ? details.capacity : 0}</Typography>
+                    <Typography variant="subtitle1">Grade</Typography>
+                    <Typography>{details && details.grade}</Typography>
                   </StyledCardContent>
                 </StyledCard>
               </Grid>
@@ -94,7 +91,28 @@ export default function ClassDetails() {
             <Typography variant="h6" gutterBottom>
               Assignments
             </Typography>
-            <Typography>some assignment</Typography>
+            {details &&
+              details.upcomingAssignments.map((detail) => (
+                <Card
+                  style={{
+                    display: "flex",
+                    backgroundColor: "#f8f6fc",
+                    marginBottom: "1em",
+                    boxShadow: "none",
+                  }}
+                >
+                  <Button
+                    style={{
+                      backgroundColor: "#4741e0",
+                      color: "#fff",
+                      margin: 10,
+                    }}
+                  >
+                    {dayjs(detail.dueDate).format("MMM DD")}
+                  </Button>
+                  <StyledCardContent>{detail.name}</StyledCardContent>
+                </Card>
+              ))}
           </StyledCardContent>
         </StyledCard>
       </Grid>
@@ -104,8 +122,19 @@ export default function ClassDetails() {
             <Typography variant="h6" gutterBottom>
               Students
             </Typography>
-            <Typography>John Doe</Typography>
-            <Typography>Jane Doe</Typography>
+            {details &&
+              details.activeStudents.map((student) => (
+                <Card
+                  style={{
+                    display: "flex",
+                    backgroundColor: "#f8f6fc",
+                    marginBottom: "1em",
+                    boxShadow: "none",
+                  }}
+                >
+                  <StyledCardContent>{student.name}</StyledCardContent>
+                </Card>
+              ))}
           </StyledCardContent>
         </StyledCard>
       </Grid>

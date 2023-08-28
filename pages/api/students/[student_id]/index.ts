@@ -6,8 +6,8 @@ async function getStudent(client, studentID) {
     const getQuery = {
       text: `
           SELECT s.id AS student_id, s.join_date, s.leave_date, p.*
-          FROM students s
-          INNER JOIN persons p ON s.person_id = p.id
+          FROM student s
+          INNER JOIN person p ON s.person_id = p.id
           WHERE s.id = $1;
         `,
       values: [studentID],
@@ -59,7 +59,7 @@ async function updatePerson(
 ) {
   const updateQuery = {
     text: `
-      UPDATE persons 
+      UPDATE person 
       SET name = $2, phone = $3, email = $4, notes = $5, active = $6, time_updated = NOW()
       WHERE id = $1
       RETURNING id;
@@ -74,7 +74,7 @@ async function updatePerson(
 async function updateStudent(client, personID, { joinDate, leaveDate }) {
   const updateQuery = {
     text: `
-      UPDATE students 
+      UPDATE student 
       SET join_date = COALESCE($2, join_date), leave_date = COALESCE($3, leave_date), time_updated = NOW()
       WHERE person_id = $1
       RETURNING id;
@@ -130,7 +130,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           req.body;
 
         const fetchPersonIdQuery = {
-          text: "SELECT person_id FROM students WHERE id = $1;",
+          text: "SELECT person_id FROM student WHERE id = $1;",
           values: [studentID],
         };
         const personIdResult = await client.query(fetchPersonIdQuery);
@@ -155,7 +155,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "DELETE":
       const deleteQuery = {
         text: `
-          DELETE FROM students WHERE id = $1;
+          DELETE FROM student WHERE id = $1;
         `,
         values: [studentID],
       };

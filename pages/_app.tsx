@@ -55,7 +55,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   //
   return (
     <div>
-      <Root style={{ backgroundColor: "#f3f2f0" }}>
+      <Root style={{ backgroundColor: "#f8f6fc" }}>
         <Head>
           <title>A Plus</title>
           <link rel="icon" type="image/x-icon" href="/favicon.ico?" />

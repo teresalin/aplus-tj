@@ -1,5 +1,6 @@
 import { alpha } from "@mui/system";
 import { formatDate } from "../../utils/formatDate";
+import { Person } from "../api/persons";
 import { useState } from "react";
 import { visuallyHidden } from "@mui/utils";
 import * as React from "react";
@@ -12,11 +13,11 @@ import fetcher from "../../utils/fetcher";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import NewPersonDialog from "../../src/components/NewPersonDialog";
 import Paper from "@mui/material/Paper";
-import SearchIcon from "@mui/icons-material/Search";
 import Switch from "@mui/material/Switch";
 import Tab from "@mui/material/Tab";
 import Table from "@mui/material/Table";
@@ -30,87 +31,11 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
+import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
-import { Person } from "../api/persons";
-
-function Row(props: { row: any }) {
-  const { row } = props;
-  const [open, setOpen] = React.useState(false);
-  return (
-    <React.Fragment>
-      <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
-        <TableCell component="th" scope="row">
-          {row.id}
-        </TableCell>
-        <TableCell align="left">{row.name}</TableCell>
-        <TableCell align="left">{formatDate(row.dateOfBirth)}</TableCell>
-        <TableCell align="left">{row.phone}</TableCell>
-        <TableCell align="left">{formatDate(row.joinDate)}</TableCell>
-        <TableCell align="left">
-          {row.active ? (
-            <Chip
-              icon={<CheckIcon />}
-              label="Active "
-              color="success"
-              size="small"
-            />
-          ) : (
-            <Chip
-              icon={<CloseIcon />}
-              label="Inactive"
-              color="default"
-              size="small"
-            />
-          )}
-        </TableCell>
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                Details
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                      {row.gender}
-                    </TableCell>
-                    <TableCell>{row.phone}</TableCell>
-                    <TableCell align="right">{row.email}</TableCell>
-                    <TableCell align="right">{row.dateOfBirth}</TableCell>
-                    <TableCell align="right">{row.notes}</TableCell>
-                    <TableCell align="right">{row.joinDate}</TableCell>
-                    <TableCell align="right">{row.leaveDate}</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
-  );
-}
+import SearchBar from "../../src/components/SearchBar";
+import Grid from "@mui/material/Grid";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -128,8 +53,8 @@ function getComparator<Key extends keyof any>(
   order: Order,
   orderBy: Key
 ): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string }
+  a: { [key in Key]: number | string | Date | boolean },
+  b: { [key in Key]: number | string | Date | boolean }
 ) => number {
   return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
@@ -160,32 +85,30 @@ interface HeadCell {
   id: keyof Person;
   label: string;
   numeric: boolean;
+  sort: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
-  {
-    id: "id",
-    numeric: false,
-    disablePadding: false,
-    label: "Id",
-  },
   {
     id: "name",
     numeric: false,
     disablePadding: false,
     label: "Name",
+    sort: true,
   },
   {
     id: "dateOfBirth",
     numeric: false,
     disablePadding: false,
     label: "Date of Birth",
+    sort: false,
   },
   {
     id: "phone",
     numeric: false,
     disablePadding: false,
     label: "Phone",
+    sort: false,
   },
 
   {
@@ -193,17 +116,18 @@ const headCells: readonly HeadCell[] = [
     numeric: false,
     disablePadding: false,
     label: "Join Date",
+    sort: true,
   },
   {
     id: "active",
     numeric: false,
     disablePadding: false,
     label: "Status",
+    sort: true,
   },
 ];
 
 interface EnhancedTableProps {
-  numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
     property: keyof Person
@@ -214,7 +138,7 @@ interface EnhancedTableProps {
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-  const { order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const { order, orderBy, rowCount, onRequestSort } = props;
   const createSortHandler =
     (property: keyof Person) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
@@ -230,18 +154,24 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             padding={headCell.disablePadding ? "none" : "normal"}
             sortDirection={orderBy === headCell.id ? order : false}
           >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : "asc"}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === "desc" ? "sorted descending" : "sorted ascending"}
-                </Box>
-              ) : null}
-            </TableSortLabel>
+            {headCell.sort ? (
+              <TableSortLabel
+                active={orderBy === headCell.id}
+                direction={orderBy === headCell.id ? order : "asc"}
+                onClick={createSortHandler(headCell.id)}
+              >
+                {headCell.label}
+                {orderBy === headCell.id ? (
+                  <Box component="span" sx={visuallyHidden}>
+                    {order === "desc"
+                      ? "sorted descending"
+                      : "sorted ascending"}
+                  </Box>
+                ) : null}
+              </TableSortLabel>
+            ) : (
+              headCell.label
+            )}
           </TableCell>
         ))}
         <TableCell padding="checkbox"></TableCell>
@@ -251,25 +181,17 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface EnhancedTableToolbarProps {
-  numSelected: number;
   personType: string;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected, personType } = props;
+  const { personType } = props;
 
   return (
     <Toolbar
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        }),
       }}
     >
       <Typography
@@ -286,38 +208,6 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   );
 }
 
-const SearchBar = ({ setSearchQuery }) => (
-  <TextField
-    id="table-search-bar"
-    sx={{ m: 1, width: "35ch" }}
-    placeholder="Search"
-    type="search"
-    variant="standard"
-    onInput={(e) => {
-      setSearchQuery((e.target as HTMLInputElement).value);
-    }}
-    InputProps={{
-      startAdornment: (
-        <InputAdornment position="start">
-          <SearchIcon />
-        </InputAdornment>
-      ),
-      endAdornment: (
-        <InputAdornment position="end">
-          <IconButton
-            aria-label="clear search bar"
-            // onClick={handleClickShowPassword}
-            // onMouseDown={handleMouseDownPassword}
-            edge="end"
-          >
-            <CloseIcon />
-          </IconButton>
-        </InputAdornment>
-      ),
-    }}
-  />
-);
-
 function a11yProps(key: string) {
   return {
     id: `simple-tab-${key}`,
@@ -325,12 +215,135 @@ function a11yProps(key: string) {
   };
 }
 
+function Row(props: { row: any }) {
+  const { row } = props;
+  const [open, setOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const openMenu = Boolean(anchorEl);
+
+  const handleRowClick = (event: any) => {
+    setOpen(!open);
+  };
+
+  const handleMenuClick = (event: any) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = (event: any) => {
+    event.stopPropagation();
+    setAnchorEl(null);
+  };
+
+  return (
+    <React.Fragment>
+      <TableRow
+        hover
+        onClick={handleRowClick}
+        sx={{ "& > *": { borderBottom: "unset" } }}
+      >
+        <TableCell align="left">{row.name}</TableCell>
+        <TableCell align="left">{formatDate(row.dateOfBirth)}</TableCell>
+        <TableCell align="left">{row.phone}</TableCell>
+        <TableCell align="left">{formatDate(row.joinDate)}</TableCell>
+        <TableCell align="left">
+          {row.active ? (
+            <Chip
+              icon={<CheckIcon />}
+              label="Active "
+              color="success"
+              size="small"
+            />
+          ) : (
+            <Chip
+              icon={<CloseIcon />}
+              label="Inactive"
+              color="default"
+              size="small"
+            />
+          )}
+        </TableCell>
+        <TableCell>
+          <Tooltip title="Actions">
+            <IconButton
+              onClick={handleMenuClick}
+              aria-label="action"
+              size="small"
+              aria-controls={openMenu ? "person-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={openMenu ? "true" : undefined}
+            >
+              <MoreHorizIcon />
+            </IconButton>
+          </Tooltip>
+          <Menu
+            id="person-menu"
+            anchorEl={anchorEl}
+            open={openMenu}
+            onClose={handleClose}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          >
+            <MenuItem onClick={handleClose}>Edit</MenuItem>
+            <MenuItem onClick={handleClose}>Delete</MenuItem>
+          </Menu>
+        </TableCell>
+      </TableRow>
+      <TableRow style={{ backgroundColor: "rgba(25, 118, 210, 0.08)" }}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box sx={{ margin: 1 }}>
+              <Grid container spacing={1}>
+                <Grid item xs={12}>
+                  <Typography variant="h6" gutterBottom component="div">
+                    Details
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" component="div">
+                    Name: {row.name}
+                  </Typography>
+                  <Typography variant="body2" component="div">
+                    Gender: {row.gender}
+                  </Typography>
+                  <Typography variant="body2" component="div">
+                    Date of Birth: {row.dateOfBirth}
+                  </Typography>
+                  <Typography variant="body2" component="div">
+                    Phone: {row.phone}
+                  </Typography>
+                  <Typography variant="body2" component="div">
+                    Email: {row.email}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="body2" component="div">
+                    Join Date: {row.joinDate}
+                  </Typography>
+                  <Typography variant="body2" component="div">
+                    Leave Date: {row.leaveDate}
+                  </Typography>
+                  <Typography variant="body2" component="div">
+                    Notes: {row.notes}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  );
+}
+
+const personTypes = ["persons", "staffs", "parents", "students"];
+
 export default function CollapsibleTable() {
-  const [searchQuery, setSearchQuery] = useState("");
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Person>("joinDate");
-
-  const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -338,11 +351,15 @@ export default function CollapsibleTable() {
   const { data } = useSWR(`api/${value}`, fetcher);
   const rows = data || [];
 
+  // React.useEffect(() => {
+  //   if (data) {
+  //     setRows(data);
+  //   }
+  // }, [data]);
+
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
-
-  const personTypes = ["persons", "staffs", "parents", "students"];
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -351,26 +368,6 @@ export default function CollapsibleTable() {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
-  };
-
-  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: readonly string[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelected(newSelected);
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -388,20 +385,9 @@ export default function CollapsibleTable() {
     setDense(event.target.checked);
   };
 
-  const isSelected = (name: string) => selected.indexOf(name) !== -1;
-
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
-  const visibleRows = React.useMemo(
-    () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage
-      ),
-    [order, orderBy, page, rowsPerPage]
-  );
 
   if (!rows) return <div />;
 
@@ -415,10 +401,7 @@ export default function CollapsibleTable() {
         </Tabs>
       </Box>
       <Paper sx={{ width: "100%" }}>
-        <EnhancedTableToolbar
-          numSelected={selected.length}
-          personType={value}
-        />
+        <EnhancedTableToolbar personType={value} />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -426,7 +409,6 @@ export default function CollapsibleTable() {
             size={dense ? "small" : "medium"}
           >
             <EnhancedTableHead
-              numSelected={selected.length}
               order={order}
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
@@ -441,8 +423,9 @@ export default function CollapsibleTable() {
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index: any) => {
-                  return <Row key={row.id} row={row} />;
+                  return <Row key={index} row={row} />;
                 })}
+
               {emptyRows > 0 && (
                 <TableRow
                   style={{
