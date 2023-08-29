@@ -59,6 +59,10 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <Head>
           <title>A Plus</title>
           <link rel="icon" type="image/x-icon" href="/favicon.ico?" />
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          />
           {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link
             rel="preconnect"

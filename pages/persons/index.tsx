@@ -345,7 +345,7 @@ export default function CollapsibleTable() {
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Person>("joinDate");
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [value, setValue] = React.useState("persons");
   const { data } = useSWR(`api/${value}`, fetcher);

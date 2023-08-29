@@ -36,7 +36,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       FROM
           staff
       JOIN
-          person ON staffs.person_id = person.id;
+          person ON staff.person_id = person.id;
       `,
     };
     const result = await client.query(getQuery);

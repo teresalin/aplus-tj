@@ -10,41 +10,46 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       text: `
         WITH ActiveStudentCounts AS
           (SELECT class_id, COUNT(*) AS active_student_count
-          FROM class_student
-          WHERE active = TRUE
-          GROUP BY class_id)
-        SELECT c.id,
-          c.name AS "className",
-          g.name AS "grade",
-          c.capacity,
-          p.name AS "teacherName",
-          COALESCE(active_counts.active_student_count, 0) AS "studentCount",
-          json_build_object(
-            'Monday', json_build_object('startTime', COALESCE(schedules1.start_time, '00:00:00'), 'endTime', COALESCE(schedules1.end_time, '00:00:00')), 
-            'Tuesday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
-            'Sunday', json_build_object('startTime', COALESCE(schedules7.start_time, '00:00:00'), 'endTime', COALESCE(schedules7.end_time, '00:00:00'))) 
-            AS "schedules",
-          (
-            SELECT json_agg(
-              json_build_object(
-                'id', p.id,
-                'name', p.name,
-                'gender', p.gender,
-                'phone', p.phone,
-                'email', p.email,
-                'dateOfBirth', p.date_of_birth,
-                'notes', p.notes,
-                'joinDate', s.join_date,
-                'leaveDate', s.leave_date,
-                'active', p.active
-              )
+        FROM class_student
+        WHERE active = TRUE
+        GROUP BY class_id)
+
+      SELECT c.id,
+        c.name AS "className",
+        g.name AS "grade",
+        c.capacity,
+        p.name AS "teacherName",
+        COALESCE(active_counts.active_student_count, 0) AS "studentCount",
+        json_build_object(
+          'Monday', json_build_object('startTime', COALESCE(schedules1.start_time, '00:00:00'), 'endTime', COALESCE(schedules1.end_time, '00:00:00')), 
+          'Tuesday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
+          'Sunday', json_build_object('startTime', COALESCE(schedules7.start_time, '00:00:00'), 'endTime', COALESCE(schedules7.end_time, '00:00:00'))) 
+          AS "schedules",
+        (
+          SELECT json_agg(
+            json_build_object(
+              'id', p.id,
+              'name', p.name,
+              'gender', p.gender,
+              'phone', p.phone,
+              'email', p.email,
+              'dateOfBirth', p.date_of_birth,
+              'notes', p.notes,
+              'joinDate', s.join_date,
+              'leaveDate', s.leave_date,
+              'active', p.active,
+              'englishName', s.english_name,
+              'currentSchool', s.current_school,
+              'textbookPublisher', s.textbook_publisher,
+              'startDate', cs.start_date -- Add startDate field
             )
-            FROM class_student AS cs
-            JOIN student AS s ON cs.student_id = s.id
-            JOIN person AS p ON s.person_id = p.id
-            WHERE cs.class_id = c.id
-              AND cs.active = TRUE
-          ) AS "activeStudents",
+          )
+          FROM class_student AS cs
+          JOIN student AS s ON cs.student_id = s.id
+          JOIN person AS p ON s.person_id = p.id
+          WHERE cs.class_id = c.id
+            AND cs.active = TRUE
+        ) AS "activeStudents", 
           (
             SELECT json_agg(
               json_build_object(

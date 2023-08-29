@@ -11,6 +11,10 @@ import UpdateClassDetailsDialog from "../../../src/components/UpdateClassDetails
 import useSWR from "swr";
 import Button from "@mui/material/Button";
 import dayjs from "dayjs";
+import UpdateClassStudentsDialog from "../../../src/components/UpdateClassStudentsDialog";
+import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import Box from "@mui/material/Box";
+import { generateColumns } from "../../../utils/data-grid/generateColumns";
 
 // import "@fontsource/roboto/300.css";
 // import "@fontsource/roboto/400.css";
@@ -33,6 +37,39 @@ const StyledCard = styled(Card)(({ theme }) => ({
 const StyledCardContent = styled(CardContent)(({ theme }) => ({
   padding: "24px", // mui defaults CardContent bottom-padding to 24px
 }));
+
+// const columns: GridColDef[] = [
+//   {
+//     field: "name",
+//     headerName: "姓名",
+//     minWidth: 100,
+//     flex: 1,
+//   },
+//   {
+//     field: "englishName",
+//     headerName: "英文名",
+//     minWidth: 100,
+//     flex: 1,
+//   },
+//   {
+//     field: "startDate",
+//     headerName: "開始日期",
+//     minWidth: 120,
+//     flex: 1,
+//   },
+//   {
+//     field: "currentSchool",
+//     headerName: "現讀學校",
+//     minWidth: 300,
+//     flex: 1,
+//   },
+//   {
+//     field: "textbookPublisher",
+//     headerName: "課本",
+//     minWidth: 100,
+//     flex: 1,
+//   },
+// ];
 
 export default function ClassDetails() {
   const classID = useRouter().query.class_id;
@@ -119,22 +156,31 @@ export default function ClassDetails() {
       <Grid item xs={12}>
         <StyledCard>
           <StyledCardContent>
-            <Typography variant="h6" gutterBottom>
-              Students
-            </Typography>
-            {details &&
-              details.activeStudents.map((student) => (
-                <Card
-                  style={{
-                    display: "flex",
-                    backgroundColor: "#f8f6fc",
-                    marginBottom: "1em",
-                    boxShadow: "none",
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography variant="h6" gutterBottom>
+                Students
+              </Typography>
+              {details && <UpdateClassStudentsDialog classDetails={details} />}
+            </Grid>
+            <Box sx={{ width: "100%" }}>
+              {details && (
+                <DataGrid
+                  rows={details.activeStudents}
+                  columns={generateColumns(details.activeStudents)}
+                  initialState={{
+                    pagination: {
+                      paginationModel: {
+                        pageSize: 5,
+                      },
+                    },
                   }}
-                >
-                  <StyledCardContent>{student.name}</StyledCardContent>
-                </Card>
-              ))}
+                  autoHeight={true}
+                  pageSizeOptions={[5]}
+                  disableRowSelectionOnClick
+                  density="compact"
+                />
+              )}
+            </Box>
           </StyledCardContent>
         </StyledCard>
       </Grid>

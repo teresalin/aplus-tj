@@ -1,34 +1,80 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
+import fetcher from "../../utils/fetcher";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
+import useSWR from "swr";
+import {
+  DataGrid,
+  GridColDef,
+  GridToolbarContainer,
+  GridToolbarFilterButton,
+  GridToolbar,
+} from "@mui/x-data-grid";
+import { generateColumns } from "../../utils/data-grid/generateColumns";
 
-function a11yProps(index: number) {
+interface CustomToolbarProps {
+  setFilterButtonEl: React.Dispatch<
+    React.SetStateAction<HTMLButtonElement | null>
+  >;
+}
+
+function CustomToolbar({ setFilterButtonEl }: CustomToolbarProps) {
+  return (
+    <GridToolbarContainer>
+      <GridToolbarFilterButton ref={setFilterButtonEl} />
+    </GridToolbarContainer>
+  );
+}
+
+function a11yProps(key: string) {
   return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
+    id: `simple-tab-${key}`,
+    "aria-controls": `simple-tabpanel-${key}`,
   };
 }
 
-export default function BasicTabs() {
-  const [value, setValue] = React.useState(0);
+const personTypes = ["persons", "staffs", "parents", "students"];
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+export default function CustomFilterPanelPosition() {
+  const [value, setValue] = React.useState("persons");
+  const { data } = useSWR(`api/${value}`, fetcher);
+  const rows = data || [];
+
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
+  // TODO pass this into DataGrid
+  const getTogglableColumns = (columns: GridColDef[]) => {
+    // hide the column with field `id` from list of togglable columns
+    return columns
+      .filter((column) => column.field !== "id")
+      .map((column) => column.field);
+  };
+
   return (
-    <Box sx={{ width: "100%" }}>
+    <div style={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="basic tabs example"
-        >
-          <Tab label="Item One" {...a11yProps(0)} />
-          <Tab label="Item Two" {...a11yProps(1)} />
+        <Tabs value={value} onChange={handleChange} aria-label="users tabs">
+          {personTypes.map((key) => (
+            <Tab key={key} value={key} label={key} {...a11yProps(key)} />
+          ))}
         </Tabs>
       </Box>
-    </Box>
+      {rows && (
+        <DataGrid
+          rows={rows}
+          columns={generateColumns(rows)}
+          slots={{
+            toolbar: GridToolbar,
+          }}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 10 } },
+          }}
+          pageSizeOptions={[5, 10, 25]}
+        />
+      )}
+    </div>
   );
 }

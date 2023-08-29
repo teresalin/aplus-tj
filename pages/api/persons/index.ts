@@ -9,8 +9,6 @@ export interface Person {
   email: string;
   dateOfBirth: Date;
   notes: string;
-  joinDate: Date;
-  leaveDate: Date;
   active: boolean;
 }
 
@@ -23,8 +21,6 @@ function parsePerson(row: any): Person {
     email: row.email,
     dateOfBirth: row.date_of_birth,
     notes: row.notes,
-    joinDate: row.join_date,
-    leaveDate: row.leaveDate,
     active: row.active,
   };
 }
