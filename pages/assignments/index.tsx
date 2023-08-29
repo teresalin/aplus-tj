@@ -1,40 +1,21 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
-import fetcher from "../../utils/fetcher";
+import Grid from "@mui/material/Grid";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import useSWR from "swr";
 import {
   DataGrid,
-  useGridRootProps,
   GridColDef,
   GridToolbarContainer,
   GridToolbarFilterButton,
-  GridToolbar,
-  GridToolbarContainerProps,
   GridToolbarColumnsButton,
   GridToolbarDensitySelector,
   GridToolbarExport,
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 import { generateColumns } from "../../utils/data-grid/generateColumns";
-import InfoIcon from "@mui/icons-material/Info";
-import Grid from "@mui/material/Grid";
-import Toolbar from "@mui/material/Toolbar";
-
-interface CustomToolbarProps {
-  setFilterButtonEl: React.Dispatch<
-    React.SetStateAction<HTMLButtonElement | null>
-  >;
-}
-
-function CustomToolbar({ setFilterButtonEl }: CustomToolbarProps) {
-  return (
-    <GridToolbarContainer>
-      <GridToolbarFilterButton ref={setFilterButtonEl} />
-    </GridToolbarContainer>
-  );
-}
+import fetcher from "../../utils/fetcher";
 
 function a11yProps(key: string) {
   return {
@@ -43,51 +24,38 @@ function a11yProps(key: string) {
   };
 }
 
-export const GridCustomToolbar = React.forwardRef<
-  HTMLDivElement,
-  GridToolbarContainerProps
->(function GridToolbar(props, ref) {
-  const { className, ...other } = props;
-  const rootProps = useGridRootProps();
-
-  if (
-    rootProps.disableColumnFilter &&
-    rootProps.disableColumnSelector &&
-    rootProps.disableDensitySelector
-  ) {
-    return null;
-  }
-
+function CustomToolbar({ buttonRef }) {
   return (
     <GridToolbarContainer
-      ref={ref}
-      {...other}
       sx={{ direction: "row", justifyContent: "space-between" }}
     >
-      {/* <GridToolbarContainer ref={ref} {...other}> */}
       <Grid item>
         <GridToolbarQuickFilter />
       </Grid>
       <Grid item>
         <GridToolbarColumnsButton
           title="Column visibility"
+          ref={buttonRef}
           style={{ padding: 0, minHeight: 0, minWidth: 0 }}
         />
         <GridToolbarFilterButton
+          ref={buttonRef}
           style={{ padding: 0, minHeight: 0, minWidth: 0 }}
         />
         <GridToolbarDensitySelector
           title="Density"
+          ref={buttonRef}
           style={{ padding: 0, minHeight: 0, minWidth: 0 }}
         />
         <GridToolbarExport
+          ref={buttonRef}
           title="Export"
           style={{ padding: 0, minHeight: 0, minWidth: 0 }}
         />
       </Grid>
     </GridToolbarContainer>
   );
-});
+}
 
 const personTypes = ["persons", "staffs", "parents", "students"];
 
@@ -107,6 +75,8 @@ export default function CustomFilterPanelPosition() {
       .filter((column) => column.field !== "id")
       .map((column) => column.field);
   };
+
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
 
   return (
     <div style={{ width: "100%" }}>
@@ -131,7 +101,6 @@ export default function CustomFilterPanelPosition() {
             pagination: { paginationModel: { pageSize: 10 } },
             columns: {
               columnVisibilityModel: {
-                // Hide columns status and traderName, the other columns will remain visible
                 gender: false,
                 currentSchool: false,
                 textbookPublisher: false,
@@ -141,13 +110,16 @@ export default function CustomFilterPanelPosition() {
               },
             },
           }}
-          // slots={{
-          //   toolbar: GridToolbar,
-          // }}
-          slots={{ toolbar: GridCustomToolbar }}
+          slots={{
+            toolbar: CustomToolbar,
+          }}
           slotProps={{
+            basePopper: {
+              anchorEl: buttonRef.current,
+              placement: "bottom-end",
+            },
             toolbar: {
-              showQuickFilter: true,
+              buttonRef,
             },
           }}
           pageSizeOptions={[5, 10, 25]}
