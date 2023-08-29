@@ -110,14 +110,13 @@ const headCells: readonly HeadCell[] = [
     label: "Phone",
     sort: false,
   },
-
-  {
-    id: "joinDate",
-    numeric: false,
-    disablePadding: false,
-    label: "Join Date",
-    sort: true,
-  },
+  // {
+  //   id: "joinDate",
+  //   numeric: false,
+  //   disablePadding: false,
+  //   label: "Join Date",
+  //   sort: true,
+  // },
   {
     id: "active",
     numeric: false,
@@ -343,7 +342,7 @@ const personTypes = ["persons", "staffs", "parents", "students"];
 
 export default function CollapsibleTable() {
   const [order, setOrder] = React.useState<Order>("asc");
-  const [orderBy, setOrderBy] = React.useState<keyof Person>("joinDate");
+  const [orderBy, setOrderBy] = React.useState<keyof Person>("id");
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);

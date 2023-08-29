@@ -37,6 +37,7 @@ function parseStudent(row: any): Student {
   };
 }
 
+// TODO join grade table to get grade
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
   try {
@@ -44,6 +45,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       text: `
         SELECT 
           s.id,
+          s.english_name,
+          s.current_school,
+          s.textbook_publisher,
           s.join_date, 
           s.leave_date, 
           p.*

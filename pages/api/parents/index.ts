@@ -1,8 +1,18 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../lib/db-connector";
-import { Person } from "../persons";
 
-function parsePerson(row: any): Person {
+export interface Parent {
+  id: number;
+  name: string;
+  gender: string;
+  phone: string;
+  email: string;
+  dateOfBirth: Date;
+  notes: string;
+  active: boolean;
+}
+
+function parseParent(row: any): Parent {
   return {
     id: row.id,
     name: row.name,
@@ -11,8 +21,6 @@ function parsePerson(row: any): Person {
     email: row.email,
     dateOfBirth: row.date_of_birth,
     notes: row.notes,
-    joinDate: row.join_date,
-    leaveDate: row.leaveDate,
     active: row.active,
   };
 }
@@ -38,7 +46,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         `,
     };
     const result = await client.query(getQuery);
-    res.status(200).json(result.rows.map(parsePerson));
+    res.status(200).json(result.rows.map(parseParent));
   } catch (error) {
     // Handle the error or rethrow it if needed
     throw error;

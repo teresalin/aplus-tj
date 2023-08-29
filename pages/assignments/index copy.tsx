@@ -7,22 +7,19 @@ import {
   GridToolbarFilterButton,
   GridRenderCellParams,
 } from "@mui/x-data-grid";
-import { useDemoData } from "@mui/x-data-grid-generator";
-import Tooltip from "@mui/material/Tooltip";
+import { Person } from "../api/persons";
+import { SxProps } from "@mui/material";
+import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
+import fetcher from "../../utils/fetcher";
 import IconButton from "@mui/material/IconButton";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
+import Tooltip from "@mui/material/Tooltip";
 import useSWR from "swr";
-import fetcher from "../../utils/fetcher";
-import { Person } from "../api/persons";
-import Collapse from "@mui/material/Collapse";
-import Box from "@mui/material/Box";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { SxProps } from "@mui/material";
 
 const VISIBLE_FIELDS = ["name", "rating", "country", "dateCreated", "isAdmin"];
 
