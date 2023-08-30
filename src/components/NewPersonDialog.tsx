@@ -1,24 +1,21 @@
+import { formatDate } from "../../utils/formatDate";
+import { FormEvent, FormEventHandler } from "react";
+import { Role } from "../../pages/api/staffs/roles";
 import * as React from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import fetcher from "../../utils/fetcher";
 import IconButton from "@mui/material/IconButton";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-
-import { FormEvent, FormEventHandler } from "react";
-import { formatDate } from "../../utils/formatDate";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import useSWR from "swr";
-import { Role } from "../../pages/api/staffs/roles";
-import fetcher from "../../utils/fetcher";
-import { StringDecoder } from "string_decoder";
 
 function RedBar() {
   return (
@@ -103,7 +100,7 @@ export default function NewPersonDialog(props: { personType }) {
   };
 
   return (
-    <React.Fragment>
+    <>
       <IconButton
         aria-label="Add box icon"
         onClick={handleClickOpen}
@@ -231,6 +228,6 @@ export default function NewPersonDialog(props: { personType }) {
           </DialogActions>
         </form>
       </Dialog>
-    </React.Fragment>
+    </>
   );
 }
