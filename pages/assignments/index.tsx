@@ -14,8 +14,10 @@ import {
   GridToolbarExport,
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
-import { generateColumns } from "../../utils/data-grid/generateColumns";
+
+import NewPersonDialog from "../../src/components/NewPersonDialog";
 import fetcher from "../../utils/fetcher";
+import { generateColumns } from "../../utils/data-grid/generateColumns";
 
 function a11yProps(key: string) {
   return {
@@ -30,9 +32,10 @@ function CustomToolbar({ buttonRef }) {
       sx={{ direction: "row", justifyContent: "space-between" }}
     >
       <Grid item>
-        <GridToolbarQuickFilter />
+        <GridToolbarQuickFilter style={{ marginLeft: 8 }} />
       </Grid>
       <Grid item>
+        <NewPersonDialog personType={"persons"} />
         <GridToolbarColumnsButton
           title="Column visibility"
           ref={buttonRef}
@@ -45,7 +48,11 @@ function CustomToolbar({ buttonRef }) {
         <GridToolbarDensitySelector
           title="Density"
           ref={buttonRef}
-          style={{ padding: 0, minHeight: 0, minWidth: 0 }}
+          style={{
+            padding: 0,
+            minHeight: 0,
+            minWidth: 0,
+          }}
         />
         <GridToolbarExport
           ref={buttonRef}
@@ -124,6 +131,7 @@ export default function CustomFilterPanelPosition() {
           }}
           pageSizeOptions={[5, 10, 25]}
           hideFooterSelectedRowCount
+          sx={{ backgroundColor: "#fff" }}
         />
       )}
     </div>

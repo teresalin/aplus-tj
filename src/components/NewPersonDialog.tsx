@@ -1,5 +1,6 @@
 import * as React from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import AddIcon from "@mui/icons-material/Add";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -102,8 +103,12 @@ export default function NewPersonDialog(props: { personType }) {
   };
 
   return (
-    <div>
-      <IconButton aria-label="Add box icon" onClick={handleClickOpen}>
+    <React.Fragment>
+      <IconButton
+        aria-label="Add box icon"
+        onClick={handleClickOpen}
+        color="primary"
+      >
         <AddBoxIcon />
       </IconButton>
       <Dialog disablePortal open={open} onClose={handleClose}>
@@ -226,6 +231,6 @@ export default function NewPersonDialog(props: { personType }) {
           </DialogActions>
         </form>
       </Dialog>
-    </div>
+    </React.Fragment>
   );
 }

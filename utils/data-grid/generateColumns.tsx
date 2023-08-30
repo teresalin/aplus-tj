@@ -6,6 +6,9 @@ import Tooltip from "@mui/material/Tooltip";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import dayjs from "dayjs";
+import CheckIcon from "@mui/icons-material/Check";
+import Chip from "@mui/material/Chip";
+import CloseIcon from "@mui/icons-material/Close";
 
 const renderMenu = (params) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -50,6 +53,27 @@ const renderMenu = (params) => {
         <MenuItem onClick={handleClose}>Delete</MenuItem>
       </Menu>
     </div>
+  );
+};
+
+//0.8125rem
+const renderChip = (params) => {
+  return params.value ? (
+    <Chip
+      icon={<CheckIcon />}
+      label="Active"
+      size="small"
+      sx={{ height: "20px" }}
+      style={{ backgroundColor: "#d6f8e7", color: "#507b67" }}
+    />
+  ) : (
+    <Chip
+      icon={<CloseIcon />}
+      label="Inactive"
+      size="small"
+      sx={{ height: "20px" }}
+      style={{ backgroundColor: "#f9e8e8", color: "#9f3d49" }}
+    />
   );
 };
 
@@ -183,12 +207,14 @@ export function generateColumns(apiData: any): GridColDef[] {
         headerName: "Active",
         minWidth: 100,
         flex: 1,
+        renderCell: renderChip,
       });
     }
     columns.push({
       field: "action",
       headerName: "Action",
       minWidth: 70,
+      maxWidth: 70,
       flex: 1,
       renderCell: renderMenu,
     });

@@ -140,7 +140,7 @@ export default function ClassDetails() {
                 >
                   <Button
                     style={{
-                      backgroundColor: "#4741e0",
+                      backgroundColor: "#59addd",
                       color: "#fff",
                       margin: 10,
                     }}
