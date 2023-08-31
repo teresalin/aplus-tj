@@ -26,6 +26,7 @@ function a11yProps(key: string) {
   };
 }
 
+// TODO fix toolbar icon sizes and hover
 function CustomToolbar({ buttonRef }) {
   return (
     <GridToolbarContainer
@@ -96,6 +97,7 @@ export default function CustomFilterPanelPosition() {
       </Box>
       {rows && (
         <DataGrid
+          sx={{ backgroundColor: "#fff" }}
           localeText={{
             toolbarColumns: "",
             toolbarFilters: "",
@@ -131,7 +133,6 @@ export default function CustomFilterPanelPosition() {
           }}
           pageSizeOptions={[5, 10, 25]}
           hideFooterSelectedRowCount
-          sx={{ backgroundColor: "#fff" }}
         />
       )}
     </div>

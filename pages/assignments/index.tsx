@@ -1,8 +1,15 @@
+import { useState } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
+import dayjs from "dayjs";
 import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
+import Tooltip from "@mui/material/Tooltip";
 import useSWR from "swr";
 import {
   DataGrid,
@@ -13,11 +20,11 @@ import {
   GridToolbarDensitySelector,
   GridToolbarExport,
   GridToolbarQuickFilter,
+  GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
-import NewPersonDialog from "../../src/components/NewPersonDialog";
 import fetcher from "../../utils/fetcher";
-import { generateColumns } from "../../utils/data-grid/generateColumns";
+import NewPersonDialog from "../../src/components/NewPersonDialog";
 
 function a11yProps(key: string) {
   return {
@@ -26,6 +33,7 @@ function a11yProps(key: string) {
   };
 }
 
+// TODO fix toolbar icon sizes and hover
 function CustomToolbar({ buttonRef }) {
   return (
     <GridToolbarContainer
@@ -64,11 +72,98 @@ function CustomToolbar({ buttonRef }) {
   );
 }
 
-const personTypes = ["persons", "staffs", "parents", "students"];
+const renderMenu = () => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: any) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = (event: any) => {
+    event.stopPropagation();
+    setAnchorEl(null);
+  };
+
+  return (
+    <div>
+      <Tooltip title="Actions">
+        <IconButton
+          onClick={handleClick}
+          aria-label="action"
+          size="small"
+          aria-controls={open ? "person-menu" : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? "true" : undefined}
+        >
+          <MoreHorizIcon />
+        </IconButton>
+      </Tooltip>
+      <Menu
+        id="person-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          "aria-labelledby": "basic-button",
+        }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+      >
+        <MenuItem onClick={handleClose}>Edit</MenuItem>
+        <MenuItem onClick={handleClose}>Delete</MenuItem>
+      </Menu>
+    </div>
+  );
+};
+
+const columns = [
+  {
+    field: "id",
+    headerName: "id",
+    minWidth: 120,
+    flex: 1,
+  },
+  {
+    field: "assignmentName",
+    headerName: "Assignment Name",
+    minWidth: 120,
+    flex: 1,
+  },
+  {
+    field: "className",
+    headerName: "Class Name",
+    minWidth: 120,
+    flex: 1,
+  },
+  {
+    field: "dueDate",
+    headerName: "Due Date",
+    minWidth: 120,
+    flex: 1,
+    valueFormatter: (params: GridValueFormatterParams<Date>) => {
+      if (params.value == null) {
+        return "";
+      }
+      return dayjs(params.value).format("YYYY-MM-DD");
+    },
+  },
+  {
+    field: "action",
+    headerName: "Action",
+    minWidth: 70,
+    maxWidth: 70,
+    flex: 1,
+    renderCell: renderMenu,
+  },
+];
+
+const assignmentTypes = ["all", "upcoming", "past due"];
 
 export default function CustomFilterPanelPosition() {
-  const [value, setValue] = React.useState("persons");
-  const { data } = useSWR(`api/${value}`, fetcher);
+  const [value, setValue] = React.useState("all");
+  const { data } = useSWR(`api/assignments`, fetcher);
   const rows = data || [];
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -89,13 +184,14 @@ export default function CustomFilterPanelPosition() {
     <div style={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleChange} aria-label="users tabs">
-          {personTypes.map((key) => (
+          {assignmentTypes.map((key) => (
             <Tab key={key} value={key} label={key} {...a11yProps(key)} />
           ))}
         </Tabs>
       </Box>
       {rows && (
         <DataGrid
+          sx={{ backgroundColor: "#fff" }}
           localeText={{
             toolbarColumns: "",
             toolbarFilters: "",
@@ -103,7 +199,7 @@ export default function CustomFilterPanelPosition() {
             toolbarExport: "",
           }}
           rows={rows}
-          columns={generateColumns(rows)}
+          columns={columns}
           initialState={{
             pagination: { paginationModel: { pageSize: 10 } },
             columns: {
@@ -131,7 +227,6 @@ export default function CustomFilterPanelPosition() {
           }}
           pageSizeOptions={[5, 10, 25]}
           hideFooterSelectedRowCount
-          sx={{ backgroundColor: "#fff" }}
         />
       )}
     </div>

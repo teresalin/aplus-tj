@@ -20,7 +20,7 @@ const FlexGrid = styled(Grid)(({ theme }) => ({
 const StyledCard = styled(Card)(({ theme }) => ({
   cursor: "pointer",
   "&:hover": {
-    backgroundColor: "#ddd",
+    backgroundColor: "#ecf5fc",
   },
   marginTop: "1em",
   marginBottom: "1em",

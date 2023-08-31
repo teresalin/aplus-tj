@@ -3,12 +3,15 @@ import "react-toastify/dist/ReactToastify.css";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { AppProps } from "next/app";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { styled } from "@mui/material/styles";
+import { ThemeProvider } from "@emotion/react";
+import { createTheme, styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Head from "next/head";
 import React from "react";
 import SelectedListItem from "../src/components/SelectedListItem";
+import { StyledEngineProvider } from "@mui/material/styles";
+import theme from "../styles/theme";
 
 declare global {
   interface Window {
@@ -54,7 +57,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   // for some reason. This answer may help fix properly
   //
   return (
-    <div>
+    <>
       <Root style={{ backgroundColor: "#f8f6fc" }}>
         <Head>
           <title>A Plus</title>
@@ -63,16 +66,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             rel="stylesheet"
             href="https://fonts.googleapis.com/icon?family=Material+Icons"
           />
-          {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link
-            rel="preconnect"
-            href="https://fonts.gstatic.com"
-            crossOrigin="anonymous"
-          />
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap"
-          /> */}
         </Head>
         <StyledDrawer
           variant="permanent"
@@ -86,14 +79,18 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             <SelectedListItem />
           </StyledDrawerContainer>
         </StyledDrawer>
-        <Content>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-              <Component {...pageProps} />
-            </Box>
-          </LocalizationProvider>
-        </Content>
+        <ThemeProvider theme={theme}>
+          <StyledEngineProvider injectFirst>
+            <Content>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                  <Component {...pageProps} />
+                </Box>
+              </LocalizationProvider>
+            </Content>
+          </StyledEngineProvider>
+        </ThemeProvider>
       </Root>
-    </div>
+    </>
   );
 }
