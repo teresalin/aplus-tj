@@ -30,7 +30,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           a.id,
           a.name AS assignment_name,
           a.description,
-          c.id AS class_name,
+          c.name AS class_name,
           a.due_date,
           a.time_created
         FROM

@@ -5,8 +5,8 @@ export interface Session {
   id: number;
   className: string;
   sessionDate: Date;
-  startTime: string;
-  endTime: string;
+  startTime: Date;
+  endTime: Date;
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
