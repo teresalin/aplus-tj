@@ -147,7 +147,7 @@ export default function ClassDetails() {
                   >
                     {dayjs(detail.dueDate).format("MMM DD")}
                   </Button>
-                  <StyledCardContent>{detail.name}</StyledCardContent>
+                  <StyledCardContent>{detail.assignmentName}</StyledCardContent>
                 </Card>
               ))}
           </StyledCardContent>

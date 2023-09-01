@@ -54,6 +54,15 @@ VALUES ('3rd Grade English', 1, 3, 10, 't', NOW(), NOW());
 INSERT INTO class (name, teacher_id, grade_id, capacity, active, time_created, time_updated)
 VALUES ('4th Grade English', 1, 4, 10, 't', NOW(), NOW());
 
+INSERT INTO session (class_id, session_date, start_time, end_time, time_created, time_updated)
+VALUES (3, '2023-08-14', '18:00:00', '19:30:00', NOW(), NOW());
+INSERT INTO session (class_id, session_date, start_time, end_time, time_created, time_updated)
+VALUES (3, '2023-08-16', '18:00:00', '19:30:00', NOW(), NOW());
+INSERT INTO session (class_id, session_date, start_time, end_time, time_created, time_updated)
+VALUES (3, '2023-08-21', '18:00:00', '19:30:00', NOW(), NOW());
+INSERT INTO session (class_id, session_date, start_time, end_time, time_created, time_updated)
+VALUES (3, '2023-08-23', '18:00:00', '19:30:00', NOW(), NOW());
+
 INSERT INTO class_student (class_id, student_id, start_date, active, time_created, time_updated)
 VALUES (3, 1, NOW(), 't', NOW(), NOW());
 INSERT INTO class_student (class_id, student_id, start_date, active, time_created, time_updated)
@@ -61,6 +70,8 @@ VALUES (3, 2, NOW(), 't', NOW(), NOW());
 
 INSERT INTO schedule (class_id, day_of_week, start_time, end_time, time_created, time_updated)
 VALUES (3, 'Monday', '18:00:00', '19:30:00', NOW(), NOW());
+INSERT INTO schedule (class_id, day_of_week, start_time, end_time, time_created, time_updated)
+VALUES (3, 'Wednesday', '18:00:00', '19:30:00', NOW(), NOW());
 ALTER TABLE schedule 
 ALTER COLUMN end_time TYPE TIME;
 

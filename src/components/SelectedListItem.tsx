@@ -1,4 +1,5 @@
 import * as React from "react";
+import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import Box from "@mui/material/Box";
 import ClassIcon from "@mui/icons-material/Class";
@@ -87,6 +88,14 @@ export default function SelectedListItem() {
               <ClassIcon />
             </ListItemIcon>
             <ListItemText primary="Classes" />
+          </ListItemButton>
+        </StyledLink>
+        <StyledLink href="/sessions">
+          <ListItemButton selected={isActive("/sessions")}>
+            <ListItemIcon>
+              <AccessTimeFilledIcon />
+            </ListItemIcon>
+            <ListItemText primary="Sessions" />
           </ListItemButton>
         </StyledLink>
         <StyledLink href="/assignments">
