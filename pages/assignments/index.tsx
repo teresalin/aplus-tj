@@ -22,6 +22,11 @@ import {
   GridToolbarQuickFilter,
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
+import InfoIcon from "@mui/icons-material/Info";
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import DehazeIcon from '@mui/icons-material/Dehaze';
+import TableRowsIcon from '@mui/icons-material/TableRows';
 
 import fetcher from "../../utils/fetcher";
 import NewPersonDialog from "../../src/components/NewPersonDialog";
@@ -46,16 +51,32 @@ function CustomToolbar({ buttonRef }) {
         <NewPersonDialog personType={"persons"} />
         <GridToolbarColumnsButton
           title="Column visibility"
+          startIcon={<IconButton>
+            <ViewColumnIcon style={{ fontSize: '24px' }} />
+          </IconButton>}
           ref={buttonRef}
           style={{ padding: 0, minHeight: 0, minWidth: 0 }}
+          sx={{ "& .MuiButton-startIcon": { margin: 0 } }}
         />
         <GridToolbarFilterButton
+          componentsProps={{
+            button: {
+              startIcon: (
+                <IconButton>
+                  <FilterListIcon style={{ fontSize: '24px' }} />
+                </IconButton>
+              )
+            }
+          }}
           ref={buttonRef}
           style={{ padding: 0, minHeight: 0, minWidth: 0 }}
         />
         <GridToolbarDensitySelector
           title="Density"
           ref={buttonRef}
+          startIcon={<IconButton>
+            <TableRowsIcon style={{ fontSize: '24px' }} />
+          </IconButton>}
           style={{
             padding: 0,
             minHeight: 0,
