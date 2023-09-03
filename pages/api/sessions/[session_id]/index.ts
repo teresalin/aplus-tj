@@ -30,7 +30,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           SELECT
             s.id AS session_id,
             p_teacher.name AS teacher,
-            array_agg(person.name) AS student_names
+            array_agg(
+              jsonb_build_object(
+                'id', student.id,
+                'name', person.name,
+                'englishName', student.english_name,
+                'currentSchool', student.current_school,
+                'gender', person.gender
+              )
+            ) AS student_details
           FROM session s
           JOIN class c ON s.class_id = c.id
           JOIN staff st ON c.teacher_id = st.id
@@ -49,7 +57,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             session.start_time,
             session.end_time,
             class.name AS "class_name",
-            array_agg(person.name) AS student_names
+            array_agg(
+              jsonb_build_object(
+                'id', student.id,
+                'name', person.name,
+                'englishName', student.english_name,
+                'currentSchool', student.current_school,
+                'gender', person.gender
+              )
+            ) AS student_details
           FROM session
           JOIN class ON session.class_id = class.id
           LEFT JOIN class_student ON class.id = class_student.class_id
@@ -62,29 +78,29 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         absent_students AS (
           SELECT
             acs.session_id,
-            array_agg(non_matching.student_names) AS student_names
+            array_agg(non_matching.student_details) AS student_details
           FROM (
-            SELECT unnest(active_class_students.student_names) AS student_names
+            SELECT unnest(active_class_students.student_details) AS student_details
             FROM active_class_students
             
             EXCEPT
             
-            SELECT unnest(attended_students.student_names) AS student_names
+            SELECT unnest(attended_students.student_details) AS student_details
             FROM attended_students
           ) AS non_matching
-          LEFT JOIN active_class_students acs ON non_matching.student_names = ANY(acs.student_names)
+          LEFT JOIN active_class_students acs ON non_matching.student_details = ANY(acs.student_details)
           GROUP BY acs.session_id
         )
         
         SELECT 
           attended_students.teacher,
-          attended_students.student_names AS "attended",
+          attended_students.student_details AS "attended",
           acs.session_id AS "sessionId",
           acs.session_date AS "sessionDate",
           acs.start_time AS "startTime",
           acs.end_time AS "endTime",
           acs.class_name AS "className",
-          absent_students.student_names AS "absent"
+          absent_students.student_details AS "absent"
         FROM attended_students
         JOIN active_class_students acs ON attended_students.session_id = acs.session_id
         JOIN absent_students ON attended_students.session_id = absent_students.session_id
