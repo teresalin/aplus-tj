@@ -84,3 +84,8 @@ INSERT INTO class_assignment (class_id, assignment_id, time_created, time_update
 VALUES (3, 1, NOW(), NOW());
 INSERT INTO class_assignment (class_id, assignment_id, time_created, time_updated)
 VALUES (3, 2, NOW(), NOW());
+
+INSERT INTO attendance (student_id, session_id, time_created, time_updated)
+VALUES (1, 3, NOW(), NOW());
+INSERT INTO attendance (student_id, session_id, time_created, time_updated)
+VALUES (2, 3, NOW(), NOW());
