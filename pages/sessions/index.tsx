@@ -51,10 +51,7 @@ const StyledLink = styled(Link)(({ theme }) => ({
 const sessionTypes = ["all", "upcoming", "past"];
 
 export default function CustomFilterPanelPosition() {
-  // const [value, setValue] = React.useState("all");
   const { data } = useSWR("api/sessions", fetcher);
-  // const sessions = data || [];
-
   const [selectedTab, setSelectedTab] = React.useState("all");
   const [sessions, setSessions] = React.useState(data || []);
 
@@ -63,7 +60,6 @@ export default function CustomFilterPanelPosition() {
   }, [data]);
 
   React.useEffect(() => {
-    // Fetch sessions based on the selectedTab
     fetch(`/api/sessions?tab=${selectedTab}`)
       .then((response) => response.json())
       .then((data) => setSessions(data));
@@ -79,7 +75,7 @@ export default function CustomFilterPanelPosition() {
         <Tabs
           value={selectedTab}
           onChange={handleChange}
-          aria-label="users tabs"
+          aria-label="sessions tabs"
         >
           {sessionTypes.map((key) => (
             <Tab key={key} value={key} label={key} {...a11yProps(key)} />
