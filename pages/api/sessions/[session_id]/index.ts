@@ -10,13 +10,16 @@ export interface SessionDetail {
   sessionDate: Date;
   startTime: Date;
   endTime: Date;
-  attended: string[];
-  absent: string[];
+  attended: Attendee[];
+  absent: Attendee[];
 }
 
-export interface Attendance {
-  attended: Student[];
-  absent: Student[];
+export interface Attendee {
+  id: number;
+  name: string;
+  gender: string;
+  englishName: string;
+  currentSchool: string;
 }
 
 // TODO replace hard-coded values

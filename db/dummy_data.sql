@@ -38,11 +38,19 @@ INSERT INTO person (name, gender, phone, email, date_of_birth, notes, active, ti
 VALUES ('John Doe', 'Male', '0932097363', 'johndoe@test.com', '2010-11-09', 'Plays the violin and guitar', 't', NOW(), NOW());
 INSERT INTO person (name, gender, phone, email, date_of_birth, active, time_created, time_updated)
 VALUES ('Jane Doe', 'Female', '0918477260', 'janedoe@test.com', '2013-07-16', 't', NOW(), NOW());
+INSERT INTO person (name, gender, phone, email, date_of_birth, active, time_created, time_updated)
+VALUES ('Haley Dunphy', 'Female', '0910471243', 'haleydunphy@test.com', '2000-11-07', 't', NOW(), NOW());
+INSERT INTO person (name, gender, phone, email, date_of_birth, active, time_created, time_updated)
+VALUES ('Luke Dunphy', 'Male', '0916548978', 'lukedunphy@test.com', '1999-01-30', 't', NOW(), NOW());
 
 INSERT INTO student (person_id, english_name, current_school, textbook_publisher, grade_id, join_date, time_created, time_updated)
 VALUES (4, 'Jane Doe', 'American School of Taichung', 'Pearon', 3, '2022-09-08', NOW(), NOW());
 INSERT INTO student (person_id, english_name, current_school, textbook_publisher, grade_id, join_date, time_created, time_updated)
 VALUES (3, 'John Doe', 'American School of Taichung', 'McGraw Hill Education', 3, '2022-10-22', NOW(), NOW());
+INSERT INTO student (person_id, english_name, current_school, textbook_publisher, grade_id, join_date, time_created, time_updated)
+VALUES (5, 'Haley Dunphy', 'Virginia Tech', 'McGraw Hill Education', 3, '2022-10-30', NOW(), NOW());
+INSERT INTO student (person_id, english_name, current_school, textbook_publisher, grade_id, join_date, time_created, time_updated)
+VALUES (6, 'Luke Dunphy', 'Georgia Tech', 'McGraw Hill Education', 3, '2022-11-05', NOW(), NOW());
 
 INSERT INTO staff (person_id, role_id, join_date, time_created, time_updated)
 VALUES (1, 2, '2022-10-27', NOW(), NOW());
@@ -62,11 +70,17 @@ INSERT INTO session (class_id, session_date, start_time, end_time, time_created,
 VALUES (3, '2023-08-21', '18:00:00', '19:30:00', NOW(), NOW());
 INSERT INTO session (class_id, session_date, start_time, end_time, time_created, time_updated)
 VALUES (3, '2023-08-23', '18:00:00', '19:30:00', NOW(), NOW());
+INSERT INTO session (class_id, session_date, start_time, end_time, time_created, time_updated)
+VALUES (3, '2023-12-16', '18:00:00', '19:30:00', NOW(), NOW());
 
 INSERT INTO class_student (class_id, student_id, start_date, active, time_created, time_updated)
 VALUES (3, 1, NOW(), 't', NOW(), NOW());
 INSERT INTO class_student (class_id, student_id, start_date, active, time_created, time_updated)
 VALUES (3, 2, NOW(), 't', NOW(), NOW());
+INSERT INTO class_student (class_id, student_id, start_date, active, time_created, time_updated)
+VALUES (3, 3, NOW(), 't', NOW(), NOW());
+INSERT INTO class_student (class_id, student_id, start_date, active, time_created, time_updated)
+VALUES (3, 5, NOW(), 't', NOW(), NOW());
 
 INSERT INTO schedule (class_id, day_of_week, start_time, end_time, time_created, time_updated)
 VALUES (3, 'Monday', '18:00:00', '19:30:00', NOW(), NOW());
@@ -89,3 +103,7 @@ INSERT INTO attendance (student_id, session_id, time_created, time_updated)
 VALUES (1, 3, NOW(), NOW());
 INSERT INTO attendance (student_id, session_id, time_created, time_updated)
 VALUES (2, 3, NOW(), NOW());
+INSERT INTO attendance (student_id, session_id, time_created, time_updated)
+VALUES (3, 3, NOW(), NOW());
+INSERT INTO attendance (student_id, session_id, time_created, time_updated)
+VALUES (5, 3, NOW(), NOW());

@@ -12,6 +12,7 @@ export interface Session {
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
   try {
+    const { tab } = req.query;
     const query = {
       text: `
         SELECT
@@ -24,8 +25,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           session s
           INNER JOIN class c ON s.class_id = c.id
         WHERE
-          c.active = TRUE;
+          c.active = TRUE
+          AND (
+            ($1 = 'all') OR
+            ($1 = 'upcoming' AND s.session_date >= NOW()) OR
+            ($1 = 'past' AND s.session_date < NOW())
+          )
+        ORDER BY 
+          s.session_date DESC;
       `,
+      values: [tab],
     };
     const result = await client.query(query);
     res.status(200).json(result.rows as Session[]);

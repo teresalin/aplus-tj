@@ -48,122 +48,141 @@ const StyledLink = styled(Link)(({ theme }) => ({
   color: "inherit",
 }));
 
-const sessionTypes = ["upcoming", "past", "all"];
+const sessionTypes = ["all", "upcoming", "past"];
 
 export default function CustomFilterPanelPosition() {
-  const [value, setValue] = React.useState("upcoming");
+  // const [value, setValue] = React.useState("all");
   const { data } = useSWR("api/sessions", fetcher);
-  const sessions = data || [];
+  // const sessions = data || [];
+
+  const [selectedTab, setSelectedTab] = React.useState("all");
+  const [sessions, setSessions] = React.useState(data || []);
+
+  React.useEffect(() => {
+    setSessions(data);
+  }, [data]);
+
+  React.useEffect(() => {
+    // Fetch sessions based on the selectedTab
+    fetch(`/api/sessions?tab=${selectedTab}`)
+      .then((response) => response.json())
+      .then((data) => setSessions(data));
+  }, [selectedTab]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue);
+    setSelectedTab(newValue);
   };
 
   return (
     <Box style={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={value} onChange={handleChange} aria-label="users tabs">
+        <Tabs
+          value={selectedTab}
+          onChange={handleChange}
+          aria-label="users tabs"
+        >
           {sessionTypes.map((key) => (
             <Tab key={key} value={key} label={key} {...a11yProps(key)} />
           ))}
         </Tabs>
       </Box>
       <Box>
-        {sessions.map((row: Session) => (
-          <StyledLink href={`sessions/${row.id}`} key={row.id}>
-            <StyledCard key={row.id}>
-              <StyledCardContent>
-                <Grid
-                  container
-                  spacing={2}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Grid container item xs="auto" alignItems="center">
-                    <Button
-                      style={{
-                        backgroundColor: "#59addd",
-                        color: "#fff",
-                        marginRight: "0.8em",
-                      }}
-                    >
-                      {dayjs(row.sessionDate).format("MMM DD")}
-                    </Button>
-                    <Typography>{row.className}</Typography>
-                  </Grid>
-                  <Grid container item xs="auto" justifyContent="flex-end">
-                    <Grid
-                      item
-                      sx={{
-                        display: "flex",
-                        paddingX: 1.5,
-                      }}
-                      xs="auto"
-                      alignItems="center"
-                    >
-                      <Tooltip title="Start time">
-                        <AccessTimeIcon sx={{ marginRight: "0.2em" }} />
-                      </Tooltip>
-                      <TimePicker
-                        readOnly
-                        value={dayjs(row.startTime, "HH:mm:ss")}
-                        sx={{
-                          width: "6em",
-                          "& .MuiInput-input": {
-                            padding: 0,
-                          },
-                          "& .MuiInput-root:before": {
-                            borderBottom: "none",
-                          },
-                          "&& .MuiInput-root:hover::before": {
-                            borderBottom: "none",
-                          },
+        {sessions &&
+          sessions.map((row: Session) => (
+            <StyledLink href={`sessions/${row.id}`} key={row.id}>
+              <StyledCard key={row.id}>
+                <StyledCardContent>
+                  <Grid
+                    container
+                    spacing={2}
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Grid container item xs="auto" alignItems="center">
+                      <Button
+                        style={{
+                          backgroundColor: "#59addd",
+                          color: "#fff",
+                          marginRight: "0.8em",
                         }}
-                        slotProps={{
-                          textField: { size: "small", variant: "standard" },
-                        }}
-                        disableOpenPicker
-                      />
+                      >
+                        {dayjs(row.sessionDate).format("MMM DD")}
+                      </Button>
+                      <Typography>{row.className}</Typography>
                     </Grid>
-                    <Grid
-                      item
-                      sx={{
-                        display: "flex",
-                        paddingX: 1.5,
-                      }}
-                      xs="auto"
-                      alignItems="center"
-                    >
-                      <Tooltip title="End time">
-                        <AccessTimeFilledIcon sx={{ marginRight: "0.2em" }} />
-                      </Tooltip>
-                      <TimePicker
-                        readOnly
-                        value={dayjs(row.endTime, "HH:mm:ss")}
+                    <Grid container item xs="auto" justifyContent="flex-end">
+                      <Grid
+                        item
                         sx={{
-                          width: "6em",
-                          "& .MuiInput-input": {
-                            padding: 0,
-                          },
-                          "& .MuiInput-root:before": {
-                            borderBottom: "none",
-                          },
-                          "&& .MuiInput-root:hover::before": {
-                            borderBottom: "none",
-                          },
+                          display: "flex",
+                          paddingX: 1.5,
                         }}
-                        slotProps={{
-                          textField: { size: "small", variant: "standard" },
+                        xs="auto"
+                        alignItems="center"
+                      >
+                        <Tooltip title="Start time">
+                          <AccessTimeIcon sx={{ marginRight: "0.2em" }} />
+                        </Tooltip>
+                        <TimePicker
+                          readOnly
+                          value={dayjs(row.startTime, "HH:mm:ss")}
+                          sx={{
+                            width: "6em",
+                            "& .MuiInput-input": {
+                              padding: 0,
+                            },
+                            "& .MuiInput-root:before": {
+                              borderBottom: "none",
+                            },
+                            "&& .MuiInput-root:hover::before": {
+                              borderBottom: "none",
+                            },
+                          }}
+                          slotProps={{
+                            textField: { size: "small", variant: "standard" },
+                          }}
+                          disableOpenPicker
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        sx={{
+                          display: "flex",
+                          paddingX: 1.5,
                         }}
-                        disableOpenPicker
-                      />
+                        xs="auto"
+                        alignItems="center"
+                      >
+                        <Tooltip title="End time">
+                          <AccessTimeFilledIcon sx={{ marginRight: "0.2em" }} />
+                        </Tooltip>
+                        <TimePicker
+                          readOnly
+                          value={dayjs(row.endTime, "HH:mm:ss")}
+                          sx={{
+                            width: "6em",
+                            "& .MuiInput-input": {
+                              padding: 0,
+                            },
+                            "& .MuiInput-root:before": {
+                              borderBottom: "none",
+                            },
+                            "&& .MuiInput-root:hover::before": {
+                              borderBottom: "none",
+                            },
+                          }}
+                          slotProps={{
+                            textField: { size: "small", variant: "standard" },
+                          }}
+                          disableOpenPicker
+                        />
+                      </Grid>
                     </Grid>
                   </Grid>
-                </Grid>
-              </StyledCardContent>
-            </StyledCard>
-          </StyledLink>
-        ))}
+                </StyledCardContent>
+              </StyledCard>
+            </StyledLink>
+          ))}
       </Box>
     </Box>
   );

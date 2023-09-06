@@ -1,24 +1,19 @@
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid";
 import { SessionDetail } from "../../api/sessions/[session_id]";
 import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
 import * as React from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
 import ClassIcon from "@mui/icons-material/Class";
 import EventIcon from "@mui/icons-material/Event";
 import fetcher from "../../../utils/fetcher";
 import Grid from "@mui/material/Grid";
 import HailIcon from "@mui/icons-material/Hail";
 import HelpCenterIcon from "@mui/icons-material/HelpCenter";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
@@ -26,10 +21,6 @@ import useSWR from "swr";
 // import "@fontsource/roboto/400.css";
 // import "@fontsource/roboto/500.css";
 // import "@fontsource/roboto/700.css";
-
-const FlexGrid = styled(Grid)(({ theme }) => ({
-  display: "flex",
-}));
 
 const StyledCard = styled(Card)(({ theme }) => ({
   boxShadow: "none",
@@ -53,17 +44,17 @@ const columns: GridColDef[] = [
     flex: 1,
   },
   {
-    field: "gender",
-    headerName: "性別",
-    minWidth: 100,
-    flex: 1,
-  },
-  {
     field: "englishName",
     headerName: "英文名",
     minWidth: 100,
     flex: 1,
   },
+  // {
+  //   field: "gender",
+  //   headerName: "性別",
+  //   minWidth: 100,
+  //   flex: 1,
+  // },
   {
     field: "currentSchool",
     headerName: "現讀學校",
@@ -72,96 +63,20 @@ const columns: GridColDef[] = [
   },
 ];
 
-function not(a: readonly number[], b: readonly number[]) {
-  return a.filter((value) => b.indexOf(value) === -1);
-}
-
-function intersection(a: readonly number[], b: readonly number[]) {
-  return a.filter((value) => b.indexOf(value) !== -1);
-}
-
 export default function SessionDetails() {
   const sessionID = useRouter().query.session_id;
-  const [checked, setChecked] = React.useState<readonly number[]>([]);
-  const [left, setLeft] = React.useState<readonly number[]>([0, 1, 2, 3]);
-  const [right, setRight] = React.useState<readonly number[]>([4, 5, 6, 7]);
   const { data } = useSWR(
     sessionID ? `/api/sessions/${sessionID}` : null,
     fetcher
   );
   const details = data as SessionDetail | null;
 
-  const leftChecked = intersection(checked, left);
-  const rightChecked = intersection(checked, right);
-
-  const handleToggle = (value: number) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
+  const handleClick = () => {
+    console.info("You clicked the Chip.");
   };
-
-  const handleAllRight = () => {
-    setRight(right.concat(left));
-    setLeft([]);
-  };
-
-  const handleCheckedRight = () => {
-    setRight(right.concat(leftChecked));
-    setLeft(not(left, leftChecked));
-    setChecked(not(checked, leftChecked));
-  };
-
-  const handleCheckedLeft = () => {
-    setLeft(left.concat(rightChecked));
-    setRight(not(right, rightChecked));
-    setChecked(not(checked, rightChecked));
-  };
-
-  const handleAllLeft = () => {
-    setLeft(left.concat(right));
-    setRight([]);
-  };
-
-  const customList = (items: readonly number[]) => (
-    <Paper sx={{ width: 200, height: 230, overflow: "auto" }}>
-      <List dense component="div" role="list">
-        {items.map((value: number) => {
-          const labelId = `transfer-list-item-${value}-label`;
-
-          return (
-            <ListItem
-              key={value}
-              role="listitem"
-              button
-              onClick={handleToggle(value)}
-            >
-              <ListItemIcon>
-                <Checkbox
-                  checked={checked.indexOf(value) !== -1}
-                  tabIndex={-1}
-                  disableRipple
-                  inputProps={{
-                    "aria-labelledby": labelId,
-                  }}
-                />
-              </ListItemIcon>
-              <ListItemText id={labelId} primary={`List item ${value + 1}`} />
-            </ListItem>
-          );
-        })}
-      </List>
-    </Paper>
-  );
 
   return (
-    <Grid container spacing={1}>
+    <Grid container rowSpacing={1} columnSpacing={2}>
       <Grid item xs={12} sm={12}>
         <StyledCard>
           <StyledCardContent>
@@ -276,9 +191,41 @@ export default function SessionDetails() {
           </StyledCardContent>
         </StyledCard>
       </Grid>
-      <Grid item md={6}></Grid>
-      <Grid item md={6}></Grid>
-      <Grid
+      <Grid item sm={12} md={12} lg={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Attended Students
+            </Typography>
+            <Stack direction="row" spacing={1}>
+              {details &&
+                details.attended.map((student) => (
+                  <Chip label={student.name} onClick={handleClick} />
+                ))}
+            </Stack>
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid item sm={12} md={12} lg={6}>
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Absent Students
+            </Typography>
+            <Stack direction="row" spacing={1}>
+              {details &&
+                details.absent.map((student) => (
+                  <Chip
+                    label={student.name}
+                    variant="outlined"
+                    onClick={handleClick}
+                  />
+                ))}
+            </Stack>
+          </CardContent>
+        </Card>
+      </Grid>
+      {/* <Grid
         container
         spacing={2}
         justifyContent="center"
@@ -289,7 +236,19 @@ export default function SessionDetails() {
           {details && (
             <DataGrid
               rows={details.attended}
+              disableColumnFilter
+              disableColumnSelector
+              disableDensitySelector
+              disableColumnMenu
               columns={columns}
+              slots={{ toolbar: GridToolbar }}
+              slotProps={{
+                toolbar: {
+                  showQuickFilter: true,
+                  printOptions: { disableToolbarButton: true },
+                  csvOptions: { disableToolbarButton: true },
+                },
+              }}
               initialState={{
                 pagination: {
                   paginationModel: {
@@ -352,7 +311,19 @@ export default function SessionDetails() {
           {details && (
             <DataGrid
               rows={details.absent}
+              disableColumnFilter
+              disableColumnSelector
+              disableDensitySelector
+              disableColumnMenu
               columns={columns}
+              slots={{ toolbar: GridToolbar }}
+              slotProps={{
+                toolbar: {
+                  showQuickFilter: true,
+                  printOptions: { disableToolbarButton: true },
+                  csvOptions: { disableToolbarButton: true },
+                },
+              }}
               initialState={{
                 pagination: {
                   paginationModel: {
@@ -367,7 +338,7 @@ export default function SessionDetails() {
             />
           )}
         </Grid>
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 }
