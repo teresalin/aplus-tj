@@ -12,6 +12,7 @@ import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const FlexGrid = styled(Grid)(({ theme }) => ({
   display: "flex",
@@ -38,6 +39,8 @@ const StyledLink = styled(Link)(({ theme }) => ({
 export default function Classes() {
   const { data } = useSWR("api/classes", fetcher);
   const classes = data || [];
+
+  if (!classes) return <CircularProgress />;
 
   return (
     <Grid container>

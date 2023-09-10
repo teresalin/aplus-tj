@@ -18,6 +18,7 @@ import Tabs from "@mui/material/Tabs";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function a11yProps(key: string) {
   return {
@@ -68,6 +69,8 @@ export default function CustomFilterPanelPosition() {
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setSelectedTab(newValue);
   };
+
+  if (!sessions) return <CircularProgress />;
 
   return (
     <Box style={{ width: "100%" }}>

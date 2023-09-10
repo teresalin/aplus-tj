@@ -25,15 +25,15 @@ const Logo = styled("img")(({ theme }) => ({
   marginRight: theme.spacing(1),
 }));
 
-// const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
-//   "&&.Mui-selected": {
-//     color: "#4741e0",
-//     "&&& .MuiTypography-root": {
-//       // fontWeight: "Montserrat, sans-serif",
-//       color: "#4741e0",
-//     },
-//   },
-// }));
+const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
+  "&&.Mui-selected": {
+    color: "#4741e0",
+    "&&& .MuiTypography-root": {
+      // fontWeight: "Montserrat, sans-serif",
+      color: "#4741e0",
+    },
+  },
+}));
 
 const StyledListItemText = styled(ListItemText)(({ theme }) => ({
   "&&.Mui-selected": {
@@ -49,8 +49,6 @@ export default function SelectedListItem() {
   const { pathname } = router;
 
   const isActive = (path: string) => pathname === path;
-
-  console.log("SelectedListItem");
 
   return (
     <Box sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
@@ -106,6 +104,14 @@ export default function SelectedListItem() {
               <AssignmentIcon />
             </ListItemIcon>
             <ListItemText primary="Assignments" />
+          </ListItemButton>
+        </StyledLink>
+        <StyledLink href="/billing">
+          <ListItemButton selected={isActive("/billing")}>
+            <ListItemIcon>
+              <AssignmentIcon />
+            </ListItemIcon>
+            <ListItemText primary="Billing" />
           </ListItemButton>
         </StyledLink>
         <StyledLink href="/persons">

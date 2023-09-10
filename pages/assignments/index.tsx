@@ -29,6 +29,7 @@ import {
 
 import fetcher from "../../utils/fetcher";
 import NewPersonDialog from "../../src/components/NewPersonDialog";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function a11yProps(key: string) {
   return {
@@ -226,6 +227,8 @@ export default function CustomFilterPanelPosition() {
   };
 
   const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+  if (!assignments) return <CircularProgress />;
 
   return (
     <Box style={{ width: "100%" }}>
