@@ -53,7 +53,6 @@ export default function NewPersonDialog(props: { personType }) {
 
     const target = event.target as typeof event.target & {
       name: { value: string };
-
       phone: { value: string };
       email: { value: string };
       dateOfBirth: { value: string };
@@ -105,6 +104,7 @@ export default function NewPersonDialog(props: { personType }) {
         aria-label="Add box icon"
         onClick={handleClickOpen}
         color="primary"
+        sx={{ padding: "4px" }}
       >
         <AddBoxIcon />
       </IconButton>

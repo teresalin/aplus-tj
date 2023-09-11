@@ -51,68 +51,69 @@ function CustomToolbar({ buttonRef }) {
         <GridToolbarColumnsButton
           title="Column visibility"
           ref={buttonRef}
-          startIcon={
-            <IconButton>
-              <ViewColumnIcon sx={{ fontSize: "24px" }} />
-            </IconButton>
-          }
+          startIcon={<ViewColumnIcon />}
           sx={{
             padding: 0,
             minHeight: 0,
             minWidth: 0,
-            "& .MuiButton-startIcon": { margin: 0 },
             borderRadius: 5,
+            "& .MuiButton-startIcon": {
+              "& > *:first-of-type": { fontSize: 24 },
+              margin: 0,
+              padding: "4px",
+            },
           }}
         />
         <GridToolbarFilterButton
           ref={buttonRef}
           componentsProps={{
             button: {
-              startIcon: (
-                <IconButton>
-                  <FilterListIcon style={{ fontSize: "24px" }} />
-                </IconButton>
-              ),
+              startIcon: <FilterListIcon />,
             },
           }}
           sx={{
             padding: 0,
             minHeight: 0,
             minWidth: 0,
-            "& .MuiButton-startIcon": { margin: 0 },
             borderRadius: 5,
+            "& .MuiButton-startIcon": {
+              "& > *:first-of-type": { fontSize: 24 },
+              margin: 0,
+              padding: "4px",
+            },
           }}
         />
         <GridToolbarDensitySelector
           title="Density"
           ref={buttonRef}
-          startIcon={
-            <IconButton>
-              <TableRowsIcon style={{ fontSize: "24px" }} />
-            </IconButton>
-          }
+          startIcon={<TableRowsIcon />}
           sx={{
             padding: 0,
             minHeight: 0,
             minWidth: 0,
-            "& .MuiButton-startIcon": { margin: 0 },
+
             borderRadius: 5,
+            "& .MuiButton-startIcon": {
+              "& > *:first-of-type": { fontSize: 24 },
+              margin: 0,
+              padding: "4px",
+            },
           }}
         />
         <GridToolbarExport
           title="Export"
           ref={buttonRef}
-          startIcon={
-            <IconButton>
-              <DownloadForOfflineIcon style={{ fontSize: "24px" }} />
-            </IconButton>
-          }
+          startIcon={<DownloadForOfflineIcon />}
           sx={{
             padding: 0,
             minHeight: 0,
             minWidth: 0,
-            "& .MuiButton-startIcon": { margin: 0 },
             borderRadius: 5,
+            "& .MuiButton-startIcon": {
+              "& > *:first-of-type": { fontSize: 24 },
+              margin: 0,
+              padding: "4px",
+            },
           }}
         />
       </Grid>
