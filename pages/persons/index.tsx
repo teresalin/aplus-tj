@@ -1,9 +1,14 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import Grid from "@mui/material/Grid";
 import Tab from "@mui/material/Tab";
+import TableRowsIcon from "@mui/icons-material/TableRows";
 import Tabs from "@mui/material/Tabs";
 import useSWR from "swr";
+import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import {
   DataGrid,
   GridColDef,
@@ -15,8 +20,8 @@ import {
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 
-import NewPersonDialog from "../../src/components/NewPersonDialog";
 import fetcher from "../../utils/fetcher";
+import NewPersonDialog from "../../src/components/NewPersonDialog";
 import { generateColumns } from "../../utils/data-grid/generateColumns";
 
 function a11yProps(key: string) {
@@ -26,39 +31,83 @@ function a11yProps(key: string) {
   };
 }
 
-// TODO fix toolbar icon sizes and hover
 function CustomToolbar({ buttonRef }) {
   return (
     <GridToolbarContainer
       sx={{ direction: "row", justifyContent: "space-between" }}
     >
       <Grid item>
-        <GridToolbarQuickFilter style={{ marginLeft: 8 }} />
+        <GridToolbarQuickFilter sx={{ marginLeft: 1 }} />
       </Grid>
       <Grid item>
         <NewPersonDialog personType={"persons"} />
         <GridToolbarColumnsButton
           title="Column visibility"
           ref={buttonRef}
-          style={{ padding: 0, minHeight: 0, minWidth: 0 }}
+          startIcon={<ViewColumnIcon />}
+          sx={{
+            padding: 0,
+            minHeight: 0,
+            minWidth: 0,
+            borderRadius: 5,
+            "& .MuiButton-startIcon": {
+              "& > *:first-of-type": { fontSize: 24 },
+              margin: 0,
+              padding: "4px",
+            },
+          }}
         />
         <GridToolbarFilterButton
           ref={buttonRef}
-          style={{ padding: 0, minHeight: 0, minWidth: 0 }}
+          componentsProps={{
+            button: {
+              startIcon: <FilterListIcon />,
+            },
+          }}
+          sx={{
+            padding: 0,
+            minHeight: 0,
+            minWidth: 0,
+            borderRadius: 5,
+            "& .MuiButton-startIcon": {
+              "& > *:first-of-type": { fontSize: 24 },
+              margin: 0,
+              padding: "4px",
+            },
+          }}
         />
         <GridToolbarDensitySelector
           title="Density"
           ref={buttonRef}
-          style={{
+          startIcon={<TableRowsIcon />}
+          sx={{
             padding: 0,
             minHeight: 0,
             minWidth: 0,
+
+            borderRadius: 5,
+            "& .MuiButton-startIcon": {
+              "& > *:first-of-type": { fontSize: 24 },
+              margin: 0,
+              padding: "4px",
+            },
           }}
         />
         <GridToolbarExport
-          ref={buttonRef}
           title="Export"
-          style={{ padding: 0, minHeight: 0, minWidth: 0 }}
+          ref={buttonRef}
+          startIcon={<DownloadForOfflineIcon />}
+          sx={{
+            padding: 0,
+            minHeight: 0,
+            minWidth: 0,
+            borderRadius: 5,
+            "& .MuiButton-startIcon": {
+              "& > *:first-of-type": { fontSize: 24 },
+              margin: 0,
+              padding: "4px",
+            },
+          }}
         />
       </Grid>
     </GridToolbarContainer>
@@ -85,6 +134,8 @@ export default function CustomFilterPanelPosition() {
   };
 
   const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+  if (!rows) return <CircularProgress />;
 
   return (
     <div style={{ width: "100%" }}>

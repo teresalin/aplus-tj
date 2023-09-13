@@ -5,14 +5,9 @@ import dayjs from "dayjs";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Tab from "@mui/material/Tab";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 import Tabs from "@mui/material/Tabs";
-import Tooltip from "@mui/material/Tooltip";
 import useSWR from "swr";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import {
@@ -27,9 +22,12 @@ import {
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
-import fetcher from "../../utils/fetcher";
-import NewPersonDialog from "../../src/components/NewPersonDialog";
 import CircularProgress from "@mui/material/CircularProgress";
+import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
+import fetcher from "../../utils/fetcher";
+import NewAssignmentDialog from "../../src/components/assignment/NewAssignmentDialog";
+import RenderMenu from "../../src/components/data-grid/RenderMenu";
+import UpdateAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
 
 function a11yProps(key: string) {
   return {
@@ -47,7 +45,7 @@ function CustomToolbar({ buttonRef }) {
         <GridToolbarQuickFilter sx={{ marginLeft: 1 }} />
       </Grid>
       <Grid item>
-        <NewPersonDialog personType={"persons"} />
+        <NewAssignmentDialog />
         <GridToolbarColumnsButton
           title="Column visibility"
           ref={buttonRef}
@@ -121,102 +119,33 @@ function CustomToolbar({ buttonRef }) {
   );
 }
 
-const renderMenu = () => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event: any) => {
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = (event: any) => {
-    event.stopPropagation();
-    setAnchorEl(null);
-  };
-
-  return (
-    <div>
-      <Tooltip title="Actions">
-        <IconButton
-          onClick={handleClick}
-          aria-label="action"
-          size="small"
-          aria-controls={open ? "assignment-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? "true" : undefined}
-        >
-          <MoreHorizIcon />
-        </IconButton>
-      </Tooltip>
-      <Menu
-        id="assignment-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          "aria-labelledby": "basic-button",
-        }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-      >
-        <MenuItem onClick={handleClose}>Edit</MenuItem>
-        <MenuItem onClick={handleClose}>Delete</MenuItem>
-      </Menu>
-    </div>
-  );
-};
-
-const columns = [
-  {
-    field: "id",
-    headerName: "id",
-    minWidth: 120,
-    flex: 1,
-  },
-  {
-    field: "assignmentName",
-    headerName: "Assignment Name",
-    minWidth: 120,
-    flex: 1,
-  },
-  {
-    field: "className",
-    headerName: "Class Name",
-    minWidth: 120,
-    flex: 1,
-  },
-  {
-    field: "dueDate",
-    headerName: "Due Date",
-    minWidth: 120,
-    flex: 1,
-    valueFormatter: (params: GridValueFormatterParams<Date>) => {
-      if (params.value == null) {
-        return "";
-      }
-      return dayjs(params.value).format("YYYY-MM-DD");
-    },
-  },
-  {
-    field: "action",
-    headerName: "Action",
-    minWidth: 70,
-    maxWidth: 70,
-    flex: 1,
-    renderCell: renderMenu,
-  },
-];
-
 const assignmentTypes = ["all", "upcoming", "past due"];
 
 export default function CustomFilterPanelPosition() {
   const [value, setValue] = React.useState("all");
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { data } = useSWR(`api/assignments`, fetcher);
   const assignments = data || [];
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
+  };
+
+  const handleEdit = () => {
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
   };
 
   // TODO pass this into DataGrid
@@ -227,12 +156,55 @@ export default function CustomFilterPanelPosition() {
       .map((column) => column.field);
   };
 
+  const columns = [
+    {
+      field: "id",
+      headerName: "id",
+      minWidth: 50,
+      flex: 1,
+    },
+    {
+      field: "assignmentName",
+      headerName: "Assignment Name",
+      minWidth: 120,
+      flex: 1,
+    },
+    {
+      field: "className",
+      headerName: "Class Name",
+      minWidth: 120,
+      flex: 1,
+    },
+    {
+      field: "dueDate",
+      headerName: "Due Date",
+      minWidth: 120,
+      flex: 1,
+      valueFormatter: (params: GridValueFormatterParams<Date>) => {
+        if (params.value == null) {
+          return "";
+        }
+        return dayjs(params.value).format("YYYY-MM-DD");
+      },
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      minWidth: 70,
+      maxWidth: 70,
+      flex: 1,
+      renderCell: () => (
+        <RenderMenu onEdit={handleEdit} onDelete={handleDelete} />
+      ),
+    },
+  ];
+
   const buttonRef = React.useRef<HTMLButtonElement>(null);
 
   if (!assignments) return <CircularProgress />;
 
   return (
-    <Box style={{ width: "100%" }}>
+    <div style={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
@@ -244,46 +216,52 @@ export default function CustomFilterPanelPosition() {
           ))}
         </Tabs>
       </Box>
-      {assignments && (
-        <DataGrid
-          sx={{ backgroundColor: "#fff" }}
-          rows={assignments}
-          columns={columns}
-          localeText={{
-            toolbarColumns: "",
-            toolbarFilters: "",
-            toolbarDensity: "",
-            toolbarExport: "",
-          }}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 10 } },
-            columns: {
-              columnVisibilityModel: {
-                gender: false,
-                currentSchool: false,
-                textbookPublisher: false,
-                startDate: false,
-                joinDate: false,
-                leaveDate: false,
-              },
+      <DataGrid
+        sx={{ backgroundColor: "#fff" }}
+        rows={assignments}
+        columns={columns}
+        localeText={{
+          toolbarColumns: "",
+          toolbarFilters: "",
+          toolbarDensity: "",
+          toolbarExport: "",
+        }}
+        initialState={{
+          pagination: { paginationModel: { pageSize: 10 } },
+          columns: {
+            columnVisibilityModel: {
+              gender: false,
+              currentSchool: false,
+              textbookPublisher: false,
+              startDate: false,
+              joinDate: false,
+              leaveDate: false,
             },
-          }}
-          slots={{
-            toolbar: CustomToolbar,
-          }}
-          slotProps={{
-            basePopper: {
-              anchorEl: buttonRef.current,
-              placement: "bottom-end",
-            },
-            toolbar: {
-              buttonRef,
-            },
-          }}
-          pageSizeOptions={[5, 10, 25]}
-          hideFooterSelectedRowCount
-        />
-      )}
-    </Box>
+          },
+        }}
+        slots={{
+          toolbar: CustomToolbar,
+        }}
+        slotProps={{
+          basePopper: {
+            anchorEl: buttonRef.current,
+            placement: "bottom-end",
+          },
+          toolbar: {
+            buttonRef,
+          },
+        }}
+        pageSizeOptions={[5, 10, 25]}
+        hideFooterSelectedRowCount
+      />
+      <UpdateAssignmentDialog
+        open={isEditDialogOpen}
+        onClose={handleCloseEditDialog}
+      />
+      <DeleteAssignmentDialog
+        open={isDeleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+      />
+    </div>
   );
 }
