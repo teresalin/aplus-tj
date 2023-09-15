@@ -30,95 +30,13 @@ import EditAssignmentDialog from "../../src/components/assignment/EditAssignment
 import fetcher from "../../utils/fetcher";
 import NewAssignmentDialog from "../../src/components/assignment/NewAssignmentDialog";
 import RenderMenu from "../../src/components/data-grid/RenderMenu";
+import CustomToolBar from "../../src/components/data-grid/CustomToolBar";
 
 function a11yProps(key: string) {
   return {
     id: `simple-tab-${key}`,
     "aria-controls": `simple-tabpanel-${key}`,
   };
-}
-
-function CustomToolbar({ buttonRef }) {
-  return (
-    <GridToolbarContainer
-      sx={{ direction: "row", justifyContent: "space-between" }}
-    >
-      <Grid item>
-        <GridToolbarQuickFilter sx={{ marginLeft: 1 }} />
-      </Grid>
-      <Grid item>
-        <NewAssignmentDialog />
-        <GridToolbarColumnsButton
-          title="Column visibility"
-          ref={buttonRef}
-          startIcon={<ViewColumnIcon />}
-          sx={{
-            padding: 0,
-            minHeight: 0,
-            minWidth: 0,
-            borderRadius: 5,
-            "& .MuiButton-startIcon": {
-              "& > *:first-of-type": { fontSize: 24 },
-              margin: 0,
-              padding: "4px",
-            },
-          }}
-        />
-        <GridToolbarFilterButton
-          ref={buttonRef}
-          componentsProps={{
-            button: {
-              startIcon: <FilterListIcon />,
-            },
-          }}
-          sx={{
-            padding: 0,
-            minHeight: 0,
-            minWidth: 0,
-            borderRadius: 5,
-            "& .MuiButton-startIcon": {
-              "& > *:first-of-type": { fontSize: 24 },
-              margin: 0,
-              padding: "4px",
-            },
-          }}
-        />
-        <GridToolbarDensitySelector
-          title="Density"
-          ref={buttonRef}
-          startIcon={<TableRowsIcon />}
-          sx={{
-            padding: 0,
-            minHeight: 0,
-            minWidth: 0,
-
-            borderRadius: 5,
-            "& .MuiButton-startIcon": {
-              "& > *:first-of-type": { fontSize: 24 },
-              margin: 0,
-              padding: "4px",
-            },
-          }}
-        />
-        <GridToolbarExport
-          title="Export"
-          ref={buttonRef}
-          startIcon={<DownloadForOfflineIcon />}
-          sx={{
-            padding: 0,
-            minHeight: 0,
-            minWidth: 0,
-            borderRadius: 5,
-            "& .MuiButton-startIcon": {
-              "& > *:first-of-type": { fontSize: 24 },
-              margin: 0,
-              padding: "4px",
-            },
-          }}
-        />
-      </Grid>
-    </GridToolbarContainer>
-  );
 }
 
 const assignmentTypes = ["all", "upcoming", "past due"];
@@ -135,17 +53,15 @@ export default function CustomFilterPanelPosition() {
   const { data } = useSWR(`api/assignments`, fetcher);
   const assignments = data as Assignment[];
 
-  console.log("selectedRowData: ", selectedRowData);
-
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
-  const handleEdit = () => {
+  const handleOpenEditDialog = () => {
     setIsEditDialogOpen(true);
   };
 
-  const handleDelete = () => {
+  const handleOpenDeleteDialog = () => {
     setIsDeleteDialogOpen(true);
   };
 
@@ -177,6 +93,21 @@ export default function CustomFilterPanelPosition() {
       setIsEditDialogOpen(false);
     } else {
       console.error("Error updating assignment data:", response.statusText);
+    }
+  };
+
+  const handleDeleteRowData = async () => {
+    const response = await fetch(`/api/assignments/${selectedRowData?.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      setIsDeleteDialogOpen(false);
+    } else {
+      console.error("Error deleting assignment data:", response.statusText);
     }
   };
 
@@ -245,7 +176,10 @@ export default function CustomFilterPanelPosition() {
       maxWidth: 70,
       flex: 1,
       renderCell: () => (
-        <RenderMenu onEdit={handleEdit} onDelete={handleDelete} />
+        <RenderMenu
+          onEditClick={handleOpenEditDialog}
+          onDeleteClick={handleOpenDeleteDialog}
+        />
       ),
     },
   ];
@@ -289,7 +223,12 @@ export default function CustomFilterPanelPosition() {
           },
         }}
         slots={{
-          toolbar: CustomToolbar,
+          toolbar: () => (
+            <CustomToolBar
+              buttonRef={buttonRef}
+              children={<NewAssignmentDialog />}
+            />
+          ),
         }}
         slotProps={{
           basePopper: {
@@ -307,11 +246,12 @@ export default function CustomFilterPanelPosition() {
         existingData={selectedRowData}
         open={isEditDialogOpen}
         onClose={handleCloseEditDialog}
-        onSave={handleSaveRowData}
+        onSubmit={handleSaveRowData}
       />
       <DeleteAssignmentDialog
         open={isDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}
+        onSubmit={handleDeleteRowData}
       />
     </div>
   );

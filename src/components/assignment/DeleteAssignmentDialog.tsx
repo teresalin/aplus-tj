@@ -9,12 +9,18 @@ import DialogTitle from "@mui/material/DialogTitle";
 export interface IDeleteAssignmentDialogProps {
   open: boolean;
   onClose: () => void;
+  onSubmit;
 }
 
 export default function DeleteAssignmentDialog({
   open,
   onClose,
+  onSubmit,
 }: IDeleteAssignmentDialogProps) {
+  const handleSubmit = () => {
+    onSubmit();
+  };
+
   return (
     <>
       <Dialog
@@ -32,7 +38,7 @@ export default function DeleteAssignmentDialog({
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button onClick={onClose} autoFocus>
+          <Button autoFocus onClick={handleSubmit}>
             Delete
           </Button>
         </DialogActions>

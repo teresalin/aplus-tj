@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { Tooltip, IconButton, Menu, MenuItem } from "@mui/material";
+import React, { useState } from "react";
+import Tooltip from "@mui/material/Tooltip";
 
-function RenderMenu({ onEdit, onDelete }) {
+function RenderMenu({ onEditClick, onDeleteClick }) {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = (event) => {
@@ -14,12 +17,12 @@ function RenderMenu({ onEdit, onDelete }) {
   };
 
   const handleDelete = () => {
-    onDelete();
+    onDeleteClick();
     handleClose();
   };
 
   const handleEdit = () => {
-    onEdit();
+    onEditClick();
     handleClose();
   };
 

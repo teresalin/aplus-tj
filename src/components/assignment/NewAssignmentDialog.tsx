@@ -15,16 +15,6 @@ import TextField from "@mui/material/TextField";
 import useSWR from "swr";
 import { Class } from "../../../pages/api/classes";
 
-function RedBar() {
-  return (
-    <Box
-      sx={{
-        height: 20,
-      }}
-    />
-  );
-}
-
 export default function NewAssignmentDialog() {
   const [classId, setClassId] = React.useState("");
   const [open, setOpen] = React.useState(false);

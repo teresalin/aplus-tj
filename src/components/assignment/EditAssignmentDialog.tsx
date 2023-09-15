@@ -18,14 +18,14 @@ export interface IEditAssignmentDialogProps {
   existingData;
   open: boolean;
   onClose: () => void;
-  onSave;
+  onSubmit;
 }
 
 export default function EditAssignmentDialog({
   existingData,
   open,
   onClose,
-  onSave,
+  onSubmit,
 }: IEditAssignmentDialogProps) {
   const [editedData, setEditedData] = useState(existingData);
   const { data } = useSWR("/api/classes", fetcher);
@@ -37,8 +37,6 @@ export default function EditAssignmentDialog({
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    console.log(`name: ${name}`);
-    console.log(`value: ${value}`);
     setEditedData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -47,7 +45,7 @@ export default function EditAssignmentDialog({
 
   const handleSubmit: FormEventHandler = (event: FormEvent) => {
     event.preventDefault();
-    onSave(editedData);
+    onSubmit(editedData);
   };
 
   return (

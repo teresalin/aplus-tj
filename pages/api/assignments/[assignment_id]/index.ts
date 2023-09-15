@@ -80,6 +80,26 @@ async function updateClassAssignment(client, assignmentID, { classId }) {
   await client.query(query);
 }
 
+async function deleteAssignment(client, assignmentID) {
+  const query = {
+    text: `
+      DELETE FROM assignment WHERE id = $1
+    `,
+    values: [assignmentID],
+  };
+  await client.query(query);
+}
+
+async function deleteClassAssignment(client, assignmentID) {
+  const query = {
+    text: `
+      DELETE FROM class_assignment WHERE assignment_id = $1
+    `,
+    values: [assignmentID],
+  };
+  await client.query(query);
+}
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const assignmentID = req.query.assignment_id;
   const client = await getDBClient();
@@ -131,14 +151,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
       break;
     case "DELETE":
-      const deleteQuery = {
-        text: `
-          DELETE FROM student WHERE id = $1;
-        `,
-        values: [assignmentID],
-      };
-      await client.query(deleteQuery);
-      res.status(200).json({ message: "OK", id: assignmentID });
+      await deleteClassAssignment(client, assignmentID);
+      await deleteAssignment(client, assignmentID);
+      res.status(200).json({ message: "Success", id: assignmentID });
       break;
     default:
       res.setHeader("Allow", ["GET", "POST", "DELETE"]);
