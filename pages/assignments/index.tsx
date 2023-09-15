@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as React from "react";
 import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 import dayjs from "dayjs";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 import FilterListIcon from "@mui/icons-material/FilterList";
@@ -20,14 +21,15 @@ import {
   GridToolbarExport,
   GridToolbarQuickFilter,
   GridValueFormatterParams,
+  GridRowSelectionModel,
 } from "@mui/x-data-grid";
 
-import CircularProgress from "@mui/material/CircularProgress";
+import { Assignment } from "../api/assignments";
 import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
+import EditAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
 import fetcher from "../../utils/fetcher";
 import NewAssignmentDialog from "../../src/components/assignment/NewAssignmentDialog";
 import RenderMenu from "../../src/components/data-grid/RenderMenu";
-import UpdateAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
 
 function a11yProps(key: string) {
   return {
@@ -123,12 +125,19 @@ const assignmentTypes = ["all", "upcoming", "past due"];
 
 export default function CustomFilterPanelPosition() {
   const [value, setValue] = React.useState("all");
+  const [rowSelectionModel, setRowSelectionModel] =
+    useState<GridRowSelectionModel>([]);
+  const [selectedRowData, setSelectedRowData] = useState<
+    Assignment | undefined
+  >({} as Assignment);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { data } = useSWR(`api/assignments`, fetcher);
-  const assignments = data || [];
+  const assignments = data as Assignment[];
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  console.log("selectedRowData: ", selectedRowData);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
@@ -146,6 +155,29 @@ export default function CustomFilterPanelPosition() {
 
   const handleCloseDeleteDialog = () => {
     setIsDeleteDialogOpen(false);
+  };
+
+  const onRowsSelectionHandler = (ids) => {
+    const selectedRowsData = ids.map((id) =>
+      assignments.find((row) => row.id === id)
+    );
+    setSelectedRowData(selectedRowsData[0]);
+  };
+
+  const handleSaveRowData = async (editedData) => {
+    const response = await fetch(`/api/assignments/${editedData.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editedData),
+    });
+
+    if (response.ok) {
+      setIsEditDialogOpen(false);
+    } else {
+      console.error("Error updating assignment data:", response.statusText);
+    }
   };
 
   // TODO pass this into DataGrid
@@ -166,19 +198,38 @@ export default function CustomFilterPanelPosition() {
     {
       field: "assignmentName",
       headerName: "Assignment Name",
-      minWidth: 120,
+      minWidth: 100,
       flex: 1,
     },
     {
       field: "className",
       headerName: "Class Name",
-      minWidth: 120,
+      minWidth: 100,
+      flex: 1,
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      minWidth: 100,
       flex: 1,
     },
     {
       field: "dueDate",
       headerName: "Due Date",
-      minWidth: 120,
+      minWidth: 50,
+      flex: 1,
+      valueFormatter: (params: GridValueFormatterParams<Date>) => {
+        if (params.value == null) {
+          return "";
+        }
+        return dayjs(params.value).format("YYYY-MM-DD");
+      },
+    },
+    // TODO fix failed prop type warning
+    {
+      field: "created",
+      headerName: "Created On",
+      minWidth: 50,
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams<Date>) => {
         if (params.value == null) {
@@ -208,7 +259,7 @@ export default function CustomFilterPanelPosition() {
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
-          onChange={handleChange}
+          onChange={handleTabChange}
           aria-label="assignment tabs"
         >
           {assignmentTypes.map((key) => (
@@ -220,6 +271,8 @@ export default function CustomFilterPanelPosition() {
         sx={{ backgroundColor: "#fff" }}
         rows={assignments}
         columns={columns}
+        onRowSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
+        rowSelectionModel={rowSelectionModel}
         localeText={{
           toolbarColumns: "",
           toolbarFilters: "",
@@ -230,12 +283,8 @@ export default function CustomFilterPanelPosition() {
           pagination: { paginationModel: { pageSize: 10 } },
           columns: {
             columnVisibilityModel: {
-              gender: false,
-              currentSchool: false,
-              textbookPublisher: false,
-              startDate: false,
-              joinDate: false,
-              leaveDate: false,
+              id: false,
+              created: false,
             },
           },
         }}
@@ -254,9 +303,11 @@ export default function CustomFilterPanelPosition() {
         pageSizeOptions={[5, 10, 25]}
         hideFooterSelectedRowCount
       />
-      <UpdateAssignmentDialog
+      <EditAssignmentDialog
+        existingData={selectedRowData}
         open={isEditDialogOpen}
         onClose={handleCloseEditDialog}
+        onSave={handleSaveRowData}
       />
       <DeleteAssignmentDialog
         open={isDeleteDialogOpen}

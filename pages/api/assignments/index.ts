@@ -3,9 +3,10 @@ import { getDBClient } from "../../../lib/db-connector";
 
 export interface Assignment {
   id: number;
+  classId: number;
+  className: number;
   assignmentName: string;
   description: string;
-  className: number;
   dueDate: Date;
   created: Date;
 }
@@ -13,9 +14,10 @@ export interface Assignment {
 function parseAssignment(row: any): Assignment {
   return {
     id: row.id,
+    classId: row.class_id,
+    className: row.class_name,
     assignmentName: row.assignment_name,
     description: row.description,
-    className: row.class_name,
     dueDate: row.due_date,
     created: row.time_created,
   };
@@ -30,6 +32,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           a.id,
           a.name AS assignment_name,
           a.description,
+          c.id AS class_id,
           c.name AS class_name,
           a.due_date,
           a.time_created

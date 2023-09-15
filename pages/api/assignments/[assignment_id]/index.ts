@@ -55,34 +55,29 @@ async function createClassAssignment(client, classID, assignmentID) {
 async function updateAssignment(
   client,
   assignmentID,
-  { name, description, dueDate }
+  { assignmentName, description, dueDate }
 ) {
   const query = {
     text: `
       UPDATE assignment 
-      SET name = $2, description = $3, dueDate = $4, time_updated = NOW()
+      SET name = $2, description = $3, due_date = $4, time_updated = NOW()
       WHERE id = $1
     `,
-    values: [assignmentID, name, description, dueDate],
+    values: [assignmentID, assignmentName, description, dueDate],
   };
-
-  const result = await client.query(query);
-  return result.rows[0].id;
+  await client.query(query);
 }
 
 async function updateClassAssignment(client, assignmentID, { classId }) {
   const query = {
     text: `
       UPDATE class_assignment 
-      SET class_id = $2, assignment_id = $1 time_updated = NOW()
+      SET class_id = $2, time_updated = NOW()
       WHERE assignment_id = $1
-      RETURNING id;
     `,
     values: [assignmentID, classId],
   };
-
-  const result = await client.query(query);
-  return result.rows[0].id;
+  await client.query(query);
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -121,9 +116,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "PUT":
       try {
-        const { name, description, dueDate, classId } = req.body;
+        const { assignmentName, description, dueDate, classId } = req.body;
         await updateAssignment(client, assignmentID, {
-          name,
+          assignmentName,
           description,
           dueDate,
         });
