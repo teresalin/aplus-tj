@@ -1,4 +1,3 @@
-import { formatDate } from "../../../utils/formatDate";
 import { FormEvent, FormEventHandler, useState } from "react";
 import * as React from "react";
 import Button from "@mui/material/Button";
@@ -50,78 +49,76 @@ export default function EditAssignmentDialog({
 
   return (
     <>
-      {editedData && (
-        <Dialog disablePortal open={open} onClose={onClose}>
-          <form onSubmit={handleSubmit}>
-            <DialogTitle>New assignment</DialogTitle>
-            <DialogContent>
-              <TextField
-                fullWidth
-                required
-                id="assignmentName"
-                name="assignmentName"
-                label="Assignment Name"
-                type="text"
-                variant="outlined"
-                margin="dense"
-                value={editedData.assignmentName}
-                onChange={handleInputChange}
-              />
-              {/* TODO format date in yyyy-mm-dd format */}
-              <TextField
-                fullWidth
-                required
-                id="dueDate"
-                name="dueDate"
-                label="Due Date"
-                type="date"
-                variant="outlined"
-                margin="dense"
-                InputLabelProps={{ shrink: true }}
-                value={dayjs(editedData.dueDate).format("YYYY-MM-DD")}
-                onChange={handleInputChange}
-              />
-              <TextField
-                fullWidth
-                required
-                id="classId"
-                name="classId"
-                label="Assign to a class"
-                margin="dense"
-                value={editedData.classId}
-                select
-                onChange={handleInputChange}
-              >
-                {classes.map((item: Class) => (
-                  <MenuItem key={item.id} value={item.id}>
-                    {item.className}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                fullWidth
-                required
-                id="description"
-                name="description"
-                label="Description"
-                type="text"
-                variant="outlined"
-                margin="dense"
-                value={editedData.description}
-                onChange={handleInputChange}
-                multiline
-                maxRows={3}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={onClose}>Cancel</Button>
-              <Button autoFocus type="submit" onClick={handleSubmit}>
-                Submit
-              </Button>
-            </DialogActions>
-          </form>
-        </Dialog>
-      )}
+      <Dialog disablePortal open={open} onClose={onClose}>
+        <form onSubmit={handleSubmit}>
+          <DialogTitle>New assignment</DialogTitle>
+          <DialogContent>
+            <TextField
+              fullWidth
+              required
+              id="assignmentName"
+              name="assignmentName"
+              label="Assignment Name"
+              type="text"
+              variant="outlined"
+              margin="dense"
+              value={editedData.assignmentName}
+              onChange={handleInputChange}
+            />
+            {/* TODO format date in yyyy-mm-dd format */}
+            <TextField
+              fullWidth
+              required
+              id="dueDate"
+              name="dueDate"
+              label="Due Date"
+              type="date"
+              variant="outlined"
+              margin="dense"
+              InputLabelProps={{ shrink: true }}
+              value={dayjs(editedData.dueDate).format("YYYY-MM-DD")}
+              onChange={handleInputChange}
+            />
+            <TextField
+              fullWidth
+              required
+              id="classId"
+              name="classId"
+              label="Assign to a class"
+              margin="dense"
+              value={editedData.classId}
+              select
+              onChange={handleInputChange}
+            >
+              {classes.map((item: Class) => (
+                <MenuItem key={item.id} value={item.id}>
+                  {item.className}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              fullWidth
+              required
+              id="description"
+              name="description"
+              label="Description"
+              type="text"
+              variant="outlined"
+              margin="dense"
+              value={editedData.description}
+              onChange={handleInputChange}
+              multiline
+              maxRows={3}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button autoFocus type="submit" onClick={handleSubmit}>
+              Submit
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     </>
   );
 }

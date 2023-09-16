@@ -1,36 +1,26 @@
+import { Assignment } from "../api/assignments";
 import { useState } from "react";
 import * as React from "react";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
+import CustomToolBar from "../../src/components/data-grid/CustomToolBar";
 import dayjs from "dayjs";
-import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import Grid from "@mui/material/Grid";
-import Tab from "@mui/material/Tab";
-import TableRowsIcon from "@mui/icons-material/TableRows";
-import Tabs from "@mui/material/Tabs";
-import useSWR from "swr";
-import ViewColumnIcon from "@mui/icons-material/ViewColumn";
-import {
-  DataGrid,
-  GridColDef,
-  GridToolbarContainer,
-  GridToolbarFilterButton,
-  GridToolbarColumnsButton,
-  GridToolbarDensitySelector,
-  GridToolbarExport,
-  GridToolbarQuickFilter,
-  GridValueFormatterParams,
-  GridRowSelectionModel,
-} from "@mui/x-data-grid";
-
-import { Assignment } from "../api/assignments";
 import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
 import EditAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
 import fetcher from "../../utils/fetcher";
+import IconButton from "@mui/material/IconButton";
 import NewAssignmentDialog from "../../src/components/assignment/NewAssignmentDialog";
 import RenderMenu from "../../src/components/data-grid/RenderMenu";
-import CustomToolBar from "../../src/components/data-grid/CustomToolBar";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import useSWR from "swr";
+import {
+  DataGrid,
+  GridColDef,
+  GridValueFormatterParams,
+  GridRowSelectionModel,
+} from "@mui/x-data-grid";
 
 function a11yProps(key: string) {
   return {
@@ -48,6 +38,7 @@ export default function CustomFilterPanelPosition() {
   const [selectedRowData, setSelectedRowData] = useState<
     Assignment | undefined
   >({} as Assignment);
+  const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { data } = useSWR(`api/assignments`, fetcher);
@@ -57,16 +48,24 @@ export default function CustomFilterPanelPosition() {
     setValue(newValue);
   };
 
+  const handleOpenNewDialog = () => {
+    setIsNewDialogOpen(true);
+  };
+
+  const handleCloseNewDialog = () => {
+    setIsNewDialogOpen(false);
+  };
+
   const handleOpenEditDialog = () => {
     setIsEditDialogOpen(true);
   };
 
-  const handleOpenDeleteDialog = () => {
-    setIsDeleteDialogOpen(true);
-  };
-
   const handleCloseEditDialog = () => {
     setIsEditDialogOpen(false);
+  };
+
+  const handleOpenDeleteDialog = () => {
+    setIsDeleteDialogOpen(true);
   };
 
   const handleCloseDeleteDialog = () => {
@@ -78,6 +77,22 @@ export default function CustomFilterPanelPosition() {
       assignments.find((row) => row.id === id)
     );
     setSelectedRowData(selectedRowsData[0]);
+  };
+
+  const handleCreateNewAssignment = async (data) => {
+    const response = await fetch(`/api/assignments/[assignment_id]`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      setIsEditDialogOpen(false);
+    } else {
+      console.error("Error updating assignment data:", response.statusText);
+    }
   };
 
   const handleSaveRowData = async (editedData) => {
@@ -118,6 +133,19 @@ export default function CustomFilterPanelPosition() {
       .filter((column) => column.field !== "id")
       .map((column) => column.field);
   };
+
+  function AddIconButton({ onClick }) {
+    return (
+      <IconButton
+        aria-label="Add box icon"
+        onClick={onClick}
+        color="primary"
+        sx={{ padding: "4px" }}
+      >
+        <AddBoxIcon />
+      </IconButton>
+    );
+  }
 
   const columns = [
     {
@@ -226,7 +254,7 @@ export default function CustomFilterPanelPosition() {
           toolbar: () => (
             <CustomToolBar
               buttonRef={buttonRef}
-              children={<NewAssignmentDialog />}
+              children={<AddIconButton onClick={handleOpenNewDialog} />}
             />
           ),
         }}
@@ -241,6 +269,11 @@ export default function CustomFilterPanelPosition() {
         }}
         pageSizeOptions={[5, 10, 25]}
         hideFooterSelectedRowCount
+      />
+      <NewAssignmentDialog
+        open={isNewDialogOpen}
+        onClose={handleCloseNewDialog}
+        onSubmit={handleCreateNewAssignment}
       />
       <EditAssignmentDialog
         existingData={selectedRowData}

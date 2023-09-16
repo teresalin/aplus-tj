@@ -24,14 +24,17 @@ async function getAssignment(client, assignmentID) {
   }
 }
 
-async function createAssignment(client, { name, description, dueDate }) {
+async function createAssignment(
+  client,
+  { assignmentName, description, dueDate }
+) {
   const query = {
     text: `
       INSERT INTO assignment(name, description, due_date, time_created, time_updated) 
       VALUES ($1, $2, $3, NOW(), NOW())
       RETURNING id;
     `,
-    values: [name, description, dueDate],
+    values: [assignmentName, description, dueDate],
   };
 
   const result = await client.query(query);
@@ -47,9 +50,7 @@ async function createClassAssignment(client, classID, assignmentID) {
     `,
     values: [classID, assignmentID],
   };
-
-  const result = await client.query(query);
-  return result.rows[0].id;
+  await client.query(query);
 }
 
 async function updateAssignment(
@@ -108,35 +109,28 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "GET":
       try {
         const result = await getAssignment(client, assignmentID);
-        res.status(200).json(result);
+        res.status(200).json({ result });
       } catch (err) {
-        res.status(500).json({ message: "Something went wrong" });
+        res.status(500).json({ message: "Failed to retrieve assignment data" });
       }
       break;
     case "POST":
       try {
-        const { name, description, dueDate, classId } = req.body;
+        const { assignmentName, dueDate, classId, description } = req.body;
         const assignmentID = await createAssignment(client, {
-          name,
+          assignmentName,
           description,
           dueDate,
         });
         await createClassAssignment(client, classId, assignmentID);
         res.status(200).json({ message: "Success" });
       } catch (err) {
-        if (err.code === "23505") {
-          // PostgreSQL unique constraint violation error
-          res
-            .status(409)
-            .json({ message: "A person with the same details already exists" });
-        } else {
-          res.status(500).json({ message: "Something went wrong" });
-        }
+        res.status(500).json({ message: "Failed to create new assignment" });
       }
       break;
     case "PUT":
       try {
-        const { assignmentName, description, dueDate, classId } = req.body;
+        const { assignmentName, dueDate, classId, description } = req.body;
         await updateAssignment(client, assignmentID, {
           assignmentName,
           description,
@@ -147,13 +141,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         });
         res.status(200).json({ message: "Success" });
       } catch (err) {
-        res.status(500).json({ message: "Something went wrong" });
+        res.status(500).json({ message: "Failed to update assignment" });
       }
       break;
     case "DELETE":
-      await deleteClassAssignment(client, assignmentID);
-      await deleteAssignment(client, assignmentID);
-      res.status(200).json({ message: "Success", id: assignmentID });
+      try {
+        await deleteClassAssignment(client, assignmentID);
+        await deleteAssignment(client, assignmentID);
+        res.status(200).json({ message: "Success" });
+      } catch (err) {
+        res.status(500).json({ message: "Failed to delete assignment" });
+      }
       break;
     default:
       res.setHeader("Allow", ["GET", "POST", "DELETE"]);
