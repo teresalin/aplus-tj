@@ -148,7 +148,7 @@ export default function CustomFilterPanelPosition() {
     );
   }
 
-  const columns = [
+  const columns: GridColDef[] = [
     {
       field: "id",
       headerName: "id",
@@ -218,7 +218,7 @@ export default function CustomFilterPanelPosition() {
   if (!assignments) return <CircularProgress />;
 
   return (
-    <div style={{ flex: 1, overflow: "hidden" }}>
+    <Box style={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
@@ -287,6 +287,6 @@ export default function CustomFilterPanelPosition() {
         onClose={handleCloseDeleteDialog}
         onSubmit={handleDeleteRowData}
       />
-    </div>
+    </Box>
   );
 }

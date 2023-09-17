@@ -22,22 +22,20 @@ export default function AppLayout(props) {
   return (
     <>
       <Box sx={{ display: "flex" }}>
+        <StyledDrawer
+          variant="permanent"
+          PaperProps={{
+            sx: {
+              width: 250,
+            },
+          }}
+        >
+          <StyledDrawerContainer>
+            <SelectedListItem />
+          </StyledDrawerContainer>
+        </StyledDrawer>
         <Main>
-          <StyledDrawer
-            variant="permanent"
-            PaperProps={{
-              sx: {
-                width: 250,
-              },
-            }}
-          >
-            <StyledDrawerContainer>
-              <SelectedListItem />
-            </StyledDrawerContainer>
-          </StyledDrawer>
-          <Box sx={{ p: 3, marginLeft: "250px", overflowX: "hidden" }}>
-            {props.mainPage}
-          </Box>
+          <Box sx={{ p: 3, overflowX: "hidden" }}>{props.mainPage}</Box>
         </Main>
       </Box>
     </>

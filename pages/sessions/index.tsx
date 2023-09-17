@@ -1,24 +1,24 @@
-import * as React from "react";
-import { GridColDef } from "@mui/x-data-grid";
-import { Session } from "../api/sessions";
 import { styled } from "@mui/material/styles";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import * as React from "react";
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import CircularProgress from "@mui/material/CircularProgress";
 import dayjs from "dayjs";
-import fetcher from "../../utils/fetcher";
 import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
+import Link from "next/link";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
-import CircularProgress from "@mui/material/CircularProgress";
+
+import fetcher from "../../utils/fetcher";
+import { Session } from "../api/sessions";
 
 function a11yProps(key: string) {
   return {
@@ -42,11 +42,6 @@ const StyledCardContent = styled(CardContent)(({ theme }) => ({
     paddingBottom: 18,
   },
   alignContent: "center",
-}));
-
-const StyledLink = styled(Link)(({ theme }) => ({
-  textDecoration: "none",
-  color: "inherit",
 }));
 
 const sessionTypes = ["all", "upcoming", "past"];
@@ -88,7 +83,7 @@ export default function CustomFilterPanelPosition() {
       <Box>
         {sessions &&
           sessions.map((row: Session) => (
-            <StyledLink href={`sessions/${row.id}`} key={row.id}>
+            <Link href={`sessions/${row.id}`} key={row.id}>
               <StyledCard key={row.id}>
                 <StyledCardContent>
                   <Grid
@@ -180,7 +175,7 @@ export default function CustomFilterPanelPosition() {
                   </Grid>
                 </StyledCardContent>
               </StyledCard>
-            </StyledLink>
+            </Link>
           ))}
       </Box>
     </Box>

@@ -1,3 +1,5 @@
+import { styled } from "@mui/material/styles";
+import { useRouter } from "next/router";
 import * as React from "react";
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import AssignmentIcon from "@mui/icons-material/Assignment";
@@ -6,19 +8,12 @@ import ClassIcon from "@mui/icons-material/Class";
 import Divider from "@mui/material/Divider";
 import GridViewIcon from "@mui/icons-material/GridView";
 import GroupIcon from "@mui/icons-material/Group";
-import Link from "@mui/material/Link";
+import Link from "next/link";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { useRouter } from "next/router";
-import { styled } from "@mui/material/styles";
-
-const StyledLink = styled(Link)(({ theme }) => ({
-  textDecoration: "none",
-  color: "inherit",
-}));
 
 const Logo = styled("img")(({ theme }) => ({
   maxWidth: 30,
@@ -48,13 +43,13 @@ export default function SelectedListItem() {
   const router = useRouter();
   const { pathname } = router;
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => pathname.startsWith(path);
 
   return (
     <Box sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
       <List component="nav" aria-label="main navigations">
-        <StyledLink href="/">
-          <ListItemButton selected={isActive("/")}>
+        <Link href="/">
+          <ListItemButton>
             <ListItemIcon>
               <Logo src="/owl.png" alt="A Plus" />
             </ListItemIcon>
@@ -70,8 +65,8 @@ export default function SelectedListItem() {
               }}
             />
           </ListItemButton>
-        </StyledLink>
-        <StyledLink
+        </Link>
+        <Link
           href="/overview"
           style={{ textDecoration: "none", color: "inherit" }}
         >
@@ -81,47 +76,47 @@ export default function SelectedListItem() {
             </ListItemIcon>
             <ListItemText primary="Dashboard" />
           </ListItemButton>
-        </StyledLink>
-        <StyledLink href="/classes">
+        </Link>
+        <Link href="/classes">
           <ListItemButton selected={isActive("/classes")}>
             <ListItemIcon>
               <ClassIcon />
             </ListItemIcon>
             <ListItemText primary="Classes" />
           </ListItemButton>
-        </StyledLink>
-        <StyledLink href="/sessions">
+        </Link>
+        <Link href="/sessions">
           <ListItemButton selected={isActive("/sessions")}>
             <ListItemIcon>
               <AccessTimeFilledIcon />
             </ListItemIcon>
             <ListItemText primary="Sessions" />
           </ListItemButton>
-        </StyledLink>
-        <StyledLink href="/assignments">
+        </Link>
+        <Link href="/assignments">
           <ListItemButton selected={isActive("/assignments")}>
             <ListItemIcon>
               <AssignmentIcon />
             </ListItemIcon>
             <ListItemText primary="Assignments" />
           </ListItemButton>
-        </StyledLink>
-        <StyledLink href="/billing">
+        </Link>
+        <Link href="/billing">
           <ListItemButton selected={isActive("/billing")}>
             <ListItemIcon>
               <AssignmentIcon />
             </ListItemIcon>
             <ListItemText primary="Billing" />
           </ListItemButton>
-        </StyledLink>
-        <StyledLink href="/persons">
+        </Link>
+        <Link href="/persons">
           <ListItemButton selected={isActive("/persons")}>
             <ListItemIcon>
               <GroupIcon />
             </ListItemIcon>
             <ListItemText primary="Users" />
           </ListItemButton>
-        </StyledLink>
+        </Link>
       </List>
       <Divider />
       <List component="nav" aria-label="secondary navigations">

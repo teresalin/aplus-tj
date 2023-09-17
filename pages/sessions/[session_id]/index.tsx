@@ -17,11 +17,6 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-// import "@fontsource/roboto/300.css";
-// import "@fontsource/roboto/400.css";
-// import "@fontsource/roboto/500.css";
-// import "@fontsource/roboto/700.css";
-
 const StyledCard = styled(Card)(({ theme }) => ({
   boxShadow: "none",
   marginTop: "0.7em",
@@ -76,154 +71,146 @@ export default function SessionDetails() {
   };
 
   return (
-    <Grid container rowSpacing={1} columnSpacing={2}>
+    <Grid container spacing={2}>
       <Grid item xs={12} sm={12}>
-        <StyledCard>
-          <StyledCardContent>
-            <Grid container justifyContent="space-between" alignItems="center">
-              <Typography variant="h6" gutterBottom>
-                Details
-              </Typography>
+        <Box p={3} sx={{ backgroundColor: "#fff", borderRadius: 2 }}>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Typography variant="h6" gutterBottom>
+              Details
+            </Typography>
+          </Grid>
+          <Grid container spacing={{ xs: 1, sm: 2, md: 2, lg: 3 }}>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+              <Card variant="outlined">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingTop: "8px",
+                    paddingLeft: "16px",
+                    paddingRight: "8px",
+                  }}
+                >
+                  <EventIcon sx={{ fontSize: "2.8em" }} />
+                  <CardContent>
+                    <Box>
+                      {/* <Typography variant="subtitle1">Date</Typography> */}
+                      <Typography>Aug 22</Typography>
+                      <Typography variant="caption">18:00 - 20:00</Typography>
+                    </Box>
+                  </CardContent>
+                </Box>
+              </Card>
             </Grid>
-            <Grid container spacing={{ xs: 1, sm: 2, md: 2, lg: 3 }}>
-              <Grid item xs={12} sm={12} md={6} lg={3}>
-                <Card variant="outlined">
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      paddingTop: "8px",
-                      paddingLeft: "16px",
-                      paddingRight: "8px",
-                    }}
-                  >
-                    <EventIcon sx={{ fontSize: "2.8em" }} />
-                    <CardContent>
-                      <Box>
-                        {/* <Typography variant="subtitle1">Date</Typography> */}
-                        <Typography>Aug 22</Typography>
-                        <Typography variant="caption">18:00 - 20:00</Typography>
-                      </Box>
-                    </CardContent>
-                  </Box>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={12} md={6} lg={3}>
-                <Card variant="outlined">
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      paddingTop: "8px",
-                      paddingLeft: "16px",
-                      paddingRight: "8px",
-                    }}
-                  >
-                    <ClassIcon sx={{ fontSize: "2.8em" }} />
-                    <CardContent>
-                      <Box>
-                        {/* <Typography variant="subtitle1">Class</Typography> */}
-                        <Typography>{details?.className}</Typography>
-                        <Typography variant="caption">
-                          {details?.teacher}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Box>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={12} md={6} lg={3}>
-                <Card variant="outlined">
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      paddingTop: "8px",
-                      paddingLeft: "16px",
-                      paddingRight: "8px",
-                    }}
-                  >
-                    <HailIcon sx={{ fontSize: "2.8em" }} />
-                    <CardContent>
-                      <Box>
-                        <Typography variant="subtitle1">Attended</Typography>
-                        <Typography variant="h5">
-                          {details
-                            ? details.attended.length
-                            : "Info not available"}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Box>
-                </Card>
-              </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+              <Card variant="outlined">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingTop: "8px",
+                    paddingLeft: "16px",
+                    paddingRight: "8px",
+                  }}
+                >
+                  <ClassIcon sx={{ fontSize: "2.8em" }} />
+                  <CardContent>
+                    <Box>
+                      {/* <Typography variant="subtitle1">Class</Typography> */}
+                      <Typography>{details?.className}</Typography>
+                      <Typography variant="caption">
+                        {details?.teacher}
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </Box>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+              <Card variant="outlined">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingTop: "8px",
+                    paddingLeft: "16px",
+                    paddingRight: "8px",
+                  }}
+                >
+                  <HailIcon sx={{ fontSize: "2.8em" }} />
+                  <CardContent>
+                    <Box>
+                      <Typography variant="subtitle1">Attended</Typography>
+                      <Typography variant="h5">
+                        {details
+                          ? details.attended.length
+                          : "Info not available"}
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </Box>
+              </Card>
+            </Grid>
 
-              <Grid item xs={12} sm={12} md={6} lg={3}>
-                <Card variant="outlined">
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      paddingTop: "8px",
-                      paddingLeft: "16px",
-                      paddingRight: "8px",
-                    }}
-                  >
-                    <HelpCenterIcon sx={{ fontSize: "2.8em" }} />
-                    <CardContent>
-                      <Box>
-                        <Typography variant="subtitle1">Absent</Typography>
-                        <Typography variant="h5">
-                          {details
-                            ? details.absent.length
-                            : "Info not available"}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Box>
-                </Card>
-              </Grid>
+            <Grid item xs={12} sm={12} md={6} lg={3}>
+              <Card variant="outlined">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingTop: "8px",
+                    paddingLeft: "16px",
+                    paddingRight: "8px",
+                  }}
+                >
+                  <HelpCenterIcon sx={{ fontSize: "2.8em" }} />
+                  <CardContent>
+                    <Box>
+                      <Typography variant="subtitle1">Absent</Typography>
+                      <Typography variant="h5">
+                        {details ? details.absent.length : "Info not available"}
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </Box>
+              </Card>
             </Grid>
-          </StyledCardContent>
-        </StyledCard>
+          </Grid>
+        </Box>
       </Grid>
       <Grid item sm={12} md={12} lg={6}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Attended Students
-            </Typography>
-            <Stack direction="row" spacing={1}>
-              {details &&
-                details.attended.map((student) => (
-                  <Chip label={student.name} onClick={handleClick} />
-                ))}
-            </Stack>
-          </CardContent>
-        </Card>
+        <Box p={3} sx={{ backgroundColor: "#fff", borderRadius: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Attended Students
+          </Typography>
+          <Stack direction="row" spacing={1}>
+            {details &&
+              details.attended.map((student) => (
+                <Chip label={student.name} onClick={handleClick} />
+              ))}
+          </Stack>
+        </Box>
       </Grid>
       <Grid item sm={12} md={12} lg={6}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Absent Students
-            </Typography>
-            <Stack direction="row" spacing={1}>
-              {details &&
-                details.absent.map((student) => (
-                  <Chip
-                    label={student.name}
-                    variant="outlined"
-                    onClick={handleClick}
-                  />
-                ))}
-            </Stack>
-          </CardContent>
-        </Card>
+        <Box p={3} sx={{ backgroundColor: "#fff", borderRadius: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Absent Students
+          </Typography>
+          <Stack direction="row" spacing={1}>
+            {details &&
+              details.absent.map((student) => (
+                <Chip
+                  label={student.name}
+                  variant="outlined"
+                  onClick={handleClick}
+                />
+              ))}
+          </Stack>
+        </Box>
       </Grid>
       {/* <Grid
         container

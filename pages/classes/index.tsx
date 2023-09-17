@@ -1,18 +1,19 @@
-import { Class } from "../api/classes";
 import { styled } from "@mui/material/styles";
 import * as React from "react";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import ChildCareIcon from "@mui/icons-material/ChildCare";
-import fetcher from "../../utils/fetcher";
+import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
+import Link from "next/link";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
-import CircularProgress from "@mui/material/CircularProgress";
+
+import fetcher from "../../utils/fetcher";
+import { Class } from "../api/classes";
 
 const FlexGrid = styled(Grid)(({ theme }) => ({
   display: "flex",
@@ -29,11 +30,6 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 const StyledCardContent = styled(CardContent)(({ theme }) => ({
   padding: "24px", // mui defaults CardContent bottom-padding to 24px
-}));
-
-const StyledLink = styled(Link)(({ theme }) => ({
-  textDecoration: "none",
-  color: "inherit",
 }));
 
 export default function Classes() {
@@ -53,7 +49,7 @@ export default function Classes() {
       <Grid item xs={12}>
         <Typography>All Classes</Typography>
         {classes.map((row: Class) => (
-          <StyledLink href={`classes/${row.id}`} key={row.id}>
+          <Link href={`classes/${row.id}`} key={row.id}>
             <StyledCard key={row.id}>
               <StyledCardContent>
                 <Grid
@@ -90,7 +86,7 @@ export default function Classes() {
                 </Grid>
               </StyledCardContent>
             </StyledCard>
-          </StyledLink>
+          </Link>
         ))}
       </Grid>
     </Grid>
