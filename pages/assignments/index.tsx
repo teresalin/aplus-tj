@@ -79,6 +79,7 @@ export default function CustomFilterPanelPosition() {
     setSelectedRowData(selectedRowsData[0]);
   };
 
+  // TODO creating without description does not close dialog
   const handleCreateNewAssignment = async (data) => {
     const response = await fetch(`/api/assignments/[assignment_id]`, {
       method: "POST",
@@ -217,7 +218,7 @@ export default function CustomFilterPanelPosition() {
   if (!assignments) return <CircularProgress />;
 
   return (
-    <div style={{ width: "100%" }}>
+    <div style={{ flex: 1, overflow: "hidden" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
