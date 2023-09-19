@@ -12,8 +12,8 @@ import fetcher from "../../../utils/fetcher";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import UpdateClassDetailsDialog from "../../../src/components/UpdateClassDetailsDialog";
-import UpdateClassStudentsDialog from "../../../src/components/UpdateClassStudentsDialog";
+import UpdateClassDetailsDialog from "../../../src/components/class/UpdateClassDetailsDialog";
+import UpdateClassStudentsDialog from "../../../src/components/class/UpdateClassStudentsDialog";
 import useSWR from "swr";
 
 // import "@fontsource/roboto/300.css";

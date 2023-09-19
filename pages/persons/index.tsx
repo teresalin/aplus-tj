@@ -1,28 +1,17 @@
 import * as React from "react";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
-import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import Grid from "@mui/material/Grid";
 import Tab from "@mui/material/Tab";
-import TableRowsIcon from "@mui/icons-material/TableRows";
 import Tabs from "@mui/material/Tabs";
 import useSWR from "swr";
-import ViewColumnIcon from "@mui/icons-material/ViewColumn";
-import {
-  DataGrid,
-  GridColDef,
-  GridToolbarContainer,
-  GridToolbarFilterButton,
-  GridToolbarColumnsButton,
-  GridToolbarDensitySelector,
-  GridToolbarExport,
-  GridToolbarQuickFilter,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 import fetcher from "../../utils/fetcher";
-import NewPersonDialog from "../../src/components/NewPersonDialog";
 import { generateColumns } from "../../utils/data-grid/generateColumns";
+import CustomToolBar from "../../src/components/data-grid/CustomToolBar";
+import IconButton from "@mui/material/IconButton";
+import NewPersonDialog from "../../src/components/person/NewPersonDialog";
 
 function a11yProps(key: string) {
   return {
@@ -31,98 +20,27 @@ function a11yProps(key: string) {
   };
 }
 
-function CustomToolbar({ buttonRef }) {
-  return (
-    <GridToolbarContainer
-      sx={{ direction: "row", justifyContent: "space-between" }}
-    >
-      <Grid item>
-        <GridToolbarQuickFilter sx={{ marginLeft: 1 }} />
-      </Grid>
-      <Grid item>
-        <NewPersonDialog personType={"persons"} />
-        <GridToolbarColumnsButton
-          title="Column visibility"
-          ref={buttonRef}
-          startIcon={<ViewColumnIcon />}
-          sx={{
-            padding: 0,
-            minHeight: 0,
-            minWidth: 0,
-            borderRadius: 5,
-            "& .MuiButton-startIcon": {
-              "& > *:first-of-type": { fontSize: 24 },
-              margin: 0,
-              padding: "4px",
-            },
-          }}
-        />
-        <GridToolbarFilterButton
-          ref={buttonRef}
-          componentsProps={{
-            button: {
-              startIcon: <FilterListIcon />,
-            },
-          }}
-          sx={{
-            padding: 0,
-            minHeight: 0,
-            minWidth: 0,
-            borderRadius: 5,
-            "& .MuiButton-startIcon": {
-              "& > *:first-of-type": { fontSize: 24 },
-              margin: 0,
-              padding: "4px",
-            },
-          }}
-        />
-        <GridToolbarDensitySelector
-          title="Density"
-          ref={buttonRef}
-          startIcon={<TableRowsIcon />}
-          sx={{
-            padding: 0,
-            minHeight: 0,
-            minWidth: 0,
-
-            borderRadius: 5,
-            "& .MuiButton-startIcon": {
-              "& > *:first-of-type": { fontSize: 24 },
-              margin: 0,
-              padding: "4px",
-            },
-          }}
-        />
-        <GridToolbarExport
-          title="Export"
-          ref={buttonRef}
-          startIcon={<DownloadForOfflineIcon />}
-          sx={{
-            padding: 0,
-            minHeight: 0,
-            minWidth: 0,
-            borderRadius: 5,
-            "& .MuiButton-startIcon": {
-              "& > *:first-of-type": { fontSize: 24 },
-              margin: 0,
-              padding: "4px",
-            },
-          }}
-        />
-      </Grid>
-    </GridToolbarContainer>
-  );
-}
-
 const personTypes = ["persons", "staffs", "parents", "students"];
 
 export default function CustomFilterPanelPosition() {
   const [value, setValue] = React.useState("persons");
+  const [isNewDialogOpen, setIsNewDialogOpen] = React.useState(false);
   const { data } = useSWR(`api/${value}`, fetcher);
-  const rows = data || [];
+  const persons = data as [];
+  const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
+    null
+  );
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
+  };
+
+  const handleOpenNewDialog = () => {
+    setIsNewDialogOpen(true);
+  };
+
+  const handleCloseNewDialog = () => {
+    setIsNewDialogOpen(false);
   };
 
   // TODO pass this into DataGrid
@@ -133,9 +51,37 @@ export default function CustomFilterPanelPosition() {
       .map((column) => column.field);
   };
 
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
+  // TODO update this
+  const handleCreateNewPerson = async (data) => {
+    const response = await fetch(`/api/assignments/[assignment_id]`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
-  if (!rows) return <CircularProgress />;
+    if (response.ok) {
+      setIsNewDialogOpen(false);
+    } else {
+      console.error("Error updating assignment data:", response.statusText);
+    }
+  };
+
+  function AddIconButton({ onClick }) {
+    return (
+      <IconButton
+        aria-label="Add box icon"
+        onClick={onClick}
+        color="primary"
+        sx={{ padding: "4px" }}
+      >
+        <AddBoxIcon />
+      </IconButton>
+    );
+  }
+
+  if (!persons) return <CircularProgress />;
 
   return (
     <div style={{ width: "100%" }}>
@@ -146,7 +92,7 @@ export default function CustomFilterPanelPosition() {
           ))}
         </Tabs>
       </Box>
-      {rows && (
+      {persons && (
         <DataGrid
           sx={{ backgroundColor: "#fff" }}
           localeText={{
@@ -155,8 +101,8 @@ export default function CustomFilterPanelPosition() {
             toolbarDensity: "",
             toolbarExport: "",
           }}
-          rows={rows}
-          columns={generateColumns(rows)}
+          rows={persons}
+          columns={generateColumns(persons)}
           initialState={{
             pagination: { paginationModel: { pageSize: 10 } },
             columns: {
@@ -171,21 +117,28 @@ export default function CustomFilterPanelPosition() {
             },
           }}
           slots={{
-            toolbar: CustomToolbar,
+            toolbar: CustomToolBar,
           }}
           slotProps={{
-            basePopper: {
-              anchorEl: buttonRef.current,
+            panel: {
+              anchorEl: buttonEl,
               placement: "bottom-end",
             },
             toolbar: {
-              buttonRef,
+              children: <AddIconButton onClick={handleOpenNewDialog} />,
+              setButtonEl,
             },
           }}
           pageSizeOptions={[5, 10, 25]}
           hideFooterSelectedRowCount
         />
       )}
+      <NewPersonDialog
+        personType={value}
+        open={isNewDialogOpen}
+        onClose={handleCloseNewDialog}
+        onSubmit={handleCreateNewPerson}
+      />
     </div>
   );
 }

@@ -4,14 +4,8 @@ import * as React from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
-import CustomToolBar from "../../src/components/data-grid/CustomToolBar";
 import dayjs from "dayjs";
-import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
-import EditAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
-import fetcher from "../../utils/fetcher";
 import IconButton from "@mui/material/IconButton";
-import NewAssignmentDialog from "../../src/components/assignment/NewAssignmentDialog";
-import RenderMenu from "../../src/components/data-grid/RenderMenu";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import useSWR from "swr";
@@ -21,6 +15,13 @@ import {
   GridValueFormatterParams,
   GridRowSelectionModel,
 } from "@mui/x-data-grid";
+
+import fetcher from "../../utils/fetcher";
+import CustomToolBar from "../../src/components/data-grid/CustomToolBar";
+import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
+import EditAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
+import NewAssignmentDialog from "../../src/components/assignment/NewAssignmentDialog";
+import RenderMenu from "../../src/components/data-grid/RenderMenu";
 
 function a11yProps(key: string) {
   return {
@@ -43,9 +44,9 @@ export default function CustomFilterPanelPosition() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { data } = useSWR(`api/assignments`, fetcher);
   const assignments = data as Assignment[];
-  // const buttonRef = React.useRef<HTMLButtonElement>(null);
-  const [filterButtonEl, setFilterButtonEl] =
-    React.useState<HTMLButtonElement | null>(null);
+  const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
+    null
+  );
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -93,7 +94,7 @@ export default function CustomFilterPanelPosition() {
     });
 
     if (response.ok) {
-      setIsEditDialogOpen(false);
+      setIsNewDialogOpen(false);
     } else {
       console.error("Error updating assignment data:", response.statusText);
     }
@@ -216,10 +217,6 @@ export default function CustomFilterPanelPosition() {
     },
   ];
 
-  function children() {
-    return <AddIconButton onClick={handleOpenNewDialog} />;
-  }
-
   if (!assignments) return <CircularProgress />;
 
   return (
@@ -261,12 +258,12 @@ export default function CustomFilterPanelPosition() {
         }}
         slotProps={{
           panel: {
-            anchorEl: filterButtonEl,
+            anchorEl: buttonEl,
             placement: "bottom-end",
           },
           toolbar: {
-            // children, TODOf fix this
-            setFilterButtonEl,
+            children: <AddIconButton onClick={handleOpenNewDialog} />,
+            setButtonEl,
           },
         }}
         pageSizeOptions={[5, 10, 25]}

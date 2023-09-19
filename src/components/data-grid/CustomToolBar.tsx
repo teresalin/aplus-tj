@@ -14,18 +14,11 @@ import {
 import React from "react";
 
 export interface CustomToolbarProps {
-  buttonRef?: React.RefObject<HTMLButtonElement>;
-  children;
-  setFilterButtonEl: React.Dispatch<
-    React.SetStateAction<HTMLButtonElement | null>
-  >;
+  children: React.JSX.Element;
+  setButtonEl: React.Dispatch<React.SetStateAction<HTMLButtonElement | null>>;
 }
 
-function CustomToolBar({
-  buttonRef,
-  children,
-  setFilterButtonEl,
-}: CustomToolbarProps) {
+function CustomToolBar({ children, setButtonEl }: CustomToolbarProps) {
   return (
     <GridToolbarContainer
       sx={{ direction: "row", justifyContent: "space-between" }}
@@ -37,7 +30,7 @@ function CustomToolBar({
         {children}
         <GridToolbarColumnsButton
           title="Column visibility"
-          // ref={buttonRef}
+          ref={setButtonEl}
           startIcon={<ViewColumnIcon />}
           sx={{
             padding: 0,
@@ -52,7 +45,7 @@ function CustomToolBar({
           }}
         />
         <GridToolbarFilterButton
-          ref={setFilterButtonEl}
+          ref={setButtonEl}
           componentsProps={{
             button: {
               startIcon: <FilterListIcon />,
