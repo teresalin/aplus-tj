@@ -1,5 +1,4 @@
 import { Assignment } from "../api/assignments";
-import { useState } from "react";
 import * as React from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
@@ -17,11 +16,11 @@ import {
 } from "@mui/x-data-grid";
 
 import fetcher from "../../utils/fetcher";
-import CustomToolBar from "../../src/components/data-grid/CustomToolBar";
+import CustomToolBar from "../../src/components/dataGrid/CustomToolBar";
 import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
 import EditAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
 import NewAssignmentDialog from "../../src/components/assignment/NewAssignmentDialog";
-import RenderMenu from "../../src/components/data-grid/RenderMenu";
+import RenderMenu from "../../src/components/dataGrid/RenderMenu";
 
 function a11yProps(key: string) {
   return {
@@ -33,23 +32,24 @@ function a11yProps(key: string) {
 const assignmentTypes = ["all", "upcoming", "past due"];
 
 export default function CustomFilterPanelPosition() {
-  const [value, setValue] = React.useState("all");
+  const [tab, setTab] = React.useState("all");
   const [rowSelectionModel, setRowSelectionModel] =
-    useState<GridRowSelectionModel>([]);
-  const [selectedRowData, setSelectedRowData] = useState<
+    React.useState<GridRowSelectionModel>([]);
+  const [selectedRowData, setSelectedRowData] = React.useState<
     Assignment | undefined
   >({} as Assignment);
-  const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { data } = useSWR(`api/assignments`, fetcher);
-  const assignments = data as Assignment[];
+  const [isNewDialogOpen, setIsNewDialogOpen] = React.useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
     null
   );
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue);
+  const { data } = useSWR(`api/assignments`, fetcher);
+  const assignments = data as Assignment[];
+
+  const handleTabChange = (event: React.SyntheticEvent, newTab: string) => {
+    setTab(newTab);
   };
 
   const handleOpenNewDialog = () => {
@@ -223,7 +223,7 @@ export default function CustomFilterPanelPosition() {
     <Box style={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
-          value={value}
+          value={tab}
           onChange={handleTabChange}
           aria-label="assignment tabs"
         >
@@ -236,8 +236,8 @@ export default function CustomFilterPanelPosition() {
         sx={{ backgroundColor: "#fff" }}
         rows={assignments}
         columns={columns}
-        onRowSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
         rowSelectionModel={rowSelectionModel}
+        onRowSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
         localeText={{
           toolbarColumns: "",
           toolbarFilters: "",

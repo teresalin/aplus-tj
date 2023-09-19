@@ -1,7 +1,3 @@
-import { formatDate } from "../../../utils/formatDate";
-import { FormEvent, FormEventHandler, useEffect, useState } from "react";
-import { Person } from "../../../pages/api/persons";
-import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { useRouter } from "next/router";
 import * as React from "react";
@@ -13,7 +9,6 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import EditIcon from "@mui/icons-material/Edit";
-import fetcher from "../../../utils/fetcher";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
 import Switch from "@mui/material/Switch";
@@ -22,7 +17,11 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import { Role } from "../../../pages/api/staffs/roles";
+
+import fetcher from "../../../utils/fetcher";
+import { FormEvent, FormEventHandler } from "react";
+import { Person } from "../../../pages/api/persons";
+import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
 
 const dayOfWeek = [
   "Monday",
@@ -46,9 +45,9 @@ function RedBar() {
 
 export default function UpdateClassDetailsDialog({ classDetails }) {
   const classID = useRouter().query.class_id;
-  const [open, setOpen] = useState(false);
-  const [teacher, setTeacher] = useState(classDetails.teacherName);
-  const [updatedSchedules, setUpdatedSchedules] = useState(
+  const [open, setOpen] = React.useState(false);
+  const [teacher, setTeacher] = React.useState(classDetails.teacherName);
+  const [updatedSchedules, setUpdatedSchedules] = React.useState(
     classDetails.schedules
   );
   const { data } = useSWR(open ? "/api/staffs" : null, fetcher);

@@ -1,4 +1,4 @@
-import { FormEvent, FormEventHandler, useState } from "react";
+import { FormEvent, FormEventHandler } from "react";
 import * as React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -23,7 +23,7 @@ export default function NewAssignmentDialog({
   onClose,
   onSubmit,
 }: INewAssignmentDialogProps) {
-  const [editedData, setEditedData] = useState({
+  const [editedData, setEditedData] = React.useState({
     assignmentName: "",
     dueDate: "",
     classId: 0,
