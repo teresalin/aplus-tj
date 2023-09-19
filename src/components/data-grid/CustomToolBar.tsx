@@ -11,8 +11,21 @@ import {
   GridToolbarExport,
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
+import React from "react";
 
-function CustomToolBar({ buttonRef, children }) {
+export interface CustomToolbarProps {
+  buttonRef?: React.RefObject<HTMLButtonElement>;
+  children;
+  setFilterButtonEl: React.Dispatch<
+    React.SetStateAction<HTMLButtonElement | null>
+  >;
+}
+
+function CustomToolBar({
+  buttonRef,
+  children,
+  setFilterButtonEl,
+}: CustomToolbarProps) {
   return (
     <GridToolbarContainer
       sx={{ direction: "row", justifyContent: "space-between" }}
@@ -24,7 +37,7 @@ function CustomToolBar({ buttonRef, children }) {
         {children}
         <GridToolbarColumnsButton
           title="Column visibility"
-          ref={buttonRef}
+          // ref={buttonRef}
           startIcon={<ViewColumnIcon />}
           sx={{
             padding: 0,
@@ -39,7 +52,7 @@ function CustomToolBar({ buttonRef, children }) {
           }}
         />
         <GridToolbarFilterButton
-          ref={buttonRef}
+          ref={setFilterButtonEl}
           componentsProps={{
             button: {
               startIcon: <FilterListIcon />,
@@ -59,7 +72,6 @@ function CustomToolBar({ buttonRef, children }) {
         />
         <GridToolbarDensitySelector
           title="Density"
-          ref={buttonRef}
           startIcon={<TableRowsIcon />}
           sx={{
             padding: 0,
@@ -76,7 +88,6 @@ function CustomToolBar({ buttonRef, children }) {
         />
         <GridToolbarExport
           title="Export"
-          ref={buttonRef}
           startIcon={<DownloadForOfflineIcon />}
           sx={{
             padding: 0,

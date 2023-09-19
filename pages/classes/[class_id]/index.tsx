@@ -130,10 +130,10 @@ export default function ClassDetails() {
       <Grid item xs={12}>
         <Box p={3} sx={{ backgroundColor: "#fff", borderRadius: 2 }}>
           <Typography mb={2} variant="h6" gutterBottom>
-            Assignments
+            Upcoming Assignments
           </Typography>
           {details &&
-            details.upcomingAssignments.map((detail) => (
+            details.upcomingAssignments.slice(0, 3).map((detail) => (
               <Card
                 style={{
                   display: "flex",

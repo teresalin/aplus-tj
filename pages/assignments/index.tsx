@@ -43,6 +43,9 @@ export default function CustomFilterPanelPosition() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { data } = useSWR(`api/assignments`, fetcher);
   const assignments = data as Assignment[];
+  // const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const [filterButtonEl, setFilterButtonEl] =
+    React.useState<HTMLButtonElement | null>(null);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
@@ -213,7 +216,9 @@ export default function CustomFilterPanelPosition() {
     },
   ];
 
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
+  function children() {
+    return <AddIconButton onClick={handleOpenNewDialog} />;
+  }
 
   if (!assignments) return <CircularProgress />;
 
@@ -252,20 +257,16 @@ export default function CustomFilterPanelPosition() {
           },
         }}
         slots={{
-          toolbar: () => (
-            <CustomToolBar
-              buttonRef={buttonRef}
-              children={<AddIconButton onClick={handleOpenNewDialog} />}
-            />
-          ),
+          toolbar: CustomToolBar,
         }}
         slotProps={{
-          basePopper: {
-            anchorEl: buttonRef.current,
+          panel: {
+            anchorEl: filterButtonEl,
             placement: "bottom-end",
           },
           toolbar: {
-            buttonRef,
+            // children, TODOf fix this
+            setFilterButtonEl,
           },
         }}
         pageSizeOptions={[5, 10, 25]}
