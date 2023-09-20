@@ -215,7 +215,7 @@ export default function CustomFilterPanelPosition() {
     {
       field: "name",
       headerName: "Name",
-      minWidth: 100,
+      minWidth: 150,
       flex: 1,
     },
     {
@@ -227,19 +227,19 @@ export default function CustomFilterPanelPosition() {
     {
       field: "phone",
       headerName: "Phone",
-      minWidth: 100,
+      minWidth: 120,
       flex: 1,
     },
     {
       field: "email",
       headerName: "Email",
-      minWidth: 100,
+      minWidth: 200,
       flex: 1,
     },
     {
       field: "dateOfBirth",
       headerName: "Date of Birth",
-      minWidth: 50,
+      minWidth: 120,
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams<Date>) => {
         if (params.value == null) {
@@ -259,7 +259,7 @@ export default function CustomFilterPanelPosition() {
     {
       field: "created",
       headerName: "Created On",
-      minWidth: 50,
+      minWidth: 120,
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams<Date>) => {
         if (params.value == null) {
@@ -286,7 +286,7 @@ export default function CustomFilterPanelPosition() {
   if (!persons) return <CircularProgress />;
 
   return (
-    <div style={{ width: "100%" }}>
+    <Box sx={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={tab} onChange={handleChange} aria-label="users tabs">
           {personTypes.map((key) => (
@@ -296,7 +296,11 @@ export default function CustomFilterPanelPosition() {
       </Box>
       {persons && (
         <DataGrid
-          sx={{ backgroundColor: "#fff" }}
+          sx={{
+            width: "100%",
+            overflow: "hidden",
+            backgroundColor: "#fff",
+          }}
           rows={persons}
           columns={columns}
           getRowHeight={({ id, densityFactor }: GridRowHeightParams) => {
@@ -349,6 +353,6 @@ export default function CustomFilterPanelPosition() {
         onClose={handleCloseNewDialog}
         onSubmit={handleCreateNewPerson}
       />
-    </div>
+    </Box>
   );
 }

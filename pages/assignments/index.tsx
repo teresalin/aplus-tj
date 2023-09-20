@@ -162,25 +162,25 @@ export default function CustomFilterPanelPosition() {
     {
       field: "assignmentName",
       headerName: "Assignment Name",
-      minWidth: 100,
+      minWidth: 200,
       flex: 1,
     },
     {
       field: "className",
       headerName: "Class Name",
-      minWidth: 100,
+      minWidth: 150,
       flex: 1,
     },
     {
       field: "description",
       headerName: "Description",
-      minWidth: 100,
+      minWidth: 200,
       flex: 1,
     },
     {
       field: "dueDate",
       headerName: "Due Date",
-      minWidth: 50,
+      minWidth: 120,
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams<Date>) => {
         if (params.value == null) {
@@ -193,7 +193,7 @@ export default function CustomFilterPanelPosition() {
     {
       field: "created",
       headerName: "Created On",
-      minWidth: 50,
+      minWidth: 120,
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams<Date>) => {
         if (params.value == null) {
@@ -233,7 +233,11 @@ export default function CustomFilterPanelPosition() {
         </Tabs>
       </Box>
       <DataGrid
-        sx={{ backgroundColor: "#fff" }}
+        sx={{
+          width: "100%",
+          overflow: "hidden",
+          backgroundColor: "#fff",
+        }}
         rows={assignments}
         columns={columns}
         rowSelectionModel={rowSelectionModel}

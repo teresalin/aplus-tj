@@ -15,6 +15,7 @@ const StyledDrawerContainer = styled("div")(({ theme }) => ({
 
 const Main = styled("main")(({ theme }) => ({
   flexGrow: 1,
+  overflowX: "hidden",
   padding: theme.spacing(3),
 }));
 
