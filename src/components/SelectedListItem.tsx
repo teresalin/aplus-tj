@@ -4,6 +4,7 @@ import * as React from "react";
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import Box from "@mui/material/Box";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ClassIcon from "@mui/icons-material/Class";
 import Divider from "@mui/material/Divider";
 import GridViewIcon from "@mui/icons-material/GridView";
@@ -75,6 +76,14 @@ export default function SelectedListItem() {
               <GridViewIcon />
             </ListItemIcon>
             <ListItemText primary="Dashboard" />
+          </ListItemButton>
+        </Link>
+        <Link href="/schedule">
+          <ListItemButton selected={isActive("/schedule")}>
+            <ListItemIcon>
+              <CalendarMonthIcon />
+            </ListItemIcon>
+            <ListItemText primary="Schedule" />
           </ListItemButton>
         </Link>
         <Link href="/classes">

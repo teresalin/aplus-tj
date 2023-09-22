@@ -1,23 +1,26 @@
-import { styled } from "@mui/material/styles";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { Assignment } from "../api/assignments";
 import * as React from "react";
-import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import CircularProgress from "@mui/material/CircularProgress";
 import dayjs from "dayjs";
-import Grid from "@mui/material/Grid";
-import Link from "next/link";
+import IconButton from "@mui/material/IconButton";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
 import useSWR from "swr";
+import {
+  DataGrid,
+  GridColDef,
+  GridValueFormatterParams,
+  GridRowSelectionModel,
+} from "@mui/x-data-grid";
 
 import fetcher from "../../utils/fetcher";
+import CustomToolBar from "../../src/components/dataGrid/CustomToolBar";
+import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
+import EditAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
+import NewAssignmentDialog from "../../src/components/assignment/NewAssignmentDialog";
+import RenderMenu from "../../src/components/dataGrid/RenderMenu";
 import { Session } from "../api/sessions";
 
 function a11yProps(key: string) {
@@ -27,157 +30,255 @@ function a11yProps(key: string) {
   };
 }
 
-const StyledCard = styled(Card)(() => ({
-  cursor: "pointer",
-  "&:hover": {
-    backgroundColor: "#ecf5fc",
-  },
-  marginTop: "1em",
-  marginBottom: "1em",
-}));
-
-const StyledCardContent = styled(CardContent)(({ theme }) => ({
-  padding: 18, // mui defaults CardContent bottom-padding to 24px
-  "&:last-child": {
-    paddingBottom: 18,
-  },
-  alignContent: "center",
-}));
-
-const sessionTypes = ["all", "upcoming", "past"];
+const assignmentTypes = ["all", "upcoming", "past due"];
 
 export default function CustomFilterPanelPosition() {
-  const { data } = useSWR("api/sessions", fetcher);
-  const [selectedTab, setSelectedTab] = React.useState("all");
-  const [sessions, setSessions] = React.useState(data || []);
+  const [tab, setTab] = React.useState("all");
+  const [rowSelectionModel, setRowSelectionModel] =
+    React.useState<GridRowSelectionModel>([]);
+  const [selectedRowData, setSelectedRowData] = React.useState<
+    Assignment | undefined
+  >({} as Assignment);
+  const [isNewDialogOpen, setIsNewDialogOpen] = React.useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
+    null
+  );
 
-  React.useEffect(() => {
-    setSessions(data);
-  }, [data]);
+  const { data } = useSWR(`api/sessions?tab=${tab}`, fetcher);
+  const sessions = data as Session[];
 
-  React.useEffect(() => {
-    fetch(`/api/sessions?tab=${selectedTab}`)
-      .then((response) => response.json())
-      .then((data) => setSessions(data));
-  }, [selectedTab]);
-
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    setSelectedTab(newValue);
+  const handleTabChange = (event: React.SyntheticEvent, newTab: string) => {
+    setTab(newTab);
   };
+
+  const handleOpenNewDialog = () => {
+    setIsNewDialogOpen(true);
+  };
+
+  const handleCloseNewDialog = () => {
+    setIsNewDialogOpen(false);
+  };
+
+  const handleOpenEditDialog = () => {
+    setIsEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
+  };
+
+  const handleOpenDeleteDialog = () => {
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
+  };
+
+  const onRowsSelectionHandler = (ids) => {
+    const selectedRowsData = ids.map((id) =>
+      sessions.find((row) => row.id === id)
+    );
+    setSelectedRowData(selectedRowsData[0]);
+  };
+
+  // TODO creating without description does not close dialog
+  const handleCreateNewAssignment = async (data) => {
+    const response = await fetch(`/api/assignments/[assignment_id]`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      setIsNewDialogOpen(false);
+    } else {
+      console.error("Error updating assignment data:", response.statusText);
+    }
+  };
+
+  const handleSaveRowData = async (editedData) => {
+    const response = await fetch(`/api/assignments/${editedData.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editedData),
+    });
+
+    if (response.ok) {
+      setIsEditDialogOpen(false);
+    } else {
+      console.error("Error updating assignment data:", response.statusText);
+    }
+  };
+
+  const handleDeleteRowData = async () => {
+    const response = await fetch(`/api/assignments/${selectedRowData?.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      setIsDeleteDialogOpen(false);
+    } else {
+      console.error("Error deleting assignment data:", response.statusText);
+    }
+  };
+
+  // TODO pass this into DataGrid
+  const getTogglableColumns = (columns: GridColDef[]) => {
+    // hide the column with field `id` from list of togglable columns
+    return columns
+      .filter((column) => column.field !== "id")
+      .map((column) => column.field);
+  };
+
+  function AddIconButton({ onClick }) {
+    return (
+      <IconButton
+        aria-label="Add box icon"
+        onClick={onClick}
+        color="primary"
+        sx={{ padding: "4px" }}
+      >
+        <AddBoxIcon />
+      </IconButton>
+    );
+  }
+
+  const columns: GridColDef[] = [
+    {
+      field: "id",
+      headerName: "id",
+      minWidth: 50,
+      flex: 1,
+    },
+    {
+      field: "className",
+      headerName: "Class Name",
+      minWidth: 200,
+      flex: 1,
+    },
+    {
+      field: "sessionDate",
+      headerName: "sessionDate",
+      minWidth: 150,
+      flex: 1,
+    },
+    {
+      field: "startTime",
+      headerName: "Start Time",
+      minWidth: 120,
+      flex: 1,
+      valueFormatter: (params: GridValueFormatterParams<Date>) => {
+        if (params.value == null) {
+          return "";
+        }
+        return dayjs(params.value).format("YYYY-MM-DD");
+      },
+    },
+    {
+      field: "endTime",
+      headerName: "End Time",
+      minWidth: 120,
+      flex: 1,
+      valueFormatter: (params: GridValueFormatterParams<Date>) => {
+        if (params.value == null) {
+          return "";
+        }
+        return dayjs(params.value).format("YYYY-MM-DD");
+      },
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      minWidth: 70,
+      maxWidth: 70,
+      flex: 1,
+      renderCell: () => (
+        <RenderMenu
+          onEditClick={handleOpenEditDialog}
+          onDeleteClick={handleOpenDeleteDialog}
+        />
+      ),
+    },
+  ];
 
   if (!sessions) return <CircularProgress />;
 
   return (
     <Box style={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={selectedTab}
-          onChange={handleChange}
-          aria-label="sessions tabs"
-        >
-          {sessionTypes.map((key) => (
+        <Tabs value={tab} onChange={handleTabChange} aria-label="session tabs">
+          {assignmentTypes.map((key) => (
             <Tab key={key} value={key} label={key} {...a11yProps(key)} />
           ))}
         </Tabs>
       </Box>
-      <Box>
-        {sessions &&
-          sessions.map((row: Session) => (
-            <Link href={`sessions/${row.id}`} key={row.id}>
-              <StyledCard key={row.id}>
-                <StyledCardContent>
-                  <Grid
-                    container
-                    spacing={2}
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Grid container item xs="auto" alignItems="center">
-                      <Button
-                        style={{
-                          backgroundColor: "#59addd",
-                          color: "#fff",
-                          marginRight: "0.8em",
-                        }}
-                      >
-                        {dayjs(row.sessionDate).format("MMM DD")}
-                      </Button>
-                      <Typography>{row.className}</Typography>
-                    </Grid>
-                    <Grid container item xs="auto" justifyContent="flex-end">
-                      <Grid
-                        item
-                        sx={{
-                          display: "flex",
-                          paddingX: 1.5,
-                        }}
-                        xs="auto"
-                        alignItems="center"
-                      >
-                        <Tooltip title="Start time">
-                          <AccessTimeIcon sx={{ marginRight: "0.2em" }} />
-                        </Tooltip>
-                        <TimePicker
-                          readOnly
-                          value={dayjs(row.startTime, "HH:mm:ss")}
-                          sx={{
-                            width: "6em",
-                            "& .MuiInput-input": {
-                              padding: 0,
-                            },
-                            "& .MuiInput-root:before": {
-                              borderBottom: "none",
-                            },
-                            "&& .MuiInput-root:hover::before": {
-                              borderBottom: "none",
-                            },
-                          }}
-                          slotProps={{
-                            textField: { size: "small", variant: "standard" },
-                          }}
-                          disableOpenPicker
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        sx={{
-                          display: "flex",
-                          paddingX: 1.5,
-                        }}
-                        xs="auto"
-                        alignItems="center"
-                      >
-                        <Tooltip title="End time">
-                          <AccessTimeFilledIcon sx={{ marginRight: "0.2em" }} />
-                        </Tooltip>
-                        <TimePicker
-                          readOnly
-                          value={dayjs(row.endTime, "HH:mm:ss")}
-                          sx={{
-                            width: "6em",
-                            "& .MuiInput-input": {
-                              padding: 0,
-                            },
-                            "& .MuiInput-root:before": {
-                              borderBottom: "none",
-                            },
-                            "&& .MuiInput-root:hover::before": {
-                              borderBottom: "none",
-                            },
-                          }}
-                          slotProps={{
-                            textField: { size: "small", variant: "standard" },
-                          }}
-                          disableOpenPicker
-                        />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </StyledCardContent>
-              </StyledCard>
-            </Link>
-          ))}
-      </Box>
+      <DataGrid
+        sx={{
+          width: "100%",
+          overflow: "hidden",
+          backgroundColor: "#fff",
+        }}
+        rows={sessions}
+        columns={columns}
+        rowSelectionModel={rowSelectionModel}
+        onRowSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
+        localeText={{
+          toolbarColumns: "",
+          toolbarFilters: "",
+          toolbarDensity: "",
+          toolbarExport: "",
+        }}
+        initialState={{
+          pagination: { paginationModel: { pageSize: 10 } },
+          columns: {
+            columnVisibilityModel: {
+              id: false,
+              created: false,
+            },
+          },
+        }}
+        slots={{
+          toolbar: CustomToolBar,
+        }}
+        slotProps={{
+          panel: {
+            anchorEl: buttonEl,
+            placement: "bottom-end",
+          },
+          toolbar: {
+            children: <AddIconButton onClick={handleOpenNewDialog} />,
+            setButtonEl,
+          },
+        }}
+        pageSizeOptions={[5, 10, 25]}
+        hideFooterSelectedRowCount
+      />
+      <NewAssignmentDialog
+        open={isNewDialogOpen}
+        onClose={handleCloseNewDialog}
+        onSubmit={handleCreateNewAssignment}
+      />
+      <EditAssignmentDialog
+        existingData={selectedRowData}
+        open={isEditDialogOpen}
+        onClose={handleCloseEditDialog}
+        onSubmit={handleSaveRowData}
+      />
+      <DeleteAssignmentDialog
+        open={isDeleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        onSubmit={handleDeleteRowData}
+      />
     </Box>
   );
 }

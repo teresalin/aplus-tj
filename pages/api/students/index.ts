@@ -22,14 +22,14 @@ function parseStudent(row: any): Student {
   return {
     id: row.id,
     name: row.name,
-    englishName: row.englishName,
+    englishName: row.english_name,
     gender: row.gender,
     phone: row.phone,
     email: row.email,
     dateOfBirth: row.date_of_birth,
     currentSchool: row.current_school,
     textbookPublisher: row.textbook_publisher,
-    grade: row.grade,
+    grade: row.grade_name,
     notes: row.notes,
     joinDate: row.join_date,
     leaveDate: row.leave_date,
@@ -50,9 +50,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           s.textbook_publisher,
           s.join_date, 
           s.leave_date, 
-          p.*
+          p.*,
+          g.name AS grade_name
         FROM student s
-        INNER JOIN person p ON s.person_id = p.id;
+        INNER JOIN person p ON s.person_id = p.id
+        INNER JOIN grade g ON s.grade_id = g.id;
       `,
     };
     const result = await client.query(getQuery);

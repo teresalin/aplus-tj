@@ -7,12 +7,14 @@ import CircularProgress from "@mui/material/CircularProgress";
 import CloseIcon from "@mui/icons-material/Close";
 import dayjs from "dayjs";
 import IconButton from "@mui/material/IconButton";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import useSWR from "swr";
 import {
   DataGrid,
   GridColDef,
+  GridColumnVisibilityModel,
   GridRowHeightParams,
   GridRowSelectionModel,
   GridValueFormatterParams,
@@ -32,15 +34,31 @@ function a11yProps(key: string) {
   };
 }
 
-const personTypes = ["persons", "staffs", "parents", "students"];
+const personTypes = ["students", "parents", "staffs"];
 
 export default function CustomFilterPanelPosition() {
-  const [tab, setTab] = React.useState("persons");
+  const [tab, setTab] = React.useState("students");
+  const [gridKey, setGridKey] = React.useState(0);
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
-  const [selectedRowData, setSelectedRowData] = React.useState<
-    Person | undefined
-  >({} as Person);
+  const [selectedRowIndex, setSelectedRowIndex] = React.useState();
+  const [selectedRowData, setSelectedRowData] = React.useState<Person>(
+    {} as Person
+  );
+  const [visibleColumnCount, setVisibleColumnCount] = React.useState(7);
+  const [columnVisibilityModel, setColumnVisibilityModel] =
+    React.useState<GridColumnVisibilityModel>({
+      detailPanel: true,
+      id: false,
+      name: true,
+      gender: false,
+      phone: true,
+      email: true,
+      dateOfBirth: true,
+      active: true,
+      created: false,
+      action: true,
+    });
   const [isNewDialogOpen, setIsNewDialogOpen] = React.useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
@@ -49,7 +67,6 @@ export default function CustomFilterPanelPosition() {
   );
 
   const { data } = useSWR(`api/${tab}`, fetcher);
-  // const persons = data as [];
   const [persons, setPersons] = React.useState(data);
 
   React.useEffect(() => {
@@ -58,6 +75,14 @@ export default function CustomFilterPanelPosition() {
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setTab(newValue);
+  };
+
+  const handleToggleColumn = () => {
+    // Toggle the visibility of a column here
+    // For example, you can change the state that controls the "display: none" CSS
+
+    // After making changes to column visibility, trigger a re-render by changing the key
+    setGridKey((prevKey) => prevKey + 1);
   };
 
   const handleOpenNewDialog = () => {
@@ -84,52 +109,91 @@ export default function CustomFilterPanelPosition() {
     setIsDeleteDialogOpen(false);
   };
 
-  function addAfter(array, index, newItem) {
-    return [...array.slice(0, index + 1), newItem, ...array.slice(index + 1)];
-  }
+  const onRowClick = (data) => {
+    const newDetailPanel = {
+      id: "detailPanel",
+    } as unknown;
 
-  function removeAfter(array, index) {
-    return [...array.slice(0, index + 1), ...array.slice(index + 2)];
-  }
-
-  const onRowsSelectionHandler = (ids) => {
-    const selectedRowsData = ids.map((id) =>
-      persons.find((row) => row.id === id)
-    );
-    // get selected row index
-    const index = persons.findIndex((x) => x.id === selectedRowsData[0].id);
-    const detailPanel = persons[index + 1];
-    console.log("index: ", index);
-
-    const hasDetailPanel = detailPanel.id === "";
-    console.log("hasDetailPanel: ", hasDetailPanel);
-    if (hasDetailPanel) {
-      let removed = removeAfter(persons, index);
-      setPersons(removed);
-    } else {
-      const test = {
-        id: "",
-        name: "",
-        gender: "",
-        phone: "",
-        email: "",
-        dateOfBirth: "",
-        notes: "",
-        active: "",
-        created: "",
-      } as unknown as Person;
-      const newArr = addAfter(persons, index, test);
-      setPersons(newArr);
+    function removeObjectById(array, idToRemove) {
+      return array.filter((item) => item.id !== idToRemove);
     }
-    setSelectedRowData(selectedRowsData[0]);
+
+    function insertDetailPanelById(
+      array: any[],
+      idToInsertAfter: string,
+      newObject: any
+    ): any[] {
+      const newArray: any[] = [];
+      for (const item of array) {
+        newArray.push(item);
+        if (item.id === idToInsertAfter) {
+          newArray.push(newObject);
+        }
+      }
+      return newArray;
+    }
+
+    const hasDetailPanel = persons.some(
+      (person) => person.id === "detailPanel"
+    );
+
+    const isFirstClick = Object.keys(selectedRowData).length === 0;
+    const isSameRowClick =
+      selectedRowData !== undefined && selectedRowData.id === data.id;
+    const isNewRowClick =
+      selectedRowData !== undefined && selectedRowData.id !== data.id;
+
+    if (isFirstClick) {
+      const newArr = insertDetailPanelById(persons, data.id, newDetailPanel);
+      setPersons(newArr);
+      setSelectedRowData(data);
+    } else if (isNewRowClick) {
+      if (hasDetailPanel) {
+        // remove existing detail panel
+        const result = removeObjectById(persons, "detailPanel");
+        // add detail panel after new row
+        const newArr = insertDetailPanelById(result, data.id, newDetailPanel);
+        setPersons(newArr);
+        setSelectedRowData(data);
+      } else {
+        const newArr = insertDetailPanelById(persons, data.id, newDetailPanel);
+        setPersons(newArr);
+        setSelectedRowData(data);
+      }
+    } else if (isSameRowClick) {
+      if (hasDetailPanel) {
+        const result = removeObjectById(persons, "detailPanel");
+        setPersons(result);
+      } else {
+        const newArr = insertDetailPanelById(persons, data.id, newDetailPanel);
+        setPersons(newArr);
+      }
+    } else {
+      // do nothing
+    }
   };
 
-  // TODO pass this into DataGrid
   const getTogglableColumns = (columns: GridColDef[]) => {
-    // hide the column with field `id` from list of togglable columns
+    // hide the column with field `id` and `action` from list of togglable columns
     return columns
-      .filter((column) => column.field !== "id")
+      .filter(
+        (column) =>
+          column.field !== "id" &&
+          column.field !== "action" &&
+          column.field !== "detailPanel"
+      )
       .map((column) => column.field);
+  };
+
+  const onColumnVisibilityChange = (model) => {
+    let count = 0;
+    for (const key in model) {
+      if (model[key] === true) {
+        count++;
+      }
+    }
+    setVisibleColumnCount(count);
+    setColumnVisibilityModel(model);
   };
 
   // TODO update this
@@ -145,7 +209,7 @@ export default function CustomFilterPanelPosition() {
     if (response.ok) {
       setIsNewDialogOpen(false);
     } else {
-      console.error("Error updating assignment data:", response.statusText);
+      console.error("Error updating user data:", response.statusText);
     }
   };
 
@@ -184,25 +248,29 @@ export default function CustomFilterPanelPosition() {
 
   const columns: GridColDef[] = [
     {
-      field: "details",
-      headerName: "details",
-      minWidth: 50,
-      flex: 1,
+      field: "detailPanel",
+      headerName: "",
+      disableColumnMenu: true,
+      sortable: false,
+      hideSortIcons: true,
       colSpan: ({ row }) => {
-        if (row.id === "") {
-          return 8;
+        if (row.id === "detailPanel") {
+          return visibleColumnCount;
         }
         return undefined;
       },
-      valueGetter: ({ value, row }) => {
-        if (row.id === "") {
-          return "testingtestingtestingtestingtestingtestingtestingtestingtestingtestingtestingtesting";
-        }
-        return value;
-      },
+      width: 1,
+      // valueGetter: ({ value, row }) => {
+      //   if (row.id === "") {
+      //     return "testingtestingtestingtestingtestingtestingtestingtestingtestingtestingtestingtesting";
+      //   }
+      //   return value;
+      // },
       renderCell: (params) => {
-        if (params.row.id === "") {
+        if (params.row.id === "detailPanel") {
           return <DetailPanel data={selectedRowData} />;
+        } else {
+          return <KeyboardArrowDownIcon />;
         }
       },
     },
@@ -286,7 +354,7 @@ export default function CustomFilterPanelPosition() {
   if (!persons) return <CircularProgress />;
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={tab} onChange={handleChange} aria-label="users tabs">
           {personTypes.map((key) => (
@@ -296,21 +364,30 @@ export default function CustomFilterPanelPosition() {
       </Box>
       {persons && (
         <DataGrid
+          autoHeight={true}
+          key={gridKey}
           sx={{
             width: "100%",
             overflow: "hidden",
             backgroundColor: "#fff",
+            "&.MuiDataGrid-root .MuiDataGrid-cell:focus-within": {
+              outline: "none !important",
+            },
+          }}
+          columnVisibilityModel={columnVisibilityModel}
+          onColumnVisibilityModelChange={(newModel) => {
+            onColumnVisibilityChange(newModel);
           }}
           rows={persons}
           columns={columns}
-          getRowHeight={({ id, densityFactor }: GridRowHeightParams) => {
-            if (id === "") {
+          getRowHeight={({ id }: GridRowHeightParams) => {
+            if (id === "detailPanel") {
               return "auto";
             }
             return null;
           }}
           rowSelectionModel={rowSelectionModel}
-          onRowSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
+          onRowClick={(params) => onRowClick(params.row)}
           localeText={{
             toolbarColumns: "",
             toolbarFilters: "",
@@ -320,14 +397,7 @@ export default function CustomFilterPanelPosition() {
           initialState={{
             pagination: { paginationModel: { pageSize: 10 } },
             columns: {
-              columnVisibilityModel: {
-                gender: false,
-                currentSchool: false,
-                textbookPublisher: false,
-                startDate: false,
-                joinDate: false,
-                leaveDate: false,
-              },
+              columnVisibilityModel: columnVisibilityModel,
             },
           }}
           slots={{
@@ -341,6 +411,9 @@ export default function CustomFilterPanelPosition() {
             toolbar: {
               children: <AddIconButton onClick={handleOpenNewDialog} />,
               setButtonEl,
+            },
+            columnsPanel: {
+              getTogglableColumns,
             },
           }}
           pageSizeOptions={[5, 10, 25]}

@@ -6,18 +6,96 @@ function DetailPanel({ data }) {
   return (
     <>
       <Paper
-        elevation={0}
-        sx={{ p: 2, flexGrow: 1, backgroundColor: "#e3f3fb" }}
+        variant="outlined"
+        sx={{ m: 2, p: 2, flexGrow: 1, borderColor: "#3c6ea0" }}
       >
-        <Grid container direction="row" alignItems="center" spacing={2}>
-          <Grid item xs={6}>
-            <Typography>{data.name}</Typography>
-            <Typography>testingtestingtestingtestingtesting</Typography>
-            <Typography>testingtestingtestingtestingtesting</Typography>
+        <Grid container alignItems="center" spacing={2}>
+          <Grid container item spacing={3}>
+            <Grid item xs={4}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#3c6ea0" }}
+              >
+                Name
+              </Typography>
+              <Typography variant="body2">{data.name}</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#3c6ea0" }}
+              >
+                English Name
+              </Typography>
+              <Typography variant="body2">{data.englishName}</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#3c6ea0" }}
+              >
+                Gender
+              </Typography>
+              <Typography variant="body2">{data.gender}</Typography>
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <Typography>testingtestingtestingtestingtesting</Typography>
-            <Typography>testingtestingtestingtestingtesting</Typography>
+          <Grid container item spacing={3}>
+            <Grid item xs={4}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#3c6ea0" }}
+              >
+                Phone
+              </Typography>
+              <Typography variant="body2">123-456-7890</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#3c6ea0" }}
+              >
+                Email
+              </Typography>
+              <Typography variant="body2">{data.email}</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#3c6ea0" }}
+              >
+                Date of Birth
+              </Typography>
+              <Typography variant="body2">03-21-2000</Typography>
+            </Grid>
+          </Grid>
+          <Grid container item spacing={3}>
+            <Grid item xs={4}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#3c6ea0" }}
+              >
+                Current School
+              </Typography>
+              <Typography variant="body2">Some School</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#3c6ea0" }}
+              >
+                Grade
+              </Typography>
+              <Typography variant="body2">{data.grade}</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#3c6ea0" }}
+              >
+                Textbook Publisher
+              </Typography>
+              <Typography variant="body2">{data.textbookPublisher}</Typography>
+            </Grid>
           </Grid>
         </Grid>
       </Paper>
