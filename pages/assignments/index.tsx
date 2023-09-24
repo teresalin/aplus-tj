@@ -31,7 +31,7 @@ function a11yProps(key: string) {
 
 const assignmentTypes = ["all", "upcoming", "past due"];
 
-export default function CustomFilterPanelPosition() {
+export default function AssignmentGrid() {
   const [tab, setTab] = React.useState("all");
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);

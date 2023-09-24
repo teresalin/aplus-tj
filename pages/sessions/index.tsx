@@ -3,11 +3,16 @@ import * as React from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
+import CustomParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
+import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import tz from "dayjs/plugin/timezone";
 import useSWR from "swr";
+import utc from "dayjs/plugin/utc";
 import {
   DataGrid,
   GridColDef,
@@ -23,17 +28,12 @@ import NewAssignmentDialog from "../../src/components/assignment/NewAssignmentDi
 import RenderMenu from "../../src/components/dataGrid/RenderMenu";
 import { Session } from "../api/sessions";
 
-function a11yProps(key: string) {
-  return {
-    id: `simple-tab-${key}`,
-    "aria-controls": `simple-tabpanel-${key}`,
-  };
-}
+dayjs.extend(CustomParseFormat);
+dayjs.extend(utc);
+dayjs.extend(tz);
 
-const assignmentTypes = ["all", "upcoming", "past due"];
-
-export default function CustomFilterPanelPosition() {
-  const [tab, setTab] = React.useState("all");
+export default function SessionGrid() {
+  const [timeRange, setTimeRange] = React.useState("thisMonth");
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
   const [selectedRowData, setSelectedRowData] = React.useState<
@@ -46,11 +46,11 @@ export default function CustomFilterPanelPosition() {
     null
   );
 
-  const { data } = useSWR(`api/sessions?tab=${tab}`, fetcher);
+  const { data } = useSWR(`api/sessions?range=${timeRange}`, fetcher);
   const sessions = data as Session[];
 
-  const handleTabChange = (event: React.SyntheticEvent, newTab: string) => {
-    setTab(newTab);
+  const handleSelectChange = (event: SelectChangeEvent) => {
+    setTimeRange(event.target.value);
   };
 
   const handleOpenNewDialog = () => {
@@ -153,6 +153,11 @@ export default function CustomFilterPanelPosition() {
     );
   }
 
+  const convertToTime = (ft) =>
+    dayjs(ft, "HH:mm:ss", "en", true).isValid()
+      ? dayjs(ft, "HH:mm:ss").format("hh:ss A")
+      : ft;
+
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -171,6 +176,12 @@ export default function CustomFilterPanelPosition() {
       headerName: "sessionDate",
       minWidth: 150,
       flex: 1,
+      valueFormatter: (params: GridValueFormatterParams<Date>) => {
+        if (params.value == null) {
+          return "";
+        }
+        return dayjs.utc(params.value).tz("Asia/Taipei").format("YYYY-MM-DD");
+      },
     },
     {
       field: "startTime",
@@ -181,7 +192,7 @@ export default function CustomFilterPanelPosition() {
         if (params.value == null) {
           return "";
         }
-        return dayjs(params.value).format("YYYY-MM-DD");
+        return convertToTime(params.value);
       },
     },
     {
@@ -193,7 +204,7 @@ export default function CustomFilterPanelPosition() {
         if (params.value == null) {
           return "";
         }
-        return dayjs(params.value).format("YYYY-MM-DD");
+        return convertToTime(params.value);
       },
     },
     {
@@ -216,11 +227,24 @@ export default function CustomFilterPanelPosition() {
   return (
     <Box style={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={tab} onChange={handleTabChange} aria-label="session tabs">
-          {assignmentTypes.map((key) => (
-            <Tab key={key} value={key} label={key} {...a11yProps(key)} />
-          ))}
-        </Tabs>
+        <FormControl sx={{ my: 1, minWidth: 150 }}>
+          <InputLabel id="demo-select-small-label"></InputLabel>
+          <Select
+            id="demo-select-small"
+            value={timeRange}
+            displayEmpty
+            label=""
+            onChange={handleSelectChange}
+            style={{ height: "30px" }}
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            <MenuItem value="last7Days">Last 7 days</MenuItem>
+            <MenuItem value="thisMonth">This month</MenuItem>
+            <MenuItem value="yearToDate">Year to date</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
       <DataGrid
         sx={{

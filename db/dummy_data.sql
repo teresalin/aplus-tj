@@ -71,6 +71,12 @@ VALUES (3, '2023-08-21', '18:00:00', '19:30:00', NOW(), NOW());
 INSERT INTO session (class_id, session_date, start_time, end_time, time_created, time_updated)
 VALUES (3, '2023-08-23', '18:00:00', '19:30:00', NOW(), NOW());
 INSERT INTO session (class_id, session_date, start_time, end_time, time_created, time_updated)
+VALUES (3, '2023-08-31', '18:00:00', '19:30:00', NOW(), NOW());
+INSERT INTO session (class_id, session_date, start_time, end_time, time_created, time_updated)
+VALUES (3, '2023-09-01', '18:00:00', '19:30:00', NOW(), NOW());
+INSERT INTO session (class_id, session_date, start_time, end_time, time_created, time_updated)
+VALUES (3, '2023-09-30', '18:00:00', '19:30:00', NOW(), NOW());
+INSERT INTO session (class_id, session_date, start_time, end_time, time_created, time_updated)
 VALUES (3, '2023-12-16', '18:00:00', '19:30:00', NOW(), NOW());
 
 INSERT INTO class_student (class_id, student_id, start_date, active, time_created, time_updated)

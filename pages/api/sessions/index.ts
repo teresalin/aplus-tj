@@ -12,7 +12,7 @@ export interface Session {
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
   try {
-    const { tab } = req.query;
+    const { range } = req.query;
     const query = {
       text: `
         SELECT
@@ -27,14 +27,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         WHERE
           c.active = TRUE
           AND (
-            ($1 = 'all') OR
-            ($1 = 'upcoming' AND s.session_date >= NOW()) OR
-            ($1 = 'past' AND s.session_date < NOW())
+            ($1 = 'last7Days' AND s.session_date >= (CURRENT_DATE - INTERVAL '7 days') AND s.session_date < (CURRENT_DATE + INTERVAL '7 days')) OR
+            ($1 = 'thisMonth' AND s.session_date >= DATE_TRUNC('month', CURRENT_DATE) AND s.session_date < (DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month')) OR
+            ($1 = 'yearToDate' AND s.session_date >= DATE_TRUNC('year', CURRENT_DATE))
           )
         ORDER BY 
           s.session_date DESC;
       `,
-      values: [tab],
+      values: [range],
     };
     const result = await client.query(query);
     res.status(200).json(result.rows as Session[]);

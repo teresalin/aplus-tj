@@ -36,7 +36,7 @@ function a11yProps(key: string) {
 
 const personTypes = ["students", "parents", "staffs"];
 
-export default function CustomFilterPanelPosition() {
+export default function PersonGrid() {
   const [tab, setTab] = React.useState("students");
   const [gridKey, setGridKey] = React.useState(0);
   const [rowSelectionModel, setRowSelectionModel] =
