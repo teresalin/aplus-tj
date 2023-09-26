@@ -31,6 +31,11 @@ export default function EditAssignmentDialog({
   const { data } = useSWR("/api/classes", fetcher);
   const classes = data as Class[] | undefined;
 
+  const isUpdate = !!existingData;
+  console.log("isUpdate: ", isUpdate);
+
+  //   console.log("existingData: ", existingData);
+
   React.useEffect(() => {
     if (editedData) {
       setEditedData(existingData);
@@ -113,7 +118,6 @@ export default function EditAssignmentDialog({
               </TextField>
               <TextField
                 fullWidth
-                required
                 id="description"
                 name="description"
                 label="Description"

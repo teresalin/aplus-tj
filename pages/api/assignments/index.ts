@@ -4,7 +4,7 @@ import { getDBClient } from "../../../lib/db-connector";
 export interface Assignment {
   id: number;
   classId: number;
-  className: number;
+  className: string;
   assignmentName: string;
   description: string;
   dueDate: Date;
@@ -26,7 +26,7 @@ function parseAssignment(row: any): Assignment {
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
   try {
-    const getQuery = {
+    const query = {
       text: `
         SELECT
           a.id,
@@ -39,13 +39,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         FROM
           assignment a
           INNER JOIN class_assignment ca ON a.id = ca.assignment_id
-          INNER JOIN class c ON ca.class_id = c.id;
+          INNER JOIN class c ON ca.class_id = c.id
+        ORDER BY
+          due_date;
       `,
     };
-    const result = await client.query(getQuery);
+    const result = await client.query(query);
     res.status(200).json(result.rows.map(parseAssignment));
   } catch (error) {
-    // Handle the error or rethrow it if needed
-    throw error;
+    console.error("Error retrieving assignments", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

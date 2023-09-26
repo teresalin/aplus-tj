@@ -11,18 +11,21 @@ import useSWR from "swr";
 
 import fetcher from "../../../utils/fetcher";
 import { Class } from "../../../pages/api/classes";
+import { TimePicker } from "@mui/x-date-pickers";
+import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 
-export interface INewAssignmentDialogProps {
+export interface INewSessionDialogProps {
   open: boolean;
   onClose: () => void;
   onSubmit;
 }
 
-export default function NewAssignmentDialog({
+export default function NewSessionDialog({
   open,
   onClose,
   onSubmit,
-}: INewAssignmentDialogProps) {
+}: INewSessionDialogProps) {
   const [editedData, setEditedData] = React.useState({
     assignmentName: "",
     dueDate: "",
@@ -49,25 +52,13 @@ export default function NewAssignmentDialog({
     <>
       <Dialog disablePortal open={open} onClose={onClose}>
         <form onSubmit={handleSubmit}>
-          <DialogTitle>New assignment</DialogTitle>
+          <DialogTitle>New session</DialogTitle>
           <DialogContent>
-            <TextField
-              id="assignmentName"
-              name="assignmentName"
-              label="Assignment Name"
-              type="text"
-              variant="outlined"
-              margin="dense"
-              required
-              fullWidth
-              value={editedData.assignmentName}
-              onChange={handleInputChange}
-            />
             {/* TODO format date in yyyy-mm-dd format */}
             <TextField
-              id="dueDate"
-              name="dueDate"
-              label="Due Date"
+              id="sessionDate"
+              name="sessionDate"
+              label="Session Date"
               type="date"
               variant="outlined"
               margin="dense"
@@ -94,19 +85,16 @@ export default function NewAssignmentDialog({
                 </MenuItem>
               ))}
             </TextField>
-            <TextField
-              id="description"
-              name="description"
-              label="Description"
-              type="text"
-              variant="outlined"
-              margin="dense"
-              multiline
-              fullWidth
-              maxRows={3}
-              value={editedData.description}
-              onChange={handleInputChange}
-            />
+            <Stack mt={1} direction="row" spacing={1}>
+              <TimePicker
+                label="Start Time"
+                slotProps={{ textField: { size: "small" } }}
+              />
+              <TimePicker
+                label="End Time"
+                slotProps={{ textField: { size: "small" } }}
+              />
+            </Stack>
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>

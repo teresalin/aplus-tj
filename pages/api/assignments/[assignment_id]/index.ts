@@ -1,29 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../../lib/db-connector";
 
-async function getAssignment(client, assignmentID) {
-  try {
-    const query = {
-      text: `
-          SELECT 
-            assignment.id, 
-            assignment.name, 
-            assignment.description, 
-            assignment.due_date
-          FROM assignment
-          WHERE assignment.id = $1;
-        `,
-      values: [assignmentID],
-    };
-
-    const result = await client.query(query);
-    return result.rows[0];
-  } catch (error) {
-    // Handle the error or rethrow it if needed
-    throw error;
-  }
-}
-
 async function createAssignment(
   client,
   { assignmentName, description, dueDate }
@@ -108,10 +85,23 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case "GET":
       try {
-        const result = await getAssignment(client, assignmentID);
-        res.status(200).json({ result });
+        const query = {
+          text: `
+            SELECT 
+              assignment.id, 
+              assignment.name, 
+              assignment.description, 
+              assignment.due_date
+            FROM assignment
+            WHERE assignment.id = $1;
+          `,
+          values: [assignmentID],
+        };
+        const result = await client.query(query);
+        res.status(200).json(result.rows[0]);
       } catch (err) {
-        res.status(500).json({ message: "Failed to retrieve assignment data" });
+        console.error("Error retrieving assignment", err);
+        res.status(500).json({ message: "Internal server error" });
       }
       break;
     case "POST":
@@ -125,7 +115,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         await createClassAssignment(client, classId, assignmentID);
         res.status(200).json({ message: "Success" });
       } catch (err) {
-        res.status(500).json({ message: "Failed to create new assignment" });
+        console.error("Error creating assignment", err);
+        res.status(500).json({ message: "Internal server error" });
       }
       break;
     case "PUT":
@@ -141,7 +132,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         });
         res.status(200).json({ message: "Success" });
       } catch (err) {
-        res.status(500).json({ message: "Failed to update assignment" });
+        console.error("Error updating assignment", err);
+        res.status(500).json({ message: "Internal server error" });
       }
       break;
     case "DELETE":
@@ -150,11 +142,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         await deleteAssignment(client, assignmentID);
         res.status(200).json({ message: "Success" });
       } catch (err) {
-        res.status(500).json({ message: "Failed to delete assignment" });
+        console.error("Error deleting assignment", err);
+        res.status(500).json({ message: "Internal server error" });
       }
       break;
     default:
-      res.setHeader("Allow", ["GET", "POST", "DELETE"]);
+      res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 };

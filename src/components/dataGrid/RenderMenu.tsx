@@ -5,11 +5,12 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import React from "react";
 import Tooltip from "@mui/material/Tooltip";
 
-function RenderMenu({ onEditClick, onDeleteClick }) {
+function RenderMenu({ onClick, onEditClick, onDeleteClick }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handleClick = (event) => {
+  const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
+    onClick();
   };
 
   const handleClose = () => {
@@ -27,10 +28,10 @@ function RenderMenu({ onEditClick, onDeleteClick }) {
   };
 
   return (
-    <div>
+    <>
       <Tooltip title="Actions">
         <IconButton
-          onClick={handleClick}
+          onClick={handleOpen}
           aria-label="action"
           size="small"
           aria-controls={anchorEl ? "assignment-menu" : undefined}
@@ -54,7 +55,7 @@ function RenderMenu({ onEditClick, onDeleteClick }) {
         <MenuItem onClick={handleEdit}>Edit</MenuItem>
         <MenuItem onClick={handleDelete}>Delete</MenuItem>
       </Menu>
-    </div>
+    </>
   );
 }
 

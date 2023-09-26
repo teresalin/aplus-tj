@@ -1,6 +1,7 @@
 import { styled } from "@mui/material/styles";
 import * as React from "react";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import ChildCareIcon from "@mui/icons-material/ChildCare";
@@ -15,15 +16,11 @@ import useSWR from "swr";
 import fetcher from "../../utils/fetcher";
 import { Class } from "../api/classes";
 
-const FlexGrid = styled(Grid)(({ theme }) => ({
-  display: "flex",
-}));
-
 const StyledCard = styled(Card)(({ theme }) => ({
   cursor: "pointer",
-  "&:hover": {
-    backgroundColor: "#ecf5fc",
-  },
+  // "&:hover": {
+  //   backgroundColor: "#ecf5fc",
+  // },
   marginTop: "1em",
   marginBottom: "1em",
 }));
@@ -34,7 +31,7 @@ const StyledCardContent = styled(CardContent)(({ theme }) => ({
 
 export default function Classes() {
   const { data } = useSWR("api/classes", fetcher);
-  const classes = data || [];
+  const classes = data as Class[];
 
   if (!classes) return <CircularProgress />;
 
@@ -56,32 +53,55 @@ export default function Classes() {
                   container
                   spacing={2}
                   direction="row"
+                  alignContent="center"
                   justifyContent="space-between"
                 >
-                  <Grid container item xs="auto">
+                  <Grid container item alignContent="center" xs="auto">
                     <Typography>{row.className}</Typography>
                   </Grid>
-                  <Grid container item xs="auto">
-                    <FlexGrid item sx={{ paddingX: 1.5 }}>
+                  <Grid container item alignContent="center" xs="auto">
+                    <Grid item sx={{ paddingX: 1.5 }}>
                       <Tooltip title="Teacher">
-                        <SupportAgentIcon />
+                        <Button
+                          startIcon={<SupportAgentIcon />}
+                          sx={{
+                            "&:hover": {
+                              backgroundColor: "transparent",
+                            },
+                          }}
+                        >
+                          {row.teacherName}
+                        </Button>
                       </Tooltip>
-                      <Typography>{row.teacherName}</Typography>
-                    </FlexGrid>
-                    <FlexGrid item sx={{ paddingX: 1.5 }}>
+                    </Grid>
+                    <Grid item sx={{ paddingX: 1.5 }}>
                       <Tooltip title="Students">
-                        <ChildCareIcon />
+                        <Button
+                          startIcon={<ChildCareIcon />}
+                          sx={{
+                            "&:hover": {
+                              backgroundColor: "transparent",
+                            },
+                          }}
+                        >
+                          {row.studentCount}/{row.capacity}
+                        </Button>
                       </Tooltip>
-                      <Typography>
-                        {row.studentCount}/{row.capacity}
-                      </Typography>
-                    </FlexGrid>
-                    <FlexGrid item sx={{ paddingX: 1.5 }}>
+                    </Grid>
+                    <Grid item sx={{ paddingX: 1.5 }}>
                       <Tooltip title="Assignments">
-                        <AssignmentIcon />
+                        <Button
+                          startIcon={<AssignmentIcon />}
+                          sx={{
+                            "&:hover": {
+                              backgroundColor: "transparent",
+                            },
+                          }}
+                        >
+                          Assignments
+                        </Button>
                       </Tooltip>
-                      <Typography>Assignments</Typography>
-                    </FlexGrid>
+                    </Grid>
                   </Grid>
                 </Grid>
               </StyledCardContent>

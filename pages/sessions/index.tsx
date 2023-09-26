@@ -21,12 +21,12 @@ import {
 } from "@mui/x-data-grid";
 
 import fetcher from "../../utils/fetcher";
-import CustomToolBar from "../../src/components/dataGrid/CustomToolBar";
-import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
-import EditAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
-import NewAssignmentDialog from "../../src/components/assignment/NewAssignmentDialog";
-import RenderMenu from "../../src/components/dataGrid/RenderMenu";
 import { Session } from "../api/sessions";
+import CustomToolBar from "../../src/components/dataGrid/CustomToolBar";
+import DeleteSessionDialog from "../../src/components/session/DeleteSessionDialog";
+import EditAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
+import NewSessionDialog from "../../src/components/session/NewSessionDialog";
+import RenderMenu from "../../src/components/dataGrid/RenderMenu";
 
 dayjs.extend(CustomParseFormat);
 dayjs.extend(utc);
@@ -287,7 +287,7 @@ export default function SessionGrid() {
         pageSizeOptions={[5, 10, 25]}
         hideFooterSelectedRowCount
       />
-      <NewAssignmentDialog
+      <NewSessionDialog
         open={isNewDialogOpen}
         onClose={handleCloseNewDialog}
         onSubmit={handleCreateNewAssignment}
@@ -298,7 +298,7 @@ export default function SessionGrid() {
         onClose={handleCloseEditDialog}
         onSubmit={handleSaveRowData}
       />
-      <DeleteAssignmentDialog
+      <DeleteSessionDialog
         open={isDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}
         onSubmit={handleDeleteRowData}

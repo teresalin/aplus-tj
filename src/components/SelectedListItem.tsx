@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import * as React from "react";
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import Box from "@mui/material/Box";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ClassIcon from "@mui/icons-material/Class";
@@ -113,7 +114,7 @@ export default function SelectedListItem() {
         <Link href="/billing">
           <ListItemButton selected={isActive("/billing")}>
             <ListItemIcon>
-              <AssignmentIcon />
+              <AttachMoneyIcon />
             </ListItemIcon>
             <ListItemText primary="Billing" />
           </ListItemButton>

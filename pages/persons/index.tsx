@@ -77,14 +77,6 @@ export default function PersonGrid() {
     setTab(newValue);
   };
 
-  const handleToggleColumn = () => {
-    // Toggle the visibility of a column here
-    // For example, you can change the state that controls the "display: none" CSS
-
-    // After making changes to column visibility, trigger a re-render by changing the key
-    setGridKey((prevKey) => prevKey + 1);
-  };
-
   const handleOpenNewDialog = () => {
     setIsNewDialogOpen(true);
   };
@@ -174,18 +166,20 @@ export default function PersonGrid() {
   };
 
   const getTogglableColumns = (columns: GridColDef[]) => {
-    // hide the column with field `id` and `action` from list of togglable columns
     return columns
       .filter(
         (column) =>
           column.field !== "id" &&
           column.field !== "action" &&
-          column.field !== "detailPanel"
+          column.field !== "detailPanel" &&
+          column.field !== "created"
       )
       .map((column) => column.field);
   };
 
-  const onColumnVisibilityChange = (model) => {
+  const onColumnVisibilityChange = (
+    model: React.SetStateAction<GridColumnVisibilityModel>
+  ) => {
     let count = 0;
     for (const key in model) {
       if (model[key] === true) {
@@ -260,12 +254,6 @@ export default function PersonGrid() {
         return undefined;
       },
       width: 1,
-      // valueGetter: ({ value, row }) => {
-      //   if (row.id === "") {
-      //     return "testingtestingtestingtestingtestingtestingtestingtestingtestingtestingtestingtesting";
-      //   }
-      //   return value;
-      // },
       renderCell: (params) => {
         if (params.row.id === "detailPanel") {
           return <DetailPanel data={selectedRowData} />;

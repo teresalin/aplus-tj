@@ -18,9 +18,9 @@ import {
 import fetcher from "../../utils/fetcher";
 import CustomToolBar from "../../src/components/dataGrid/CustomToolBar";
 import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
-import EditAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
-import NewAssignmentDialog from "../../src/components/assignment/NewAssignmentDialog";
 import RenderMenu from "../../src/components/dataGrid/RenderMenu";
+import UpdateCreateAssignmentDialog from "../../src/components/assignment/UpdateCreateAssignmentDialog";
+import Button from "@mui/material/Button";
 
 function a11yProps(key: string) {
   return {
@@ -37,9 +37,9 @@ export default function AssignmentGrid() {
     React.useState<GridRowSelectionModel>([]);
   const [selectedRowData, setSelectedRowData] = React.useState<
     Assignment | undefined
-  >({} as Assignment);
-  const [isNewDialogOpen, setIsNewDialogOpen] = React.useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+  >();
+  const [isUpdateCreateDialogOpen, setIsUpdateCreateDialogOpen] =
+    React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
     null
@@ -52,20 +52,17 @@ export default function AssignmentGrid() {
     setTab(newTab);
   };
 
-  const handleOpenNewDialog = () => {
-    setIsNewDialogOpen(true);
+  const handleOpenUpdateCreateDialog = () => {
+    setIsUpdateCreateDialogOpen(true);
   };
 
-  const handleCloseNewDialog = () => {
-    setIsNewDialogOpen(false);
+  const handleCloseUpdateCreateDialog = () => {
+    setIsUpdateCreateDialogOpen(false);
   };
 
-  const handleOpenEditDialog = () => {
-    setIsEditDialogOpen(true);
-  };
-
-  const handleCloseEditDialog = () => {
-    setIsEditDialogOpen(false);
+  const handleRenderMenuClick = (row) => {
+    console.log("RENDER MENU CLICKED");
+    setSelectedRowData(row);
   };
 
   const handleOpenDeleteDialog = () => {
@@ -84,21 +81,21 @@ export default function AssignmentGrid() {
   };
 
   // TODO creating without description does not close dialog
-  const handleCreateNewAssignment = async (data) => {
-    const response = await fetch(`/api/assignments/[assignment_id]`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+  // const handleCreateNewAssignment = async (data) => {
+  //   const response = await fetch(`/api/assignments/[assignment_id]`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(data),
+  //   });
 
-    if (response.ok) {
-      setIsNewDialogOpen(false);
-    } else {
-      console.error("Error updating assignment data:", response.statusText);
-    }
-  };
+  //   if (response.ok) {
+  //     setIsNewDialogOpen(false);
+  //   } else {
+  //     console.error("Error updating assignment data:", response.statusText);
+  //   }
+  // };
 
   const handleSaveRowData = async (editedData) => {
     const response = await fetch(`/api/assignments/${editedData.id}`, {
@@ -110,7 +107,7 @@ export default function AssignmentGrid() {
     });
 
     if (response.ok) {
-      setIsEditDialogOpen(false);
+      setIsUpdateCreateDialogOpen(false);
     } else {
       console.error("Error updating assignment data:", response.statusText);
     }
@@ -131,11 +128,14 @@ export default function AssignmentGrid() {
     }
   };
 
-  // TODO pass this into DataGrid
   const getTogglableColumns = (columns: GridColDef[]) => {
-    // hide the column with field `id` from list of togglable columns
     return columns
-      .filter((column) => column.field !== "id")
+      .filter(
+        (column) =>
+          column.field !== "id" &&
+          column.field !== "action" &&
+          column.field !== "created"
+      )
       .map((column) => column.field);
   };
 
@@ -208,9 +208,10 @@ export default function AssignmentGrid() {
       minWidth: 70,
       maxWidth: 70,
       flex: 1,
-      renderCell: () => (
+      renderCell: (params) => (
         <RenderMenu
-          onEditClick={handleOpenEditDialog}
+          onClick={() => handleRenderMenuClick(params.row)}
+          onEditClick={handleOpenUpdateCreateDialog}
           onDeleteClick={handleOpenDeleteDialog}
         />
       ),
@@ -232,6 +233,7 @@ export default function AssignmentGrid() {
           ))}
         </Tabs>
       </Box>
+      {/* TODO disable filter on certain columns */}
       <DataGrid
         sx={{
           width: "100%",
@@ -252,7 +254,7 @@ export default function AssignmentGrid() {
           pagination: { paginationModel: { pageSize: 10 } },
           columns: {
             columnVisibilityModel: {
-              id: false,
+              id: true,
               created: false,
             },
           },
@@ -266,22 +268,20 @@ export default function AssignmentGrid() {
             placement: "bottom-end",
           },
           toolbar: {
-            children: <AddIconButton onClick={handleOpenNewDialog} />,
+            children: <AddIconButton onClick={handleOpenUpdateCreateDialog} />,
             setButtonEl,
+          },
+          columnsPanel: {
+            getTogglableColumns,
           },
         }}
         pageSizeOptions={[5, 10, 25]}
         hideFooterSelectedRowCount
       />
-      <NewAssignmentDialog
-        open={isNewDialogOpen}
-        onClose={handleCloseNewDialog}
-        onSubmit={handleCreateNewAssignment}
-      />
-      <EditAssignmentDialog
+      <UpdateCreateAssignmentDialog
         existingData={selectedRowData}
-        open={isEditDialogOpen}
-        onClose={handleCloseEditDialog}
+        open={isUpdateCreateDialogOpen}
+        onClose={handleCloseUpdateCreateDialog}
         onSubmit={handleSaveRowData}
       />
       <DeleteAssignmentDialog
