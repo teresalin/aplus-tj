@@ -3,7 +3,9 @@ import { getDBClient } from "../../../lib/db-connector";
 
 export interface Session {
   id: number;
+  classId: number;
   className: string;
+  teacher: string;
   sessionDate: Date;
   startTime: Date;
   endTime: Date;
@@ -17,6 +19,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       text: `
         SELECT
           s.id AS "id",
+          c.id AS "classId",
           c.name AS "className",
           s.session_date AS "sessionDate",
           s.start_time AS "startTime",
@@ -38,8 +41,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     };
     const result = await client.query(query);
     res.status(200).json(result.rows as Session[]);
-  } catch (error) {
-    // Handle the error or rethrow it if needed
-    throw error;
+  } catch (err) {
+    console.error("Error retrieving sessions", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

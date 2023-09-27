@@ -24,8 +24,9 @@ import fetcher from "../../utils/fetcher";
 import { Person } from "../api/persons";
 import CustomToolBar from "../../src/components/dataGrid/CustomToolBar";
 import DetailPanel from "../../src/components/dataGrid/DetailPanel";
-import NewPersonDialog from "../../src/components/person/NewPersonDialog";
+import NewPersonDialog from "../../src/components/person/UpdateCreatePersonDialog";
 import RenderMenu from "../../src/components/dataGrid/RenderMenu";
+import UpdateCreatePersonDialog from "../../src/components/person/UpdateCreatePersonDialog";
 
 function a11yProps(key: string) {
   return {
@@ -41,10 +42,12 @@ export default function PersonGrid() {
   const [gridKey, setGridKey] = React.useState(0);
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
-  const [selectedRowIndex, setSelectedRowIndex] = React.useState();
   const [selectedRowData, setSelectedRowData] = React.useState<Person>(
     {} as Person
   );
+  const [detailPanelOpen, setDetailPanelOpen] = React.useState<
+    Map<string, boolean>
+  >(new Map());
   const [visibleColumnCount, setVisibleColumnCount] = React.useState(7);
   const [columnVisibilityModel, setColumnVisibilityModel] =
     React.useState<GridColumnVisibilityModel>({
@@ -101,67 +104,56 @@ export default function PersonGrid() {
     setIsDeleteDialogOpen(false);
   };
 
-  const onRowClick = (data) => {
-    const newDetailPanel = {
-      id: "detailPanel",
-    } as unknown;
-
-    function removeObjectById(array, idToRemove) {
-      return array.filter((item) => item.id !== idToRemove);
+  const onRowClick = (data: { id: string }) => {
+    if (data.id.toString().startsWith("detail-panel")) {
+      return;
     }
 
-    function insertDetailPanelById(
+    const newDetailPanel = {
+      ...data,
+      id: `detail-panel-${data.id}`,
+    };
+
+    setDetailPanelOpen((prevState) => ({
+      ...prevState,
+      [data.id]: !prevState[data.id], // Toggle the state for the clicked row
+    }));
+
+    function insertDetailPanelByRowId(
       array: any[],
-      idToInsertAfter: string,
-      newObject: any
+      rowId: string,
+      detailPanel: any
     ): any[] {
       const newArray: any[] = [];
       for (const item of array) {
         newArray.push(item);
-        if (item.id === idToInsertAfter) {
-          newArray.push(newObject);
+        if (item.id === rowId) {
+          newArray.push(detailPanel);
         }
       }
       return newArray;
     }
 
-    const hasDetailPanel = persons.some(
-      (person) => person.id === "detailPanel"
-    );
-
-    const isFirstClick = Object.keys(selectedRowData).length === 0;
-    const isSameRowClick =
-      selectedRowData !== undefined && selectedRowData.id === data.id;
-    const isNewRowClick =
-      selectedRowData !== undefined && selectedRowData.id !== data.id;
-
-    if (isFirstClick) {
-      const newArr = insertDetailPanelById(persons, data.id, newDetailPanel);
-      setPersons(newArr);
-      setSelectedRowData(data);
-    } else if (isNewRowClick) {
-      if (hasDetailPanel) {
-        // remove existing detail panel
-        const result = removeObjectById(persons, "detailPanel");
-        // add detail panel after new row
-        const newArr = insertDetailPanelById(result, data.id, newDetailPanel);
-        setPersons(newArr);
-        setSelectedRowData(data);
-      } else {
-        const newArr = insertDetailPanelById(persons, data.id, newDetailPanel);
-        setPersons(newArr);
-        setSelectedRowData(data);
+    function removeDetailPanelByRowId(array: any[], rowId: string): any[] {
+      const newArray: any[] = [];
+      for (let i = 0; i < array.length; i++) {
+        newArray.push(array[i]);
+        if (array[i].id === rowId) {
+          i++;
+        }
       }
-    } else if (isSameRowClick) {
-      if (hasDetailPanel) {
-        const result = removeObjectById(persons, "detailPanel");
-        setPersons(result);
-      } else {
-        const newArr = insertDetailPanelById(persons, data.id, newDetailPanel);
-        setPersons(newArr);
-      }
+      return newArray;
+    }
+
+    const isPanelOpen = detailPanelOpen.get(data.id);
+    if (isPanelOpen) {
+      setDetailPanelOpen((map) => new Map(detailPanelOpen.set(data.id, false)));
+      const result = removeDetailPanelByRowId(persons, data.id);
+      setPersons(result);
     } else {
-      // do nothing
+      setDetailPanelOpen((map) => new Map(detailPanelOpen.set(data.id, true)));
+      const result = insertDetailPanelByRowId(persons, data.id, newDetailPanel);
+      setPersons(result);
     }
   };
 
@@ -247,21 +239,22 @@ export default function PersonGrid() {
       disableColumnMenu: true,
       sortable: false,
       hideSortIcons: true,
+      width: 1,
       colSpan: ({ row }) => {
-        if (row.id === "detailPanel") {
+        if (row.id.toString().startsWith("detail-panel")) {
           return visibleColumnCount;
         }
         return undefined;
       },
-      width: 1,
       renderCell: (params) => {
-        if (params.row.id === "detailPanel") {
-          return <DetailPanel data={selectedRowData} />;
+        if (params.row.id.toString().startsWith("detail-panel")) {
+          return <DetailPanel data={params.row} />;
         } else {
           return <KeyboardArrowDownIcon />;
         }
       },
     },
+
     {
       field: "id",
       headerName: "id",
@@ -330,8 +323,9 @@ export default function PersonGrid() {
       minWidth: 70,
       maxWidth: 70,
       flex: 1,
-      renderCell: () => (
+      renderCell: (params) => (
         <RenderMenu
+          // onClick={() => handleRenderMenuClick(params.row)}
           onEditClick={handleOpenEditDialog}
           onDeleteClick={handleOpenDeleteDialog}
         />
@@ -369,7 +363,7 @@ export default function PersonGrid() {
           rows={persons}
           columns={columns}
           getRowHeight={({ id }: GridRowHeightParams) => {
-            if (id === "detailPanel") {
+            if (id.toString().startsWith("detail-panel")) {
               return "auto";
             }
             return null;
@@ -408,8 +402,9 @@ export default function PersonGrid() {
           hideFooterSelectedRowCount
         />
       )}
-      <NewPersonDialog
+      <UpdateCreatePersonDialog
         personType={tab}
+        existingData={null}
         open={isNewDialogOpen}
         onClose={handleCloseNewDialog}
         onSubmit={handleCreateNewPerson}

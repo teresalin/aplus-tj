@@ -210,7 +210,7 @@ export default function AssignmentGrid() {
       flex: 1,
       renderCell: (params) => (
         <RenderMenu
-          onClick={() => handleRenderMenuClick(params.row)}
+          // onClick={() => handleRenderMenuClick(params.row)}
           onEditClick={handleOpenUpdateCreateDialog}
           onDeleteClick={handleOpenDeleteDialog}
         />
@@ -254,7 +254,7 @@ export default function AssignmentGrid() {
           pagination: { paginationModel: { pageSize: 10 } },
           columns: {
             columnVisibilityModel: {
-              id: true,
+              id: false,
               created: false,
             },
           },

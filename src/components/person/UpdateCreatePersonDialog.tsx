@@ -24,19 +24,21 @@ function RedBar() {
   );
 }
 
-export interface INewPersonDialogProps {
+export interface IUpdateCreatePersonDialogProps {
   personType;
+  existingData;
   open: boolean;
   onClose: () => void;
   onSubmit;
 }
 
-export default function EditAssignmentDialog({
+export default function UpdateCreatePersonDialog({
   personType,
+  existingData,
   open,
   onClose,
   onSubmit,
-}: INewPersonDialogProps) {
+}: IUpdateCreatePersonDialogProps) {
   const [newPerson, setNewPerson] = React.useState({
     name: "",
     phone: "",

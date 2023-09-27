@@ -47,7 +47,7 @@ function DetailPanel({ data }) {
               >
                 Phone
               </Typography>
-              <Typography variant="body2">123-456-7890</Typography>
+              <Typography variant="body2">{data.phone}</Typography>
             </Grid>
             <Grid item xs={4}>
               <Typography
@@ -65,7 +65,7 @@ function DetailPanel({ data }) {
               >
                 Date of Birth
               </Typography>
-              <Typography variant="body2">03-21-2000</Typography>
+              <Typography variant="body2">{data.dateOfBirth}</Typography>
             </Grid>
           </Grid>
           <Grid container item spacing={3}>
@@ -76,7 +76,7 @@ function DetailPanel({ data }) {
               >
                 Current School
               </Typography>
-              <Typography variant="body2">Some School</Typography>
+              <Typography variant="body2">{data.currentSchool}</Typography>
             </Grid>
             <Grid item xs={4}>
               <Typography
