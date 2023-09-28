@@ -22,11 +22,11 @@ import {
 
 import fetcher from "../../utils/fetcher";
 import { Session } from "../api/sessions";
-import CustomToolBar from "../../src/components/dataGrid/CustomToolBar";
+import CustomToolBar from "../../src/components/grid/CustomToolBar";
 import DeleteSessionDialog from "../../src/components/session/DeleteSessionDialog";
 import EditAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
 import NewSessionDialog from "../../src/components/session/NewSessionDialog";
-import RenderMenu from "../../src/components/dataGrid/RenderMenu";
+import RenderMenu from "../../src/components/grid/RenderMenu";
 
 dayjs.extend(CustomParseFormat);
 dayjs.extend(utc);

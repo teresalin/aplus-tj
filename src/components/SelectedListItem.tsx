@@ -79,8 +79,8 @@ export default function SelectedListItem() {
             <ListItemText primary="Dashboard" />
           </ListItemButton>
         </Link>
-        <Link href="/schedule">
-          <ListItemButton selected={isActive("/schedule")}>
+        <Link href="/schedules">
+          <ListItemButton selected={isActive("/schedules")}>
             <ListItemIcon>
               <CalendarMonthIcon />
             </ListItemIcon>

@@ -32,9 +32,6 @@ export default function EditAssignmentDialog({
   const classes = data as Class[] | undefined;
 
   const isUpdate = !!existingData;
-  console.log("isUpdate: ", isUpdate);
-
-  //   console.log("existingData: ", existingData);
 
   React.useEffect(() => {
     if (editedData) {

@@ -17,7 +17,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const result = await client.query(getQuery);
     res.status(200).json(result.rows as Role[]);
   } catch (error) {
-    // Handle the error or rethrow it if needed
-    throw error;
+    console.error("Error retrieving staff roles", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -1,22 +1,25 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../lib/db-connector";
+import { Role } from "./roles";
 
 export interface Staff {
   id: number;
   name: string;
+  role: Role;
   gender: string;
   phone: string;
   email: string;
   dateOfBirth: Date;
-  notes: string;
   joinDate: Date;
   leaveDate: Date;
+  notes: string;
   active: boolean;
 }
 
 function parseStaff(row: any): Staff {
   return {
     id: row.id,
+    role: row.role,
     name: row.name,
     gender: row.gender,
     phone: row.phone,
@@ -54,7 +57,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const result = await client.query(getQuery);
     res.status(200).json(result.rows.map(parseStaff));
   } catch (error) {
-    // Handle the error or rethrow it if needed
-    throw error;
+    console.error("Error retrieving roles", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

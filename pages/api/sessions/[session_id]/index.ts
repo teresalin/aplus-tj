@@ -112,7 +112,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const result = await client.query(query);
     res.status(200).json(result.rows[0]);
   } catch (error) {
-    // Handle the error or rethrow it if needed
-    throw error;
+    console.error("Error retrieving session", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

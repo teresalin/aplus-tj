@@ -16,9 +16,9 @@ import {
 } from "@mui/x-data-grid";
 
 import fetcher from "../../utils/fetcher";
-import CustomToolBar from "../../src/components/dataGrid/CustomToolBar";
+import CustomToolBar from "../../src/components/grid/CustomToolBar";
 import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
-import RenderMenu from "../../src/components/dataGrid/RenderMenu";
+import RenderMenu from "../../src/components/grid/RenderMenu";
 import UpdateCreateAssignmentDialog from "../../src/components/assignment/UpdateCreateAssignmentDialog";
 import Button from "@mui/material/Button";
 
@@ -61,7 +61,6 @@ export default function AssignmentGrid() {
   };
 
   const handleRenderMenuClick = (row) => {
-    console.log("RENDER MENU CLICKED");
     setSelectedRowData(row);
   };
 

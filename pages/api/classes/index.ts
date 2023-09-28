@@ -41,7 +41,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const result = await client.query(getQuery);
     res.status(200).json(result.rows as Class[]);
   } catch (error) {
-    // Handle the error or rethrow it if needed
-    throw error;
+    console.error("Error retrieving classes", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

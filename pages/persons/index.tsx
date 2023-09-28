@@ -6,6 +6,8 @@ import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import CloseIcon from "@mui/icons-material/Close";
 import dayjs from "dayjs";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import IconButton from "@mui/material/IconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Tab from "@mui/material/Tab";
@@ -22,11 +24,13 @@ import {
 
 import fetcher from "../../utils/fetcher";
 import { Person } from "../api/persons";
-import CustomToolBar from "../../src/components/dataGrid/CustomToolBar";
-import DetailPanel from "../../src/components/dataGrid/DetailPanel";
+import CustomToolBar from "../../src/components/grid/CustomToolBar";
+import DetailPanel from "../../src/components/grid/DetailPanel";
 import NewPersonDialog from "../../src/components/person/UpdateCreatePersonDialog";
-import RenderMenu from "../../src/components/dataGrid/RenderMenu";
+import RenderMenu from "../../src/components/grid/RenderMenu";
 import UpdateCreatePersonDialog from "../../src/components/person/UpdateCreatePersonDialog";
+import StudentDetailPanel from "../../src/components/person/StudentDetailPanel";
+import StaffDetailPanel from "../../src/components/person/StaffDetailPanel";
 
 function a11yProps(key: string) {
   return {
@@ -76,8 +80,9 @@ export default function PersonGrid() {
     setPersons(data);
   }, [data]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setTab(newValue);
+    setDetailPanelOpen(new Map());
   };
 
   const handleOpenNewDialog = () => {
@@ -248,9 +253,19 @@ export default function PersonGrid() {
       },
       renderCell: (params) => {
         if (params.row.id.toString().startsWith("detail-panel")) {
-          return <DetailPanel data={params.row} />;
+          if (tab === "students") {
+            return <StudentDetailPanel data={params.row} />;
+          } else if (tab === "parents") {
+            return <DetailPanel data={params.row} />;
+          } else {
+            return <StaffDetailPanel data={params.row} />;
+          }
         } else {
-          return <KeyboardArrowDownIcon />;
+          return detailPanelOpen.get(params.row.id) ? (
+            <ExpandLessIcon />
+          ) : (
+            <ExpandMoreIcon />
+          );
         }
       },
     },
@@ -338,7 +353,7 @@ export default function PersonGrid() {
   return (
     <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={tab} onChange={handleChange} aria-label="users tabs">
+        <Tabs value={tab} onChange={handleTabChange} aria-label="users tabs">
           {personTypes.map((key) => (
             <Tab key={key} value={key} label={key} {...a11yProps(key)} />
           ))}
