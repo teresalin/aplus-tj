@@ -102,6 +102,7 @@ CREATE TABLE attendance (
 );
 
 -- allow DELETE; auto delete any thing beyond 30 days
+-- TODO move this to session level?
 CREATE TABLE assignment (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50),

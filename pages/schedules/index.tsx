@@ -11,12 +11,21 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 // const localizer = momentLocalizer(moment);
 const mLocalizer = momentLocalizer(moment);
 
-const ColoredDateCellWrapper = ({ children }) =>
-  React.cloneElement(React.Children.only(children), {
-    style: {
-      backgroundColor: "lightblue",
-    },
-  });
+// const ColoredDateCellWrapper = ({ children }) =>
+//   React.cloneElement(React.Children.only(children), {
+//     style: {
+//       backgroundColor: "lightblue",
+//     },
+//   });
+
+const backgroundEvents = [
+  {
+    id: 0,
+    title: "Available for Clients",
+    start: new Date(2023, 3, 13, 6),
+    end: new Date(2023, 3, 13, 18),
+  },
+];
 
 const events = [
   {
@@ -96,6 +105,7 @@ const events = [
   {
     id: 11,
     title: "Planning Meeting with Paige",
+    isSchedule: true,
     start: new Date(2023, 3, 13, 8, 0, 0),
     end: new Date(2023, 3, 13, 10, 30, 0),
   },
@@ -226,11 +236,11 @@ export default function Basic({
   showDemoLink = true,
   ...props
 }) {
-  const { components, defaultDate, max, views } = React.useMemo(
+  const { defaultDate, max, views } = React.useMemo(
     () => ({
-      components: {
-        timeSlotWrapper: ColoredDateCellWrapper,
-      },
+      //   components: {
+      //     timeSlotWrapper: ColoredDateCellWrapper,
+      //   },
       defaultDate: new Date(2023, 3, 1),
       max: dates.add(dates.endOf(new Date(2023, 17, 1), "day"), -1, "hours"),
       views: Object.keys(Views).map((k) => Views[k]),
@@ -242,7 +252,8 @@ export default function Basic({
     <>
       <div style={{ height: 600 }} {...props}>
         <Calendar
-          components={components}
+          backgroundEvents={backgroundEvents}
+          //   components={components}
           defaultDate={defaultDate}
           events={events}
           localizer={localizer}
@@ -250,6 +261,23 @@ export default function Basic({
           showMultiDayTimes
           step={60}
           views={views}
+          eventPropGetter={(event, start, end, isSelected) => {
+            let newStyle = {
+              backgroundColor: "lightgrey",
+              color: "black",
+              borderRadius: "0px",
+              border: "none",
+            };
+
+            if (event.isSchedule) {
+              newStyle.backgroundColor = "#8dcdec";
+            }
+
+            return {
+              className: "",
+              style: newStyle,
+            };
+          }}
         />
       </div>
     </>
