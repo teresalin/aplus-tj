@@ -1,33 +1,32 @@
 import { NextApiRequest, NextApiResponse } from "next";
+
 import { getDBClient } from "../../../lib/db-connector";
+import { Person } from "../persons";
 import { Role } from "./roles";
 
-export interface Staff {
-  id: number;
-  name: string;
+export interface Staff extends Person {
+  staffId: number;
   role: Role;
-  gender: string;
-  phone: string;
-  email: string;
-  dateOfBirth: Date;
   joinDate: Date;
   leaveDate: Date;
-  notes: string;
-  active: boolean;
 }
 
 function parseStaff(row: any): Staff {
   return {
     id: row.id,
-    role: row.role,
+    staffId: row.staff_id,
     name: row.name,
+    role: {
+      id: row.grade_id,
+      name: row.grade_name,
+    },
     gender: row.gender,
     phone: row.phone,
     email: row.email,
     dateOfBirth: row.date_of_birth,
-    notes: row.notes,
     joinDate: row.join_date,
     leaveDate: row.leaveDate,
+    notes: row.notes,
     active: row.active,
   };
 }
@@ -35,7 +34,7 @@ function parseStaff(row: any): Staff {
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
   try {
-    const getQuery = {
+    const query = {
       text: `
         SELECT
           person.id,
@@ -46,18 +45,19 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           person.date_of_birth,
           person.notes,
           person.active,
+          staff.id AS staff_id,
           staff.join_date,
           staff.leave_date
-      FROM
+        FROM
           staff
-      JOIN
+        JOIN
           person ON staff.person_id = person.id;
       `,
     };
-    const result = await client.query(getQuery);
+    const result = await client.query(query);
     res.status(200).json(result.rows.map(parseStaff));
   } catch (error) {
-    console.error("Error retrieving roles", error);
+    console.error("Error retrieving staffs", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

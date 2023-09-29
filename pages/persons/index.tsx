@@ -26,9 +26,9 @@ import fetcher from "../../utils/fetcher";
 import { Person } from "../api/persons";
 import CustomToolBar from "../../src/components/grid/CustomToolBar";
 import DetailPanel from "../../src/components/grid/DetailPanel";
-import NewPersonDialog from "../../src/components/person/UpdateCreatePersonDialog";
+import NewPersonDialog from "../../src/components/person/student/UpdateCreateStudentDialog";
 import RenderMenu from "../../src/components/grid/RenderMenu";
-import UpdateCreatePersonDialog from "../../src/components/person/UpdateCreatePersonDialog";
+import UpdateCreatePersonDialog from "../../src/components/person/student/UpdateCreateStudentDialog";
 import StudentDetailPanel from "../../src/components/person/StudentDetailPanel";
 import StaffDetailPanel from "../../src/components/person/StaffDetailPanel";
 
@@ -43,7 +43,6 @@ const personTypes = ["students", "parents", "staffs"];
 
 export default function PersonGrid() {
   const [tab, setTab] = React.useState("students");
-  const [gridKey, setGridKey] = React.useState(0);
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
   const [selectedRowData, setSelectedRowData] = React.useState<Person>(
@@ -66,7 +65,8 @@ export default function PersonGrid() {
       created: false,
       action: true,
     });
-  const [isNewDialogOpen, setIsNewDialogOpen] = React.useState(false);
+  const [isUpdateCreateDialogOpen, setIsUpdateCreateDialogOpen] =
+    React.useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
@@ -85,20 +85,12 @@ export default function PersonGrid() {
     setDetailPanelOpen(new Map());
   };
 
-  const handleOpenNewDialog = () => {
-    setIsNewDialogOpen(true);
+  const handleOpenUpdateCreateDialog = () => {
+    setIsUpdateCreateDialogOpen(true);
   };
 
-  const handleCloseNewDialog = () => {
-    setIsNewDialogOpen(false);
-  };
-
-  const handleOpenEditDialog = () => {
-    setIsEditDialogOpen(true);
-  };
-
-  const handleCloseEditDialog = () => {
-    setIsEditDialogOpen(false);
+  const handleCloseUpdateCreateDialog = () => {
+    setIsUpdateCreateDialogOpen(false);
   };
 
   const handleOpenDeleteDialog = () => {
@@ -107,6 +99,12 @@ export default function PersonGrid() {
 
   const handleCloseDeleteDialog = () => {
     setIsDeleteDialogOpen(false);
+  };
+
+  const handleRenderMenuClick = (row) => {
+    console.log("RENDER MENU CLICKED");
+    console.log(row);
+    setSelectedRowData(row);
   };
 
   const onRowClick = (data: { id: string }) => {
@@ -198,7 +196,7 @@ export default function PersonGrid() {
     });
 
     if (response.ok) {
-      setIsNewDialogOpen(false);
+      setIsUpdateCreateDialogOpen(false);
     } else {
       console.error("Error updating user data:", response.statusText);
     }
@@ -340,8 +338,8 @@ export default function PersonGrid() {
       flex: 1,
       renderCell: (params) => (
         <RenderMenu
-          // onClick={() => handleRenderMenuClick(params.row)}
-          onEditClick={handleOpenEditDialog}
+          onClick={() => handleRenderMenuClick(params.row)}
+          onEditClick={handleOpenUpdateCreateDialog}
           onDeleteClick={handleOpenDeleteDialog}
         />
       ),
@@ -362,7 +360,6 @@ export default function PersonGrid() {
       {persons && (
         <DataGrid
           autoHeight={true}
-          key={gridKey}
           sx={{
             width: "100%",
             overflow: "hidden",
@@ -406,7 +403,9 @@ export default function PersonGrid() {
               placement: "bottom-end",
             },
             toolbar: {
-              children: <AddIconButton onClick={handleOpenNewDialog} />,
+              children: (
+                <AddIconButton onClick={handleOpenUpdateCreateDialog} />
+              ),
               setButtonEl,
             },
             columnsPanel: {
@@ -419,9 +418,9 @@ export default function PersonGrid() {
       )}
       <UpdateCreatePersonDialog
         personType={tab}
-        existingData={null}
-        open={isNewDialogOpen}
-        onClose={handleCloseNewDialog}
+        existingData={selectedRowData}
+        open={isUpdateCreateDialogOpen}
+        onClose={handleCloseUpdateCreateDialog}
         onSubmit={handleCreateNewPerson}
       />
     </Box>

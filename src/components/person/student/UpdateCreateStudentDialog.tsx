@@ -1,5 +1,5 @@
 import { FormEvent, FormEventHandler } from "react";
-import { Role } from "../../../pages/api/staffs/roles";
+import { Role } from "../../../../pages/api/staffs/roles";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -7,12 +7,13 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import fetcher from "../../../utils/fetcher";
+import fetcher from "../../../../utils/fetcher";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
+import dayjs from "dayjs";
 
 function RedBar() {
   return (
@@ -39,15 +40,7 @@ export default function UpdateCreatePersonDialog({
   onClose,
   onSubmit,
 }: IUpdateCreatePersonDialogProps) {
-  const [newPerson, setNewPerson] = React.useState({
-    name: "",
-    phone: "",
-    email: "",
-    dateOfBirth: "",
-    notes: "",
-    joinDate: "",
-    leaveDate: "",
-  });
+  const [editedData, setEditedData] = React.useState(existingData);
   const [role, setRole] = React.useState("");
   // const [open, setOpen] = React.useState(false);
   const { data } = useSWR("/api/staffs/roles", fetcher);
@@ -55,21 +48,37 @@ export default function UpdateCreatePersonDialog({
 
   const personIdParam = `[${personType.slice(0, -1)}_id]`;
 
+  React.useEffect(() => {
+    if (editedData) {
+      setEditedData(existingData);
+    } else {
+      setEditedData({
+        id: 0,
+        classId: 0,
+        className: "",
+        assignmentName: "",
+        description: "",
+        dueDate: new Date(),
+        created: new Date(),
+      });
+    }
+  }, [existingData]);
+
   const handleRoleChange = (event: SelectChangeEvent) => {
     setRole(event.target.value);
   };
 
-  const handleSubmit: FormEventHandler = (event: FormEvent) => {
-    event.preventDefault();
-    onSubmit(newPerson);
-  };
-
-  const handleInputChange = (event) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setNewPerson((prevData) => ({
-      ...prevData,
+    setEditedData((prevData) => ({
+      ...prevData!,
       [name]: value,
     }));
+  };
+
+  const handleSubmit: FormEventHandler = (event: FormEvent) => {
+    event.preventDefault();
+    onSubmit(editedData);
   };
 
   return (
@@ -90,7 +99,7 @@ export default function UpdateCreatePersonDialog({
               type="text"
               fullWidth
               variant="outlined"
-              value={newPerson.name}
+              value={editedData.name}
               onChange={handleInputChange}
             />
             {/* TODO format date in yyyy-mm-dd format */}
@@ -104,7 +113,7 @@ export default function UpdateCreatePersonDialog({
               fullWidth
               variant="outlined"
               InputLabelProps={{ shrink: true }}
-              value={newPerson.dateOfBirth}
+              value={dayjs(editedData.dateOfBirth).format("YYYY-MM-DD")}
               onChange={handleInputChange}
             />
             <TextField
@@ -119,7 +128,7 @@ export default function UpdateCreatePersonDialog({
               variant="outlined"
               placeholder="Hobbies, nicknames, etc."
               InputLabelProps={{ shrink: true }}
-              value={newPerson.notes}
+              value={editedData.notes}
               onChange={handleInputChange}
             />
             <RedBar />
@@ -159,7 +168,7 @@ export default function UpdateCreatePersonDialog({
               type="email"
               fullWidth
               variant="outlined"
-              value={newPerson.email}
+              value={editedData.email}
               onChange={handleInputChange}
             />
             <TextField
@@ -171,7 +180,7 @@ export default function UpdateCreatePersonDialog({
               type="tel"
               fullWidth
               variant="outlined"
-              value={newPerson.phone}
+              value={editedData.phone}
               onChange={handleInputChange}
             />
             <RedBar />
@@ -190,7 +199,7 @@ export default function UpdateCreatePersonDialog({
                   fullWidth
                   variant="outlined"
                   InputLabelProps={{ shrink: true }}
-                  value={newPerson.joinDate}
+                  value={dayjs(editedData.joinDate).format("YYYY-MM-DD")}
                   onChange={handleInputChange}
                 />
                 <TextField
@@ -202,7 +211,7 @@ export default function UpdateCreatePersonDialog({
                   fullWidth
                   variant="outlined"
                   InputLabelProps={{ shrink: true }}
-                  value={newPerson.leaveDate}
+                  value={dayjs(editedData.leaveDate).format("YYYY-MM-DD")}
                   onChange={handleInputChange}
                 />
               </div>

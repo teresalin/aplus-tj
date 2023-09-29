@@ -77,6 +77,11 @@ export default function SessionGrid() {
     setIsDeleteDialogOpen(false);
   };
 
+  const handleRenderMenuClick = (row) => {
+    console.log("RENDER MENU CLICKED");
+    setSelectedRowData(row);
+  };
+
   const onRowsSelectionHandler = (ids) => {
     const selectedRowsData = ids.map((id) =>
       sessions.find((row) => row.id === id)
@@ -213,8 +218,9 @@ export default function SessionGrid() {
       minWidth: 70,
       maxWidth: 70,
       flex: 1,
-      renderCell: () => (
+      renderCell: (params) => (
         <RenderMenu
+          onClick={() => handleRenderMenuClick(params.row)}
           onEditClick={handleOpenEditDialog}
           onDeleteClick={handleOpenDeleteDialog}
         />
