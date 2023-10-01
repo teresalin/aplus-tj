@@ -220,7 +220,6 @@ export default function SessionGrid() {
       flex: 1,
       renderCell: (params) => (
         <RenderMenu
-          onClick={() => handleRenderMenuClick(params.row)}
           onEditClick={handleOpenEditDialog}
           onDeleteClick={handleOpenDeleteDialog}
         />

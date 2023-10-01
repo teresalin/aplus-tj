@@ -5,13 +5,12 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import React from "react";
 import Tooltip from "@mui/material/Tooltip";
 
-function RenderMenu({ onClick, onEditClick, onDeleteClick }) {
+function RenderMenu({ onEditClick, onDeleteClick }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleOpen = (event) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
-    onClick();
   };
 
   const handleClose = () => {

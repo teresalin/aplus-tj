@@ -209,7 +209,6 @@ export default function AssignmentGrid() {
       flex: 1,
       renderCell: (params) => (
         <RenderMenu
-          onClick={() => handleRenderMenuClick(params.row)}
           onEditClick={handleOpenUpdateCreateDialog}
           onDeleteClick={handleOpenDeleteDialog}
         />

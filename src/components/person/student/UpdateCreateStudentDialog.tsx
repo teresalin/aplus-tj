@@ -1,19 +1,23 @@
-import { FormEvent, FormEventHandler } from "react";
-import { Role } from "../../../../pages/api/staffs/roles";
 import * as React from "react";
+import { DatePicker } from "@mui/x-date-pickers";
+import { FormEvent, FormEventHandler } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import dayjs from "dayjs";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import fetcher from "../../../../utils/fetcher";
+import Grid from "@mui/material/Grid";
 import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
-import dayjs from "dayjs";
+
+import fetcher from "../../../../utils/fetcher";
+import { Grade } from "../../../../pages/api/students/grades";
+import { Role } from "../../../../pages/api/staffs/roles";
+import { Student } from "../../../../pages/api/students";
 
 function RedBar() {
   return (
@@ -25,48 +29,34 @@ function RedBar() {
   );
 }
 
-export interface IUpdateCreatePersonDialogProps {
-  personType;
-  existingData;
+export interface IUpdateCreateStudentDialogProps {
+  isUpdate: boolean;
+  existingData: Student;
   open: boolean;
   onClose: () => void;
   onSubmit;
 }
 
-export default function UpdateCreatePersonDialog({
-  personType,
+export default function UpdateCreateStudentDialog({
+  isUpdate,
   existingData,
   open,
   onClose,
   onSubmit,
-}: IUpdateCreatePersonDialogProps) {
+}: IUpdateCreateStudentDialogProps) {
   const [editedData, setEditedData] = React.useState(existingData);
-  const [role, setRole] = React.useState("");
-  // const [open, setOpen] = React.useState(false);
-  const { data } = useSWR("/api/staffs/roles", fetcher);
-  const roles = data || ([] as Role[]);
+  const { data } = useSWR("/api/students/grades", fetcher);
+  const grades = data || ([] as Role[]);
 
-  const personIdParam = `[${personType.slice(0, -1)}_id]`;
+  console.log(existingData);
 
   React.useEffect(() => {
-    if (editedData) {
+    if (isUpdate) {
       setEditedData(existingData);
     } else {
-      setEditedData({
-        id: 0,
-        classId: 0,
-        className: "",
-        assignmentName: "",
-        description: "",
-        dueDate: new Date(),
-        created: new Date(),
-      });
+      setEditedData({} as Student);
     }
   }, [existingData]);
-
-  const handleRoleChange = (event: SelectChangeEvent) => {
-    setRole(event.target.value);
-  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -85,37 +75,62 @@ export default function UpdateCreatePersonDialog({
     <>
       <Dialog disablePortal open={open} onClose={onClose}>
         <form onSubmit={handleSubmit}>
-          <DialogTitle>New {personType.slice(0, -1)}</DialogTitle>
+          <DialogTitle>New Student</DialogTitle>
           <DialogContent>
-            <Typography variant="body2" display="block">
+            <Typography variant="body2" display="block" gutterBottom>
               Basic Information
             </Typography>
-            <TextField
-              required
-              margin="dense"
-              id="name"
-              name="name"
-              label="Full Name"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={editedData.name}
-              onChange={handleInputChange}
-            />
-            {/* TODO format date in yyyy-mm-dd format */}
-            <TextField
-              required
-              margin="dense"
-              id="dateOfBirth"
-              name="dateOfBirth"
+            <Grid container direction="row" spacing={{ xs: 0, sm: 1 }}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  required
+                  margin="dense"
+                  id="name"
+                  name="name"
+                  label="Full Name"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  value={editedData.name || ""}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  margin="dense"
+                  id="name"
+                  name="name"
+                  label="English Name"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  value={editedData.englishName || ""}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+            </Grid>
+            <DatePicker
               label="Date of Birth"
-              type="date"
-              fullWidth
-              variant="outlined"
-              InputLabelProps={{ shrink: true }}
-              value={dayjs(editedData.dateOfBirth).format("YYYY-MM-DD")}
-              onChange={handleInputChange}
+              format="YYYY-MM-DD"
+              value={
+                editedData.dateOfBirth ? dayjs(editedData.dateOfBirth) : null
+              }
+              sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
             />
+            <TextField
+              id="gender"
+              name="gender"
+              label="Select a gender"
+              margin="dense"
+              required
+              select
+              fullWidth
+              onChange={handleInputChange}
+            >
+              <MenuItem value="male">Male</MenuItem>
+              <MenuItem value="female">Female</MenuItem>
+              <MenuItem value="other">Other</MenuItem>
+            </TextField>
             <TextField
               multiline
               margin="dense"
@@ -128,35 +143,12 @@ export default function UpdateCreatePersonDialog({
               variant="outlined"
               placeholder="Hobbies, nicknames, etc."
               InputLabelProps={{ shrink: true }}
-              value={editedData.notes}
+              value={editedData.notes ? editedData.notes : ""}
               onChange={handleInputChange}
             />
             <RedBar />
-            {personType === "staffs" && (
-              <div>
-                <Typography variant="body2" display="block">
-                  Role
-                </Typography>
-                {/* TODO fix default value */}
-                <Select
-                  fullWidth
-                  // labelId="demo-simple-select-label"
-                  id="roleId"
-                  name="roleId"
-                  value={role}
-                  label="Role"
-                  displayEmpty
-                  onChange={handleRoleChange}
-                >
-                  {roles.map((role: Role) => (
-                    <MenuItem value={role.id}>{role.name}</MenuItem>
-                  ))}
-                </Select>
-                <RedBar />
-              </div>
-            )}
             {/* TODO lowercase before storing into db */}
-            <Typography variant="body2" display="block">
+            <Typography variant="body2" display="block" gutterBottom>
               Contact Information
             </Typography>
             <TextField
@@ -168,7 +160,7 @@ export default function UpdateCreatePersonDialog({
               type="email"
               fullWidth
               variant="outlined"
-              value={editedData.email}
+              value={editedData.email || ""}
               onChange={handleInputChange}
             />
             <TextField
@@ -180,42 +172,82 @@ export default function UpdateCreatePersonDialog({
               type="tel"
               fullWidth
               variant="outlined"
-              value={editedData.phone}
+              value={editedData.phone || ""}
               onChange={handleInputChange}
             />
             <RedBar />
-            {personType !== "parents" && (
-              <div>
-                <Typography variant="body2" display="block">
-                  Enrollment Period
-                </Typography>
-                <TextField
-                  required
-                  margin="dense"
-                  id="joinDate"
-                  name="joinDate"
+            <Typography variant="body2" display="block" gutterBottom>
+              School Information
+            </Typography>
+            <TextField
+              required
+              margin="dense"
+              id="currentSchool"
+              name="currentSchool"
+              label="Current School"
+              type="text"
+              fullWidth
+              variant="outlined"
+              InputLabelProps={{ shrink: true }}
+              value={editedData.currentSchool || ""}
+              onChange={handleInputChange}
+            />
+            <TextField
+              id="grade"
+              name="grade"
+              label="Select a grade"
+              margin="dense"
+              required
+              select
+              fullWidth
+              onChange={handleInputChange}
+            >
+              {grades &&
+                grades.map((grade: Grade) => (
+                  <MenuItem key={grade.id} value={grade.id}>
+                    {grade.name}
+                  </MenuItem>
+                ))}
+            </TextField>
+            <TextField
+              required
+              margin="dense"
+              id="textbookPublisher"
+              name="textbookPublisher"
+              label="Textbook Publisher"
+              type="text"
+              fullWidth
+              variant="outlined"
+              InputLabelProps={{ shrink: true }}
+              value={editedData.textbookPublisher}
+              onChange={handleInputChange}
+            />
+            <RedBar />
+            <Typography variant="body2" display="block" gutterBottom>
+              Enrollment Period
+            </Typography>
+            <Grid container direction="row" spacing={1}>
+              <Grid item xs={6}>
+                <DatePicker
                   label="Join Date"
-                  type="date"
-                  fullWidth
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  value={dayjs(editedData.joinDate).format("YYYY-MM-DD")}
-                  onChange={handleInputChange}
+                  format="YYYY-MM-DD"
+                  value={
+                    editedData.joinDate ? dayjs(editedData.joinDate) : null
+                  }
+                  sx={{ marginTop: "8px", marginBottom: "4px" }}
                 />
-                <TextField
-                  margin="dense"
-                  id="leaveDate"
-                  name="leaveDate"
+              </Grid>
+              <Grid item xs={6}>
+                <DatePicker
                   label="Leave Date"
-                  type="date"
-                  fullWidth
-                  variant="outlined"
-                  InputLabelProps={{ shrink: true }}
-                  value={dayjs(editedData.leaveDate).format("YYYY-MM-DD")}
-                  onChange={handleInputChange}
+                  format="YYYY-MM-DD"
+                  value={
+                    editedData.leaveDate ? dayjs(editedData.leaveDate) : null
+                  }
+                  sx={{ marginTop: "8px", marginBottom: "4px" }}
                 />
-              </div>
-            )}
+              </Grid>
+            </Grid>
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>

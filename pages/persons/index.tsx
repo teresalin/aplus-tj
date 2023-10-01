@@ -9,7 +9,6 @@ import dayjs from "dayjs";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import IconButton from "@mui/material/IconButton";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import useSWR from "swr";
@@ -23,14 +22,13 @@ import {
 } from "@mui/x-data-grid";
 
 import fetcher from "../../utils/fetcher";
-import { Person } from "../api/persons";
 import CustomToolBar from "../../src/components/grid/CustomToolBar";
 import DetailPanel from "../../src/components/grid/DetailPanel";
-import NewPersonDialog from "../../src/components/person/student/UpdateCreateStudentDialog";
 import RenderMenu from "../../src/components/grid/RenderMenu";
-import UpdateCreatePersonDialog from "../../src/components/person/student/UpdateCreateStudentDialog";
-import StudentDetailPanel from "../../src/components/person/StudentDetailPanel";
 import StaffDetailPanel from "../../src/components/person/StaffDetailPanel";
+import StudentDetailPanel from "../../src/components/person/StudentDetailPanel";
+import UpdateCreateStudentDialog from "../../src/components/person/student/UpdateCreateStudentDialog";
+import { Student } from "../api/students";
 
 function a11yProps(key: string) {
   return {
@@ -45,9 +43,9 @@ export default function PersonGrid() {
   const [tab, setTab] = React.useState("students");
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
-  const [selectedRowData, setSelectedRowData] = React.useState<Person>(
-    {} as Person
-  );
+  // const [selectedRowData, setSelectedRowData] = React.useState<Person>(
+  //   {} as Person
+  // );
   const [detailPanelOpen, setDetailPanelOpen] = React.useState<
     Map<string, boolean>
   >(new Map());
@@ -67,7 +65,9 @@ export default function PersonGrid() {
     });
   const [isUpdateCreateDialogOpen, setIsUpdateCreateDialogOpen] =
     React.useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
+  const [isUpdate, setIsUpdate] = React.useState(false);
+  const [rowToEdit, setRowToEdit] = React.useState({});
+  const [rowToDelete, setRowToDelete] = React.useState({});
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
     null
@@ -85,8 +85,21 @@ export default function PersonGrid() {
     setDetailPanelOpen(new Map());
   };
 
-  const handleOpenUpdateCreateDialog = () => {
+  const handleAddButtonClick = () => {
+    setIsUpdate(false);
+    setRowToEdit({});
     setIsUpdateCreateDialogOpen(true);
+  };
+
+  const handleEditClick = (row) => {
+    setIsUpdate(true);
+    setRowToEdit(row);
+    setIsUpdateCreateDialogOpen(true);
+  };
+
+  const handleDeleteClick = (row) => {
+    setRowToDelete(row);
+    setIsDeleteDialogOpen(true);
   };
 
   const handleCloseUpdateCreateDialog = () => {
@@ -99,12 +112,6 @@ export default function PersonGrid() {
 
   const handleCloseDeleteDialog = () => {
     setIsDeleteDialogOpen(false);
-  };
-
-  const handleRenderMenuClick = (row) => {
-    console.log("RENDER MENU CLICKED");
-    console.log(row);
-    setSelectedRowData(row);
   };
 
   const onRowClick = (data: { id: string }) => {
@@ -338,9 +345,8 @@ export default function PersonGrid() {
       flex: 1,
       renderCell: (params) => (
         <RenderMenu
-          onClick={() => handleRenderMenuClick(params.row)}
-          onEditClick={handleOpenUpdateCreateDialog}
-          onDeleteClick={handleOpenDeleteDialog}
+          onEditClick={() => handleEditClick(params.row)}
+          onDeleteClick={() => handleDeleteClick(params.row)}
         />
       ),
     },
@@ -403,9 +409,7 @@ export default function PersonGrid() {
               placement: "bottom-end",
             },
             toolbar: {
-              children: (
-                <AddIconButton onClick={handleOpenUpdateCreateDialog} />
-              ),
+              children: <AddIconButton onClick={handleAddButtonClick} />,
               setButtonEl,
             },
             columnsPanel: {
@@ -416,9 +420,9 @@ export default function PersonGrid() {
           hideFooterSelectedRowCount
         />
       )}
-      <UpdateCreatePersonDialog
-        personType={tab}
-        existingData={selectedRowData}
+      <UpdateCreateStudentDialog
+        isUpdate={isUpdate}
+        existingData={rowToEdit as Student}
         open={isUpdateCreateDialogOpen}
         onClose={handleCloseUpdateCreateDialog}
         onSubmit={handleCreateNewPerson}

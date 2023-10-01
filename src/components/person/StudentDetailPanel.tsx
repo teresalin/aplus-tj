@@ -85,7 +85,7 @@ function DetailPanel({ data }) {
               >
                 Grade
               </Typography>
-              <Typography variant="body2">{data.grade}</Typography>
+              <Typography variant="body2">{data.grade.name}</Typography>
             </Grid>
             <Grid item xs={4}>
               <Typography
@@ -98,6 +98,24 @@ function DetailPanel({ data }) {
             </Grid>
           </Grid>
           <Grid container item spacing={3}>
+            <Grid item xs={4}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#3c6ea0" }}
+              >
+                Join Date
+              </Typography>
+              <Typography variant="body2">{data.joinDate}</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#3c6ea0" }}
+              >
+                Leave Date
+              </Typography>
+              <Typography variant="body2">{data.leaveDate}</Typography>
+            </Grid>
             <Grid item xs={4}>
               <Typography
                 variant="body2"
