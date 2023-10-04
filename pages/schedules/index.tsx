@@ -2,14 +2,18 @@ import React from "react";
 import BigCalendar, {
   Calendar,
   Views,
-  momentLocalizer,
+  dayjsLocalizer,
 } from "react-big-calendar";
 import moment, { now } from "moment";
 import * as dates from "../../utils/dates";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import zhtw from "dayjs/locale/zh-tw";
+import dayjs from "dayjs";
 
-// const localizer = momentLocalizer(moment);
-const mLocalizer = momentLocalizer(moment);
+dayjs.locale(zhtw);
+
+const dLocalizer = dayjsLocalizer(dayjs);
+// const mLocalizer = momentLocalizer(moment);
 
 // const ColoredDateCellWrapper = ({ children }) =>
 //   React.cloneElement(React.Children.only(children), {
@@ -232,7 +236,7 @@ const events = [
 ];
 
 export default function Basic({
-  localizer = mLocalizer,
+  localizer = dLocalizer,
   showDemoLink = true,
   ...props
 }) {
@@ -254,6 +258,7 @@ export default function Basic({
         <Calendar
           backgroundEvents={backgroundEvents}
           //   components={components}
+          culture="zhtw"
           defaultDate={defaultDate}
           events={events}
           localizer={localizer}

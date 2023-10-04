@@ -1,10 +1,11 @@
-import { Client } from 'pg';
-import dotenv from 'dotenv';
+import { Client } from "pg";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const host = process.env.POSTGRES_CONNECTION
-  ? `/cloudsql/${process.env.POSTGRES_CONNECTION}` : process.env.POSTGRES_HOST;
+  ? `/cloudsql/${process.env.POSTGRES_CONNECTION}`
+  : process.env.POSTGRES_HOST;
 
 const config = {
   host,
@@ -14,20 +15,14 @@ const config = {
   password: process.env.POSTGRES_PASSWORD,
 };
 
-let client: Client | null = null
-
 export async function getDBClient() {
   try {
-    if (client) {
-      return client;
-    }
-
-    const newClient = new Client(config);
-    await newClient.connect();
-    client = newClient;
+    // TODO
+    const client = new Client(config);
+    await client.connect();
     return client;
   } catch (err) {
-    console.error('Error connecting to the database:', err);
+    console.error("Error connecting to the database:", err);
     throw err;
   }
 }

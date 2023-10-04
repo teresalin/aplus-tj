@@ -188,7 +188,6 @@ export default function UpdateCreateStudentDialog({
               type="text"
               fullWidth
               variant="outlined"
-              InputLabelProps={{ shrink: true }}
               value={editedData.currentSchool || ""}
               onChange={handleInputChange}
             />
@@ -218,7 +217,6 @@ export default function UpdateCreateStudentDialog({
               type="text"
               fullWidth
               variant="outlined"
-              InputLabelProps={{ shrink: true }}
               value={editedData.textbookPublisher}
               onChange={handleInputChange}
             />
