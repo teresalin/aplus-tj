@@ -29,6 +29,7 @@ import StaffDetailPanel from "../../src/components/person/StaffDetailPanel";
 import StudentDetailPanel from "../../src/components/person/StudentDetailPanel";
 import UpdateCreateStudentDialog from "../../src/components/person/student/UpdateCreateStudentDialog";
 import { Student } from "../api/students";
+import DeactivateStudentDialog from "../../src/components/person/student/DeactivateStudentDialog";
 
 function a11yProps(key: string) {
   return {
@@ -67,8 +68,9 @@ export default function PersonGrid() {
     React.useState(false);
   const [isUpdate, setIsUpdate] = React.useState(false);
   const [rowToEdit, setRowToEdit] = React.useState({});
-  const [rowToDelete, setRowToDelete] = React.useState({});
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [rowToDeactivate, setRowToDeactivate] = React.useState({});
+  const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] =
+    React.useState(false);
   const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
     null
   );
@@ -80,6 +82,10 @@ export default function PersonGrid() {
     setPersons(data);
   }, [data]);
 
+  React.useEffect(() => {
+    setIsUpdateCreateDialogOpen(true);
+  }, [isUpdate, rowToEdit]);
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setTab(newValue);
     setDetailPanelOpen(new Map());
@@ -88,30 +94,28 @@ export default function PersonGrid() {
   const handleAddButtonClick = () => {
     setIsUpdate(false);
     setRowToEdit({});
-    setIsUpdateCreateDialogOpen(true);
   };
 
   const handleEditClick = (row) => {
     setIsUpdate(true);
     setRowToEdit(row);
-    setIsUpdateCreateDialogOpen(true);
   };
 
-  const handleDeleteClick = (row) => {
-    setRowToDelete(row);
-    setIsDeleteDialogOpen(true);
+  const handleDeactivateClick = (row) => {
+    setRowToDeactivate(row);
+    setIsDeactivateDialogOpen(true);
   };
 
   const handleCloseUpdateCreateDialog = () => {
     setIsUpdateCreateDialogOpen(false);
   };
 
-  const handleOpenDeleteDialog = () => {
-    setIsDeleteDialogOpen(true);
+  const handleOpenDeactivateDialog = () => {
+    setIsDeactivateDialogOpen(true);
   };
 
-  const handleCloseDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
+  const handleCloseDeactivateDialog = () => {
+    setIsDeactivateDialogOpen(false);
   };
 
   const onRowClick = (data: { id: string }) => {
@@ -194,6 +198,22 @@ export default function PersonGrid() {
 
   // TODO update this
   const handleCreateNewPerson = async (data) => {
+    const response = await fetch(`/api/assignments/[assignment_id]`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      setIsUpdateCreateDialogOpen(false);
+    } else {
+      console.error("Error updating user data:", response.statusText);
+    }
+  };
+
+  const handleDeactivatePerson = async (data) => {
     const response = await fetch(`/api/assignments/[assignment_id]`, {
       method: "POST",
       headers: {
@@ -346,7 +366,7 @@ export default function PersonGrid() {
       renderCell: (params) => (
         <RenderMenu
           onEditClick={() => handleEditClick(params.row)}
-          onDeleteClick={() => handleDeleteClick(params.row)}
+          onDeleteClick={() => handleDeactivateClick(params.row)}
         />
       ),
     },
@@ -426,6 +446,11 @@ export default function PersonGrid() {
         open={isUpdateCreateDialogOpen}
         onClose={handleCloseUpdateCreateDialog}
         onSubmit={handleCreateNewPerson}
+      />
+      <DeactivateStudentDialog
+        open={isDeactivateDialogOpen}
+        onClose={handleCloseDeactivateDialog}
+        onSubmit={handleDeactivatePerson}
       />
     </Box>
   );
