@@ -16,6 +16,9 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import SettingsIcon from "@mui/icons-material/Settings";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 const Logo = styled("img")(({ theme }) => ({
   maxWidth: 30,
@@ -41,7 +44,7 @@ const StyledListItemText = styled(ListItemText)(({ theme }) => ({
   },
 }));
 
-export default function SelectedListItem() {
+export default function SelectedListItem({ toggleTheme }) {
   const router = useRouter();
   const { pathname } = router;
 
@@ -62,7 +65,6 @@ export default function SelectedListItem() {
                 fontSize: 20,
                 fontFamily: "Roboto, Helvetica, Arial, sans-serif",
                 fontWeight: 800,
-                color: "#434260",
                 letterSpacing: 0,
               }}
             />
@@ -120,7 +122,14 @@ export default function SelectedListItem() {
           </ListItemButton>
         </Link>
         <Link href="/persons">
-          <ListItemButton selected={isActive("/persons")}>
+          <ListItemButton
+            selected={isActive("/persons")}
+            // sx={{
+            //   "&.Mui-selected": {
+            //     backgroundColor: "#1e1e1f",
+            //   },
+            // }}
+          >
             <ListItemIcon>
               <GroupIcon />
             </ListItemIcon>
@@ -137,6 +146,30 @@ export default function SelectedListItem() {
           <ListItemText primary="Settings" />
         </ListItemButton>
       </List>
+      {/* <List component="nav" aria-label="footer" sx={{ bottom: 0 }}>
+        <ListItemButton selected={isActive("/settings")}>
+          <ListItemIcon>
+            <SettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary="Theme" />
+        </ListItemButton>
+      </List> */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          textAlign: "center",
+          padding: 10,
+        }}
+      >
+        <Button
+          variant="outlined"
+          startIcon={<DarkModeIcon />}
+          onClick={toggleTheme}
+        >
+          Dark Mode
+        </Button>
+      </div>
     </Box>
   );
 }

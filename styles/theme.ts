@@ -12,7 +12,7 @@ import { ThemeOptions, createTheme } from "@mui/material/styles";
 //   },
 // };
 
-const theme = createTheme({
+const lightTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
@@ -21,7 +21,25 @@ const theme = createTheme({
     secondary: {
       main: "#dc9770",
     },
+    background: {
+      default: "#f8f6fc",
+    },
   },
 });
 
-export default theme;
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+    primary: {
+      main: "#58acdc",
+    },
+    secondary: {
+      main: "#dc8858",
+    },
+    background: {
+      default: "#1e1e1f",
+    },
+  },
+});
+
+export { lightTheme, darkTheme };

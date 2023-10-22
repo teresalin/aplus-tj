@@ -44,6 +44,9 @@ export default function PersonGrid() {
   const [tab, setTab] = React.useState("students");
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
+  // const [selectedRowData, setSelectedRowData] = React.useState<Person>(
+  //   {} as Person
+  // );
   const [detailPanelOpen, setDetailPanelOpen] = React.useState<
     Map<string, boolean>
   >(new Map());
@@ -243,15 +246,15 @@ export default function PersonGrid() {
   const renderChip = (params) => {
     return params.value ? (
       <Chip
-        // icon={<CheckIcon />}
+        icon={<CheckIcon />}
         label="Active"
         size="small"
-        sx={{ height: "20px", paddingX: 1 }}
-        style={{ backgroundColor: "#bef0cc", color: "#507b67" }}
+        sx={{ height: "20px" }}
+        style={{ backgroundColor: "#d6f8e7", color: "#507b67" }}
       />
     ) : (
       <Chip
-        // icon={<CloseIcon />}
+        icon={<CloseIcon />}
         label="Inactive"
         size="small"
         sx={{ height: "20px" }}
@@ -374,20 +377,13 @@ export default function PersonGrid() {
 
   return (
     <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={tab} onChange={handleTabChange} aria-label="users tabs">
-          {personTypes.map((key) => (
-            <Tab key={key} value={key} label={key} {...a11yProps(key)} />
-          ))}
-        </Tabs>
-      </Box>
       {persons && (
         <DataGrid
           autoHeight={true}
           sx={{
             width: "100%",
             overflow: "hidden",
-            // backgroundColor: "#fff",
+            backgroundColor: "#fff",
             "&.MuiDataGrid-root .MuiDataGrid-cell:focus-within": {
               outline: "none !important",
             },

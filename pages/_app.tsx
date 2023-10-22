@@ -8,16 +8,36 @@ import AppLayout from "../src/components/layout/layout";
 import CssBaseline from "@mui/material/CssBaseline";
 import Head from "next/head";
 import React from "react";
-import theme from "../styles/theme";
+import { lightTheme, darkTheme } from "../styles/theme";
+
+function getActiveTheme(themeMode: "light" | "dark") {
+  return themeMode === "light" ? lightTheme : darkTheme;
+}
 
 export default function MyApp({ Component, pageProps }: AppProps) {
+  const [activeTheme, setActiveTheme] = React.useState(lightTheme);
+  const [selectedTheme, setSelectedTheme] = React.useState<"light" | "dark">(
+    "light"
+  );
+
+  const toggleTheme: React.MouseEventHandler<HTMLAnchorElement> = () => {
+    const desiredTheme = selectedTheme === "light" ? "dark" : "light";
+    setSelectedTheme(desiredTheme);
+  };
+
+  React.useEffect(() => {
+    setActiveTheme(getActiveTheme(selectedTheme));
+  }, [selectedTheme]);
+
+  console.log("selectedTheme: ", selectedTheme);
+
   return (
     <>
       <Head>
         <title>A Plus</title>
         <link rel="icon" type="image/x-icon" href="/favicon.ico?" />
       </Head>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={activeTheme}>
         <CssBaseline />
         <StyledEngineProvider injectFirst>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -27,6 +47,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
                   <Component {...pageProps} />
                 </>
               }
+              toggleTheme={toggleTheme}
             />
           </LocalizationProvider>
         </StyledEngineProvider>

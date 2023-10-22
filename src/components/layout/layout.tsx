@@ -19,7 +19,7 @@ const Main = styled("main")(({ theme }) => ({
   padding: theme.spacing(3),
 }));
 
-export default function AppLayout(props) {
+export default function AppLayout({ mainPage, toggleTheme }) {
   return (
     <>
       <Box sx={{ display: "flex" }}>
@@ -32,11 +32,11 @@ export default function AppLayout(props) {
           }}
         >
           <StyledDrawerContainer>
-            <SelectedListItem />
+            <SelectedListItem toggleTheme={toggleTheme} />
           </StyledDrawerContainer>
         </StyledDrawer>
         <Main>
-          <Box sx={{ p: 3, overflowX: "hidden" }}>{props.mainPage}</Box>
+          <Box sx={{ p: 3, overflowX: "hidden" }}>{mainPage}</Box>
         </Main>
       </Box>
     </>
