@@ -60,9 +60,23 @@ export default function UpdateCreateStudentDialog({
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
+    console.log("name: ", name);
+    console.log("value: ", value);
     setEditedData((prevData) => ({
       ...prevData!,
       [name]: value,
+    }));
+  };
+
+  const handleGradeChange = (
+    event: React.ChangeEvent<{ name: string; value: unknown }>
+  ) => {
+    const { name, value } = event.target;
+    console.log("name: ", name);
+    console.log("value: ", value);
+    setEditedData((prevData) => ({
+      ...prevData,
+      grade: { id: value as number, name: "some name" }, // Replace "some name" with the actual grade name
     }));
   };
 
@@ -125,11 +139,12 @@ export default function UpdateCreateStudentDialog({
               required
               select
               fullWidth
+              value={editedData.gender || ""}
               onChange={handleInputChange}
             >
-              <MenuItem value="male">Male</MenuItem>
-              <MenuItem value="female">Female</MenuItem>
-              <MenuItem value="other">Other</MenuItem>
+              <MenuItem value="Male">Male</MenuItem>
+              <MenuItem value="Female">Female</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
             </TextField>
             <TextField
               multiline
@@ -143,7 +158,7 @@ export default function UpdateCreateStudentDialog({
               variant="outlined"
               placeholder="Hobbies, nicknames, etc."
               InputLabelProps={{ shrink: true }}
-              value={editedData.notes ? editedData.notes : ""}
+              value={editedData.notes || ""}
               onChange={handleInputChange}
             />
             <RedBar />
@@ -199,7 +214,8 @@ export default function UpdateCreateStudentDialog({
               required
               select
               fullWidth
-              onChange={handleInputChange}
+              value={editedData.grade?.id || ""}
+              onChange={handleGradeChange}
             >
               {grades &&
                 grades.map((grade: Grade) => (
@@ -229,9 +245,7 @@ export default function UpdateCreateStudentDialog({
                 <DatePicker
                   label="Join Date"
                   format="YYYY-MM-DD"
-                  value={
-                    editedData.joinDate ? dayjs(editedData.joinDate) : null
-                  }
+                  value={editedData.joinDate && dayjs(editedData.joinDate)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
                 />
               </Grid>
@@ -239,9 +253,7 @@ export default function UpdateCreateStudentDialog({
                 <DatePicker
                   label="Leave Date"
                   format="YYYY-MM-DD"
-                  value={
-                    editedData.leaveDate ? dayjs(editedData.leaveDate) : null
-                  }
+                  value={editedData.leaveDate && dayjs(editedData.leaveDate)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
                 />
               </Grid>

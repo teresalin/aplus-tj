@@ -82,10 +82,6 @@ export default function PersonGrid() {
     setPersons(data);
   }, [data]);
 
-  React.useEffect(() => {
-    setIsUpdateCreateDialogOpen(true);
-  }, [isUpdate, rowToEdit]);
-
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setTab(newValue);
     setDetailPanelOpen(new Map());
@@ -94,11 +90,14 @@ export default function PersonGrid() {
   const handleAddButtonClick = () => {
     setIsUpdate(false);
     setRowToEdit({});
+    setIsUpdateCreateDialogOpen(true);
   };
 
+  // TODO handle async issue
   const handleEditClick = (row) => {
     setIsUpdate(true);
     setRowToEdit(row);
+    setIsUpdateCreateDialogOpen(true);
   };
 
   const handleDeactivateClick = (row) => {
@@ -108,6 +107,7 @@ export default function PersonGrid() {
 
   const handleCloseUpdateCreateDialog = () => {
     setIsUpdateCreateDialogOpen(false);
+    setRowToEdit({});
   };
 
   const handleOpenDeactivateDialog = () => {
@@ -116,6 +116,7 @@ export default function PersonGrid() {
 
   const handleCloseDeactivateDialog = () => {
     setIsDeactivateDialogOpen(false);
+    setRowToDeactivate({});
   };
 
   const onRowClick = (data: { id: string }) => {
@@ -198,7 +199,7 @@ export default function PersonGrid() {
 
   // TODO update this
   const handleCreateNewPerson = async (data) => {
-    const response = await fetch(`/api/assignments/[assignment_id]`, {
+    const response = await fetch(`/api/${tab}/[assignment_id]`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -209,12 +210,12 @@ export default function PersonGrid() {
     if (response.ok) {
       setIsUpdateCreateDialogOpen(false);
     } else {
-      console.error("Error updating user data:", response.statusText);
+      console.error("Error creating new user:", response.statusText);
     }
   };
 
   const handleDeactivatePerson = async (data) => {
-    const response = await fetch(`/api/assignments/[assignment_id]`, {
+    const response = await fetch(`/api/${tab}/${data.id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -225,7 +226,7 @@ export default function PersonGrid() {
     if (response.ok) {
       setIsUpdateCreateDialogOpen(false);
     } else {
-      console.error("Error updating user data:", response.statusText);
+      console.error("Error deactivating user:", response.statusText);
     }
   };
 
