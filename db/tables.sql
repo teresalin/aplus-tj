@@ -153,6 +153,8 @@ CREATE TABLE holiday (
 
 -- each record represents a billing statement for a specific period (e.g., a month)
 -- create new records for each billing cycle (month) for each student.
+-- when a student makes a payment, create a new record,
+-- but use a negative value in the amount field to indicate a payment
 CREATE TABLE student_billing_record (
   id SERIAL PRIMARY KEY,
   student_id INT REFERENCES student(id) NOT NULL,

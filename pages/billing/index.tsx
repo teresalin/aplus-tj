@@ -75,17 +75,12 @@ export default function PersonGrid() {
     null
   );
 
-  const { data } = useSWR(`api/${tab}`, fetcher);
-  const [persons, setPersons] = React.useState(data);
+  const { data } = useSWR(`api/billing`, fetcher);
+  const [billingRecords, setBillingRecords] = React.useState(data);
 
   React.useEffect(() => {
-    setPersons(data);
+    setBillingRecords(data);
   }, [data]);
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
-    setTab(newValue);
-    setDetailPanelOpen(new Map());
-  };
 
   const handleAddButtonClick = () => {
     setIsUpdate(false);
@@ -163,12 +158,16 @@ export default function PersonGrid() {
     const isPanelOpen = detailPanelOpen.get(data.id);
     if (isPanelOpen) {
       setDetailPanelOpen((map) => new Map(detailPanelOpen.set(data.id, false)));
-      const result = removeDetailPanelByRowId(persons, data.id);
-      setPersons(result);
+      const result = removeDetailPanelByRowId(billingRecords, data.id);
+      setBillingRecords(result);
     } else {
       setDetailPanelOpen((map) => new Map(detailPanelOpen.set(data.id, true)));
-      const result = insertDetailPanelByRowId(persons, data.id, newDetailPanel);
-      setPersons(result);
+      const result = insertDetailPanelByRowId(
+        billingRecords,
+        data.id,
+        newDetailPanel
+      );
+      setBillingRecords(result);
     }
   };
 
@@ -246,16 +245,14 @@ export default function PersonGrid() {
   const renderChip = (params) => {
     return params.value ? (
       <Chip
-        icon={<CheckIcon />}
-        label="Active"
+        label="Paid in Full"
         size="small"
         sx={{ height: "20px" }}
         style={{ backgroundColor: "#d6f8e7", color: "#507b67" }}
       />
     ) : (
       <Chip
-        icon={<CloseIcon />}
-        label="Inactive"
+        label="Pending"
         size="small"
         sx={{ height: "20px" }}
         style={{ backgroundColor: "#f9e8e8", color: "#9f3d49" }}
@@ -303,32 +300,8 @@ export default function PersonGrid() {
       flex: 1,
     },
     {
-      field: "name",
-      headerName: "Name",
-      minWidth: 150,
-      flex: 1,
-    },
-    {
-      field: "gender",
-      headerName: "Gender",
-      minWidth: 100,
-      flex: 1,
-    },
-    {
-      field: "phone",
-      headerName: "Phone",
-      minWidth: 120,
-      flex: 1,
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      minWidth: 200,
-      flex: 1,
-    },
-    {
-      field: "dateOfBirth",
-      headerName: "Date of Birth",
+      field: "billingDate",
+      headerName: "Biling Date",
       minWidth: 120,
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams<Date>) => {
@@ -339,8 +312,20 @@ export default function PersonGrid() {
       },
     },
     {
-      field: "active",
-      headerName: "Active",
+      field: "amount",
+      headerName: "Amount",
+      minWidth: 100,
+      flex: 1,
+    },
+    {
+      field: "studentName",
+      headerName: "Student Name",
+      minWidth: 120,
+      flex: 1,
+    },
+    {
+      field: "paid",
+      headerName: "Status",
       minWidth: 100,
       flex: 1,
       renderCell: renderChip,
@@ -373,17 +358,16 @@ export default function PersonGrid() {
     },
   ];
 
-  if (!persons) return <CircularProgress />;
+  if (!billingRecords) return <CircularProgress />;
 
   return (
     <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
-      {persons && (
+      {billingRecords && (
         <DataGrid
           autoHeight={true}
           sx={{
             width: "100%",
             overflow: "hidden",
-            backgroundColor: "#fff",
             "&.MuiDataGrid-root .MuiDataGrid-cell:focus-within": {
               outline: "none !important",
             },
@@ -392,7 +376,7 @@ export default function PersonGrid() {
           onColumnVisibilityModelChange={(newModel) => {
             onColumnVisibilityChange(newModel);
           }}
-          rows={persons}
+          rows={billingRecords}
           columns={columns}
           getRowHeight={({ id }: GridRowHeightParams) => {
             if (id.toString().startsWith("detail-panel")) {

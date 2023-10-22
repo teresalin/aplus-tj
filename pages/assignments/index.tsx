@@ -236,7 +236,6 @@ export default function AssignmentGrid() {
         sx={{
           width: "100%",
           overflow: "hidden",
-          backgroundColor: "#fff",
         }}
         rows={assignments}
         columns={columns}

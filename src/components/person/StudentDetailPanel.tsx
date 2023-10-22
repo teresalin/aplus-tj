@@ -5,10 +5,7 @@ import Typography from "@mui/material/Typography";
 function DetailPanel({ data }) {
   return (
     <>
-      <Paper
-        variant="outlined"
-        sx={{ m: 2, p: 2, flexGrow: 1, borderColor: "#3c6ea0" }}
-      >
+      <Paper variant="outlined" sx={{ m: 2, p: 2, flexGrow: 1 }}>
         <Grid container alignItems="center" spacing={2}>
           <Grid container item spacing={3}>
             <Grid item xs={4}>

@@ -255,7 +255,6 @@ export default function SessionGrid() {
         sx={{
           width: "100%",
           overflow: "hidden",
-          backgroundColor: "#fff",
         }}
         rows={sessions}
         columns={columns}

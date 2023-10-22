@@ -21,15 +21,15 @@ import {
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
-import fetcher from "../../utils/fetcher";
+import { Student } from "../api/students";
 import CustomToolBar from "../../src/components/grid/CustomToolBar";
+import DeactivateStudentDialog from "../../src/components/person/student/DeactivateStudentDialog";
 import DetailPanel from "../../src/components/grid/DetailPanel";
+import fetcher from "../../utils/fetcher";
 import RenderMenu from "../../src/components/grid/RenderMenu";
 import StaffDetailPanel from "../../src/components/person/StaffDetailPanel";
 import StudentDetailPanel from "../../src/components/person/StudentDetailPanel";
 import UpdateCreateStudentDialog from "../../src/components/person/student/UpdateCreateStudentDialog";
-import { Student } from "../api/students";
-import DeactivateStudentDialog from "../../src/components/person/student/DeactivateStudentDialog";
 
 function a11yProps(key: string) {
   return {
