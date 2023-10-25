@@ -33,7 +33,7 @@ export default function NewSessionDialog({
     description: "",
   });
   const { data } = useSWR("/api/classes", fetcher);
-  const classes = data || ([] as Class[]);
+  const classes = data || [];
 
   const handleSubmit: FormEventHandler = (event: FormEvent) => {
     event.preventDefault();

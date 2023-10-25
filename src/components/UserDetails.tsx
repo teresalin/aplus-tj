@@ -52,7 +52,7 @@ const fetchDataByType = (
   );
 
   return {
-    data: data || ([] as Person[]), // You can provide a default empty array here
+    data: data || [], // You can provide a default empty array here
   };
 };
 

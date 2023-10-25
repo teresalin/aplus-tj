@@ -19,6 +19,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
+import Stack from "@mui/material/Stack";
+import Grid from "@mui/material/Grid";
 
 const Logo = styled("img")(({ theme }) => ({
   maxWidth: 30,
@@ -45,131 +47,138 @@ const StyledListItemText = styled(ListItemText)(({ theme }) => ({
 }));
 
 export default function SelectedListItem({ toggleTheme }) {
+  const [isButtonFixed, setIsButtonFixed] = React.useState(true);
+
   const router = useRouter();
   const { pathname } = router;
 
   const isActive = (path: string) => pathname.startsWith(path);
 
+  React.useEffect(() => {
+    // Determine the height of the container
+    const container = document.getElementById("container"); // Replace with the actual container ID
+    const containerHeight = container ? container.clientHeight : 0;
+
+    // Set the button to fixed position if the container height is above a threshold
+    setIsButtonFixed(containerHeight > 600); // Adjust the threshold as needed
+  }, []);
+
   return (
     <Box sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
-      <List component="nav" aria-label="main navigations">
-        <Link href="/">
-          <ListItemButton>
-            <ListItemIcon>
-              <Logo src="/owl.png" alt="A Plus" />
-            </ListItemIcon>
-            <ListItemText
-              sx={{ my: 1 }}
-              primary="A Plus"
-              primaryTypographyProps={{
-                fontSize: 20,
-                fontFamily: "Roboto, Helvetica, Arial, sans-serif",
-                fontWeight: 800,
-                letterSpacing: 0,
-              }}
-            />
-          </ListItemButton>
-        </Link>
-        <Link
-          href="/overview"
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
-          <ListItemButton selected={isActive("/overview")}>
-            <ListItemIcon>
-              <GridViewIcon />
-            </ListItemIcon>
-            <ListItemText primary="Dashboard" />
-          </ListItemButton>
-        </Link>
-        <Link href="/schedules">
-          <ListItemButton selected={isActive("/schedules")}>
-            <ListItemIcon>
-              <CalendarMonthIcon />
-            </ListItemIcon>
-            <ListItemText primary="Schedule" />
-          </ListItemButton>
-        </Link>
-        <Link href="/classes">
-          <ListItemButton selected={isActive("/classes")}>
-            <ListItemIcon>
-              <ClassIcon />
-            </ListItemIcon>
-            <ListItemText primary="Classes" />
-          </ListItemButton>
-        </Link>
-        <Link href="/sessions">
-          <ListItemButton selected={isActive("/sessions")}>
-            <ListItemIcon>
-              <AccessTimeFilledIcon />
-            </ListItemIcon>
-            <ListItemText primary="Sessions" />
-          </ListItemButton>
-        </Link>
-        <Link href="/assignments">
-          <ListItemButton selected={isActive("/assignments")}>
-            <ListItemIcon>
-              <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Assignments" />
-          </ListItemButton>
-        </Link>
-        <Link href="/billing">
-          <ListItemButton selected={isActive("/billing")}>
-            <ListItemIcon>
-              <AttachMoneyIcon />
-            </ListItemIcon>
-            <ListItemText primary="Billing" />
-          </ListItemButton>
-        </Link>
-        <Link href="/persons">
-          <ListItemButton
-            selected={isActive("/persons")}
+      <Stack direction="column">
+        <List component="nav" aria-label="main navigations">
+          <Link href="/">
+            <ListItemButton>
+              <ListItemIcon>
+                <Logo src="/owl.png" alt="A Plus" />
+              </ListItemIcon>
+              <ListItemText
+                sx={{ my: 1 }}
+                primary="A Plus"
+                primaryTypographyProps={{
+                  fontSize: 20,
+                  fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+                  fontWeight: 800,
+                  letterSpacing: 0,
+                }}
+              />
+            </ListItemButton>
+          </Link>
+          <Link
+            href="/overview"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <ListItemButton selected={isActive("/overview")}>
+              <ListItemIcon>
+                <GridViewIcon />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+            </ListItemButton>
+          </Link>
+          <Link href="/schedules">
+            <ListItemButton selected={isActive("/schedules")}>
+              <ListItemIcon>
+                <CalendarMonthIcon />
+              </ListItemIcon>
+              <ListItemText primary="Schedule" />
+            </ListItemButton>
+          </Link>
+          <Link href="/classes">
+            <ListItemButton selected={isActive("/classes")}>
+              <ListItemIcon>
+                <ClassIcon />
+              </ListItemIcon>
+              <ListItemText primary="Classes" />
+            </ListItemButton>
+          </Link>
+          <Link href="/sessions">
+            <ListItemButton selected={isActive("/sessions")}>
+              <ListItemIcon>
+                <AccessTimeFilledIcon />
+              </ListItemIcon>
+              <ListItemText primary="Sessions" />
+            </ListItemButton>
+          </Link>
+          <Link href="/assignments">
+            <ListItemButton selected={isActive("/assignments")}>
+              <ListItemIcon>
+                <AssignmentIcon />
+              </ListItemIcon>
+              <ListItemText primary="Assignments" />
+            </ListItemButton>
+          </Link>
+          <Link href="/billing">
+            <ListItemButton selected={isActive("/billing")}>
+              <ListItemIcon>
+                <AttachMoneyIcon />
+              </ListItemIcon>
+              <ListItemText primary="Billing" />
+            </ListItemButton>
+          </Link>
+          <Link href="/persons">
+            <ListItemButton
+              selected={isActive("/persons")}
             // sx={{
             //   "&.Mui-selected": {
             //     backgroundColor: "#1e1e1f",
             //   },
             // }}
-          >
+            >
+              <ListItemIcon>
+                <GroupIcon />
+              </ListItemIcon>
+              <ListItemText primary="Users" />
+            </ListItemButton>
+          </Link>
+        </List>
+        <Divider />
+        <List component="nav" aria-label="secondary navigations">
+          <ListItemButton selected={isActive("/settings")}>
             <ListItemIcon>
-              <GroupIcon />
+              <SettingsIcon />
             </ListItemIcon>
-            <ListItemText primary="Users" />
+            <ListItemText primary="Settings" />
           </ListItemButton>
-        </Link>
-      </List>
-      <Divider />
-      <List component="nav" aria-label="secondary navigations">
-        <ListItemButton selected={isActive("/settings")}>
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText primary="Settings" />
-        </ListItemButton>
-      </List>
-      {/* <List component="nav" aria-label="footer" sx={{ bottom: 0 }}>
-        <ListItemButton selected={isActive("/settings")}>
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText primary="Theme" />
-        </ListItemButton>
-      </List> */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
-          textAlign: "center",
-          padding: 10,
-        }}
-      >
-        <Button
-          variant="outlined"
-          startIcon={<DarkModeIcon />}
-          onClick={toggleTheme}
+        </List>
+      </Stack>
+      <Stack direction="column">
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            textAlign: "center",
+            padding: 10,
+          }}
         >
-          Dark Mode
-        </Button>
-      </div>
+          <Button
+            variant="outlined"
+            startIcon={<DarkModeIcon />}
+            onClick={toggleTheme}
+          >
+            Dark Mode
+          </Button>
+        </div>
+      </Stack>
     </Box>
   );
 }

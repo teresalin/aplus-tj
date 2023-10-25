@@ -79,7 +79,9 @@ export default function PersonGrid() {
   const [billingRecords, setBillingRecords] = React.useState(data);
 
   React.useEffect(() => {
-    setBillingRecords(data);
+    if (data) {
+      setBillingRecords(data);
+    }
   }, [data]);
 
   const handleAddButtonClick = () => {

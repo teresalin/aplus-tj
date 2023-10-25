@@ -73,10 +73,12 @@ export default function PersonGrid() {
   );
 
   const { data } = useSWR(`api/${tab}`, fetcher);
-  const [persons, setPersons] = React.useState(data);
+  const [persons, setPersons] = React.useState([]);
 
   React.useEffect(() => {
-    setPersons(data);
+    if (data) {
+      setPersons(data);
+    }
   }, [data]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -161,11 +163,11 @@ export default function PersonGrid() {
     if (isPanelOpen) {
       setDetailPanelOpen((map) => new Map(detailPanelOpen.set(data.id, false)));
       const result = removeDetailPanelByRowId(persons, data.id);
-      setPersons(result);
+      setPersons(result as never[]);
     } else {
       setDetailPanelOpen((map) => new Map(detailPanelOpen.set(data.id, true)));
       const result = insertDetailPanelByRowId(persons, data.id, newDetailPanel);
-      setPersons(result);
+      setPersons(result as never[]);
     }
   };
 
@@ -195,9 +197,12 @@ export default function PersonGrid() {
   };
 
   // TODO update this
-  const handleCreateNewPerson = async (data) => {
-    const response = await fetch(`/api/${tab}/index`, {
-      method: "POST",
+  const handleUpdateOrCreatePerson = async (data) => {
+    const url = isUpdate ? `/api/${tab}/${data.id}` : `/api/${tab}/index`;
+    const method = isUpdate ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+      method: method,
       headers: {
         "Content-Type": "application/json",
       },
@@ -207,7 +212,7 @@ export default function PersonGrid() {
     if (response.ok) {
       setIsUpdateCreateDialogOpen(false);
     } else {
-      console.error("Error creating new user:", response.statusText);
+      console.error("Error creating/updating user:", response.statusText);
     }
   };
 
@@ -443,7 +448,7 @@ export default function PersonGrid() {
         existingData={rowToEdit as Student}
         open={isUpdateCreateDialogOpen}
         onClose={handleCloseUpdateCreateDialog}
-        onSubmit={handleCreateNewPerson}
+        onSubmit={handleUpdateOrCreatePerson}
       />
       <DeactivateStudentDialog
         open={isDeactivateDialogOpen}

@@ -3,7 +3,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { FormEvent, FormEventHandler } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -46,7 +46,7 @@ export default function UpdateCreateStudentDialog({
 }: IUpdateCreateStudentDialogProps) {
   const [editedData, setEditedData] = React.useState(existingData);
   const { data } = useSWR("/api/students/grades", fetcher);
-  const grades = data || ([] as Role[]);
+  const grades = data || [];
 
   React.useEffect(() => {
     if (isUpdate) {
@@ -133,6 +133,11 @@ export default function UpdateCreateStudentDialog({
               }
               onChange={(date) => handleDateChange('dateOfBirth', date)}
               sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
+              slotProps={{
+                textField: {
+                  required: true,
+                },
+              }}
             />
             <TextField
               id="gender"
@@ -251,6 +256,11 @@ export default function UpdateCreateStudentDialog({
                   value={editedData.joinDate && dayjs(editedData.joinDate)}
                   onChange={(date) => handleDateChange('joinDate', date)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
+                  slotProps={{
+                    textField: {
+                      required: true,
+                    },
+                  }}
                 />
               </Grid>
               <Grid item xs={6}>
