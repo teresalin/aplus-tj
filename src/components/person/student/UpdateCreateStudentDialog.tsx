@@ -15,9 +15,8 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
 import fetcher from "../../../../utils/fetcher";
-import { Grade } from "../../../../pages/api/students/grades";
-import { Role } from "../../../../pages/api/staffs/roles";
-import { Student } from "../../../../pages/api/students";
+import { Grade } from "../../../../pages/api/persons/students/grades";
+import { Student } from "../../../../pages/api/persons/students";
 
 function RedBar() {
   return (
@@ -45,7 +44,7 @@ export default function UpdateCreateStudentDialog({
   onSubmit,
 }: IUpdateCreateStudentDialogProps) {
   const [editedData, setEditedData] = React.useState(existingData);
-  const { data } = useSWR("/api/students/grades", fetcher);
+  const { data } = useSWR("/api/persons/students/grades", fetcher);
   const grades = data || [];
 
   React.useEffect(() => {
@@ -70,7 +69,6 @@ export default function UpdateCreateStudentDialog({
       [fieldName]: date,
     }));
   };
-
 
   const handleGradeChange = (
     event: React.ChangeEvent<{ name: string; value: unknown }>
@@ -131,7 +129,7 @@ export default function UpdateCreateStudentDialog({
               value={
                 editedData.dateOfBirth ? dayjs(editedData.dateOfBirth) : null
               }
-              onChange={(date) => handleDateChange('dateOfBirth', date)}
+              onChange={(date) => handleDateChange("dateOfBirth", date)}
               sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
               slotProps={{
                 textField: {
@@ -254,7 +252,7 @@ export default function UpdateCreateStudentDialog({
                   label="Join Date"
                   format="YYYY-MM-DD"
                   value={editedData.joinDate && dayjs(editedData.joinDate)}
-                  onChange={(date) => handleDateChange('joinDate', date)}
+                  onChange={(date) => handleDateChange("joinDate", date)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
                   slotProps={{
                     textField: {
@@ -268,7 +266,7 @@ export default function UpdateCreateStudentDialog({
                   label="Leave Date"
                   format="YYYY-MM-DD"
                   value={editedData.leaveDate && dayjs(editedData.leaveDate)}
-                  onChange={(date) => handleDateChange('leaveDate', date)}
+                  onChange={(date) => handleDateChange("leaveDate", date)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
                 />
               </Grid>

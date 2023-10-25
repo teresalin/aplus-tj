@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -48,7 +48,6 @@ export default function UpdateClassStudentsDialog({ classDetails }) {
   };
 
   const handleTimeChange = (day: string, newValue) => {
-    console.log(dayjs(newValue).format("HH:mm:ss"));
     setUpdatedSchedules((prevSchedules: any) => ({
       ...prevSchedules,
       [day]: {

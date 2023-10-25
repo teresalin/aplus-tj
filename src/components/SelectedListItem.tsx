@@ -5,8 +5,10 @@ import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ClassIcon from "@mui/icons-material/Class";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 import Divider from "@mui/material/Divider";
 import GridViewIcon from "@mui/icons-material/GridView";
 import GroupIcon from "@mui/icons-material/Group";
@@ -16,11 +18,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import SettingsIcon from "@mui/icons-material/Settings";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
 import Stack from "@mui/material/Stack";
-import Grid from "@mui/material/Grid";
 
 const Logo = styled("img")(({ theme }) => ({
   maxWidth: 30,
@@ -135,14 +133,14 @@ export default function SelectedListItem({ toggleTheme }) {
               <ListItemText primary="Billing" />
             </ListItemButton>
           </Link>
-          <Link href="/persons">
+          <Link href="/persons/students">
             <ListItemButton
-              selected={isActive("/persons")}
-            // sx={{
-            //   "&.Mui-selected": {
-            //     backgroundColor: "#1e1e1f",
-            //   },
-            // }}
+              selected={isActive("/persons/students")}
+              // sx={{
+              //   "&.Mui-selected": {
+              //     backgroundColor: "#1e1e1f",
+              //   },
+              // }}
             >
               <ListItemIcon>
                 <GroupIcon />

@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-
-import { getDBClient } from "../../../lib/db-connector";
-import { Person } from "../persons";
+import { getDBClient } from "../../../../lib/db-connector";
+import { Person } from "..";
 import { Role } from "./roles";
 
 export interface Staff extends Person {

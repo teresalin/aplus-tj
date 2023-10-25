@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { getDBClient } from "../../../../lib/db-connector";
+import { getDBClient } from "../../../../../lib/db-connector";
 
 async function getStaff(client, staffID) {
   try {

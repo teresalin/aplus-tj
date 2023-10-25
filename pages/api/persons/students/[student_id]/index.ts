@@ -1,5 +1,5 @@
 import { Client, PoolClient } from "pg";
-import { getDBClient } from "../../../../lib/db-connector";
+import { getDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Student } from "..";
 

@@ -62,7 +62,6 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
   };
 
   const handleTimeChange = (day: string, newValue) => {
-    console.log(dayjs(newValue).format("HH:mm:ss"));
     setUpdatedSchedules((prevSchedules: any) => ({
       ...prevSchedules,
       [day]: {

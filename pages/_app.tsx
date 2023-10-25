@@ -1,6 +1,7 @@
 import "../styles/globals.css";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { AppProps } from "next/app";
+import { lightTheme, darkTheme } from "../styles/theme";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { StyledEngineProvider } from "@mui/material/styles";
 import { ThemeProvider } from "@emotion/react";
@@ -8,7 +9,6 @@ import AppLayout from "../src/components/layout/layout";
 import CssBaseline from "@mui/material/CssBaseline";
 import Head from "next/head";
 import React from "react";
-import { lightTheme, darkTheme } from "../styles/theme";
 
 function getActiveTheme(themeMode: "light" | "dark") {
   return themeMode === "light" ? lightTheme : darkTheme;
@@ -28,8 +28,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   React.useEffect(() => {
     setActiveTheme(getActiveTheme(selectedTheme));
   }, [selectedTheme]);
-
-  console.log("selectedTheme: ", selectedTheme);
 
   return (
     <>

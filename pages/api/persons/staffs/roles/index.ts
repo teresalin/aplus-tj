@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { getDBClient } from "../../../../lib/db-connector";
+import { getDBClient } from "../../../../../lib/db-connector";
 
 export interface Role {
   id: number;

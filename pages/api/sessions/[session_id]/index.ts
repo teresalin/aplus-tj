@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../../lib/db-connector";
-import { Student } from "../../students";
 
 // TODO reformat?
 export interface SessionDetail {

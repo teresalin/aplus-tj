@@ -1,16 +1,12 @@
 import * as React from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
-import CheckIcon from "@mui/icons-material/Check";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
-import CloseIcon from "@mui/icons-material/Close";
 import dayjs from "dayjs";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import IconButton from "@mui/material/IconButton";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
 import useSWR from "swr";
 import {
   DataGrid,
@@ -28,7 +24,7 @@ import RenderMenu from "../../src/components/grid/RenderMenu";
 import StaffDetailPanel from "../../src/components/person/StaffDetailPanel";
 import StudentDetailPanel from "../../src/components/person/StudentDetailPanel";
 import UpdateCreateStudentDialog from "../../src/components/person/student/UpdateCreateStudentDialog";
-import { Student } from "../api/students";
+import { Student } from "../api/persons/students";
 import DeactivateStudentDialog from "../../src/components/person/student/DeactivateStudentDialog";
 
 function a11yProps(key: string) {

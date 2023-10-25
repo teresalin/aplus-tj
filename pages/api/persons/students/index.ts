@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { getDBClient } from "../../../lib/db-connector";
+import { getDBClient } from "../../../../lib/db-connector";
 import { Grade } from "./grades";
-import { Person } from "../persons";
+import { Person } from "../../persons";
 
 export interface Student extends Person {
   studentId: number;
