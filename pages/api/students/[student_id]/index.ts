@@ -1,9 +1,9 @@
-import { Client } from "pg";
+import { Client, PoolClient } from "pg";
 import { getDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Student } from "..";
 
-async function createPersonAndStudent(client: Client, data: Student) {
+async function createPersonAndStudent(client: PoolClient, data: Student) {
   const {
     name,
     gender,
@@ -58,7 +58,7 @@ async function createPersonAndStudent(client: Client, data: Student) {
   }
 }
 
-async function updatePersonAndStudent(client: Client, data: Student) {
+async function updatePersonAndStudent(client: PoolClient, data: Student) {
   const {
     id,
     name,
