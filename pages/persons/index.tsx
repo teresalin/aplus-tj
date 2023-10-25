@@ -196,7 +196,7 @@ export default function PersonGrid() {
 
   // TODO update this
   const handleCreateNewPerson = async (data) => {
-    const response = await fetch(`/api/${tab}/[assignment_id]`, {
+    const response = await fetch(`/api/${tab}/index`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -3,7 +3,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { FormEvent, FormEventHandler } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -48,8 +48,6 @@ export default function UpdateCreateStudentDialog({
   const { data } = useSWR("/api/students/grades", fetcher);
   const grades = data || ([] as Role[]);
 
-  console.log(existingData);
-
   React.useEffect(() => {
     if (isUpdate) {
       setEditedData(existingData);
@@ -60,23 +58,27 @@ export default function UpdateCreateStudentDialog({
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    console.log("name: ", name);
-    console.log("value: ", value);
     setEditedData((prevData) => ({
       ...prevData!,
       [name]: value,
     }));
   };
 
+  const handleDateChange = (fieldName, date) => {
+    setEditedData((prevData) => ({
+      ...prevData,
+      [fieldName]: date,
+    }));
+  };
+
+
   const handleGradeChange = (
     event: React.ChangeEvent<{ name: string; value: unknown }>
   ) => {
     const { name, value } = event.target;
-    console.log("name: ", name);
-    console.log("value: ", value);
     setEditedData((prevData) => ({
       ...prevData,
-      grade: { id: value as number, name: "some name" }, // Replace "some name" with the actual grade name
+      grade: { id: value as number, name: name },
     }));
   };
 
@@ -112,8 +114,8 @@ export default function UpdateCreateStudentDialog({
               <Grid item xs={12} sm={6}>
                 <TextField
                   margin="dense"
-                  id="name"
-                  name="name"
+                  id="englishName"
+                  name="englishName"
                   label="English Name"
                   type="text"
                   fullWidth
@@ -129,6 +131,7 @@ export default function UpdateCreateStudentDialog({
               value={
                 editedData.dateOfBirth ? dayjs(editedData.dateOfBirth) : null
               }
+              onChange={(date) => handleDateChange('dateOfBirth', date)}
               sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
             />
             <TextField
@@ -246,6 +249,7 @@ export default function UpdateCreateStudentDialog({
                   label="Join Date"
                   format="YYYY-MM-DD"
                   value={editedData.joinDate && dayjs(editedData.joinDate)}
+                  onChange={(date) => handleDateChange('joinDate', date)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
                 />
               </Grid>
@@ -254,6 +258,7 @@ export default function UpdateCreateStudentDialog({
                   label="Leave Date"
                   format="YYYY-MM-DD"
                   value={editedData.leaveDate && dayjs(editedData.leaveDate)}
+                  onChange={(date) => handleDateChange('leaveDate', date)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
                 />
               </Grid>

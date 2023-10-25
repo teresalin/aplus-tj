@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../../lib/db-connector";
+import { Student } from "..";
+import { Client } from "pg";
 
 async function getStudent(client, studentID) {
   try {
@@ -21,35 +23,47 @@ async function getStudent(client, studentID) {
   }
 }
 
-async function createPerson(
-  client,
-  { name, phone, email, dateOfBirth, notes }
-) {
-  const insertQuery = {
-    text: `
-      INSERT INTO persons(name, phone, email, date_of_birth, notes, active, time_created, time_updated) 
-      VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
-      RETURNING id;
-    `,
-    values: [name, phone, email, dateOfBirth, notes, "t"],
-  };
+async function createPersonAndStudent(client: Client, data: Student) {
+  const { name, gender, phone, email, dateOfBirth, notes, englishName, currentSchool, textbookPublisher, grade, joinDate, leaveDate } = data;
 
-  const result = await client.query(insertQuery);
-  return result.rows[0].id;
-}
+  try {
+    await client.query('BEGIN'); // Start a transaction
+    const personInsertQuery = {
+      text: `
+        INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, time_created, time_updated) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+        RETURNING id;
+      `,
+      values: [name, gender, phone, email, dateOfBirth, notes, 't'],
+    };
 
-async function createStudent(client, personID, { joinDate, leaveDate }) {
-  const insertQuery = {
-    text: `
-      INSERT INTO students(person_id, join_date, leave_date, time_created, time_updated) 
-      VALUES ($1, $2, $3, NOW(), NOW())
-      RETURNING id;
-    `,
-    values: [personID, joinDate, leaveDate],
-  };
+    const personResult = await client.query(personInsertQuery);
 
-  const result = await client.query(insertQuery);
-  return result.rows[0].id;
+    // Create the student
+    const studentInsertQuery = {
+      text: `
+        INSERT INTO student(person_id, english_name, current_school, textbook_publisher, grade_id, join_date, leave_date, time_created, time_updated) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+        RETURNING id;
+      `,
+      values: [
+        personResult.rows[0].id,
+        englishName,
+        currentSchool,
+        textbookPublisher,
+        grade.id,
+        joinDate,
+        leaveDate,
+      ],
+    };
+
+    const studentResult = await client.query(studentInsertQuery);
+    await client.query('COMMIT'); // Commit the transaction
+    return studentResult.rows[0].id;
+  } catch (err) {
+    await client.query('ROLLBACK'); // Roll back the transaction on error
+    throw err;
+  }
 }
 
 async function updatePerson(
@@ -101,26 +115,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "POST":
       try {
-        const { name, phone, email, dateOfBirth, notes, joinDate, leaveDate } =
-          req.body;
-
-        const personID = await createPerson(client, {
-          name,
-          phone,
-          email,
-          dateOfBirth,
-          notes,
-        });
-        await createStudent(client, personID, { joinDate, leaveDate });
-        res.status(200).json({ message: "Success" });
+        const data: Student = req.body;
+        await createPersonAndStudent(client, data);
+        res.status(200).json({ message: 'Success' });
       } catch (err) {
-        if (err.code === "23505") {
+        if (err.code === '23505') {
           // PostgreSQL unique constraint violation error
-          res
-            .status(409)
-            .json({ message: "A person with the same details already exists" });
+          res.status(409).json({ message: 'A person with the same details already exists' });
         } else {
-          res.status(500).json({ message: "Something went wrong" });
+          res.status(500).json({ message: 'Something went wrong' });
         }
       }
       break;

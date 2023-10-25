@@ -27,7 +27,7 @@ async function createPerson(
 ) {
   const insertQuery = {
     text: `
-      INSERT INTO persons(name, phone, email, date_of_birth, notes, active, time_created, time_updated) 
+      INSERT INTO person(name, phone, email, date_of_birth, notes, active, time_created, time_updated) 
       VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
       RETURNING id;
     `,

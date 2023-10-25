@@ -167,9 +167,6 @@ CREATE TABLE student_billing_record (
   time_updated TIMESTAMP
 );
 
-INSERT INTO student_billing_record (student_id, billing_date, description, amount, time_created, time_updated)
-VALUES (5, '2023-09-30', 'September tuition', 4000 ,NOW(), NOW());
-
 CREATE TABLE student_payment_method (
   id SERIAL PRIMARY KEY,
   student_id INT REFERENCES student(id) NOT NULL,
@@ -189,9 +186,6 @@ CREATE TABLE billing_category (
   time_updated TIMESTAMP
 );
 
-INSERT INTO billing_category (name, time_created, time_updated)
-VALUES ('Tuition', NOW(), NOW());
-
 -- one row per class session
 CREATE TABLE student_billing_details (
   id SERIAL PRIMARY KEY,
@@ -201,6 +195,3 @@ CREATE TABLE student_billing_details (
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
-
-INSERT INTO student_billing_details (billing_record_id, category_id, amount, time_created, time_updated)
-VALUES (1, 1, 1000 ,NOW(), NOW());

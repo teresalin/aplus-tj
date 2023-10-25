@@ -7,4 +7,5 @@ module.exports = {
       aggregateTimeout: 300,
     },
   }),
+  reactStrictMode: true,
 }
