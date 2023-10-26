@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-
 import { getDBClient } from "../../../../lib/db-connector";
 import { Grade } from "./grades";
+import { parseStudent } from "../../../../utils/apiUtils";
 import { Person } from "../../persons";
 
 export interface Student extends Person {
@@ -12,29 +12,6 @@ export interface Student extends Person {
   grade: Grade;
   joinDate: Date;
   leaveDate: Date;
-}
-
-function parseStudent(row: any): Student {
-  return {
-    id: row.id,
-    studentId: row.student_id,
-    name: row.name,
-    englishName: row.english_name,
-    gender: row.gender,
-    phone: row.phone,
-    email: row.email,
-    dateOfBirth: row.date_of_birth,
-    currentSchool: row.current_school,
-    textbookPublisher: row.textbook_publisher,
-    grade: {
-      id: row.grade_id,
-      name: row.grade_name,
-    },
-    joinDate: row.join_date,
-    leaveDate: row.leave_date,
-    notes: row.notes,
-    active: row.active,
-  };
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {

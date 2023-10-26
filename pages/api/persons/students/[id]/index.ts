@@ -1,7 +1,8 @@
-import { Client, PoolClient } from "pg";
+import { PoolClient } from "pg";
 import { getDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Student } from "..";
+import { parseStudent } from "../../../../../utils/apiUtils";
 
 async function createPersonAndStudent(client: PoolClient, data: Student) {
   const {
@@ -119,7 +120,7 @@ async function updatePersonAndStudent(client: PoolClient, data: Student) {
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const studentID = req.query.student_id;
+  const personID = req.query.id;
   const client = await getDBClient();
 
   switch (req.method) {
@@ -127,16 +128,32 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       try {
         const studentSelectQuery = {
           text: `
-              SELECT person.id AS student_id, person.join_date, person.leave_date, person.*
+              SELECT 
+                person.id,
+                person.name,
+                person.gender,
+                person.phone,
+                person.email,
+                person.date_of_birth,
+                person.notes,
+                person.active,
+                student.id AS student_id,
+                student.english_name,
+                student.current_school,
+                student.textbook_publisher,
+                student.join_date, 
+                student.leave_date, 
+                grade.id AS grade_id,
+                grade.name AS grade_name
               FROM student
               INNER JOIN person ON student.person_id = person.id
+              INNER JOIN grade ON student.grade_id = grade.id
               WHERE person.id = $1;
             `,
-          values: [studentID],
+          values: [personID],
         };
-
         const result = await client.query(studentSelectQuery);
-        res.status(200).json(result.rows[0]);
+        res.status(200).json(result.rows.map(parseStudent)[0]);
       } catch (err) {
         res.status(500).json({ message: "Something went wrong" });
       }
@@ -172,7 +189,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         text: `
           DELETE FROM student WHERE id = $1;
         `,
-        values: [studentID],
+        values: [personID],
       };
       await client.query(studentDeleteQuery);
       res.status(200).json({ message: "Success" });

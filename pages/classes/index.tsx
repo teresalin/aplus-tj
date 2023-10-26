@@ -11,10 +11,10 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import fetcher from "../../utils/fetcher";
 import { Class } from "../api/classes";
-import Paper from "@mui/material/Paper";
 import { Schedule } from "../api/classes/[class_id]/schedules";
+import fetcher from "../../utils/fetcher";
+import Paper from "@mui/material/Paper";
 
 export default function Classes() {
   const { data } = useSWR("api/classes", fetcher);

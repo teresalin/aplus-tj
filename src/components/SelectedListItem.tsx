@@ -25,41 +25,22 @@ const Logo = styled("img")(({ theme }) => ({
   marginRight: theme.spacing(1),
 }));
 
-const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
-  "&&.Mui-selected": {
-    color: "#4741e0",
-    "&&& .MuiTypography-root": {
-      // fontWeight: "Montserrat, sans-serif",
-      color: "#4741e0",
-    },
-  },
-}));
-
-const StyledListItemText = styled(ListItemText)(({ theme }) => ({
-  "&&.Mui-selected": {
-    color: "red",
-    "&:hover": {
-      backgroundColor: "yellow",
-    },
-  },
-}));
-
 export default function SelectedListItem({ toggleTheme }) {
-  const [isButtonFixed, setIsButtonFixed] = React.useState(true);
+  // const [isButtonFixed, setIsButtonFixed] = React.useState(true);
 
   const router = useRouter();
   const { pathname } = router;
 
   const isActive = (path: string) => pathname.startsWith(path);
 
-  React.useEffect(() => {
-    // Determine the height of the container
-    const container = document.getElementById("container"); // Replace with the actual container ID
-    const containerHeight = container ? container.clientHeight : 0;
+  // React.useEffect(() => {
+  //   // Determine the height of the container
+  //   const container = document.getElementById("container"); // Replace with the actual container ID
+  //   const containerHeight = container ? container.clientHeight : 0;
 
-    // Set the button to fixed position if the container height is above a threshold
-    setIsButtonFixed(containerHeight > 600); // Adjust the threshold as needed
-  }, []);
+  //   // Set the button to fixed position if the container height is above a threshold
+  //   setIsButtonFixed(containerHeight > 600); // Adjust the threshold as needed
+  // }, []);
 
   return (
     <Box sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>

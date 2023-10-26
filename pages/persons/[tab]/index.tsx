@@ -124,56 +124,7 @@ export default function PersonGrid() {
   };
 
   const onRowClick = (data: { id: string }) => {
-    if (data.id.toString().startsWith("detail-panel")) {
-      return;
-    }
-
-    const newDetailPanel = {
-      ...data,
-      id: `detail-panel-${data.id}`,
-    };
-
-    setDetailPanelOpen((prevState) => ({
-      ...prevState,
-      [data.id]: !prevState[data.id], // Toggle the state for the clicked row
-    }));
-
-    function insertDetailPanelByRowId(
-      array: any[],
-      rowId: string,
-      detailPanel: any
-    ): any[] {
-      const newArray: any[] = [];
-      for (const item of array) {
-        newArray.push(item);
-        if (item.id === rowId) {
-          newArray.push(detailPanel);
-        }
-      }
-      return newArray;
-    }
-
-    function removeDetailPanelByRowId(array: any[], rowId: string): any[] {
-      const newArray: any[] = [];
-      for (let i = 0; i < array.length; i++) {
-        newArray.push(array[i]);
-        if (array[i].id === rowId) {
-          i++;
-        }
-      }
-      return newArray;
-    }
-
-    const isPanelOpen = detailPanelOpen.get(data.id);
-    if (isPanelOpen) {
-      setDetailPanelOpen((map) => new Map(detailPanelOpen.set(data.id, false)));
-      const result = removeDetailPanelByRowId(persons, data.id);
-      setPersons(result as never[]);
-    } else {
-      setDetailPanelOpen((map) => new Map(detailPanelOpen.set(data.id, true)));
-      const result = insertDetailPanelByRowId(persons, data.id, newDetailPanel);
-      setPersons(result as never[]);
-    }
+    router.push(`/persons/[tab]/[id]`, `/persons/${tab}/${data.id}`);
   };
 
   const getTogglableColumns = (columns: GridColDef[]) => {
@@ -201,9 +152,10 @@ export default function PersonGrid() {
     setColumnVisibilityModel(model);
   };
 
-  // TODO update this
   const handleUpdateOrCreatePerson = async (data) => {
-    const url = isUpdate ? `/api/${tab}/${data.id}` : `/api/${tab}/index`;
+    const url = isUpdate
+      ? `/api/persons/${tab}/${data.id}`
+      : `/api/persons/${tab}/index`;
     const method = isUpdate ? "PUT" : "POST";
 
     const response = await fetch(url, {
@@ -271,38 +223,6 @@ export default function PersonGrid() {
   };
 
   const columns: GridColDef[] = [
-    {
-      field: "detailPanel",
-      headerName: "",
-      disableColumnMenu: true,
-      sortable: false,
-      hideSortIcons: true,
-      width: 1,
-      colSpan: ({ row }) => {
-        if (row.id.toString().startsWith("detail-panel")) {
-          return visibleColumnCount;
-        }
-        return undefined;
-      },
-      renderCell: (params) => {
-        if (params.row.id.toString().startsWith("detail-panel")) {
-          if (tab === "students") {
-            return <StudentDetailPanel data={params.row} />;
-          } else if (tab === "parents") {
-            return <DetailPanel data={params.row} />;
-          } else {
-            return <StaffDetailPanel data={params.row} />;
-          }
-        } else {
-          return detailPanelOpen.get(params.row.id) ? (
-            <ExpandLessIcon />
-          ) : (
-            <ExpandMoreIcon />
-          );
-        }
-      },
-    },
-
     {
       field: "id",
       headerName: "id",
@@ -397,9 +317,11 @@ export default function PersonGrid() {
           sx={{
             width: "100%",
             overflow: "hidden",
-            // backgroundColor: "#fff",
-            "&.MuiDataGrid-root .MuiDataGrid-cell:focus-within": {
-              outline: "none !important",
+            ".MuiDataGrid-cell:focus": {
+              outline: "none",
+            },
+            "& .MuiDataGrid-row:hover": {
+              cursor: "pointer",
             },
           }}
           columnVisibilityModel={columnVisibilityModel}
