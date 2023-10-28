@@ -5,8 +5,6 @@ import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import dayjs from "dayjs";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import IconButton from "@mui/material/IconButton";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
@@ -20,14 +18,11 @@ import {
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
+import { Staff } from "../../api/persons/staffs";
 import { Student } from "../../api/persons/students";
 import CustomToolBar from "../../../src/components/grid/CustomToolBar";
-import DeactivateStudentDialog from "../../../src/components/person/student/DeactivateStudentDialog";
-import DetailPanel from "../../../src/components/grid/DetailPanel";
 import fetcher from "../../../utils/fetcher";
-import RenderMenu from "../../../src/components/grid/RenderMenu";
-import StaffDetailPanel from "../../../src/components/person/StaffDetailPanel";
-import StudentDetailPanel from "../../../src/components/person/StudentDetailPanel";
+import UpdateCreateStaffDialog from "../../../src/components/person/staff/UpdateCreateStaffDialog";
 import UpdateCreateStudentDialog from "../../../src/components/person/student/UpdateCreateStudentDialog";
 
 function a11yProps(key: string) {
@@ -44,10 +39,6 @@ export default function PersonGrid() {
   const [tab, setTab] = React.useState("students");
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
-  const [detailPanelOpen, setDetailPanelOpen] = React.useState<
-    Map<string, boolean>
-  >(new Map());
-  const [visibleColumnCount, setVisibleColumnCount] = React.useState(7);
   const [columnVisibilityModel, setColumnVisibilityModel] =
     React.useState<GridColumnVisibilityModel>({
       detailPanel: true,
@@ -61,13 +52,15 @@ export default function PersonGrid() {
       created: false,
       action: true,
     });
-  const [isUpdateCreateDialogOpen, setIsUpdateCreateDialogOpen] =
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [isCreateStudentDialogOpen, setIsCreateStudentDialogOpen] =
+    React.useState(false);
+  const [isCreateParentDialogOpen, setIsCreateParentDialogOpen] =
+    React.useState(false);
+  const [isCreateStaffDialogOpen, setIsCreateStaffDialogOpen] =
     React.useState(false);
   const [isUpdate, setIsUpdate] = React.useState(false);
   const [rowToEdit, setRowToEdit] = React.useState({});
-  const [rowToDeactivate, setRowToDeactivate] = React.useState({});
-  const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] =
-    React.useState(false);
   const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
     null
   );
@@ -87,41 +80,84 @@ export default function PersonGrid() {
     let routeToNavigate = `/persons/${newValue}`; // Construct the new route
     // Use the router to navigate to the selected route
     router.push(routeToNavigate);
-    // You can keep the setDetailPanelOpen(new Map()) if needed
-    setDetailPanelOpen(new Map());
   };
 
   const handleAddButtonClick = () => {
     setIsUpdate(false);
-    setRowToEdit({});
-    setIsUpdateCreateDialogOpen(true);
+    setRowToEdit({}); // Reset any data
+    openDialog();
   };
 
-  // TODO handle async issue
-  const handleEditClick = (row) => {
-    setIsUpdate(true);
-    setRowToEdit(row);
-    setIsUpdateCreateDialogOpen(true);
+  const dialogStates = {
+    students: {
+      isOpen: isCreateStudentDialogOpen,
+      setIsOpen: setIsCreateStudentDialogOpen,
+    },
+    parents: {
+      isOpen: isCreateParentDialogOpen,
+      setIsOpen: setIsCreateParentDialogOpen,
+    },
+    staffs: {
+      isOpen: isCreateStaffDialogOpen,
+      setIsOpen: setIsCreateStaffDialogOpen,
+    },
   };
 
-  const handleDeactivateClick = (row) => {
-    setRowToDeactivate(row);
-    setIsDeactivateDialogOpen(true);
+  React.useEffect(() => {
+    // Check the tab and set the dialog state accordingly
+    const dialogState = dialogStates[tab];
+    if (dialogState) {
+      setDialogOpen(dialogState.isOpen);
+    }
+  }, [tab, dialogStates]);
+
+  const openDialog = () => {
+    const tabState = dialogStates[tab];
+    if (tabState) {
+      tabState.setIsOpen(true);
+    }
   };
 
-  const handleCloseUpdateCreateDialog = () => {
-    setIsUpdateCreateDialogOpen(false);
-    setRowToEdit({});
+  const closeDialog = () => {
+    const tabState = dialogStates[tab];
+    if (tabState) {
+      tabState.setIsOpen(false);
+    }
   };
 
-  const handleOpenDeactivateDialog = () => {
-    setIsDeactivateDialogOpen(true);
+  const handleUpdateOrCreatePerson = async (data) => {
+    const url = isUpdate
+      ? `/api/persons/${tab}/${data.id}`
+      : `/api/persons/${tab}/index`;
+    const method = isUpdate ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      closeDialog();
+    } else {
+      console.error("Error creating/updating user:", response.statusText);
+    }
   };
 
-  const handleCloseDeactivateDialog = () => {
-    setIsDeactivateDialogOpen(false);
-    setRowToDeactivate({});
-  };
+  // const handleCloseUpdateCreateStudentDialog = () => {
+  //   setIsCreateStudentDialogOpen(false);
+  //   setRowToEdit({});
+  // };
+  // const handleCloseUpdateCreateStaffDialog = () => {
+  //   setIsCreateStaffDialogOpen(false);
+  //   setRowToEdit({});
+  // };
+  // const handleCloseUpdateCreateParentDialog = () => {
+  //   setIsCreateParentDialogOpen(false);
+  //   setRowToEdit({});
+  // };
 
   const onRowClick = (data: { id: string }) => {
     router.push(`/persons/[tab]/[id]`, `/persons/${tab}/${data.id}`);
@@ -148,45 +184,7 @@ export default function PersonGrid() {
         count++;
       }
     }
-    setVisibleColumnCount(count);
     setColumnVisibilityModel(model);
-  };
-
-  const handleUpdateOrCreatePerson = async (data) => {
-    const url = isUpdate
-      ? `/api/persons/${tab}/${data.id}`
-      : `/api/persons/${tab}/index`;
-    const method = isUpdate ? "PUT" : "POST";
-
-    const response = await fetch(url, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      setIsUpdateCreateDialogOpen(false);
-    } else {
-      console.error("Error creating/updating user:", response.statusText);
-    }
-  };
-
-  const handleDeactivatePerson = async (data) => {
-    const response = await fetch(`/api/${tab}/${data.id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      setIsUpdateCreateDialogOpen(false);
-    } else {
-      console.error("Error deactivating user:", response.statusText);
-    }
   };
 
   function AddIconButton({ onClick }) {
@@ -285,19 +283,19 @@ export default function PersonGrid() {
         return dayjs(params.value).format("YYYY-MM-DD");
       },
     },
-    {
-      field: "action",
-      headerName: "Action",
-      minWidth: 70,
-      maxWidth: 70,
-      flex: 1,
-      renderCell: (params) => (
-        <RenderMenu
-          onEditClick={() => handleEditClick(params.row)}
-          onDeleteClick={() => handleDeactivateClick(params.row)}
-        />
-      ),
-    },
+    // {
+    //   field: "action",
+    //   headerName: "Action",
+    //   minWidth: 70,
+    //   maxWidth: 70,
+    //   flex: 1,
+    //   renderCell: (params) => (
+    //     <RenderMenu
+    //       onEditClick={() => handleEditClick(params.row)}
+    //       onDeleteClick={() => handleDeactivateClick(params.row)}
+    //     />
+    //   ),
+    // },
   ];
 
   if (!persons) return <CircularProgress />;
@@ -373,15 +371,22 @@ export default function PersonGrid() {
       <UpdateCreateStudentDialog
         isUpdate={isUpdate}
         existingData={rowToEdit as Student}
-        open={isUpdateCreateDialogOpen}
-        onClose={handleCloseUpdateCreateDialog}
+        open={isCreateStudentDialogOpen}
+        onClose={closeDialog}
         onSubmit={handleUpdateOrCreatePerson}
       />
-      <DeactivateStudentDialog
+      <UpdateCreateStaffDialog
+        isUpdate={isUpdate}
+        existingData={rowToEdit as Staff}
+        open={isCreateStaffDialogOpen}
+        onClose={closeDialog}
+        onSubmit={handleUpdateOrCreatePerson}
+      />
+      {/* <DeactivateStudentDialog
         open={isDeactivateDialogOpen}
         onClose={handleCloseDeactivateDialog}
         onSubmit={handleDeactivatePerson}
-      />
+      /> */}
     </Box>
   );
 }

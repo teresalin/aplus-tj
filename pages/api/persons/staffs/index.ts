@@ -2,32 +2,13 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../../lib/db-connector";
 import { Person } from "..";
 import { Role } from "./roles";
+import { parseStaff } from "../../../../utils/apiUtils";
 
 export interface Staff extends Person {
   staffId: number;
   role: Role;
   joinDate: Date;
   leaveDate: Date;
-}
-
-function parseStaff(row: any): Staff {
-  return {
-    id: row.id,
-    staffId: row.staff_id,
-    name: row.name,
-    role: {
-      id: row.grade_id,
-      name: row.grade_name,
-    },
-    gender: row.gender,
-    phone: row.phone,
-    email: row.email,
-    dateOfBirth: row.date_of_birth,
-    joinDate: row.join_date,
-    leaveDate: row.leaveDate,
-    notes: row.notes,
-    active: row.active,
-  };
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {

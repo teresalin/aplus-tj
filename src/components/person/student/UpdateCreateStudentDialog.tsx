@@ -32,7 +32,7 @@ export interface IUpdateCreateStudentDialogProps {
   isUpdate: boolean;
   existingData: Student;
   open: boolean;
-  onClose: () => void;
+  onClose;
   onSubmit;
 }
 

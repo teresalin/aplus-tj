@@ -1,125 +1,143 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { PoolClient } from "pg";
 import { getDBClient } from "../../../../../lib/db-connector";
+import { NextApiRequest, NextApiResponse } from "next";
+import { Staff } from "..";
+import { parseStaff } from "../../../../../utils/apiUtils";
 
-async function getStaff(client, staffID) {
+async function createPersonAndStaff(client: PoolClient, data: Staff) {
+  const {
+    name,
+    gender,
+    phone,
+    email,
+    dateOfBirth,
+    notes,
+    role,
+    joinDate,
+    leaveDate,
+  } = data;
+
   try {
-    const getQuery = {
+    await client.query("BEGIN"); // Start a transaction
+    const personInsertQuery = {
       text: `
-        SELECT s.id AS student_id, s.role_id, s.join_date, s.leave_date, p.*
-        FROM student s
-        INNER JOIN person p ON s.person_id = p.id
-        WHERE s.id = $1;
+        INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, time_created, time_updated) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+        RETURNING id;
       `,
-      values: [staffID],
+      values: [name, gender, phone, email, dateOfBirth, notes, "t"],
     };
 
-    const result = await client.query(getQuery);
-    return result.rows[0];
-  } catch (error) {
-    // Handle the error or rethrow it if needed
-    throw error;
+    const personResult = await client.query(personInsertQuery);
+
+    const staffInsertQuery = {
+      text: `
+        INSERT INTO staff(person_id, role_id, join_date, leave_date, time_created, time_updated) 
+        VALUES ($1, $2, $3, $4, NOW(), NOW())
+        RETURNING id;
+      `,
+      values: [personResult.rows[0].id, role.id, joinDate, leaveDate],
+    };
+
+    const staffResult = await client.query(staffInsertQuery);
+    await client.query("COMMIT"); // Commit the transaction
+    return staffResult.rows[0].id;
+  } catch (err) {
+    await client.query("ROLLBACK"); // Roll back the transaction on error
+    throw err;
   }
 }
 
-async function createPerson(
-  client,
-  { name, phone, email, dateOfBirth, notes }
-) {
-  const insertQuery = {
-    text: `
-      INSERT INTO person(name, phone, email, date_of_birth, notes, active, time_created, time_updated) 
-      VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
-      RETURNING id;
-    `,
-    values: [name, phone, email, dateOfBirth, notes, "t"],
-  };
+async function updatePersonAndStaff(client: PoolClient, data: Staff) {
+  const {
+    id,
+    name,
+    gender,
+    phone,
+    email,
+    dateOfBirth,
+    notes,
+    role,
+    joinDate,
+    leaveDate,
+  } = data;
 
-  const result = await client.query(insertQuery);
-  return result.rows[0].id;
-}
+  try {
+    await client.query("BEGIN"); // Start a transaction
 
-async function createStaff(client, personID, { roleId, joinDate, leaveDate }) {
-  const insertQuery = {
-    text: `
-      INSERT INTO staffs(person_id, role_id, join_date, leave_date, time_created, time_updated) 
-      VALUES ($1, $2, $3, $4, NOW(), NOW())
-      RETURNING id;
-    `,
-    values: [personID, roleId, joinDate, leaveDate],
-  };
+    const personUpdateQuery = {
+      text: `
+        UPDATE person
+        SET name = $1, gender = $2, phone = $3, email = $4, date_of_birth = $5, notes = $6, time_updated = NOW()
+        WHERE id = $7
+        RETURNING id;
+      `,
+      values: [name, gender, phone, email, dateOfBirth, notes, id],
+    };
 
-  const result = await client.query(insertQuery);
-  return result.rows[0].id;
-}
+    const personResult = await client.query(personUpdateQuery);
 
-async function updatePerson(
-  client,
-  personID,
-  { name, phone, email, notes, active }
-) {
-  const updateQuery = {
-    text: `
-      UPDATE person 
-      SET name = $2, phone = $3, email = $4, notes = $5, active = $6, time_updated = NOW()
-      WHERE id = $1
-      RETURNING id;
-    `,
-    values: [personID, name, phone, email, notes, active],
-  };
+    const staffUpdateQuery = {
+      text: `
+        UPDATE staff
+        SET role_id = $1, join_date = $1, leave_date = $3, time_updated = NOW()
+        WHERE person_id = $4
+        RETURNING id;
+      `,
+      values: [role.id, joinDate, leaveDate, personResult.rows[0].id],
+    };
 
-  const result = await client.query(updateQuery);
-  return result.rows[0].id;
-}
+    const staffResult = await client.query(staffUpdateQuery);
 
-async function updateStaff(client, personID, { roleId, joinDate, leaveDate }) {
-  const updateQuery = {
-    text: `
-      UPDATE staff 
-      SET role_id = $2 ,join_date = COALESCE($3, join_date), leave_date = COALESCE($4, leave_date), time_updated = NOW()
-      WHERE person_id = $1
-      RETURNING id;
-    `,
-    values: [personID, roleId, joinDate, leaveDate],
-  };
-
-  const result = await client.query(updateQuery);
-  return result.rows[0].id;
+    await client.query("COMMIT"); // Commit the transaction
+    return staffResult.rows[0].id;
+  } catch (err) {
+    await client.query("ROLLBACK"); // Roll back the transaction on error
+    throw err;
+  }
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const staffID = req.query.student_id;
+  const personID = req.query.id;
   const client = await getDBClient();
 
   switch (req.method) {
     case "GET":
       try {
-        const result = await getStaff(client, staffID);
-        res.status(200).json(result);
+        const staffSelectQuery = {
+          text: `
+              SELECT 
+                person.id,
+                person.name,
+                person.gender,
+                person.phone,
+                person.email,
+                person.date_of_birth,
+                person.notes,
+                person.active,
+                staff.id AS staff_id,
+                staff.join_date, 
+                staff.leave_date, 
+                role.id AS role_id,
+                role.name AS role_name
+              FROM staff
+              INNER JOIN person ON staff.person_id = person.id
+              INNER JOIN role ON staff.role_id = role.id
+              WHERE person.id = $1;
+            `,
+          values: [personID],
+        };
+        const result = await client.query(staffSelectQuery);
+        res.status(200).json(result.rows.map(parseStaff)[0]);
       } catch (err) {
         res.status(500).json({ message: "Something went wrong" });
       }
       break;
     case "POST":
       try {
-        const {
-          name,
-          phone,
-          email,
-          dateOfBirth,
-          notes,
-          roleId,
-          joinDate,
-          leaveDate,
-        } = req.body;
-
-        const personID = await createPerson(client, {
-          name,
-          phone,
-          email,
-          dateOfBirth,
-          notes,
-        });
-        await createStaff(client, personID, { roleId, joinDate, leaveDate });
+        const data: Staff = req.body;
+        console.log("data: ", data);
+        await createPersonAndStaff(client, data);
         res.status(200).json({ message: "Success" });
       } catch (err) {
         if (err.code === "23505") {
@@ -128,59 +146,33 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             .status(409)
             .json({ message: "A person with the same details already exists" });
         } else {
+          console.log(err);
           res.status(500).json({ message: "Something went wrong" });
         }
       }
       break;
     case "PUT":
       try {
-        const {
-          name,
-          phone,
-          email,
-          notes,
-          roleId,
-          joinDate,
-          leaveDate,
-          active,
-        } = req.body;
-
-        const fetchPersonIdQuery = {
-          text: "SELECT person_id FROM student WHERE id = $1;",
-          values: [staffID],
-        };
-        const personIdResult = await client.query(fetchPersonIdQuery);
-        const personID = personIdResult.rows[0].person_id;
-
-        await updatePerson(client, personID, {
-          name,
-          phone,
-          email,
-          notes,
-          active,
-        });
-        await updateStaff(client, personID, {
-          roleId,
-          joinDate,
-          leaveDate,
-        });
+        const data: Staff = req.body;
+        await updatePersonAndStaff(client, data);
         res.status(200).json({ message: "Success" });
       } catch (err) {
         res.status(500).json({ message: "Something went wrong" });
       }
       break;
+    // TODO set to inactive instead of delete
     case "DELETE":
-      const deleteQuery = {
+      const staffDeleteQuery = {
         text: `
-          DELETE FROM student WHERE id = $1;
+          DELETE FROM staff WHERE id = $1;
         `,
-        values: [staffID],
+        values: [personID],
       };
-      await client.query(deleteQuery);
-      res.status(200).json({ message: "OK", id: staffID });
+      await client.query(staffDeleteQuery);
+      res.status(200).json({ message: "Success" });
       break;
     default:
-      res.setHeader("Allow", ["GET", "POST", "DELETE"]);
+      res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 };

@@ -21,7 +21,6 @@ import fetcher from "../../utils/fetcher";
 import CustomToolBar from "../../src/components/grid/CustomToolBar";
 import DetailPanel from "../../src/components/grid/DetailPanel";
 import RenderMenu from "../../src/components/grid/RenderMenu";
-import StaffDetailPanel from "../../src/components/person/StaffDetailPanel";
 import StudentDetailPanel from "../../src/components/person/StudentDetailPanel";
 import UpdateCreateStudentDialog from "../../src/components/person/student/UpdateCreateStudentDialog";
 import { Student } from "../api/persons/students";
@@ -279,7 +278,6 @@ export default function PersonGrid() {
           } else if (tab === "parents") {
             return <DetailPanel data={params.row} />;
           } else {
-            return <StaffDetailPanel data={params.row} />;
           }
         } else {
           return detailPanelOpen.get(params.row.id) ? (

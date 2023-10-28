@@ -1,3 +1,4 @@
+import { Staff } from "../pages/api/persons/staffs";
 import { Student } from "../pages/api/persons/students";
 
 export function parseStudent(row: any): Student {
@@ -18,6 +19,26 @@ export function parseStudent(row: any): Student {
     },
     joinDate: row.join_date,
     leaveDate: row.leave_date,
+    notes: row.notes,
+    active: row.active,
+  };
+}
+
+export function parseStaff(row: any): Staff {
+  return {
+    id: row.id,
+    staffId: row.staff_id,
+    name: row.name,
+    role: {
+      id: row.grade_id,
+      name: row.grade_name,
+    },
+    gender: row.gender,
+    phone: row.phone,
+    email: row.email,
+    dateOfBirth: row.date_of_birth,
+    joinDate: row.join_date,
+    leaveDate: row.leaveDate,
     notes: row.notes,
     active: row.active,
   };

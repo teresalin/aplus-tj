@@ -9,6 +9,8 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import useSWR from "swr";
 
+import BillingTab from "../../../src/components/person/student/BillingTab";
+import ClassesTab from "../../../src/components/person/student/ClassesTab";
 import DetailsTab from "../../../src/components/person/student/DetailsTab";
 import fetcher from "../../../utils/fetcher";
 
@@ -91,10 +93,10 @@ export default function ClassDetails() {
           <DetailsTab details={details} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          Item Two
+          <ClassesTab id={id} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          Item Three
+          <BillingTab details={id} />
         </CustomTabPanel>
       </Box>
     </>
