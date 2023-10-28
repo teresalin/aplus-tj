@@ -104,8 +104,8 @@ const DetailsTab = ({ details }) => {
         School Information
       </Typography>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Grid container direction="row" spacing={3}>
-          <Grid item xs={4}>
+        <Grid container spacing={3}>
+          <Grid item sm={12} md={4}>
             <Typography
               variant="body2"
               sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -114,7 +114,7 @@ const DetailsTab = ({ details }) => {
             </Typography>
             <Typography variant="body2">{details.currentSchool}</Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item sm={12} md={4}>
             <Typography
               variant="body2"
               sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -123,7 +123,7 @@ const DetailsTab = ({ details }) => {
             </Typography>
             <Typography variant="body2">{details.grade.name}</Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item sm={12} md={4}>
             <Typography
               variant="body2"
               sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -138,8 +138,8 @@ const DetailsTab = ({ details }) => {
         A Plus Enrollment
       </Typography>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Grid container direction="row" spacing={3}>
-          <Grid item xs={4}>
+        <Grid container spacing={3}>
+          <Grid item sm={12} md={4}>
             <Typography
               variant="body2"
               sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -148,7 +148,7 @@ const DetailsTab = ({ details }) => {
             </Typography>
             <Typography variant="body2">{details.joinDate}</Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item sm={12} md={4}>
             <Typography
               variant="body2"
               sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -157,7 +157,7 @@ const DetailsTab = ({ details }) => {
             </Typography>
             <Typography variant="body2">{details.leaveDate}</Typography>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item sm={12} md={4}>
             <Typography
               variant="body2"
               sx={{ fontWeight: 700, color: theme.palette.primary.main }}

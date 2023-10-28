@@ -52,8 +52,8 @@ const ClassesTab = ({ id }) => {
             <Box sx={{ pb: "7px" }}>{renderChip(detail.active)}</Box>
           </Stack>
           <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-            <Grid container direction="row" spacing={3}>
-              <Grid item xs={4}>
+            <Grid container spacing={3}>
+              <Grid item sm={12} md={4}>
                 <Typography
                   variant="body2"
                   sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -62,7 +62,7 @@ const ClassesTab = ({ id }) => {
                 </Typography>
                 <Typography variant="body2">{detail.startDate}</Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item sm={12} md={4}>
                 <Typography
                   variant="body2"
                   sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -71,7 +71,7 @@ const ClassesTab = ({ id }) => {
                 </Typography>
                 <Typography variant="body2">{detail.endDate}</Typography>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item sm={12} md={4}>
                 <Typography
                   variant="body2"
                   sx={{ fontWeight: 700, color: theme.palette.primary.main }}

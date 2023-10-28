@@ -71,20 +71,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 AND a.due_date >= current_date - interval '1 month'
             ) AS "pastAssignments",
             (
-                SELECT json_agg(
-                    json_build_object(
-                        'id', a.id,
-                        'classId', ca.class_id,
-                        'assignmentName', a.name,
-                        'description', a.description,
-                        'dueDate', a.due_date,
-                        'timeCreated', a.time_created
-                    ) ORDER BY a.due_date -- Order by due_date here
-                )
-                FROM class_assignment AS ca
-                JOIN assignment AS a ON ca.assignment_id = a.id
-                WHERE ca.class_id = c.id
-                AND a.due_date > current_date
+              SELECT COALESCE(json_agg(
+                  json_build_object(
+                      'id', a.id,
+                      'classId', ca.class_id,
+                      'assignmentName', a.name,
+                      'description', a.description,
+                      'dueDate', a.due_date,
+                      'timeCreated', a.time_created
+                  ) ORDER BY a.due_date
+              ), '[]'::json)
+              FROM class_assignment AS ca
+              JOIN assignment AS a ON ca.assignment_id = a.id
+              WHERE ca.class_id = c.id
+              AND a.due_date > current_date
             ) AS "upcomingAssignments"
         FROM class AS c
         JOIN staff AS s ON c.teacher_id = s.id

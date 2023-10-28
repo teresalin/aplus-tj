@@ -1,51 +1,23 @@
-import { Class } from "../../api/classes";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
+import { useTheme } from "@mui/material/styles";
 import * as React from "react";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import dayjs from "dayjs";
-import fetcher from "../../../utils/fetcher";
 import Grid from "@mui/material/Grid";
+import Link from "next/link";
+import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import useSWR from "swr";
+
+import { Class } from "../../api/classes";
+import fetcher from "../../../utils/fetcher";
 import UpdateClassDetailsDialog from "../../../src/components/class/UpdateClassDetailsDialog";
 import UpdateClassStudentsDialog from "../../../src/components/class/UpdateClassStudentsDialog";
-import useSWR from "swr";
-import Link from "next/link";
-
-// import "@fontsource/roboto/300.css";
-// import "@fontsource/roboto/400.css";
-// import "@fontsource/roboto/500.css";
-// import "@fontsource/roboto/700.css";
-
-const FlexGrid = styled(Grid)(({ theme }) => ({
-  display: "flex",
-}));
-
-const StyledCard = styled(Card)(({ theme }) => ({
-  boxShadow: "none",
-  marginTop: "0.7em",
-  marginBottom: "0.7em",
-  border: "2px solid",
-  borderColor: "#f3f2f0",
-  borderRadius: 7,
-}));
-
-const StyledCardContent = styled(CardContent)(({ theme }) => ({
-  padding: "24px", // mui defaults CardContent bottom-padding to 24px
-}));
-
-const AssignmentStyledCardContent = styled(CardContent)(({ theme }) => ({
-  "&:last-child": {
-    // padding: "0.8em",
-    padding: 0,
-  },
-}));
 
 const columns: GridColDef[] = [
   {
@@ -81,6 +53,7 @@ const columns: GridColDef[] = [
 ];
 
 export default function ClassDetails() {
+  const theme = useTheme();
   const classID = useRouter().query.class_id;
   const { data } = useSWR(classID ? `/api/classes/${classID}` : null, fetcher);
   const details = data as Class | null;
@@ -101,120 +74,117 @@ export default function ClassDetails() {
           Back
         </Button>
       </Box>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Box p={3} sx={{ backgroundColor: "#fff", borderRadius: 2 }}>
-            <Grid container justifyContent="space-between" alignItems="center">
-              <Typography variant="h6" gutterBottom>
-                Details
+      <Box mb={2}>
+        <Grid container justifyContent="space-between" alignItems="center">
+          <Typography variant="h6" gutterBottom>
+            Details
+          </Typography>
+          {details && <UpdateClassDetailsDialog classDetails={details} />}
+        </Grid>
+        <Grid container rowSpacing={0} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+          <Grid item xs={12} md={4}>
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+              >
+                Schedule
               </Typography>
-              {details && <UpdateClassDetailsDialog classDetails={details} />}
-            </Grid>
-            <Grid
-              container
-              rowSpacing={0}
-              columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+              <Typography>MWF</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+              >
+                Teacher
+              </Typography>
+              <Typography>
+                {details ? details.teacherName : "No teacher assigned"}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+              >
+                Grade
+              </Typography>
+              <Typography>{details && details.grade}</Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+      <Typography variant="h6" gutterBottom>
+        Upcoming Assignments
+      </Typography>
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        {details &&
+          details.upcomingAssignments.slice(0, 3).map((detail) => (
+            <Card
+              style={{
+                display: "flex",
+                backgroundColor: "#f8f6fc",
+                marginBottom: "1em",
+                boxShadow: "none",
+                height: "4.4em",
+                padding: "0.8em",
+              }}
             >
-              <Grid item xs={12} md={4}>
-                <StyledCard variant="outlined">
-                  <StyledCardContent>
-                    <Typography variant="subtitle1">Schedule</Typography>
-                    <Typography>MWF</Typography>
-                  </StyledCardContent>
-                </StyledCard>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <StyledCard variant="outlined">
-                  <StyledCardContent>
-                    <Typography variant="subtitle1">Teacher</Typography>
-                    <Typography>
-                      {details ? details.teacherName : "No teacher assigned"}
-                    </Typography>
-                  </StyledCardContent>
-                </StyledCard>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <StyledCard variant="outlined">
-                  <StyledCardContent>
-                    <Typography variant="subtitle1">Grade</Typography>
-                    <Typography>{details && details.grade}</Typography>
-                  </StyledCardContent>
-                </StyledCard>
-              </Grid>
-            </Grid>
-          </Box>
-        </Grid>
-        <Grid item xs={12}>
-          <Box p={3} sx={{ backgroundColor: "#fff", borderRadius: 2 }}>
-            <Typography mb={2} variant="h6" gutterBottom>
-              Upcoming Assignments
-            </Typography>
-            {details &&
-              details.upcomingAssignments.slice(0, 3).map((detail) => (
-                <Card
-                  style={{
-                    display: "flex",
-                    backgroundColor: "#f8f6fc",
-                    marginBottom: "1em",
-                    boxShadow: "none",
-                    height: "4.4em",
-                    padding: "0.8em",
-                  }}
-                >
-                  <Button
-                    sx={{
-                      backgroundColor: "#59addd",
-                      color: "#fff",
-                      // margin: 10,
-                      mr: 2,
-                    }}
-                  >
-                    {dayjs(detail.dueDate).format("MMM DD")}
-                  </Button>
-                  {/* <AssignmentStyledCardContent> */}
-                  <Stack direction="column" justifyContent="center">
-                    <Typography>{detail.assignmentName}</Typography>
-                    {detail.description && (
-                      <Typography variant="subtitle2" sx={{ color: "#808080" }}>
-                        {detail.description}
-                      </Typography>
-                    )}
-                  </Stack>
-                  {/* </AssignmentStyledCardContent> */}
-                </Card>
-              ))}
-          </Box>
-        </Grid>
-        <Grid item xs={12}>
-          <Box p={3} sx={{ backgroundColor: "#fff", borderRadius: 2 }}>
-            <Grid container justifyContent="space-between" alignItems="center">
-              <Typography variant="h6" gutterBottom>
-                Students
-              </Typography>
-              {details && <UpdateClassStudentsDialog classDetails={details} />}
-            </Grid>
-            <Box sx={{ width: "100%" }}>
-              {details && (
-                <DataGrid
-                  rows={details.activeStudents}
-                  columns={columns}
-                  initialState={{
-                    pagination: {
-                      paginationModel: {
-                        pageSize: 5,
-                      },
-                    },
-                  }}
-                  autoHeight={true}
-                  pageSizeOptions={[5]}
-                  disableRowSelectionOnClick
-                  density="compact"
-                />
-              )}
-            </Box>
-          </Box>
-        </Grid>
+              <Button
+                sx={{
+                  backgroundColor: "#59addd",
+                  color: "#fff",
+                  // margin: 10,
+                  mr: 2,
+                }}
+              >
+                {dayjs(detail.dueDate).format("MMM DD")}
+              </Button>
+              {/* <AssignmentStyledCardContent> */}
+              <Stack direction="column" justifyContent="center">
+                <Typography>{detail.assignmentName}</Typography>
+                {detail.description && (
+                  <Typography variant="subtitle2" sx={{ color: "#808080" }}>
+                    {detail.description}
+                  </Typography>
+                )}
+              </Stack>
+              {/* </AssignmentStyledCardContent> */}
+            </Card>
+          ))}
+      </Paper>
+      <Grid container justifyContent="space-between" alignItems="center">
+        <Typography variant="h6" gutterBottom>
+          Students
+        </Typography>
+        {details && <UpdateClassStudentsDialog classDetails={details} />}
       </Grid>
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        <Box sx={{ width: "100%" }}>
+          {details && (
+            <DataGrid
+              rows={details.activeStudents}
+              columns={columns}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 5,
+                  },
+                },
+              }}
+              autoHeight={true}
+              pageSizeOptions={[5]}
+              disableRowSelectionOnClick
+              density="compact"
+            />
+          )}
+        </Box>
+      </Paper>
     </>
   );
 }

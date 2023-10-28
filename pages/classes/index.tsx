@@ -64,7 +64,7 @@ export default function Classes() {
                 <Grid container item alignContent="center" xs="auto">
                   <Typography>{row.className}</Typography>
                 </Grid>
-                <Grid container item justifyContent="flex-end" xs={4}>
+                <Grid container item justifyContent="flex-end" xs={5}>
                   <Grid item xs={3}>
                     <Tooltip title="Schedule">
                       <Button
