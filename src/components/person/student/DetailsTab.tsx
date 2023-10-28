@@ -2,6 +2,7 @@ import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CakeIcon from "@mui/icons-material/Cake";
+import CircularProgress from "@mui/material/CircularProgress";
 import EmailIcon from "@mui/icons-material/Email";
 import Grid from "@mui/material/Grid";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
@@ -15,7 +16,7 @@ const DetailsTab = ({ details }) => {
   if (!details) {
     return (
       <Paper variant="outlined" sx={{ p: 2 }}>
-        <Typography>Loading...</Typography>
+        <CircularProgress />
       </Paper>
     );
   }
@@ -143,7 +144,7 @@ const DetailsTab = ({ details }) => {
               variant="body2"
               sx={{ fontWeight: 700, color: theme.palette.primary.main }}
             >
-              Joined On
+              Join Date
             </Typography>
             <Typography variant="body2">{details.joinDate}</Typography>
           </Grid>
