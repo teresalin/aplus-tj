@@ -23,7 +23,6 @@ import { Assignment } from "../api/assignments";
 import { Session } from "../api/sessions";
 import CustomToolBar from "../../src/components/grid/CustomToolBar";
 import DeleteSessionDialog from "../../src/components/session/DeleteSessionDialog";
-import EditAssignmentDialog from "../../src/components/assignment/EditAssignmentDialog";
 import fetcher from "../../utils/fetcher";
 import NewSessionDialog from "../../src/components/session/NewSessionDialog";
 import RenderMenu from "../../src/components/grid/RenderMenu";
@@ -294,12 +293,6 @@ export default function SessionGrid() {
         open={isNewDialogOpen}
         onClose={handleCloseNewDialog}
         onSubmit={handleCreateNewAssignment}
-      />
-      <EditAssignmentDialog
-        existingData={selectedRowData}
-        open={isEditDialogOpen}
-        onClose={handleCloseEditDialog}
-        onSubmit={handleSaveRowData}
       />
       <DeleteSessionDialog
         open={isDeleteDialogOpen}

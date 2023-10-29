@@ -53,11 +53,11 @@ export default function Classes() {
               alignContent="center"
               justifyContent="space-between"
             >
-              <Grid container item alignContent="center" xs="auto">
+              <Grid container item alignContent="center" xs={12} md="auto">
                 <Typography>{row.className}</Typography>
               </Grid>
-              <Grid container item justifyContent="flex-end" xs={5}>
-                <Grid item xs={3}>
+              <Grid container item justifyContent="flex-end" xs={12} md={5}>
+                <Grid item md={12} lg={3}>
                   <Tooltip title="Schedule">
                     <Button
                       startIcon={<TodayIcon />}
@@ -71,11 +71,13 @@ export default function Classes() {
                     </Button>
                   </Tooltip>
                 </Grid>
-                <Grid item xs={5}>
+                <Grid item md={12} lg={5}>
                   <Tooltip title="Teacher">
                     <Button
                       startIcon={<SupportAgentIcon />}
                       sx={{
+                        whiteSpace: "nowrap",
+                        minWidth: "maxContent",
                         "&:hover": {
                           backgroundColor: "transparent",
                         },
@@ -85,7 +87,7 @@ export default function Classes() {
                     </Button>
                   </Tooltip>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item md={12} lg={3}>
                   <Tooltip title="Students/Capacity">
                     <Button
                       startIcon={<ChildCareIcon />}
