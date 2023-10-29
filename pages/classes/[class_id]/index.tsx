@@ -83,7 +83,7 @@ export default function ClassDetails() {
         </Grid>
         <Grid container rowSpacing={0} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
           <Grid item xs={12} md={4}>
-            <Paper variant="outlined" sx={{ p: 2 }}>
+            <Card variant="outlined" sx={{ p: 2 }}>
               <Typography
                 variant="body2"
                 sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -91,10 +91,10 @@ export default function ClassDetails() {
                 Schedule
               </Typography>
               <Typography>MWF</Typography>
-            </Paper>
+            </Card>
           </Grid>
           <Grid item xs={12} md={4}>
-            <Paper variant="outlined" sx={{ p: 2 }}>
+            <Card variant="outlined" sx={{ p: 2 }}>
               <Typography
                 variant="body2"
                 sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -104,10 +104,10 @@ export default function ClassDetails() {
               <Typography>
                 {details ? details.teacherName : "No teacher assigned"}
               </Typography>
-            </Paper>
+            </Card>
           </Grid>
           <Grid item xs={12} md={4}>
-            <Paper variant="outlined" sx={{ p: 2 }}>
+            <Card variant="outlined" sx={{ p: 2 }}>
               <Typography
                 variant="body2"
                 sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -115,7 +115,7 @@ export default function ClassDetails() {
                 Grade
               </Typography>
               <Typography>{details && details.grade}</Typography>
-            </Paper>
+            </Card>
           </Grid>
         </Grid>
       </Box>
@@ -124,39 +124,40 @@ export default function ClassDetails() {
       </Typography>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         {details &&
-          details.upcomingAssignments.slice(0, 3).map((detail) => (
-            <Card
-              style={{
-                display: "flex",
-                backgroundColor: "#f8f6fc",
-                marginBottom: "1em",
-                boxShadow: "none",
-                height: "4.4em",
-                padding: "0.8em",
-              }}
-            >
-              <Button
-                sx={{
-                  backgroundColor: "#59addd",
-                  color: "#fff",
-                  // margin: 10,
-                  mr: 2,
+          details.upcomingAssignments
+            .slice(0, 3)
+            .map((detail, index, array) => (
+              <Card
+                style={{
+                  display: "flex",
+                  backgroundColor: "#f8f6fc",
+                  marginBottom: index < array.length - 1 ? "1em" : "0",
+                  boxShadow: "none",
+                  height: "4.4em",
+                  padding: "0.8em",
                 }}
               >
-                {dayjs(detail.dueDate).format("MMM DD")}
-              </Button>
-              {/* <AssignmentStyledCardContent> */}
-              <Stack direction="column" justifyContent="center">
-                <Typography>{detail.assignmentName}</Typography>
-                {detail.description && (
-                  <Typography variant="subtitle2" sx={{ color: "#808080" }}>
-                    {detail.description}
-                  </Typography>
-                )}
-              </Stack>
-              {/* </AssignmentStyledCardContent> */}
-            </Card>
-          ))}
+                <Button
+                  sx={{
+                    backgroundColor: "#59addd",
+                    color: "#fff",
+                    // margin: 10,
+                    mr: 2,
+                  }}
+                >
+                  {dayjs(detail.dueDate).format("MMM DD")}
+                </Button>
+                {/* <AssignmentStyledCardContent> */}
+                <Stack direction="column" justifyContent="center">
+                  <Typography>{detail.assignmentName}</Typography>
+                  {detail.description && (
+                    <Typography variant="subtitle2" sx={{ color: "#808080" }}>
+                      {detail.description}
+                    </Typography>
+                  )}
+                </Stack>
+              </Card>
+            ))}
       </Paper>
       <Grid container justifyContent="space-between" alignItems="center">
         <Typography variant="h6" gutterBottom>

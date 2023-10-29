@@ -10,18 +10,21 @@ import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import useSWR from "swr";
 
-import fetcher from "../../../utils/fetcher";
-import { Class } from "../../../pages/api/classes";
 import { Assignment } from "../../../pages/api/assignments";
+import { Class } from "../../../pages/api/classes";
+import fetcher from "../../../utils/fetcher";
+import { DatePicker } from "@mui/x-date-pickers";
 
 export interface IEditAssignmentDialogProps {
-  existingData: Assignment | undefined | null;
+  isUpdate: boolean;
+  existingData: Assignment;
   open: boolean;
-  onClose: () => void;
-  onSubmit: (data: Assignment | null | undefined) => void;
+  onClose;
+  onSubmit;
 }
 
 export default function EditAssignmentDialog({
+  isUpdate,
   existingData,
   open,
   onClose,
@@ -29,31 +32,28 @@ export default function EditAssignmentDialog({
 }: IEditAssignmentDialogProps) {
   const [editedData, setEditedData] = React.useState(existingData);
   const { data } = useSWR("/api/classes", fetcher);
-  const classes = data as Class[] | undefined;
-
-  const isUpdate = !!existingData;
+  const classes = data || [];
 
   React.useEffect(() => {
-    if (editedData) {
+    if (isUpdate) {
       setEditedData(existingData);
     } else {
-      setEditedData({
-        id: 0,
-        classId: 0,
-        className: "",
-        assignmentName: "",
-        description: "",
-        dueDate: new Date(),
-        created: new Date(),
-      });
+      setEditedData({} as Assignment);
     }
   }, [existingData]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setEditedData((prevData: Assignment | null | undefined) => ({
+    setEditedData((prevData) => ({
       ...prevData!,
       [name]: value,
+    }));
+  };
+
+  const handleDateChange = (fieldName, date) => {
+    setEditedData((prevData) => ({
+      ...prevData,
+      [fieldName]: date,
     }));
   };
 
@@ -81,19 +81,17 @@ export default function EditAssignmentDialog({
                 value={editedData.assignmentName}
                 onChange={handleInputChange}
               />
-              {/* TODO format date in yyyy-mm-dd format */}
-              <TextField
-                fullWidth
-                required
-                id="dueDate"
-                name="dueDate"
-                label="Due Date"
-                type="date"
-                variant="outlined"
-                margin="dense"
-                InputLabelProps={{ shrink: true }}
-                value={dayjs(editedData.dueDate).format("YYYY-MM-DD")}
-                onChange={handleInputChange}
+              <DatePicker
+                label="Date of Birth"
+                format="YYYY-MM-DD"
+                value={editedData.dueDate ? dayjs(editedData.dueDate) : null}
+                onChange={(date) => handleDateChange("dueDate", date)}
+                sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
+                slotProps={{
+                  textField: {
+                    required: true,
+                  },
+                }}
               />
               <TextField
                 fullWidth

@@ -1,4 +1,3 @@
-import { Assignment } from "../api/assignments";
 import * as React from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
@@ -7,20 +6,21 @@ import dayjs from "dayjs";
 import IconButton from "@mui/material/IconButton";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import {
   DataGrid,
   GridColDef,
   GridValueFormatterParams,
   GridRowSelectionModel,
+  GridColumnVisibilityModel,
 } from "@mui/x-data-grid";
 
-import fetcher from "../../utils/fetcher";
+import { Assignment } from "../api/assignments";
 import CustomToolBar from "../../src/components/grid/CustomToolBar";
 import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
+import fetcher from "../../utils/fetcher";
 import RenderMenu from "../../src/components/grid/RenderMenu";
 import UpdateCreateAssignmentDialog from "../../src/components/assignment/UpdateCreateAssignmentDialog";
-import Button from "@mui/material/Button";
 
 function a11yProps(key: string) {
   return {
@@ -32,88 +32,98 @@ function a11yProps(key: string) {
 const assignmentTypes = ["all", "upcoming", "past due"];
 
 export default function AssignmentGrid() {
+  const { mutate } = useSWRConfig();
   const [tab, setTab] = React.useState("all");
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
-  const [selectedRowData, setSelectedRowData] = React.useState<
-    Assignment | undefined
-  >();
+  const [columnVisibilityModel, setColumnVisibilityModel] =
+    React.useState<GridColumnVisibilityModel>({
+      detailPanel: true,
+      id: false,
+      name: true,
+      gender: false,
+      phone: true,
+      email: true,
+      dateOfBirth: true,
+      active: true,
+      created: false,
+      action: true,
+    });
   const [isUpdateCreateDialogOpen, setIsUpdateCreateDialogOpen] =
     React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [isUpdate, setIsUpdate] = React.useState(false);
+  const [rowToEdit, setRowToEdit] = React.useState({});
+  const [rowToDeactivate, setRowToDeactivate] = React.useState({});
+  const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] =
+    React.useState(false);
   const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
     null
   );
 
   const { data } = useSWR(`api/assignments`, fetcher);
-  const assignments = data as Assignment[];
+  const assignments = data || [];
 
   const handleTabChange = (event: React.SyntheticEvent, newTab: string) => {
     setTab(newTab);
   };
 
-  const handleOpenUpdateCreateDialog = () => {
+  const handleAddButtonClick = () => {
+    setIsUpdate(false);
+    setRowToEdit({}); // Reset any data
     setIsUpdateCreateDialogOpen(true);
+  };
+
+  const handleEditClick = (row) => {
+    setIsUpdate(true);
+    setRowToEdit(row);
+    setIsUpdateCreateDialogOpen(true);
+  };
+
+  const handleDeactivateClick = (row) => {
+    setRowToDeactivate(row);
+    setIsDeactivateDialogOpen(true);
   };
 
   const handleCloseUpdateCreateDialog = () => {
     setIsUpdateCreateDialogOpen(false);
+    setRowToEdit({});
   };
 
-  const handleRenderMenuClick = (row) => {
-    setSelectedRowData(row);
+  const handleOpenDeactivateDialog = () => {
+    setIsDeactivateDialogOpen(true);
   };
 
-  const handleOpenDeleteDialog = () => {
-    setIsDeleteDialogOpen(true);
+  const handleCloseDeactivateDialog = () => {
+    setIsDeactivateDialogOpen(false);
+    setRowToDeactivate({});
   };
 
-  const handleCloseDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
-  };
+  // TODO mutate is not working
+  const handleUpdateOrCreateAssignment = async (data) => {
+    const url = isUpdate
+      ? `/api/assignments/${data.id}`
+      : `/api/assignments/index`;
+    const method = isUpdate ? "PUT" : "POST";
 
-  const onRowsSelectionHandler = (ids) => {
-    const selectedRowsData = ids.map((id) =>
-      assignments.find((row) => row.id === id)
-    );
-    setSelectedRowData(selectedRowsData[0]);
-  };
-
-  // TODO creating without description does not close dialog
-  // const handleCreateNewAssignment = async (data) => {
-  //   const response = await fetch(`/api/assignments/[assignment_id]`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(data),
-  //   });
-
-  //   if (response.ok) {
-  //     setIsNewDialogOpen(false);
-  //   } else {
-  //     console.error("Error updating assignment data:", response.statusText);
-  //   }
-  // };
-
-  const handleSaveRowData = async (editedData) => {
-    const response = await fetch(`/api/assignments/${editedData.id}`, {
-      method: "PUT",
+    const response = await fetch(url, {
+      method: method,
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(editedData),
+      body: JSON.stringify(data),
     });
 
     if (response.ok) {
       setIsUpdateCreateDialogOpen(false);
+      mutate("/api/assignments");
     } else {
-      console.error("Error updating assignment data:", response.statusText);
+      console.error("Error creating/updating assignment:", response.statusText);
     }
   };
 
-  const handleDeleteRowData = async () => {
-    const response = await fetch(`/api/assignments/${selectedRowData?.id}`, {
+  const handleDeleteAssignment = async (data) => {
+    const response = await fetch(`/api/assignments/${data.id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -136,6 +146,18 @@ export default function AssignmentGrid() {
           column.field !== "created"
       )
       .map((column) => column.field);
+  };
+
+  const onColumnVisibilityChange = (
+    model: React.SetStateAction<GridColumnVisibilityModel>
+  ) => {
+    let count = 0;
+    for (const key in model) {
+      if (model[key] === true) {
+        count++;
+      }
+    }
+    setColumnVisibilityModel(model);
   };
 
   function AddIconButton({ onClick }) {
@@ -209,8 +231,8 @@ export default function AssignmentGrid() {
       flex: 1,
       renderCell: (params) => (
         <RenderMenu
-          onEditClick={handleOpenUpdateCreateDialog}
-          onDeleteClick={handleOpenDeleteDialog}
+          onEditClick={() => handleEditClick(params.row)}
+          onDeleteClick={() => handleDeactivateClick(params.row)}
         />
       ),
     },
@@ -236,11 +258,20 @@ export default function AssignmentGrid() {
         sx={{
           width: "100%",
           overflow: "hidden",
+          ".MuiDataGrid-cell:focus": {
+            outline: "none",
+          },
+          "& .MuiDataGrid-row:hover": {
+            cursor: "pointer",
+          },
+        }}
+        columnVisibilityModel={columnVisibilityModel}
+        onColumnVisibilityModelChange={(newModel) => {
+          onColumnVisibilityChange(newModel);
         }}
         rows={assignments}
         columns={columns}
         rowSelectionModel={rowSelectionModel}
-        onRowSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
         localeText={{
           toolbarColumns: "",
           toolbarFilters: "",
@@ -265,7 +296,7 @@ export default function AssignmentGrid() {
             placement: "bottom-end",
           },
           toolbar: {
-            children: <AddIconButton onClick={handleOpenUpdateCreateDialog} />,
+            children: <AddIconButton onClick={handleAddButtonClick} />,
             setButtonEl,
           },
           columnsPanel: {
@@ -276,15 +307,16 @@ export default function AssignmentGrid() {
         hideFooterSelectedRowCount
       />
       <UpdateCreateAssignmentDialog
-        existingData={selectedRowData}
+        isUpdate={isUpdate}
+        existingData={rowToEdit as Assignment}
         open={isUpdateCreateDialogOpen}
         onClose={handleCloseUpdateCreateDialog}
-        onSubmit={handleSaveRowData}
+        onSubmit={handleUpdateOrCreateAssignment}
       />
       <DeleteAssignmentDialog
         open={isDeleteDialogOpen}
-        onClose={handleCloseDeleteDialog}
-        onSubmit={handleDeleteRowData}
+        onClose={handleCloseDeactivateDialog}
+        onSubmit={handleDeleteAssignment}
       />
     </Box>
   );

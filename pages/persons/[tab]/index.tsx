@@ -328,12 +328,6 @@ export default function PersonGrid() {
           }}
           rows={persons}
           columns={columns}
-          getRowHeight={({ id }: GridRowHeightParams) => {
-            if (id.toString().startsWith("detail-panel")) {
-              return "auto";
-            }
-            return null;
-          }}
           rowSelectionModel={rowSelectionModel}
           onRowClick={(params) => onRowClick(params.row)}
           localeText={{

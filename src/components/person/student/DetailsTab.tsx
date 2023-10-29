@@ -2,6 +2,7 @@ import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CakeIcon from "@mui/icons-material/Cake";
+import Card from "@mui/material/Card";
 import CircularProgress from "@mui/material/CircularProgress";
 import EmailIcon from "@mui/icons-material/Email";
 import Grid from "@mui/material/Grid";
@@ -14,16 +15,12 @@ const DetailsTab = ({ details }) => {
   const theme = useTheme();
 
   if (!details) {
-    return (
-      <Paper variant="outlined" sx={{ p: 2 }}>
-        <CircularProgress />
-      </Paper>
-    );
+    return <CircularProgress />;
   }
 
   return (
     <>
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Grid container direction="row" spacing={3}>
           <Grid item>
             <Box
@@ -99,11 +96,11 @@ const DetailsTab = ({ details }) => {
             </Grid>
           </Grid>
         </Grid>
-      </Paper>
+      </Card>
       <Typography variant="h6" gutterBottom>
         School Information
       </Typography>
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={3}>
           <Grid item sm={12} md={4}>
             <Typography
@@ -133,11 +130,11 @@ const DetailsTab = ({ details }) => {
             <Typography variant="body2">{details.textbookPublisher}</Typography>
           </Grid>
         </Grid>
-      </Paper>
+      </Card>
       <Typography variant="h6" gutterBottom>
         A Plus Enrollment
       </Typography>
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Grid container spacing={3}>
           <Grid item sm={12} md={4}>
             <Typography
@@ -169,11 +166,11 @@ const DetailsTab = ({ details }) => {
             </Typography>
           </Grid>
         </Grid>
-      </Paper>
+      </Card>
       <Typography variant="h6" gutterBottom>
         Other
       </Typography>
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Typography
           variant="body2"
           sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -181,7 +178,7 @@ const DetailsTab = ({ details }) => {
           Notes
         </Typography>
         <Typography variant="body2">{details.notes || "N/A"}</Typography>
-      </Paper>
+      </Card>
     </>
   );
 };

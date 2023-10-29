@@ -1,10 +1,10 @@
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import fetcher from "../../../../utils/fetcher";
 import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
 import React from "react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -16,11 +16,7 @@ const ClassesTab = ({ id }) => {
   const details = data || [];
 
   if (!details) {
-    return (
-      <Paper variant="outlined" sx={{ p: 2 }}>
-        <CircularProgress />
-      </Paper>
-    );
+    return <CircularProgress />;
   }
 
   const renderChip = (params) => {
@@ -51,7 +47,7 @@ const ClassesTab = ({ id }) => {
             </Typography>
             <Box sx={{ pb: "7px" }}>{renderChip(detail.active)}</Box>
           </Stack>
-          <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+          <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
             <Grid container spacing={3}>
               <Grid item sm={12} md={4}>
                 <Typography
@@ -83,7 +79,7 @@ const ClassesTab = ({ id }) => {
                 ))}
               </Grid>
             </Grid>
-          </Paper>
+          </Card>
         </>
       ))}
     </>
