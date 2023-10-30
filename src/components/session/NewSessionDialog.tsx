@@ -81,7 +81,7 @@ export default function NewSessionDialog({
             >
               {classes.map((item: Class) => (
                 <MenuItem key={item.id} value={item.id}>
-                  {item.className}
+                  {item.name}
                 </MenuItem>
               ))}
             </TextField>

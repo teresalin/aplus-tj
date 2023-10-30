@@ -8,8 +8,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const query = {
       text: `
         SELECT
-          class.id AS "classId",
-          class.name AS "className",
+          class.name,
           class_student.start_date AS "startDate",
           class_student.end_date AS "endDate",
           class_student.active,

@@ -56,7 +56,7 @@ export default function ClassDetails() {
   const theme = useTheme();
   const classID = useRouter().query.class_id;
   const { data } = useSWR(classID ? `/api/classes/${classID}` : null, fetcher);
-  const details = data as Class | null;
+  const classData = data || [];
 
   return (
     <>
@@ -79,52 +79,58 @@ export default function ClassDetails() {
           <Typography variant="h6" gutterBottom>
             Details
           </Typography>
-          {details && <UpdateClassDetailsDialog classDetails={details} />}
+          {classData && <UpdateClassDetailsDialog classDetails={classData} />}
         </Grid>
-        <Grid container rowSpacing={0} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-          <Grid item xs={12} md={4}>
-            <Card variant="outlined" sx={{ p: 2 }}>
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-              >
-                Schedule
-              </Typography>
-              <Typography>MWF</Typography>
-            </Card>
+        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+          <Grid
+            container
+            rowSpacing={0}
+            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          >
+            <Grid item xs={12} md={4}>
+              <Card variant="outlined" sx={{ p: 2 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                >
+                  Schedule
+                </Typography>
+                <Typography>MWF</Typography>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Card variant="outlined" sx={{ p: 2 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                >
+                  Teacher
+                </Typography>
+                <Typography>
+                  {classData ? classData.teacherName : "No teacher assigned"}
+                </Typography>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Card variant="outlined" sx={{ p: 2 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                >
+                  Grade
+                </Typography>
+                <Typography>{classData && classData.grade.name}</Typography>
+              </Card>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <Card variant="outlined" sx={{ p: 2 }}>
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-              >
-                Teacher
-              </Typography>
-              <Typography>
-                {details ? details.teacherName : "No teacher assigned"}
-              </Typography>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card variant="outlined" sx={{ p: 2 }}>
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-              >
-                Grade
-              </Typography>
-              <Typography>{details && details.grade}</Typography>
-            </Card>
-          </Grid>
-        </Grid>
+        </Paper>
       </Box>
       <Typography variant="h6" gutterBottom>
         Upcoming Assignments
       </Typography>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        {details &&
-          details.upcomingAssignments
+        {classData && classData.upcomingAssignments ? (
+          classData.upcomingAssignments
             .slice(0, 3)
             .map((detail, index, array) => (
               <Card
@@ -157,19 +163,22 @@ export default function ClassDetails() {
                   )}
                 </Stack>
               </Card>
-            ))}
+            ))
+        ) : (
+          <p>No upcoming assignments</p>
+        )}
       </Paper>
       <Grid container justifyContent="space-between" alignItems="center">
         <Typography variant="h6" gutterBottom>
           Students
         </Typography>
-        {details && <UpdateClassStudentsDialog classDetails={details} />}
+        {classData && <UpdateClassStudentsDialog classDetails={classData} />}
       </Grid>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Box sx={{ width: "100%" }}>
-          {details && (
+          {classData && classData.activeStudents ? (
             <DataGrid
-              rows={details.activeStudents}
+              rows={classData.activeStudents}
               columns={columns}
               initialState={{
                 pagination: {
@@ -183,6 +192,8 @@ export default function ClassDetails() {
               disableRowSelectionOnClick
               density="compact"
             />
+          ) : (
+            <p>No active students data available</p>
           )}
         </Box>
       </Paper>

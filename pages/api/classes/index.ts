@@ -1,20 +1,23 @@
 import { getDBClient } from "../../../lib/db-connector";
-import { NextApiRequest, NextApiResponse } from "next";
-import { Schedule } from "./[class_id]/schedules";
 import { Assignment } from "../assignments";
+import { Grade } from "../persons/students/grades";
+import { NextApiRequest, NextApiResponse } from "next";
+import { parseClass } from "../../../utils/apiUtils";
 import { Person } from "../persons";
+import { Schedule } from "./[class_id]/schedules";
+import { Staff } from "../persons/staffs";
 
 export interface Class {
   id: number;
-  className: string;
-  teacherName: string;
-  grade: string;
-  capacity: string;
-  studentCount: number;
+  name: string;
+  teacher: Staff;
+  grade: Grade;
   schedules: Schedule[];
-  activeStudents: Person[];
-  upcomingAssignments: Assignment[];
-  pastAssignments: Assignment[];
+  capacity: string;
+  studentCount?: number;
+  activeStudents?: Person[];
+  upcomingAssignments?: Assignment[];
+  pastAssignments?: Assignment[];
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -23,12 +26,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const query = {
       text: `
         SELECT
-          c.id,
-          c.name AS "className",
-          g.name AS "grade",
+          c.id AS class_id,
+          c.name AS class_name,
           c.capacity,
-          COUNT(cs.id) AS "studentCount",
-          p.name AS "teacherName",
+          c.teacher_id,
+          g.id AS grade_id,
+          g.name AS grade_name,
+          COUNT(cs.id) AS student_count,
+          p.*,
+          sr.id AS staff_role_id,
+          sr.name AS staff_role_name,
           (
             SELECT JSON_AGG(
               JSON_BUILD_OBJECT(
@@ -46,13 +53,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         JOIN person AS p ON s.person_id = p.id
         JOIN grade AS g ON c.grade_id = g.id
         LEFT JOIN class_student AS cs ON c.id = cs.class_id AND cs.active = true
+        -- Join staff_role to staff using role_id
+        LEFT JOIN staff_role AS sr ON s.role_id = sr.id
         WHERE c.active = true
-        GROUP BY c.id, c.name, g.name, c.capacity, p.name
+        GROUP BY c.id, c.name, g.id, g.name, c.capacity, p.id, sr.id, sr.name
         ORDER BY c.id;
       `,
     };
     const result = await client.query(query);
-    res.status(200).json(result.rows as Class[]);
+    res.status(200).json(result.rows.map(parseClass));
   } catch (error) {
     console.error("Error retrieving classes", error);
     res.status(500).json({ message: "Internal server error" });

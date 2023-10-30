@@ -19,9 +19,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           schedule.start_time AS "startTime", 
           schedule.end_time AS "endTime,
         FROM
-            schedule
+          schedule
         INNER JOIN
-            class ON class.id = schedule.class_id
+          class ON class.id = schedule.class_id
         WHERE class.id = $1;
         `,
     };

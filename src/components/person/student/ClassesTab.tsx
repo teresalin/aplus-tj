@@ -13,9 +13,9 @@ import useSWR from "swr";
 const ClassesTab = ({ id }) => {
   const theme = useTheme();
   const { data } = useSWR(`/api/persons/students/${id}/classes`, fetcher);
-  const details = data || [];
+  const classes = data || [];
 
-  if (!details) {
+  if (!classes) {
     return <CircularProgress />;
   }
 
@@ -39,13 +39,13 @@ const ClassesTab = ({ id }) => {
 
   return (
     <>
-      {details.map((detail) => (
+      {classes.map((classData) => (
         <>
           <Stack direction="row" alignItems="center">
             <Typography variant="h6" gutterBottom mr={1}>
-              {detail.className}
+              {classData.name}
             </Typography>
-            <Box sx={{ pb: "7px" }}>{renderChip(detail.active)}</Box>
+            <Box sx={{ pb: "7px" }}>{renderChip(classData.active)}</Box>
           </Stack>
           <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
             <Grid container spacing={3}>
@@ -56,7 +56,7 @@ const ClassesTab = ({ id }) => {
                 >
                   Started On
                 </Typography>
-                <Typography variant="body2">{detail.startDate}</Typography>
+                <Typography variant="body2">{classData.startDate}</Typography>
               </Grid>
               <Grid item sm={12} md={4}>
                 <Typography
@@ -65,7 +65,7 @@ const ClassesTab = ({ id }) => {
                 >
                   Ended On
                 </Typography>
-                <Typography variant="body2">{detail.endDate}</Typography>
+                <Typography variant="body2">{classData.endDate}</Typography>
               </Grid>
               <Grid item sm={12} md={4}>
                 <Typography
@@ -74,7 +74,7 @@ const ClassesTab = ({ id }) => {
                 >
                   Recent Attendance
                 </Typography>
-                {detail.sessionDates.map((date) => (
+                {classData.sessionDates.map((date) => (
                   <Typography variant="body2">{date}</Typography>
                 ))}
               </Grid>
