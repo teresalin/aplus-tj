@@ -26,10 +26,10 @@ import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
 const dayOfWeek = [
   "Monday",
   "Tuesday",
-  // "Wednesday",
-  // "Thursday",
-  // "Friday",
-  // "Saturday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
   "Sunday",
 ];
 
@@ -50,8 +50,8 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
   const [updatedSchedules, setUpdatedSchedules] = React.useState(
     classDetails.schedules
   );
-  const { data } = useSWR(open ? "/api/staffs" : null, fetcher);
-  const staffs = data as Person[] | null;
+  const { data } = useSWR(open ? "/api/persons/staffs" : null, fetcher);
+  const staffs = (data as Person[]) || [];
 
   const handleClickOpen = () => {
     setOpen(true);

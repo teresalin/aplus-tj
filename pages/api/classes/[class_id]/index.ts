@@ -9,14 +9,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const query = {
       text: `
-        WITH ActiveStudentCounts AS
-        (
-          SELECT class_id, COUNT(*) AS active_student_count
-          FROM class_student
-          WHERE active = TRUE
-          GROUP BY class_id
-        )
-        
         SELECT 
           c.id,
           c.name AS class_name,
@@ -24,53 +16,56 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           g.name AS grade_name,
           c.capacity,
           p.*,
-          COALESCE(active_counts.active_student_count, 0) AS student_count,
           json_build_object(
-              'Monday', json_build_object('startTime', COALESCE(schedules1.start_time, '00:00:00'), 'endTime', COALESCE(schedules1.end_time, '00:00:00')),
-              'Tuesday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
-              'Sunday', json_build_object('startTime', COALESCE(schedules7.start_time, '00:00:00'), 'endTime', COALESCE(schedules7.end_time, '00:00:00'))
-          ) AS "schedules",
+            'Monday', json_build_object('startTime', COALESCE(schedules1.start_time, '00:00:00'), 'endTime', COALESCE(schedules1.end_time, '00:00:00')),
+            'Tuesday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
+            'Wednesday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
+            'Thursday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
+            'Friday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
+            'Saturday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
+            'Sunday', json_build_object('startTime', COALESCE(schedules7.start_time, '00:00:00'), 'endTime', COALESCE(schedules7.end_time, '00:00:00'))
+          ) AS schedules,
           (
-              SELECT json_agg(
-                  json_build_object(
-                      'id', p.id,
-                      'name', p.name,
-                      'gender', p.gender,
-                      'phone', p.phone,
-                      'email', p.email,
-                      'dateOfBirth', p.date_of_birth,
-                      'notes', p.notes,
-                      'joinDate', s.join_date,
-                      'leaveDate', s.leave_date,
-                      'active', p.active,
-                      'englishName', s.english_name,
-                      'currentSchool', s.current_school,
-                      'textbookPublisher', s.textbook_publisher,
-                      'startDate', cs.start_date -- Add startDate field
-                  )
+            SELECT json_agg(
+              json_build_object(
+                'id', p.id,
+                'name', p.name,
+                'gender', p.gender,
+                'phone', p.phone,
+                'email', p.email,
+                'dateOfBirth', p.date_of_birth,
+                'notes', p.notes,
+                'joinDate', s.join_date,
+                'leaveDate', s.leave_date,
+                'active', p.active,
+                'englishName', s.english_name,
+                'currentSchool', s.current_school,
+                'textbookPublisher', s.textbook_publisher,
+                'startDate', cs.start_date -- Add startDate field
               )
-              FROM class_student AS cs
-              JOIN student AS s ON cs.student_id = s.id
-              JOIN person AS p ON s.person_id = p.id
-              WHERE cs.class_id = c.id
-              AND cs.active = TRUE
+            )
+            FROM class_student AS cs
+            JOIN student AS s ON cs.student_id = s.id
+            JOIN person AS p ON s.person_id = p.id
+            WHERE cs.class_id = c.id
+            AND cs.active = TRUE
           ) AS active_students,
           (
-              SELECT json_agg(
-                  json_build_object(
-                      'id', a.id,
-                      'classId', ca.class_id,
-                      'assignmentName', a.name,
-                      'description', a.description,
-                      'dueDate', a.due_date,
-                      'timeCreated', a.time_created
-                  ) ORDER BY a.due_date -- Order by due_date here
-              )
-              FROM class_assignment AS ca
-              JOIN assignment AS a ON ca.assignment_id = a.id
-              WHERE ca.class_id = c.id
-              AND a.due_date <= current_date 
-              AND a.due_date >= current_date - interval '1 month'
+            SELECT json_agg(
+              json_build_object(
+                  'id', a.id,
+                  'classId', ca.class_id,
+                  'assignmentName', a.name,
+                  'description', a.description,
+                  'dueDate', a.due_date,
+                  'timeCreated', a.time_created
+              ) ORDER BY a.due_date -- Order by due_date here
+            )
+            FROM class_assignment AS ca
+            JOIN assignment AS a ON ca.assignment_id = a.id
+            WHERE ca.class_id = c.id
+            AND a.due_date <= current_date 
+            AND a.due_date >= current_date - interval '1 month'
           ) AS past_assignments,
           (
             SELECT COALESCE(json_agg(
@@ -96,9 +91,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         AND schedules1.day_of_week = 'Monday'
         LEFT JOIN schedule AS schedules2 ON c.id = schedules2.class_id
         AND schedules2.day_of_week = 'Tuesday'
+        LEFT JOIN schedule AS schedules3 ON c.id = schedules3.class_id
+        AND schedules3.day_of_week = 'Wednesday'
+        LEFT JOIN schedule AS schedules4 ON c.id = schedules4.class_id
+        AND schedules4.day_of_week = 'Thursday'
+        LEFT JOIN schedule AS schedules5 ON c.id = schedules5.class_id
+        AND schedules5.day_of_week = 'Friday'
+        LEFT JOIN schedule AS schedules6 ON c.id = schedules6.class_id
+        AND schedules6.day_of_week = 'Saturday'
         LEFT JOIN schedule AS schedules7 ON c.id = schedules7.class_id
         AND schedules7.day_of_week = 'Sunday'
-        LEFT JOIN ActiveStudentCounts AS active_counts ON c.id = active_counts.class_id
         WHERE c.id = $1
         GROUP BY 
           c.id,
@@ -108,11 +110,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           c.capacity,
           p.id,
           p.name,
-          active_counts.active_student_count,
           schedules1.start_time,
           schedules1.end_time,
           schedules2.start_time,
           schedules2.end_time,
+          schedules3.start_time,
+          schedules3.end_time,
+          schedules4.start_time,
+          schedules4.end_time,
+          schedules5.start_time,
+          schedules5.end_time,
+          schedules6.start_time,
+          schedules6.end_time,
           schedules7.start_time,
           schedules7.end_time
         ORDER BY c.id;
