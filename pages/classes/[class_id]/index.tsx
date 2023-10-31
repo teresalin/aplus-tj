@@ -18,6 +18,7 @@ import { Class } from "../../api/classes";
 import fetcher from "../../../utils/fetcher";
 import UpdateClassDetailsDialog from "../../../src/components/class/UpdateClassDetailsDialog";
 import UpdateClassStudentsDialog from "../../../src/components/class/UpdateClassStudentsDialog";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const columns: GridColDef[] = [
   {
@@ -56,147 +57,153 @@ export default function ClassDetails() {
   const theme = useTheme();
   const classID = useRouter().query.class_id;
   const { data } = useSWR(classID ? `/api/classes/${classID}` : null, fetcher);
-  const classData = data || [];
+  const classData = data as Class;
+
+  console.log(classData);
+
+  if (!classData) return <CircularProgress />;
 
   return (
-    <>
-      <Box mt={-1} mb={2}>
-        <Button
-          component={Link}
-          href="/classes"
-          startIcon={<ArrowBackIosIcon />}
-          sx={{
-            "&:hover": {
-              backgroundColor: "transparent",
-            },
-          }}
-        >
-          Back
-        </Button>
-      </Box>
-      <Box mb={2}>
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Typography variant="h6" gutterBottom>
-            Details
-          </Typography>
-          {classData && <UpdateClassDetailsDialog classDetails={classData} />}
-        </Grid>
-        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-          <Grid
-            container
-            rowSpacing={0}
-            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+    classData && (
+      <>
+        <Box mt={-1} mb={2}>
+          <Button
+            component={Link}
+            href="/classes"
+            startIcon={<ArrowBackIosIcon />}
+            sx={{
+              "&:hover": {
+                backgroundColor: "transparent",
+              },
+            }}
           >
-            <Grid item xs={12} md={4}>
-              <Card variant="outlined" sx={{ p: 2 }}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                >
-                  Schedule
-                </Typography>
-                <Typography>MWF</Typography>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Card variant="outlined" sx={{ p: 2 }}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                >
-                  Teacher
-                </Typography>
-                <Typography>
-                  {classData ? classData.teacherName : "No teacher assigned"}
-                </Typography>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Card variant="outlined" sx={{ p: 2 }}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                >
-                  Grade
-                </Typography>
-                <Typography>{classData && classData.grade.name}</Typography>
-              </Card>
-            </Grid>
+            Back
+          </Button>
+        </Box>
+        <Box mb={2}>
+          <Grid container justifyContent="space-between" alignItems="center">
+            <Typography variant="h6" gutterBottom>
+              Details
+            </Typography>
+            {classData && <UpdateClassDetailsDialog classDetails={classData} />}
           </Grid>
-        </Paper>
-      </Box>
-      <Typography variant="h6" gutterBottom>
-        Upcoming Assignments
-      </Typography>
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        {classData && classData.upcomingAssignments ? (
-          classData.upcomingAssignments
-            .slice(0, 3)
-            .map((detail, index, array) => (
-              <Card
-                style={{
-                  display: "flex",
-                  backgroundColor: "#f8f6fc",
-                  marginBottom: index < array.length - 1 ? "1em" : "0",
-                  boxShadow: "none",
-                  height: "4.4em",
-                  padding: "0.8em",
-                }}
-              >
-                <Button
-                  sx={{
-                    backgroundColor: "#59addd",
-                    color: "#fff",
-                    // margin: 10,
-                    mr: 2,
+          <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+            <Grid
+              container
+              rowSpacing={0}
+              columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+            >
+              <Grid item xs={12} md={4}>
+                <Card variant="outlined" sx={{ p: 2 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                  >
+                    Schedule
+                  </Typography>
+                  <Typography>MWF</Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Card variant="outlined" sx={{ p: 2 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                  >
+                    Teacher
+                  </Typography>
+                  <Typography>
+                    {classData ? classData.teacher.name : "No teacher assigned"}
+                  </Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Card variant="outlined" sx={{ p: 2 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                  >
+                    Grade
+                  </Typography>
+                  <Typography>{classData && classData.grade.name}</Typography>
+                </Card>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Box>
+        <Typography variant="h6" gutterBottom>
+          Upcoming Assignments
+        </Typography>
+        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+          {classData && classData.upcomingAssignments ? (
+            classData.upcomingAssignments
+              .slice(0, 3)
+              .map((detail, index, array) => (
+                <Card
+                  style={{
+                    display: "flex",
+                    backgroundColor: "#f8f6fc",
+                    marginBottom: index < array.length - 1 ? "1em" : "0",
+                    boxShadow: "none",
+                    height: "4.4em",
+                    padding: "0.8em",
                   }}
                 >
-                  {dayjs(detail.dueDate).format("MMM DD")}
-                </Button>
-                {/* <AssignmentStyledCardContent> */}
-                <Stack direction="column" justifyContent="center">
-                  <Typography>{detail.assignmentName}</Typography>
-                  {detail.description && (
-                    <Typography variant="subtitle2" sx={{ color: "#808080" }}>
-                      {detail.description}
-                    </Typography>
-                  )}
-                </Stack>
-              </Card>
-            ))
-        ) : (
-          <p>No upcoming assignments</p>
-        )}
-      </Paper>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Typography variant="h6" gutterBottom>
-          Students
-        </Typography>
-        {classData && <UpdateClassStudentsDialog classDetails={classData} />}
-      </Grid>
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Box sx={{ width: "100%" }}>
-          {classData && classData.activeStudents ? (
-            <DataGrid
-              rows={classData.activeStudents}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: {
-                    pageSize: 5,
-                  },
-                },
-              }}
-              autoHeight={true}
-              pageSizeOptions={[5]}
-              disableRowSelectionOnClick
-              density="compact"
-            />
+                  <Button
+                    sx={{
+                      backgroundColor: "#59addd",
+                      color: "#fff",
+                      // margin: 10,
+                      mr: 2,
+                    }}
+                  >
+                    {dayjs(detail.dueDate).format("MMM DD")}
+                  </Button>
+                  {/* <AssignmentStyledCardContent> */}
+                  <Stack direction="column" justifyContent="center">
+                    <Typography>{detail.assignmentName}</Typography>
+                    {detail.description && (
+                      <Typography variant="subtitle2" sx={{ color: "#808080" }}>
+                        {detail.description}
+                      </Typography>
+                    )}
+                  </Stack>
+                </Card>
+              ))
           ) : (
-            <p>No active students data available</p>
+            <p>No upcoming assignments</p>
           )}
-        </Box>
-      </Paper>
-    </>
+        </Paper>
+        <Grid container justifyContent="space-between" alignItems="center">
+          <Typography variant="h6" gutterBottom>
+            Students
+          </Typography>
+          {classData && <UpdateClassStudentsDialog classDetails={classData} />}
+        </Grid>
+        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+          <Box sx={{ width: "100%" }}>
+            {classData && classData.activeStudents ? (
+              <DataGrid
+                rows={classData.activeStudents}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 5,
+                    },
+                  },
+                }}
+                autoHeight={true}
+                pageSizeOptions={[5]}
+                disableRowSelectionOnClick
+                density="compact"
+              />
+            ) : (
+              <p>No active students data available</p>
+            )}
+          </Box>
+        </Paper>
+      </>
+    )
   );
 }

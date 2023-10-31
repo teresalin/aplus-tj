@@ -73,5 +73,8 @@ export function parseClass(row: any): Class {
     schedules: row.schedules,
     capacity: row.capacity,
     studentCount: row.student_count,
+    activeStudents: row.active_students,
+    upcomingAssignments: row.upcoming_assignments,
+    pastAssignments: row.past_assignments,
   };
 }
