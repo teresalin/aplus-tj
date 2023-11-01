@@ -161,7 +161,9 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={hasSchedule(classDetails.schedules[day])}
+                            checked={updatedSchedules.find(
+                              (schedule) => schedule.dayOfWeek === day
+                            )}
                           />
                         }
                         label={day}
@@ -173,8 +175,15 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
                         slotProps={{ textField: { size: "small" } }}
                         value={
                           updatedSchedules &&
-                          updatedSchedules[day].startTime !== "00:00:00"
-                            ? dayjs(updatedSchedules[day].startTime, "HH:mm:ss")
+                          updatedSchedules.find(
+                            (schedule) => schedule.dayOfWeek === day
+                          )
+                            ? dayjs(
+                                updatedSchedules.find(
+                                  (schedule) => schedule.dayOfWeek === day
+                                )?.startTime,
+                                "HH:mm:ss"
+                              )
                             : null
                         }
                         onChange={(newValue: Dayjs | null) =>
@@ -186,10 +195,18 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
                       <TimePicker
                         label="End Time"
                         slotProps={{ textField: { size: "small" } }}
+                        defaultValue={null}
                         value={
                           updatedSchedules &&
-                          updatedSchedules[day].endTime !== "00:00:00"
-                            ? dayjs(updatedSchedules[day].endTime, "HH:mm:ss")
+                          updatedSchedules.find(
+                            (schedule) => schedule.dayOfWeek === day
+                          )
+                            ? dayjs(
+                                updatedSchedules.find(
+                                  (schedule) => schedule.dayOfWeek === day
+                                )?.endTime,
+                                "HH:mm:ss"
+                              )
                             : null
                         }
                         onChange={(newValue: Dayjs | null) =>

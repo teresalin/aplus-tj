@@ -10,14 +10,13 @@ import { Staff } from "../persons/staffs";
 export interface Class {
   id: number;
   name: string;
-  teacher: Staff;
+  teacher: Partial<Staff>;
   grade: Grade;
   schedules: Schedule[];
-  capacity: string;
+  capacity: number;
   studentCount?: number;
   activeStudents?: Person[];
-  upcomingAssignments?: Assignment[];
-  pastAssignments?: Assignment[];
+  assignments?: Assignment[];
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -53,7 +52,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         JOIN person AS p ON s.person_id = p.id
         JOIN grade AS g ON c.grade_id = g.id
         LEFT JOIN class_student AS cs ON c.id = cs.class_id AND cs.active = true
-        -- Join staff_role to staff using role_id
         LEFT JOIN staff_role AS sr ON s.role_id = sr.id
         WHERE c.active = true
         GROUP BY c.id, c.name, g.id, g.name, c.capacity, p.id, sr.id, sr.name

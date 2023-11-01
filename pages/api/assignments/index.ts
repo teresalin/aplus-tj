@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../lib/db-connector";
+import { Class } from "../classes";
 
 export interface Assignment {
   id: number;
-  classId: number;
-  className: string;
-  assignmentName: string;
+  classInfo: Partial<Class>;
+  name: string;
   description: string;
   dueDate: Date;
   created: Date;
@@ -14,9 +14,11 @@ export interface Assignment {
 function parseAssignment(row: any): Assignment {
   return {
     id: row.id,
-    classId: row.class_id,
-    className: row.class_name,
-    assignmentName: row.assignment_name,
+    classInfo: {
+      id: row.class_id,
+      name: row.class_name,
+    },
+    name: row.assignment_name,
     description: row.description,
     dueDate: row.due_date,
     created: row.time_created,

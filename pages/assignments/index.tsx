@@ -181,7 +181,7 @@ export default function AssignmentGrid() {
       flex: 1,
     },
     {
-      field: "assignmentName",
+      field: "name",
       headerName: "Assignment Name",
       minWidth: 200,
       flex: 1,
@@ -191,6 +191,7 @@ export default function AssignmentGrid() {
       headerName: "Class Name",
       minWidth: 150,
       flex: 1,
+      valueGetter: (params) => params.row?.classInfo?.name,
     },
     {
       field: "description",

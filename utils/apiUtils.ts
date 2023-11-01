@@ -50,21 +50,8 @@ export function parseClass(row: any): Class {
     id: row.class_id,
     name: row.class_name,
     teacher: {
-      id: row.id,
+      staffId: row.staff_id,
       name: row.name,
-      gender: row.gender,
-      phone: row.phone,
-      email: row.email,
-      dateOfBirth: row.date_of_birth,
-      notes: row.notes,
-      active: row.active,
-      staffId: row.teacher_id,
-      role: {
-        id: row.staff_role_id,
-        name: row.staff_role_name,
-      },
-      joinDate: row.join_date,
-      leaveDate: row.leave_date,
     },
     grade: {
       id: row.grade_id,
@@ -74,7 +61,6 @@ export function parseClass(row: any): Class {
     capacity: row.capacity,
     studentCount: row.student_count,
     activeStudents: row.active_students,
-    upcomingAssignments: row.upcoming_assignments,
-    pastAssignments: row.past_assignments,
+    assignments: row.assignments,
   };
 }

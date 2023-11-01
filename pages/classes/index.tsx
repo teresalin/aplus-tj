@@ -3,7 +3,6 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import Button from "@mui/material/Button";
 import ChildCareIcon from "@mui/icons-material/ChildCare";
 import CircularProgress from "@mui/material/CircularProgress";
-import EditIcon from "@mui/icons-material/Edit";
 import Grid from "@mui/material/Grid";
 import Link from "next/link";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
@@ -16,8 +15,6 @@ import { Class } from "../api/classes";
 import { Schedule } from "../api/classes/[class_id]/schedules";
 import fetcher from "../../utils/fetcher";
 import Paper from "@mui/material/Paper";
-import CreateClassDialog from "../../src/components/class/CreateClassDialog";
-import IconButton from "@mui/material/IconButton";
 
 function AddIconButton({ onClick }) {
   return (
@@ -32,30 +29,30 @@ function AddIconButton({ onClick }) {
   );
 }
 
+function formatDaysOfWeek(schedules: Schedule[]): string {
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+  const selectedDays = schedules.map((schedule) => schedule.dayOfWeek);
+
+  // Create an array of abbreviations for selected days
+  const abbreviations = daysOfWeek
+    .filter((day) => selectedDays.includes(day))
+    .map((day) => day.substring(0, 1));
+
+  return abbreviations.join("");
+}
+
 export default function Classes() {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const { data } = useSWR("api/classes", fetcher);
   const classes = data || [];
-
-  function formatDaysOfWeek(schedules: Schedule[]): string {
-    const daysOfWeek = [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday",
-    ];
-    const selectedDays = schedules.map((schedule) => schedule.dayOfWeek);
-
-    // Create an array of abbreviations for selected days
-    const abbreviations = daysOfWeek
-      .filter((day) => selectedDays.includes(day))
-      .map((day) => day.substring(0, 1));
-
-    return abbreviations.join("");
-  }
 
   const handleAddButtonClick = () => {
     setDialogOpen(true);

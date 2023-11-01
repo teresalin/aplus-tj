@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../../lib/db-connector";
-import { Class } from "..";
 import { parseClass } from "../../../../utils/apiUtils";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -12,19 +11,22 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         SELECT 
           c.id,
           c.name AS class_name,
+          c.capacity,
           g.id AS grade_id,
           g.name AS grade_name,
-          c.capacity,
-          p.*,
-          json_build_object(
-            'Monday', json_build_object('startTime', COALESCE(schedules1.start_time, '00:00:00'), 'endTime', COALESCE(schedules1.end_time, '00:00:00')),
-            'Tuesday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
-            'Wednesday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
-            'Thursday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
-            'Friday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
-            'Saturday', json_build_object('startTime', COALESCE(schedules2.start_time, '00:00:00'), 'endTime', COALESCE(schedules2.end_time, '00:00:00')),
-            'Sunday', json_build_object('startTime', COALESCE(schedules7.start_time, '00:00:00'), 'endTime', COALESCE(schedules7.end_time, '00:00:00'))
-          ) AS schedules,
+          p.name,
+          s.id AS staff_id,
+          (
+            SELECT JSON_AGG(
+              JSON_BUILD_OBJECT(
+                'dayOfWeek', schedule.day_of_week,
+                'startTime', schedule.start_time,
+                'endTime', schedule.end_time
+              )
+            )
+            FROM schedule
+            WHERE schedule.class_id = c.id
+          ) AS schedules,      
           (
             SELECT json_agg(
               json_build_object(
@@ -53,36 +55,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           (
             SELECT json_agg(
               json_build_object(
-                  'id', a.id,
-                  'classId', ca.class_id,
-                  'assignmentName', a.name,
-                  'description', a.description,
-                  'dueDate', a.due_date,
-                  'timeCreated', a.time_created
+                'id', a.id,
+                'classId', ca.class_id,
+                'name', a.name,
+                'description', a.description,
+                'dueDate', a.due_date,
+                'created', a.time_created
               ) ORDER BY a.due_date -- Order by due_date here
             )
             FROM class_assignment AS ca
             JOIN assignment AS a ON ca.assignment_id = a.id
             WHERE ca.class_id = c.id
-            AND a.due_date <= current_date 
-            AND a.due_date >= current_date - interval '1 month'
-          ) AS past_assignments,
-          (
-            SELECT COALESCE(json_agg(
-                json_build_object(
-                    'id', a.id,
-                    'classId', ca.class_id,
-                    'assignmentName', a.name,
-                    'description', a.description,
-                    'dueDate', a.due_date,
-                    'timeCreated', a.time_created
-                ) ORDER BY a.due_date
-            ), '[]'::json)
-            FROM class_assignment AS ca
-            JOIN assignment AS a ON ca.assignment_id = a.id
-            WHERE ca.class_id = c.id
-            AND a.due_date > current_date
-          ) AS upcoming_assignments
+            AND a.due_date >= current_date
+            LIMIT 5
+          ) AS assignments
         FROM class AS c
         JOIN staff AS s ON c.teacher_id = s.id
         JOIN person AS p ON s.person_id = p.id
@@ -105,11 +91,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         GROUP BY 
           c.id,
           c.name,
+          c.capacity,
           g.id,
           g.name,
-          c.capacity,
-          p.id,
           p.name,
+          s.id,
           schedules1.start_time,
           schedules1.end_time,
           schedules2.start_time,

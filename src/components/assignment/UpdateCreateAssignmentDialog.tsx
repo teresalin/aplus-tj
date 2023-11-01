@@ -15,7 +15,7 @@ import { Class } from "../../../pages/api/classes";
 import fetcher from "../../../utils/fetcher";
 import { DatePicker } from "@mui/x-date-pickers";
 
-export interface IEditAssignmentDialogProps {
+export interface IUpdateCreateAssignmentDialogProps {
   isUpdate: boolean;
   existingData: Assignment;
   open: boolean;
@@ -23,13 +23,13 @@ export interface IEditAssignmentDialogProps {
   onSubmit;
 }
 
-export default function EditAssignmentDialog({
+export default function UpdateCreateAssignmentDialog({
   isUpdate,
   existingData,
   open,
   onClose,
   onSubmit,
-}: IEditAssignmentDialogProps) {
+}: IUpdateCreateAssignmentDialogProps) {
   const [editedData, setEditedData] = React.useState(existingData);
   const { data } = useSWR("/api/classes", fetcher);
   const classes = data || [];
@@ -78,13 +78,13 @@ export default function EditAssignmentDialog({
                 type="text"
                 variant="outlined"
                 margin="dense"
-                value={editedData.assignmentName}
+                value={editedData.name || ""}
                 onChange={handleInputChange}
               />
               <DatePicker
                 label="Date of Birth"
                 format="YYYY-MM-DD"
-                value={editedData.dueDate ? dayjs(editedData.dueDate) : null}
+                value={editedData.dueDate && dayjs(editedData.dueDate)}
                 onChange={(date) => handleDateChange("dueDate", date)}
                 sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
                 slotProps={{
@@ -100,7 +100,7 @@ export default function EditAssignmentDialog({
                 name="classId"
                 label="Assign to a class"
                 margin="dense"
-                value={editedData.classId}
+                value={editedData.classInfo?.id || ""}
                 select
                 onChange={handleInputChange}
               >
@@ -119,7 +119,7 @@ export default function EditAssignmentDialog({
                 type="text"
                 variant="outlined"
                 margin="dense"
-                value={editedData.description}
+                value={editedData.description || ""}
                 onChange={handleInputChange}
                 multiline
                 maxRows={3}

@@ -19,6 +19,7 @@ import fetcher from "../../../utils/fetcher";
 import UpdateClassDetailsDialog from "../../../src/components/class/UpdateClassDetailsDialog";
 import UpdateClassStudentsDialog from "../../../src/components/class/UpdateClassStudentsDialog";
 import CircularProgress from "@mui/material/CircularProgress";
+import { Schedule } from "../../api/classes/[class_id]/schedules";
 
 const columns: GridColDef[] = [
   {
@@ -53,13 +54,31 @@ const columns: GridColDef[] = [
   },
 ];
 
+function formatDaysOfWeek(schedules: Schedule[]): string {
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+  const selectedDays = schedules.map((schedule) => schedule.dayOfWeek);
+
+  // Create an array of abbreviations for selected days
+  const abbreviations = daysOfWeek
+    .filter((day) => selectedDays.includes(day))
+    .map((day) => day.substring(0, 1));
+
+  return abbreviations.join("");
+}
+
 export default function ClassDetails() {
   const theme = useTheme();
   const classID = useRouter().query.class_id;
   const { data } = useSWR(classID ? `/api/classes/${classID}` : null, fetcher);
   const classData = data as Class;
-
-  console.log(classData);
 
   if (!classData) return <CircularProgress />;
 
@@ -101,7 +120,11 @@ export default function ClassDetails() {
                   >
                     Schedule
                   </Typography>
-                  <Typography>MWF</Typography>
+                  <Typography>
+                    {classData.schedules
+                      ? formatDaysOfWeek(classData.schedules)
+                      : "N/A"}
+                  </Typography>
                 </Card>
               </Grid>
               <Grid item xs={12} md={4}>
@@ -132,44 +155,42 @@ export default function ClassDetails() {
           </Paper>
         </Box>
         <Typography variant="h6" gutterBottom>
-          Upcoming Assignments
+          Assignments
         </Typography>
         <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-          {classData && classData.upcomingAssignments ? (
-            classData.upcomingAssignments
-              .slice(0, 3)
-              .map((detail, index, array) => (
-                <Card
-                  style={{
-                    display: "flex",
-                    backgroundColor: "#f8f6fc",
-                    marginBottom: index < array.length - 1 ? "1em" : "0",
-                    boxShadow: "none",
-                    height: "4.4em",
-                    padding: "0.8em",
+          {classData && classData.assignments ? (
+            classData.assignments.slice(0, 3).map((detail, index, array) => (
+              <Card
+                style={{
+                  display: "flex",
+                  backgroundColor: "#f8f6fc",
+                  marginBottom: index < array.length - 1 ? "1em" : "0",
+                  boxShadow: "none",
+                  height: "4.4em",
+                  padding: "0.8em",
+                }}
+              >
+                <Button
+                  sx={{
+                    backgroundColor: "#59addd",
+                    color: "#fff",
+                    // margin: 10,
+                    mr: 2,
                   }}
                 >
-                  <Button
-                    sx={{
-                      backgroundColor: "#59addd",
-                      color: "#fff",
-                      // margin: 10,
-                      mr: 2,
-                    }}
-                  >
-                    {dayjs(detail.dueDate).format("MMM DD")}
-                  </Button>
-                  {/* <AssignmentStyledCardContent> */}
-                  <Stack direction="column" justifyContent="center">
-                    <Typography>{detail.assignmentName}</Typography>
-                    {detail.description && (
-                      <Typography variant="subtitle2" sx={{ color: "#808080" }}>
-                        {detail.description}
-                      </Typography>
-                    )}
-                  </Stack>
-                </Card>
-              ))
+                  {dayjs(detail.dueDate).format("MMM DD")}
+                </Button>
+                {/* <AssignmentStyledCardContent> */}
+                <Stack direction="column" justifyContent="center">
+                  <Typography>{detail.name}</Typography>
+                  {detail.description && (
+                    <Typography variant="subtitle2" sx={{ color: "#808080" }}>
+                      {detail.description}
+                    </Typography>
+                  )}
+                </Stack>
+              </Card>
+            ))
           ) : (
             <p>No upcoming assignments</p>
           )}
