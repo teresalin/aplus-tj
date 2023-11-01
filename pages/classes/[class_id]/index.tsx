@@ -8,11 +8,12 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import dayjs from "dayjs";
 import Grid from "@mui/material/Grid";
+import EditIcon from "@mui/icons-material/Edit";
 import Link from "next/link";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 import { Class } from "../../api/classes";
 import fetcher from "../../../utils/fetcher";
@@ -77,8 +78,36 @@ function formatDaysOfWeek(schedules: Schedule[]): string {
 export default function ClassDetails() {
   const theme = useTheme();
   const classID = useRouter().query.class_id;
+  const [isEditDetailsDialogOpen, setIsEditDetailsDialogOpen] =
+    React.useState(false);
   const { data } = useSWR(classID ? `/api/classes/${classID}` : null, fetcher);
   const classData = data as Class;
+
+  const handleEditDetailsClick = () => {
+    setIsEditDetailsDialogOpen(true);
+  };
+
+  const handleCloseEditDetailsDialog = () => {
+    setIsEditDetailsDialogOpen(false);
+  };
+
+  // TODO function and mutate not working
+  const handleUpdateDetails = async (data) => {
+    const response = await fetch(`/api/classes/${data.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      setIsEditDetailsDialogOpen(false);
+      mutate(`/api/classes/${data.id}`);
+    } else {
+      console.error("Error updating class details:", response.statusText);
+    }
+  };
 
   if (!classData) return <CircularProgress />;
 
@@ -104,7 +133,14 @@ export default function ClassDetails() {
             <Typography variant="h6" gutterBottom>
               Details
             </Typography>
-            {classData && <UpdateClassDetailsDialog classDetails={classData} />}
+            <Button
+              variant="text"
+              color="primary"
+              startIcon={<EditIcon />}
+              onClick={handleEditDetailsClick}
+            >
+              Edit
+            </Button>
           </Grid>
           <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
             <Grid
@@ -224,6 +260,12 @@ export default function ClassDetails() {
             )}
           </Box>
         </Paper>
+        <UpdateClassDetailsDialog
+          existingData={classData}
+          open={isEditDetailsDialogOpen}
+          onClose={handleCloseEditDetailsDialog}
+          onSubmit={handleUpdateDetails}
+        />
       </>
     )
   );

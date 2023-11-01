@@ -8,20 +8,19 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import EditIcon from "@mui/icons-material/Edit";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
+import MenuItem from "@mui/material/MenuItem";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
 
-import fetcher from "../../../utils/fetcher";
+import { Class } from "../../../pages/api/classes";
 import { FormEvent, FormEventHandler } from "react";
 import { Person } from "../../../pages/api/persons";
-import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
+import { Staff } from "../../../pages/api/persons/staffs";
+import fetcher from "../../../utils/fetcher";
 
 const dayOfWeek = [
   "Monday",
@@ -43,90 +42,113 @@ function RedBar() {
   );
 }
 
-export default function UpdateClassDetailsDialog({ classDetails }) {
+export interface IUpdateexistingDataDialogProps {
+  existingData: Class;
+  open: boolean;
+  onClose;
+  onSubmit;
+}
+
+export default function UpdateCreateStudentDialog({
+  existingData,
+  open,
+  onClose,
+  onSubmit,
+}: IUpdateexistingDataDialogProps) {
   const classID = useRouter().query.class_id;
-  const [open, setOpen] = React.useState(false);
-  const [teacher, setTeacher] = React.useState(classDetails.teacherName);
+  const [editedData, setEditedData] = React.useState(existingData);
   const [updatedSchedules, setUpdatedSchedules] = React.useState(
-    classDetails.schedules
+    existingData.schedules
   );
   const { data } = useSWR(open ? "/api/persons/staffs" : null, fetcher);
-  const staffs = (data as Person[]) || [];
+  const teachers = (data as Person[]) || [];
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  console.log(updatedSchedules);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  React.useEffect(() => {
+    setEditedData(existingData);
+  }, [existingData]);
 
-  const handleTimeChange = (day: string, newValue) => {
-    setUpdatedSchedules((prevSchedules: any) => ({
-      ...prevSchedules,
-      [day]: {
-        ...prevSchedules[day],
-        startTime: newValue
-          ? dayjs(newValue).format("HH:mm:ss")
-          : dayjs().format("HH:mm:ss"),
-      },
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setEditedData((prevData) => ({
+      ...prevData!,
+      [name]: value,
     }));
   };
 
-  const handleTeacherChange = () => {};
-
-  const hasSchedule = (schedule: Schedule) => {
-    const emptyTime = "00:00:00";
-    if (schedule) {
-      return schedule.startTime !== emptyTime && schedule.endTime !== emptyTime;
-    }
-    return false;
+  const handleGradeChange = (
+    event: React.ChangeEvent<{ name: string; value: unknown }>
+  ) => {
+    const { name, value } = event.target;
+    setEditedData((prevData) => ({
+      ...prevData,
+      grade: { id: value as number, name: name },
+    }));
   };
 
-  const handleSubmit: FormEventHandler = async (event: FormEvent) => {
-    // event.preventDefault();
+  const handleSwitchChange = (day: string) => {
+    setUpdatedSchedules((prevSchedules) => {
+      const existingScheduleIndex = prevSchedules.findIndex(
+        (schedule) => schedule.dayOfWeek === day
+      );
 
-    const target = event.target as typeof event.target & {
-      name: { value: string };
-      capacity: { value: string };
-    };
-
-    const data = {
-      name: target.name.value,
-      capacity: target.capacity.value,
-    };
-
-    try {
-      const response = await fetch(`/api/classes/${classID}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        // Handle success
-        handleClose;
+      if (existingScheduleIndex === -1) {
+        // If the schedule doesn't exist, add a new schedule with default values
+        const newSchedule = {
+          dayOfWeek: day,
+          startTime: "",
+          endTime: "",
+        };
+        return [...prevSchedules, newSchedule];
       } else {
-        // Handle error
+        // If the schedule exists, remove it
+        return prevSchedules.filter((schedule) => schedule.dayOfWeek !== day);
       }
-    } catch (error) {
-      // Handle fetch error
+    });
+  };
+
+  const handleTimeChange = (field, day: string, newValue) => {
+    setUpdatedSchedules((prevSchedules) => {
+      return prevSchedules.map((schedule) => {
+        if (schedule.dayOfWeek === day) {
+          return {
+            ...schedule,
+            [field]: newValue ? dayjs(newValue).format("HH:mm:ss") : "00:00:00",
+          };
+        }
+        return schedule;
+      });
+    });
+  };
+
+  // custom validation is required since form is unable to detected the required field in TimePicker
+  function hasEmptyOrInvalidTimeValues() {
+    return updatedSchedules.some(
+      (schedule) =>
+        !schedule.startTime ||
+        !schedule.endTime ||
+        schedule.startTime === "Invalid Date" ||
+        schedule.endTime === "Invalid Date"
+    );
+  }
+
+  // TODO fix submit
+  const handleSubmit: FormEventHandler = (event: FormEvent) => {
+    event.preventDefault();
+
+    if (hasEmptyOrInvalidTimeValues()) {
+      // Display an error message to the user
+      alert("Please fill out all time values.");
+    } else {
+      // Proceed with the form submission
+      onSubmit(editedData);
     }
   };
 
   return (
     <div>
-      <Button
-        variant="text"
-        color="primary"
-        startIcon={<EditIcon />}
-        onClick={handleClickOpen}
-      >
-        Edit
-      </Button>
-      <Dialog disablePortal open={open} onClose={handleClose}>
+      <Dialog disablePortal open={open} onClose={onClose}>
         <form onSubmit={handleSubmit}>
           <DialogTitle>Update Class Details</DialogTitle>
           <DialogContent>
@@ -137,9 +159,10 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
               required
               margin="dense"
               id="name"
+              name="name"
               label="Class Name"
               type="text"
-              defaultValue={classDetails ? classDetails.name : null}
+              defaultValue={editedData.name || ""}
               fullWidth
               variant="outlined"
             />
@@ -147,9 +170,9 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
             <Typography variant="body2" display="block">
               Schedule
             </Typography>
-            <Grid container spacing={1}>
-              {classDetails &&
-                dayOfWeek.map((day) => (
+            {existingData &&
+              dayOfWeek.map((day) => (
+                <Box key={day} my={1}>
                   <Grid
                     container
                     item
@@ -161,9 +184,12 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={updatedSchedules.find(
-                              (schedule) => schedule.dayOfWeek === day
+                            checked={Boolean(
+                              updatedSchedules.find(
+                                (schedule) => schedule.dayOfWeek === day
+                              )
                             )}
+                            onChange={() => handleSwitchChange(day)}
                           />
                         }
                         label={day}
@@ -187,15 +213,18 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
                             : null
                         }
                         onChange={(newValue: Dayjs | null) =>
-                          handleTimeChange(day, newValue)
+                          handleTimeChange("startTime", day, newValue)
                         }
                       />
                     </Grid>
                     <Grid item xs={12} md={4}>
                       <TimePicker
                         label="End Time"
-                        slotProps={{ textField: { size: "small" } }}
-                        defaultValue={null}
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                          },
+                        }}
                         value={
                           updatedSchedules &&
                           updatedSchedules.find(
@@ -210,34 +239,35 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
                             : null
                         }
                         onChange={(newValue: Dayjs | null) =>
-                          handleTimeChange(day, newValue)
+                          handleTimeChange("endTime", day, newValue)
                         }
                       />
                     </Grid>
                   </Grid>
-                ))}
-            </Grid>
+                </Box>
+              ))}
             <RedBar />
             <Typography variant="body2" display="block">
               Teacher
             </Typography>
-            {/* TODO fix default value */}
-            <Select
-              fullWidth
-              // labelId="demo-simple-select-label"
+            <TextField
               id="teacher"
-              value={teacher}
-              label="Teacher"
-              displayEmpty
-              onChange={handleTeacherChange}
+              name="teacher"
+              label="Select a teacher"
+              margin="dense"
+              required
+              select
+              fullWidth
+              value={editedData.teacher?.staffId || ""}
+              onChange={handleGradeChange}
             >
-              {staffs &&
-                staffs.map((staff: Person) => (
-                  <MenuItem key={staff.id} value={staff.id}>
-                    {staff.name}
+              {teachers &&
+                teachers.map((teacher: Staff) => (
+                  <MenuItem key={teacher.id} value={teacher.id}>
+                    {teacher.name}
                   </MenuItem>
                 ))}
-            </Select>
+            </TextField>
             <RedBar />
             <Typography variant="body2" display="block">
               Capacity
@@ -250,12 +280,12 @@ export default function UpdateClassDetailsDialog({ classDetails }) {
               type="number"
               fullWidth
               variant="outlined"
-              value={classDetails.capacity}
+              value={editedData.capacity || 0}
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button autoFocus type="submit">
+            <Button onClick={onClose}>Cancel</Button>
+            <Button autoFocus type="submit" onClick={handleSubmit}>
               Submit
             </Button>
           </DialogActions>

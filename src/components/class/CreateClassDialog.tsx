@@ -31,10 +31,10 @@ export interface ICreateClassDialogProps {
 const dayOfWeek = [
   "Monday",
   "Tuesday",
-  // "Wednesday",
-  // "Thursday",
-  // "Friday",
-  // "Saturday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
   "Sunday",
 ];
 

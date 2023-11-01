@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../../lib/db-connector";
 
 export interface Schedule {
-  id: number;
+  id?: number;
   dayOfWeek: string;
   startTime: string;
   endTime: string;
