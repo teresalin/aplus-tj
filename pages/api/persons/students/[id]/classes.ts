@@ -13,20 +13,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           class_student.end_date AS "endDate",
           class_student.active,
           (
-            SELECT array_agg(session_date ORDER BY session_date DESC)
+            SELECT array_agg(DISTINCT session_date ORDER BY session_date DESC)
             FROM (
-              SELECT session_date
-              FROM class_student
-              INNER JOIN student ON class_student.student_id = student.id
+              SELECT 
+                session_date
+              FROM attendance
+              INNER JOIN student ON attendance.student_id = student.id
               INNER JOIN person ON student.person_id = person.id
-              INNER JOIN class ON class_student.class_id = class.id
-              INNER JOIN session ON class.id = session.class_id
-              INNER JOIN attendance ON session.id = attendance.session_id
-              WHERE person.id = $1 AND class.id = class_student.class_id
+              INNER JOIN session ON attendance.session_id = session.id
+              INNER JOIN class ON session.class_id = class.id
+              WHERE person.id = $1
               ORDER BY session_date DESC
               LIMIT 3 -- Limit to the most recent 3 sessions
             ) AS subquery
-          ) AS "sessionDates"
+          ) AS "sessionDates"          
         FROM class_student
         INNER JOIN student ON class_student.student_id = student.id
         INNER JOIN person ON student.person_id = person.id
