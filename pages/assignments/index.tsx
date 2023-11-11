@@ -53,7 +53,7 @@ export default function AssignmentGrid() {
     React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [isUpdate, setIsUpdate] = React.useState(false);
-  const [rowToEdit, setRowToEdit] = React.useState({});
+  const [rowToEdit, setRowToEdit] = React.useState(null);
   const [rowToDeactivate, setRowToDeactivate] = React.useState({});
   const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] =
     React.useState(false);
@@ -70,7 +70,7 @@ export default function AssignmentGrid() {
 
   const handleAddButtonClick = () => {
     setIsUpdate(false);
-    setRowToEdit({}); // Reset any data
+    setRowToEdit(null); // Reset any data
     setIsUpdateCreateDialogOpen(true);
   };
 
@@ -87,7 +87,7 @@ export default function AssignmentGrid() {
 
   const handleCloseUpdateCreateDialog = () => {
     setIsUpdateCreateDialogOpen(false);
-    setRowToEdit({});
+    setRowToEdit(null);
   };
 
   const handleOpenDeactivateDialog = () => {
@@ -308,8 +308,7 @@ export default function AssignmentGrid() {
         hideFooterSelectedRowCount
       />
       <UpdateCreateAssignmentDialog
-        isUpdate={isUpdate}
-        existingData={rowToEdit as Assignment}
+        assignment={rowToEdit}
         open={isUpdateCreateDialogOpen}
         onClose={handleCloseUpdateCreateDialog}
         onSubmit={handleUpdateOrCreateAssignment}

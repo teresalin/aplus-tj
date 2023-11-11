@@ -168,8 +168,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           // PostgreSQL unique constraint violation error
           res
             .status(409)
-            .json({ message: "A person with the same details already exists" });
+            .json({
+              message: "A student with the same details already exists",
+            });
         } else {
+          console.error("Error creating student", err);
           res.status(500).json({ message: "Something went wrong" });
         }
       }
@@ -180,6 +183,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         await updatePersonAndStudent(client, data);
         res.status(200).json({ message: "Success" });
       } catch (err) {
+        console.error("Error updating student", err);
         res.status(500).json({ message: "Something went wrong" });
       }
       break;

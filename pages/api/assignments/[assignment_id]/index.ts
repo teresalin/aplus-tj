@@ -1,81 +1,109 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../../lib/db-connector";
+import { PoolClient } from "pg";
+import { Assignment } from "..";
 
-async function createAssignment(
-  client,
-  { assignmentName, description, dueDate }
-) {
-  const query = {
-    text: `
+async function createAssignmentAndClass(client: PoolClient, data: Assignment) {
+  const { id, name, classInfo, description, dueDate } = data;
+
+  try {
+    await client.query("BEGIN"); // Start a transaction
+    const assignmentInsertQuery = {
+      text: `
       INSERT INTO assignment(name, description, due_date, time_created, time_updated) 
       VALUES ($1, $2, $3, NOW(), NOW())
       RETURNING id;
     `,
-    values: [assignmentName, description, dueDate],
-  };
+      values: [name, description, dueDate],
+    };
 
-  const result = await client.query(query);
-  return result.rows[0].id;
-}
+    const assignmentResult = await client.query(assignmentInsertQuery);
 
-async function createClassAssignment(client, classID, assignmentID) {
-  const query = {
-    text: `
+    const classInsertQuery = {
+      text: `
       INSERT INTO class_assignment(class_id, assignment_id, time_created, time_updated) 
       VALUES ($1, $2, NOW(), NOW())
       RETURNING id;
     `,
-    values: [classID, assignmentID],
-  };
-  await client.query(query);
+      values: [classInfo.id, id],
+    };
+
+    const classResult = await client.query(classInsertQuery);
+    await client.query("COMMIT"); // Commit the transaction
+    return classResult.rows[0].id;
+  } catch (err) {
+    await client.query("ROLLBACK"); // Roll back the transaction on error
+    throw err;
+  }
 }
 
-async function updateAssignment(
-  client,
-  assignmentID,
-  { assignmentName, description, dueDate }
-) {
-  const query = {
-    text: `
+async function updateAssignmentAndClass(client: PoolClient, data: Assignment) {
+  const { id, name, classInfo, description, dueDate } = data;
+
+  try {
+    await client.query("BEGIN"); // Start a transaction
+
+    const assignmentUpdateQuery = {
+      text: `
       UPDATE assignment 
       SET name = $2, description = $3, due_date = $4, time_updated = NOW()
       WHERE id = $1
     `,
-    values: [assignmentID, assignmentName, description, dueDate],
-  };
-  await client.query(query);
-}
+      values: [id, name, description, dueDate],
+    };
 
-async function updateClassAssignment(client, assignmentID, { classId }) {
-  const query = {
-    text: `
+    const assignmentResult = await client.query(assignmentUpdateQuery);
+
+    const classUpdateQuery = {
+      text: `
       UPDATE class_assignment 
       SET class_id = $2, time_updated = NOW()
       WHERE assignment_id = $1
     `,
-    values: [assignmentID, classId],
-  };
-  await client.query(query);
+      values: [id, classInfo.id],
+    };
+
+    const classResult = await client.query(classUpdateQuery);
+
+    await client.query("COMMIT"); // Commit the transaction
+    return classResult.rows[0].id;
+  } catch (err) {
+    await client.query("ROLLBACK"); // Roll back the transaction on error
+    throw err;
+  }
 }
 
-async function deleteAssignment(client, assignmentID) {
-  const query = {
-    text: `
+async function deleteAssignmentAndClass(
+  client: PoolClient,
+  assignmentID: string | string[] | undefined
+) {
+  try {
+    await client.query("BEGIN"); // Start a transaction
+
+    const assignmentDeleteQuery = {
+      text: `
       DELETE FROM assignment WHERE id = $1
     `,
-    values: [assignmentID],
-  };
-  await client.query(query);
-}
+      values: [assignmentID],
+    };
 
-async function deleteClassAssignment(client, assignmentID) {
-  const query = {
-    text: `
+    const assignmentResult = await client.query(assignmentDeleteQuery);
+
+    const classDeleteQuery = {
+      text: `
       DELETE FROM class_assignment WHERE assignment_id = $1
     `,
-    values: [assignmentID],
-  };
-  await client.query(query);
+      values: [assignmentID],
+    };
+
+    const classResult = await client.query(classDeleteQuery);
+
+    await client.query("COMMIT"); // Commit the transaction
+    return classResult.rows[0].id;
+  } catch (err) {
+    await client.query("ROLLBACK"); // Roll back the transaction on error
+    throw err;
+  }
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -106,13 +134,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "POST":
       try {
-        const { assignmentName, dueDate, classId, description } = req.body;
-        const assignmentID = await createAssignment(client, {
-          assignmentName,
-          description,
-          dueDate,
-        });
-        await createClassAssignment(client, classId, assignmentID);
+        const data: Assignment = req.body;
+        await createAssignmentAndClass(client, data);
         res.status(200).json({ message: "Success" });
       } catch (err) {
         console.error("Error creating assignment", err);
@@ -121,15 +144,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "PUT":
       try {
-        const { assignmentName, dueDate, classId, description } = req.body;
-        await updateAssignment(client, assignmentID, {
-          assignmentName,
-          description,
-          dueDate,
-        });
-        await updateClassAssignment(client, assignmentID, {
-          classId,
-        });
+        const data: Assignment = req.body;
+        updateAssignmentAndClass(client, data);
         res.status(200).json({ message: "Success" });
       } catch (err) {
         console.error("Error updating assignment", err);
@@ -138,8 +154,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "DELETE":
       try {
-        await deleteClassAssignment(client, assignmentID);
-        await deleteAssignment(client, assignmentID);
+        deleteAssignmentAndClass(client, assignmentID);
         res.status(200).json({ message: "Success" });
       } catch (err) {
         console.error("Error deleting assignment", err);

@@ -1,3 +1,4 @@
+import { DatePicker } from "@mui/x-date-pickers";
 import { FormEvent, FormEventHandler } from "react";
 import * as React from "react";
 import Button from "@mui/material/Button";
@@ -7,133 +8,128 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import useSWR from "swr";
 
 import { Assignment } from "../../../pages/api/assignments";
 import { Class } from "../../../pages/api/classes";
 import fetcher from "../../../utils/fetcher";
-import { DatePicker } from "@mui/x-date-pickers";
 
 export interface IUpdateCreateAssignmentDialogProps {
-  isUpdate: boolean;
-  existingData: Assignment;
+  assignment: Assignment | null;
   open: boolean;
-  onClose;
+  onClose: () => void;
   onSubmit;
 }
 
 export default function UpdateCreateAssignmentDialog({
-  isUpdate,
-  existingData,
+  assignment,
   open,
   onClose,
   onSubmit,
 }: IUpdateCreateAssignmentDialogProps) {
-  const [editedData, setEditedData] = React.useState(existingData);
+  const [formData, setFormData] = React.useState({
+    name: "",
+    dueDate: dayjs("00:00:00"),
+    classId: null as number | null,
+    description: "",
+  });
   const { data } = useSWR("/api/classes", fetcher);
   const classes = data || [];
 
   React.useEffect(() => {
-    if (isUpdate) {
-      setEditedData(existingData);
-    } else {
-      setEditedData({} as Assignment);
+    if (assignment) {
+      setFormData({
+        name: assignment.name,
+        dueDate: dayjs(assignment.dueDate || "00:00:00"),
+        classId: assignment.classInfo?.id || null,
+        description: assignment.description,
+      });
     }
-  }, [existingData]);
+  }, [assignment]);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setEditedData((prevData) => ({
-      ...prevData!,
-      [name]: value,
-    }));
-  };
-
-  const handleDateChange = (fieldName, date) => {
-    setEditedData((prevData) => ({
+  const handleInputChange = (field, value) => {
+    setFormData((prevData) => ({
       ...prevData,
-      [fieldName]: date,
+      [field]: field === "classId" ? Number(value) : value,
     }));
   };
 
   const handleSubmit: FormEventHandler = (event: FormEvent) => {
     event.preventDefault();
-    onSubmit(editedData);
+    onSubmit(formData);
   };
 
   return (
     <>
-      {editedData && (
-        <Dialog disablePortal open={open} onClose={onClose}>
-          <form onSubmit={handleSubmit}>
-            <DialogTitle>New assignment</DialogTitle>
-            <DialogContent>
-              <TextField
-                fullWidth
-                required
-                id="assignmentName"
-                name="assignmentName"
-                label="Assignment Name"
-                type="text"
-                variant="outlined"
-                margin="dense"
-                value={editedData.name || ""}
-                onChange={handleInputChange}
-              />
-              <DatePicker
-                label="Date of Birth"
-                format="YYYY-MM-DD"
-                value={editedData.dueDate && dayjs(editedData.dueDate)}
-                onChange={(date) => handleDateChange("dueDate", date)}
-                sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
-                slotProps={{
-                  textField: {
-                    required: true,
-                  },
-                }}
-              />
-              <TextField
-                fullWidth
-                required
-                id="classId"
-                name="classId"
-                label="Assign to a class"
-                margin="dense"
-                value={editedData.classInfo?.id || ""}
-                select
-                onChange={handleInputChange}
-              >
-                {classes &&
-                  classes.map((item: Class) => (
-                    <MenuItem key={item.id} value={item.id}>
-                      {item.name}
-                    </MenuItem>
-                  ))}
-              </TextField>
-              <TextField
-                fullWidth
-                id="description"
-                name="description"
-                label="Description"
-                type="text"
-                variant="outlined"
-                margin="dense"
-                value={editedData.description || ""}
-                onChange={handleInputChange}
-                multiline
-                maxRows={3}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={onClose}>Cancel</Button>
-              <Button autoFocus type="submit" onClick={handleSubmit}>
-                Submit
-              </Button>
-            </DialogActions>
-          </form>
-        </Dialog>
-      )}
+      <Dialog disablePortal open={open} onClose={onClose}>
+        <form onSubmit={handleSubmit}>
+          <DialogTitle>New assignment</DialogTitle>
+          <DialogContent>
+            <TextField
+              fullWidth
+              required
+              id="name"
+              name="name"
+              label="Assignment Name"
+              type="text"
+              variant="outlined"
+              margin="dense"
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+            />
+            <DatePicker
+              label="Due Date"
+              format="YYYY-MM-DD"
+              value={formData.dueDate}
+              onChange={(date) => handleInputChange("dueDate", date)}
+              sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
+              slotProps={{
+                textField: {
+                  required: true,
+                },
+              }}
+            />
+            <Select
+              fullWidth
+              required
+              id="classId"
+              name="classId"
+              label="Assign to a class"
+              margin="dense"
+              value={formData.classId ? formData.classId.toString() : ""}
+              onChange={(e) => handleInputChange("classId", e.target.value)}
+            >
+              {classes &&
+                classes.map((item: Class) => (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.name}
+                  </MenuItem>
+                ))}
+            </Select>
+            <TextField
+              fullWidth
+              id="description"
+              name="description"
+              label="Description"
+              type="text"
+              variant="outlined"
+              margin="dense"
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              multiline
+              maxRows={3}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button autoFocus type="submit" onClick={handleSubmit}>
+              Submit
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     </>
   );
 }
