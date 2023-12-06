@@ -29,6 +29,7 @@ export default function UpdateCreateAssignmentDialog({
   onClose,
   onSubmit,
 }: IUpdateCreateAssignmentDialogProps) {
+  // TODO create two functions, one for update and one for create and make the form components reusable
   const [formData, setFormData] = React.useState({
     name: "",
     dueDate: dayjs("00:00:00"),
