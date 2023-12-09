@@ -17,10 +17,11 @@ import {
 
 import { Assignment } from "../api/assignments";
 import CustomToolBar from "../../src/components/grid/CustomToolBar";
+import CreateAssignmentDialog from "../../src/components/assignment/CreateAssignmentDialog";
 import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
 import fetcher from "../../utils/fetcher";
 import RenderMenu from "../../src/components/grid/RenderMenu";
-import UpdateCreateAssignmentDialog from "../../src/components/assignment/UpdateCreateAssignmentDialog";
+import UpdateAssignmentDialog from "../../src/components/assignment/UpdateAssignmentDialog";
 
 function a11yProps(key: string) {
   return {
@@ -51,8 +52,10 @@ export default function AssignmentGrid() {
     });
   const [isUpdateCreateDialogOpen, setIsUpdateCreateDialogOpen] =
     React.useState(false);
+  const [isUpdateialogOpen, setIsUpdateDialogOpen] = React.useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-  const [isUpdate, setIsUpdate] = React.useState(false);
+  // const [isUpdate, setIsUpdate] = React.useState(false);
   const [rowToEdit, setRowToEdit] = React.useState(null);
   const [rowToDeactivate, setRowToDeactivate] = React.useState({});
   const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] =
@@ -69,13 +72,11 @@ export default function AssignmentGrid() {
   };
 
   const handleAddButtonClick = () => {
-    setIsUpdate(false);
     setRowToEdit(null); // Reset any data
     setIsUpdateCreateDialogOpen(true);
   };
 
   const handleEditClick = (row) => {
-    setIsUpdate(true);
     setRowToEdit(row);
     setIsUpdateCreateDialogOpen(true);
   };
@@ -100,14 +101,9 @@ export default function AssignmentGrid() {
   };
 
   // TODO mutate is not working
-  const handleUpdateOrCreateAssignment = async (data) => {
-    const url = isUpdate
-      ? `/api/assignments/${data.id}`
-      : `/api/assignments/index`;
-    const method = isUpdate ? "PUT" : "POST";
-
-    const response = await fetch(url, {
-      method: method,
+  const handleUpdateAssignment = async (data) => {
+    const response = await fetch(`/api/assignments/${data.id}`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -115,10 +111,27 @@ export default function AssignmentGrid() {
     });
 
     if (response.ok) {
-      setIsUpdateCreateDialogOpen(false);
+      setIsUpdateDialogOpen(false);
       mutate("/api/assignments");
     } else {
-      console.error("Error creating/updating assignment:", response.statusText);
+      console.error("Error updating assignment:", response.statusText);
+    }
+  };
+
+  const handleCreateAssignment = async (data) => {
+    const response = await fetch("/api/assignments/index", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      setIsCreateDialogOpen(false);
+      mutate("/api/assignments");
+    } else {
+      console.error("Error creating assignment:", response.statusText);
     }
   };
 
@@ -181,17 +194,17 @@ export default function AssignmentGrid() {
       flex: 1,
     },
     {
-      field: "name",
-      headerName: "Assignment Name",
-      minWidth: 200,
-      flex: 1,
-    },
-    {
       field: "className",
       headerName: "Class Name",
       minWidth: 150,
       flex: 1,
       valueGetter: (params) => params.row?.classInfo?.name,
+    },
+    {
+      field: "name",
+      headerName: "Assignment Name",
+      minWidth: 200,
+      flex: 1,
     },
     {
       field: "description",
@@ -307,11 +320,16 @@ export default function AssignmentGrid() {
         pageSizeOptions={[5, 10, 25]}
         hideFooterSelectedRowCount
       />
-      <UpdateCreateAssignmentDialog
+      <UpdateAssignmentDialog
         assignment={rowToEdit}
         open={isUpdateCreateDialogOpen}
         onClose={handleCloseUpdateCreateDialog}
-        onSubmit={handleUpdateOrCreateAssignment}
+        onSubmit={handleUpdateAssignment}
+      />
+      <CreateAssignmentDialog
+        open={isUpdateCreateDialogOpen}
+        onClose={handleCloseUpdateCreateDialog}
+        onSubmit={handleCreateAssignment}
       />
       <DeleteAssignmentDialog
         open={isDeleteDialogOpen}

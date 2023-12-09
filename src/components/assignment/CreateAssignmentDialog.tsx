@@ -17,20 +17,18 @@ import { Class } from "../../../pages/api/classes";
 import fetcher from "../../../utils/fetcher";
 
 export interface IUpdateCreateAssignmentDialogProps {
-  assignment: Assignment | null;
   open: boolean;
   onClose: () => void;
   onSubmit;
 }
 
 export default function UpdateCreateAssignmentDialog({
-  assignment,
   open,
   onClose,
   onSubmit,
 }: IUpdateCreateAssignmentDialogProps) {
   // TODO create two functions, one for update and one for create and make the form components reusable
-  const [formData, setFormData] = React.useState({
+  const [newAssignment, setNewAssignment] = React.useState({
     name: "",
     dueDate: dayjs("00:00:00"),
     classId: null as number | null,
@@ -39,19 +37,8 @@ export default function UpdateCreateAssignmentDialog({
   const { data } = useSWR("/api/classes", fetcher);
   const classes = data || [];
 
-  React.useEffect(() => {
-    if (assignment) {
-      setFormData({
-        name: assignment.name,
-        dueDate: dayjs(assignment.dueDate || "00:00:00"),
-        classId: assignment.classInfo?.id || null,
-        description: assignment.description,
-      });
-    }
-  }, [assignment]);
-
   const handleInputChange = (field, value) => {
-    setFormData((prevData) => ({
+    setNewAssignment((prevData) => ({
       ...prevData,
       [field]: field === "classId" ? Number(value) : value,
     }));
@@ -59,7 +46,7 @@ export default function UpdateCreateAssignmentDialog({
 
   const handleSubmit: FormEventHandler = (event: FormEvent) => {
     event.preventDefault();
-    onSubmit(formData);
+    onSubmit(newAssignment);
   };
 
   return (
@@ -77,13 +64,13 @@ export default function UpdateCreateAssignmentDialog({
               type="text"
               variant="outlined"
               margin="dense"
-              value={formData.name}
+              value={newAssignment.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
             />
             <DatePicker
               label="Due Date"
               format="YYYY-MM-DD"
-              value={formData.dueDate}
+              value={newAssignment.dueDate}
               onChange={(date) => handleInputChange("dueDate", date)}
               sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
               slotProps={{
@@ -99,7 +86,9 @@ export default function UpdateCreateAssignmentDialog({
               name="classId"
               label="Assign to a class"
               margin="dense"
-              value={formData.classId ? formData.classId.toString() : ""}
+              value={
+                newAssignment.classId ? newAssignment.classId.toString() : ""
+              }
               onChange={(e) => handleInputChange("classId", e.target.value)}
             >
               {classes &&
@@ -117,7 +106,7 @@ export default function UpdateCreateAssignmentDialog({
               type="text"
               variant="outlined"
               margin="dense"
-              value={formData.description}
+              value={newAssignment.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
               multiline
               maxRows={3}

@@ -90,6 +90,14 @@ export default function SelectedListItem({ toggleTheme }) {
               <ListItemText primary="Classes" />
             </ListItemButton>
           </Link>
+          <Link href="/attendance">
+            <ListItemButton selected={isActive("/attendance")}>
+              <ListItemIcon>
+                <AccessTimeFilledIcon />
+              </ListItemIcon>
+              <ListItemText primary="Attendance" />
+            </ListItemButton>
+          </Link>
           <Link href="/sessions">
             <ListItemButton selected={isActive("/sessions")}>
               <ListItemIcon>

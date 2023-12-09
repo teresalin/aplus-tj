@@ -34,10 +34,10 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>A Plus</title>
         <link rel="icon" type="image/x-icon" href="/favicon.ico?" />
-        <link
+        {/* <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-        />
+        /> */}
       </Head>
       <ThemeProvider theme={activeTheme}>
         <CssBaseline />

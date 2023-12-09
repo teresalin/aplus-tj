@@ -154,6 +154,18 @@ export default function ClassDetails() {
                     variant="body2"
                     sx={{ fontWeight: 700, color: theme.palette.primary.main }}
                   >
+                    Grade
+                  </Typography>
+                  <Typography>{classData && classData.grade.name}</Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Card variant="outlined" sx={{ p: 2 }}>
+                  {/* add class time */}
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                  >
                     Schedule
                   </Typography>
                   <Typography>
@@ -174,17 +186,6 @@ export default function ClassDetails() {
                   <Typography>
                     {classData ? classData.teacher.name : "No teacher assigned"}
                   </Typography>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Card variant="outlined" sx={{ p: 2 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                  >
-                    Grade
-                  </Typography>
-                  <Typography>{classData && classData.grade.name}</Typography>
                 </Card>
               </Grid>
             </Grid>

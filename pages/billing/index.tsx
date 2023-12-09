@@ -358,7 +358,7 @@ export default function PersonGrid() {
 
   return (
     <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
-      {billingRecords && (
+      {/* {billingRecords && (
         <DataGrid
           autoHeight={true}
           sx={{
@@ -425,7 +425,7 @@ export default function PersonGrid() {
         open={isDeactivateDialogOpen}
         onClose={handleCloseDeactivateDialog}
         onSubmit={handleDeactivatePerson}
-      />
+      /> */}
     </Box>
   );
 }

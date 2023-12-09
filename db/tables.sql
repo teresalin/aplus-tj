@@ -40,6 +40,7 @@ CREATE TABLE parent (
   time_updated TIMESTAMP
 );
 
+-- TODO keep track of EZTalking ID
 CREATE TABLE student (
   id SERIAL PRIMARY KEY,
   person_id INT REFERENCES person(id) NOT NULL,
@@ -52,6 +53,21 @@ CREATE TABLE student (
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );
+
+CREATE TABLE user_identifier (
+  id SERIAL PRIMARY KEY,
+  person_id INT REFERENCES person(id) NOT NULL,
+  identifier_type VARCHAR(50),
+  identifier_value VARCHAR(50),
+  is_social_media BOOLEAN,
+  -- Add other relevant fields if needed
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+INSERT INTO user_identifier (person_id, identifier_type, identifier_value, is_social_media, time_created, time_updated)
+VALUES (1, 'Twitter', '@example', true, NOW(), NOW());
+INSERT INTO user_identifier (person_id, identifier_type, identifier_value, is_social_media, time_created, time_updated)
+VALUES (1, 'Account ID', '12345', false, NOW(), NOW());
 
 CREATE TABLE class (
   id SERIAL PRIMARY KEY,
@@ -94,6 +110,7 @@ CREATE TABLE class_student (
 );
 
 -- TODO capture subjects and notes?
+-- keep track of old session date
 CREATE TABLE session (
   id SERIAL PRIMARY KEY,
   class_id INT REFERENCES class(id) NOT NULL,
@@ -143,6 +160,7 @@ CREATE TABLE schedule (
   time_updated TIMESTAMP
 );
 
+-- manual enter
 CREATE TABLE holiday (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50),
@@ -155,6 +173,8 @@ CREATE TABLE holiday (
 -- create new records for each billing cycle (month) for each student.
 -- when a student makes a payment, create a new record,
 -- but use a negative value in the amount field to indicate a payment
+-- bill beginning of month
+-- calculate previous month bills
 CREATE TABLE student_billing_record (
   id SERIAL PRIMARY KEY,
   student_id INT REFERENCES student(id) NOT NULL,

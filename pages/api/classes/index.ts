@@ -1,4 +1,4 @@
-import { getDBClient } from "../../../lib/db-connector";
+import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
 import { Assignment } from "../assignments";
 import { Grade } from "../persons/students/grades";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -20,8 +20,11 @@ export interface Class {
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const client = await getDBClient();
+  let client; // Declare the client variable outside the try-catch block.
+
   try {
+    client = await getDBClient();
+
     const query = {
       text: `
         SELECT
@@ -59,9 +62,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       `,
     };
     const result = await client.query(query);
+    console.log(result.rows);
     res.status(200).json(result.rows.map(parseClass));
   } catch (error) {
     console.error("Error retrieving classes", error);
     res.status(500).json({ message: "Internal server error" });
+  } finally {
+    // Make sure to release the client in both success and error cases.
+    if (client) {
+      await releaseDBClient(client);
+    }
   }
 };

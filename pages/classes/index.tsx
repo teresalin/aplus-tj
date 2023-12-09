@@ -77,6 +77,7 @@ export default function Classes() {
     }
   };
 
+  // Settings, class color, calander
   if (!classes) return <CircularProgress />;
 
   return (

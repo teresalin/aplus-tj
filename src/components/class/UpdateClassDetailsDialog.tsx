@@ -21,6 +21,7 @@ import { FormEvent, FormEventHandler } from "react";
 import { Person } from "../../../pages/api/persons";
 import { Staff } from "../../../pages/api/persons/staffs";
 import fetcher from "../../../utils/fetcher";
+import Select from "@mui/material/Select";
 
 const dayOfWeek = [
   "Monday",
@@ -250,7 +251,25 @@ export default function UpdateCreateStudentDialog({
             <Typography variant="body2" display="block">
               Teacher
             </Typography>
-            <TextField
+            <Select
+              id="teacher"
+              name="teacher"
+              label="Select a teacher"
+              margin="dense"
+              required
+              select
+              fullWidth
+              value={editedData.teacher?.staffId || ""}
+              // onChange={handleGradeChange}
+            >
+              {teachers &&
+                teachers.map((teacher: Staff) => (
+                  <MenuItem key={teacher.id} value={teacher.id}>
+                    {teacher.name}
+                  </MenuItem>
+                ))}
+            </Select>
+            {/* <TextField
               id="teacher"
               name="teacher"
               label="Select a teacher"
@@ -267,7 +286,7 @@ export default function UpdateCreateStudentDialog({
                     {teacher.name}
                   </MenuItem>
                 ))}
-            </TextField>
+            </TextField> */}
             <RedBar />
             <Typography variant="body2" display="block">
               Capacity
