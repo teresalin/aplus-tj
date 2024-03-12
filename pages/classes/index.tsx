@@ -15,6 +15,7 @@ import { Class } from "../api/classes";
 import { Schedule } from "../api/classes/[class_id]/schedules";
 import fetcher from "../../utils/fetcher";
 import Paper from "@mui/material/Paper";
+import CreateClassDialog from "../../src/components/class/CreateClassDialog";
 
 function AddIconButton({ onClick }) {
   return (
@@ -77,7 +78,7 @@ export default function Classes() {
     }
   };
 
-  // Settings, class color, calander
+  // allow user to select a color for each class ins ettings
   if (!classes) return <CircularProgress />;
 
   return (
@@ -159,11 +160,11 @@ export default function Classes() {
           </Paper>
         </Link>
       ))}
-      {/* <CreateClassDialog
+      <CreateClassDialog
         open={dialogOpen}
         onClose={handleCloseDialog}
         onSubmit={handleCreateClass}
-      /> */}
+      />
     </>
   );
 }

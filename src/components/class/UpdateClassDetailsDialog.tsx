@@ -78,7 +78,7 @@ export default function UpdateCreateStudentDialog({
     }));
   };
 
-  const handleGradeChange = (
+  const handleTeacherChange = (
     event: React.ChangeEvent<{ name: string; value: unknown }>
   ) => {
     const { name, value } = event.target;
@@ -257,7 +257,6 @@ export default function UpdateCreateStudentDialog({
               label="Select a teacher"
               margin="dense"
               required
-              select
               fullWidth
               value={editedData.teacher?.staffId || ""}
               // onChange={handleGradeChange}

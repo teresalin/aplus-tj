@@ -187,6 +187,16 @@ CREATE TABLE student_billing_record (
   time_updated TIMESTAMP
 );
 
+-- one row per class session
+CREATE TABLE student_billing_details (
+  id SERIAL PRIMARY KEY,
+  billing_record_id INT REFERENCES student_billing_record(id) NOT NULL,
+  category_id INT REFERENCES billing_category(id),
+  amount DECIMAL(10, 2), -- The amount for this specific category in the billing record
+  time_created TIMESTAMP,
+  time_updated TIMESTAMP
+);
+
 CREATE TABLE student_payment_method (
   id SERIAL PRIMARY KEY,
   student_id INT REFERENCES student(id) NOT NULL,
@@ -202,16 +212,6 @@ CREATE TABLE billing_category (
   id SERIAL PRIMARY KEY,
   name VARCHAR(50), -- Name of the category, e.g., "Tuition," "Books," "Supplies"
   description VARCHAR(256), -- A brief description of the category
-  time_created TIMESTAMP,
-  time_updated TIMESTAMP
-);
-
--- one row per class session
-CREATE TABLE student_billing_details (
-  id SERIAL PRIMARY KEY,
-  billing_record_id INT REFERENCES student_billing_record(id) NOT NULL,
-  category_id INT REFERENCES billing_category(id),
-  amount DECIMAL(10, 2), -- The amount for this specific category in the billing record
   time_created TIMESTAMP,
   time_updated TIMESTAMP
 );

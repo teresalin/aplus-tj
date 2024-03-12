@@ -21,6 +21,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import { Staff } from "../../../pages/api/persons/staffs";
 import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
+import Select from "@mui/material/Select";
 
 export interface ICreateClassDialogProps {
   open: boolean;
@@ -55,9 +56,9 @@ export default function CreateClassDialog({
 }: ICreateClassDialogProps) {
   const [newClass, setNewClass] = React.useState({} as Class);
   const [updatedSchedules, setUpdatedSchedules] = React.useState(
-    newClass.schedules
+    [] as Schedule[]
   );
-  const { data } = useSWR("/api/staffs", fetcher);
+  const { data } = useSWR(open ? "/api/persons/staffs" : null, fetcher);
   const teachers = data || [];
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,16 +69,57 @@ export default function CreateClassDialog({
     }));
   };
 
-  const handleTimeChange = (day: string, newValue) => {
-    setUpdatedSchedules((prevSchedules: any) => ({
-      ...prevSchedules,
-      [day]: {
-        ...prevSchedules[day],
-        startTime: newValue
-          ? dayjs(newValue).format("HH:mm:ss")
-          : dayjs().format("HH:mm:ss"),
-      },
+  const handleTeacherChange = (event) => {
+    const { value } = event.target;
+    setNewClass((prevData) => ({
+      ...prevData,
+      teacher: { staffId: value as number },
     }));
+  };
+
+  // const handleTeacherChange = (
+  //   event: React.SelectChangeEvent<{ value: number }>
+  // ) => {
+  //   const { value } = event.target;
+  //   setNewClass((prevData) => ({
+  //     ...prevData,
+  //     teacher: { staffId: value as number },
+  //   }));
+  // };
+
+  const handleSwitchChange = (day: string) => {
+    setUpdatedSchedules((prevSchedules) => {
+      const existingScheduleIndex = prevSchedules.findIndex(
+        (schedule) => schedule.dayOfWeek === day
+      );
+
+      if (existingScheduleIndex === -1) {
+        // If the schedule doesn't exist, add a new schedule with default values
+        const newSchedule = {
+          dayOfWeek: day,
+          startTime: "",
+          endTime: "",
+        };
+        return [...prevSchedules, newSchedule];
+      } else {
+        // If the schedule exists, remove it
+        return prevSchedules.filter((schedule) => schedule.dayOfWeek !== day);
+      }
+    });
+  };
+
+  const handleTimeChange = (field, day: string, newValue) => {
+    setUpdatedSchedules((prevSchedules) => {
+      return prevSchedules.map((schedule) => {
+        if (schedule.dayOfWeek === day) {
+          return {
+            ...schedule,
+            [field]: newValue ? dayjs(newValue).format("HH:mm:ss") : "00:00:00",
+          };
+        }
+        return schedule;
+      });
+    });
   };
 
   const hasSchedule = (schedule: Schedule) => {
@@ -137,7 +179,15 @@ export default function CreateClassDialog({
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={hasSchedule(newClass.schedules[day])}
+                            checked={
+                              newClass.schedules &&
+                              Boolean(
+                                newClass.schedules.find(
+                                  (schedule) => schedule.dayOfWeek === day
+                                )
+                              )
+                            }
+                            onChange={() => handleSwitchChange(day)}
                           />
                         }
                         label={day}
@@ -149,27 +199,45 @@ export default function CreateClassDialog({
                         slotProps={{ textField: { size: "small" } }}
                         value={
                           updatedSchedules &&
-                          updatedSchedules[day].startTime !== "00:00:00"
-                            ? dayjs(updatedSchedules[day].startTime, "HH:mm:ss")
+                          updatedSchedules.find(
+                            (schedule) => schedule.dayOfWeek === day
+                          )
+                            ? dayjs(
+                                updatedSchedules.find(
+                                  (schedule) => schedule.dayOfWeek === day
+                                )?.startTime,
+                                "HH:mm:ss"
+                              )
                             : null
                         }
                         onChange={(newValue: Dayjs | null) =>
-                          handleTimeChange(day, newValue)
+                          handleTimeChange("startTime", day, newValue)
                         }
                       />
                     </Grid>
                     <Grid item xs={12} md={4}>
                       <TimePicker
                         label="End Time"
-                        slotProps={{ textField: { size: "small" } }}
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                          },
+                        }}
                         value={
                           updatedSchedules &&
-                          updatedSchedules[day].endTime !== "00:00:00"
-                            ? dayjs(updatedSchedules[day].endTime, "HH:mm:ss")
+                          updatedSchedules.find(
+                            (schedule) => schedule.dayOfWeek === day
+                          )
+                            ? dayjs(
+                                updatedSchedules.find(
+                                  (schedule) => schedule.dayOfWeek === day
+                                )?.endTime,
+                                "HH:mm:ss"
+                              )
                             : null
                         }
                         onChange={(newValue: Dayjs | null) =>
-                          handleTimeChange(day, newValue)
+                          handleTimeChange("endTime", day, newValue)
                         }
                       />
                     </Grid>
@@ -181,16 +249,15 @@ export default function CreateClassDialog({
               Teacher
             </Typography>
             {/* TODO fix default value */}
-            <TextField
+            <Select
               id="teacher"
               name="teacher"
               label="Select a teacher"
               margin="dense"
               required
-              select
               fullWidth
-              value={newClass.teacher?.id || ""}
-              onChange={handleInputChange}
+              value={newClass.teacher?.staffId || ""}
+              onChange={handleTeacherChange}
             >
               {teachers &&
                 teachers.map((teacher: Staff) => (
@@ -198,7 +265,7 @@ export default function CreateClassDialog({
                     {teacher.name}
                   </MenuItem>
                 ))}
-            </TextField>
+            </Select>
             <RedBar />
             <Typography variant="body2" display="block">
               Capacity
