@@ -88,7 +88,7 @@ export default function SessionGrid() {
   };
 
   // TODO creating without description does not close dialog
-  const handleCreateNewAssignment = async (data) => {
+  const handleCreateNewSession = async (data) => {
     const response = await fetch(`/api/assignments/[assignment_id]`, {
       method: "POST",
       headers: {
@@ -176,7 +176,7 @@ export default function SessionGrid() {
     },
     {
       field: "sessionDate",
-      headerName: "sessionDate",
+      headerName: "Session Date",
       minWidth: 150,
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams<Date>) => {
@@ -292,7 +292,7 @@ export default function SessionGrid() {
       <NewSessionDialog
         open={isNewDialogOpen}
         onClose={handleCloseNewDialog}
-        onSubmit={handleCreateNewAssignment}
+        onSubmit={handleCreateNewSession}
       />
       <DeleteSessionDialog
         open={isDeleteDialogOpen}

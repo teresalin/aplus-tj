@@ -114,7 +114,7 @@ CREATE TABLE class_student (
 CREATE TABLE session (
   id SERIAL PRIMARY KEY,
   class_id INT REFERENCES class(id) NOT NULL,
-  session_date DATE,
+  date DATE,
   start_time TIME,
   end_time TIME,
   time_created TIMESTAMP,

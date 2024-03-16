@@ -11,9 +11,14 @@ import useSWR from "swr";
 
 import fetcher from "../../../utils/fetcher";
 import { Class } from "../../../pages/api/classes";
-import { TimePicker } from "@mui/x-date-pickers";
+import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
+import { Session } from "../../../pages/api/sessions";
+import Select from "@mui/material/Select";
+import dayjs from "dayjs";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
 
 export interface INewSessionDialogProps {
   open: boolean;
@@ -26,25 +31,19 @@ export default function NewSessionDialog({
   onClose,
   onSubmit,
 }: INewSessionDialogProps) {
-  const [editedData, setEditedData] = React.useState({
-    assignmentName: "",
-    dueDate: "",
-    classId: 0,
-    description: "",
-  });
+  const [newSession, setnewSession] = React.useState({} as Session);
   const { data } = useSWR("/api/classes", fetcher);
   const classes = data || [];
 
   const handleSubmit: FormEventHandler = (event: FormEvent) => {
     event.preventDefault();
-    onSubmit(editedData);
+    onSubmit(newSession);
   };
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setEditedData((prevData) => ({
+  const handleInputChange = (field, value) => {
+    setnewSession((prevData) => ({
       ...prevData,
-      [name]: value,
+      [field]: field === "classId" ? Number(value) : value,
     }));
   };
 
@@ -54,45 +53,61 @@ export default function NewSessionDialog({
         <form onSubmit={handleSubmit}>
           <DialogTitle>New session</DialogTitle>
           <DialogContent>
-            {/* TODO format date in yyyy-mm-dd format */}
-            <TextField
-              id="sessionDate"
-              name="sessionDate"
+            <DatePicker
               label="Session Date"
-              type="date"
-              variant="outlined"
-              margin="dense"
-              required
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-              value={editedData.dueDate}
+              format="YYYY-MM-DD"
+              value={newSession.date}
               onChange={handleInputChange}
+              sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
+              slotProps={{
+                textField: {
+                  required: true,
+                },
+              }}
             />
-            <TextField
-              id="classId"
-              name="classId"
-              label="Assign to a class"
-              margin="dense"
-              required
-              select
-              fullWidth
-              value={editedData.classId || ""}
-              onChange={handleInputChange}
-            >
-              {classes.map((item: Class) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.name}
-                </MenuItem>
-              ))}
-            </TextField>
-            <Stack mt={1} direction="row" spacing={1}>
+            <Box mt={1.5}>
+              <FormControl fullWidth>
+                <InputLabel id="select-label">Assign to a class</InputLabel>
+                <Select
+                  fullWidth
+                  required
+                  id="classId"
+                  name="classId"
+                  label="Assign to a class"
+                  labelId="select-label"
+                  margin="dense"
+                  value={
+                    newSession.classId ? newSession.classId.toString() : ""
+                  }
+                  onChange={(e) => handleInputChange("classId", e.target.value)}
+                >
+                  {classes &&
+                    classes.map((item: Class) => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <Stack mt={2} direction="row" spacing={1}>
               <TimePicker
                 label="Start Time"
-                slotProps={{ textField: { size: "small" } }}
+                value={
+                  newSession.startTime
+                    ? dayjs(newSession.startTime, "HH:mm:ss")
+                    : null
+                }
+                onChange={handleInputChange}
               />
               <TimePicker
                 label="End Time"
-                slotProps={{ textField: { size: "small" } }}
+                value={
+                  newSession.endTime
+                    ? dayjs(newSession.endTime, "HH:mm:ss")
+                    : null
+                }
+                onChange={handleInputChange}
               />
             </Stack>
           </DialogContent>

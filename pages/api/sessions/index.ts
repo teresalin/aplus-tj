@@ -6,7 +6,7 @@ export interface Session {
   classId: number;
   className: string;
   teacher: string;
-  sessionDate: Date;
+  date: Date;
   startTime: Date;
   endTime: Date;
 }
