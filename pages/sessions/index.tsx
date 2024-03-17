@@ -87,9 +87,8 @@ export default function SessionGrid() {
     setSelectedRowData(selectedRowsData[0]);
   };
 
-  // TODO creating without description does not close dialog
   const handleCreateNewSession = async (data) => {
-    const response = await fetch(`/api/assignments/[assignment_id]`, {
+    const response = await fetch(`/api/sessions/[session_id]`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -100,7 +99,7 @@ export default function SessionGrid() {
     if (response.ok) {
       setIsNewDialogOpen(false);
     } else {
-      console.error("Error updating assignment data:", response.statusText);
+      console.error("Error creating new session:", response.statusText);
     }
   };
 

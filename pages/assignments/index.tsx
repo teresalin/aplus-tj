@@ -50,16 +50,11 @@ export default function AssignmentGrid() {
       created: false,
       action: true,
     });
-  const [isUpdateCreateDialogOpen, setIsUpdateCreateDialogOpen] =
-    React.useState(false);
-  const [isUpdateialogOpen, setIsUpdateDialogOpen] = React.useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = React.useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   // const [isUpdate, setIsUpdate] = React.useState(false);
-  const [rowToEdit, setRowToEdit] = React.useState(null);
-  const [rowToDeactivate, setRowToDeactivate] = React.useState({});
-  const [isDeactivateDialogOpen, setIsDeactivateDialogOpen] =
-    React.useState(false);
+  const [selectedRow, setSelectedRow] = React.useState<Assignment | null>(null);
   const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
     null
   );
@@ -72,32 +67,35 @@ export default function AssignmentGrid() {
   };
 
   const handleAddButtonClick = () => {
-    setRowToEdit(null); // Reset any data
-    setIsUpdateCreateDialogOpen(true);
+    setIsCreateDialogOpen(true);
   };
 
   const handleEditClick = (row) => {
-    setRowToEdit(row);
-    setIsUpdateCreateDialogOpen(true);
+    setSelectedRow(row);
+    setIsUpdateDialogOpen(true);
   };
 
-  const handleDeactivateClick = (row) => {
-    setRowToDeactivate(row);
-    setIsDeactivateDialogOpen(true);
+  const handleDeleteClick = (row) => {
+    setSelectedRow(row);
+    setIsDeleteDialogOpen(true);
   };
 
-  const handleCloseUpdateCreateDialog = () => {
-    setIsUpdateCreateDialogOpen(false);
-    setRowToEdit(null);
+  const handleCloseCreateDialog = () => {
+    setIsCreateDialogOpen(false);
   };
 
-  const handleOpenDeactivateDialog = () => {
-    setIsDeactivateDialogOpen(true);
+  const handleCloseUpdateDialog = () => {
+    setIsUpdateDialogOpen(false);
+    setSelectedRow(null);
   };
 
-  const handleCloseDeactivateDialog = () => {
-    setIsDeactivateDialogOpen(false);
-    setRowToDeactivate({});
+  const handleOpenDeleteDialog = () => {
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setIsDeleteDialogOpen(false);
+    setSelectedRow(null);
   };
 
   // TODO mutate is not working
@@ -246,7 +244,7 @@ export default function AssignmentGrid() {
       renderCell: (params) => (
         <RenderMenu
           onEditClick={() => handleEditClick(params.row)}
-          onDeleteClick={() => handleDeactivateClick(params.row)}
+          onDeleteClick={() => handleDeleteClick(params.row)}
         />
       ),
     },
@@ -321,19 +319,19 @@ export default function AssignmentGrid() {
         hideFooterSelectedRowCount
       />
       <UpdateAssignmentDialog
-        assignment={rowToEdit}
-        open={isUpdateCreateDialogOpen}
-        onClose={handleCloseUpdateCreateDialog}
+        assignment={selectedRow}
+        open={isUpdateDialogOpen}
+        onClose={handleCloseUpdateDialog}
         onSubmit={handleUpdateAssignment}
       />
       <CreateAssignmentDialog
-        open={isUpdateCreateDialogOpen}
-        onClose={handleCloseUpdateCreateDialog}
+        open={isCreateDialogOpen}
+        onClose={handleCloseCreateDialog}
         onSubmit={handleCreateAssignment}
       />
       <DeleteAssignmentDialog
         open={isDeleteDialogOpen}
-        onClose={handleCloseDeactivateDialog}
+        onClose={handleCloseDeleteDialog}
         onSubmit={handleDeleteAssignment}
       />
     </Box>
