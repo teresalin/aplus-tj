@@ -1,8 +1,4 @@
-import {
-  DatePicker,
-  DateValidationError,
-  PickerChangeHandlerContext,
-} from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 import { FormEvent, FormEventHandler } from "react";
 import * as React from "react";
 import Button from "@mui/material/Button";
@@ -19,7 +15,6 @@ import useSWR from "swr";
 import { Assignment } from "../../../pages/api/assignments";
 import { Class } from "../../../pages/api/classes";
 import fetcher from "../../../utils/fetcher";
-import { Moment } from "moment";
 
 export interface IUpdateAssignmentDialogProps {
   assignment: Assignment | null;

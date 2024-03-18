@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import IconButton from "@mui/material/IconButton";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import {
   DataGrid,
   GridColDef,
@@ -16,8 +16,8 @@ import {
 } from "@mui/x-data-grid";
 
 import { Assignment } from "../api/assignments";
-import CustomToolBar from "../../src/components/grid/CustomToolBar";
 import CreateAssignmentDialog from "../../src/components/assignment/CreateAssignmentDialog";
+import CustomToolBar from "../../src/components/grid/CustomToolBar";
 import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
 import fetcher from "../../utils/fetcher";
 import RenderMenu from "../../src/components/grid/RenderMenu";
@@ -33,7 +33,6 @@ function a11yProps(key: string) {
 const assignmentTypes = ["all", "upcoming", "past due"];
 
 export default function AssignmentGrid() {
-  const { mutate } = useSWRConfig();
   const [tab, setTab] = React.useState("all");
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
@@ -53,13 +52,12 @@ export default function AssignmentGrid() {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = React.useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-  // const [isUpdate, setIsUpdate] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<Assignment | null>(null);
   const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
     null
   );
 
-  const { data } = useSWR(`api/assignments`, fetcher);
+  const { data, mutate } = useSWR(`api/assignments`, fetcher);
   const assignments = data || [];
 
   const handleTabChange = (event: React.SyntheticEvent, newTab: string) => {
@@ -98,8 +96,7 @@ export default function AssignmentGrid() {
     setSelectedRow(null);
   };
 
-  // TODO mutate is not working
-  const handleUpdateAssignment = async (data) => {
+  const handleUpdateAssignment = async (data: Assignment) => {
     const response = await fetch(`/api/assignments/${data.id}`, {
       method: "PUT",
       headers: {
@@ -110,7 +107,7 @@ export default function AssignmentGrid() {
 
     if (response.ok) {
       setIsUpdateDialogOpen(false);
-      mutate("/api/assignments");
+      mutate({ ...data });
     } else {
       console.error("Error updating assignment:", response.statusText);
     }
@@ -127,7 +124,7 @@ export default function AssignmentGrid() {
 
     if (response.ok) {
       setIsCreateDialogOpen(false);
-      mutate("/api/assignments");
+      mutate();
     } else {
       console.error("Error creating assignment:", response.statusText);
     }

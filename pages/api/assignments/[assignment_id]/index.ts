@@ -48,6 +48,7 @@ async function updateAssignmentAndClass(client: PoolClient, data: Assignment) {
       UPDATE assignment 
       SET name = $2, description = $3, due_date = $4, time_updated = NOW()
       WHERE id = $1
+      RETURNING id;
     `,
       values: [id, name, description, dueDate],
     };
@@ -59,14 +60,25 @@ async function updateAssignmentAndClass(client: PoolClient, data: Assignment) {
       UPDATE class_assignment 
       SET class_id = $2, time_updated = NOW()
       WHERE assignment_id = $1
+      RETURNING class_id;
     `,
       values: [id, classInfo.id],
     };
 
     const classResult = await client.query(classUpdateQuery);
+    console.log(classResult[0]);
 
     await client.query("COMMIT"); // Commit the transaction
-    return classResult.rows[0].id;
+    return {
+      assignmentUpdate: {
+        affectedRows: assignmentResult.rowCount,
+        updatedAssignmentId: assignmentResult.rows[0]?.id, // Number of rows updated in the assignment table
+      },
+      classUpdate: {
+        affectedRows: classResult.rowCount, // Number of rows updated in the class_assignment table
+        updatedClassId: classResult.rows[0]?.id, // Assuming you use a RETURNING clause
+      },
+    };
   } catch (err) {
     await client.query("ROLLBACK"); // Roll back the transaction on error
     throw err;
@@ -82,7 +94,7 @@ async function deleteAssignmentAndClass(
 
     const assignmentDeleteQuery = {
       text: `
-      DELETE FROM assignment WHERE id = $1
+      DELETE FROM assignment WHERE id = $1;
     `,
       values: [assignmentID],
     };
@@ -91,7 +103,7 @@ async function deleteAssignmentAndClass(
 
     const classDeleteQuery = {
       text: `
-      DELETE FROM class_assignment WHERE assignment_id = $1
+      DELETE FROM class_assignment WHERE assignment_id = $1;
     `,
       values: [assignmentID],
     };
@@ -135,8 +147,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "POST":
       try {
         const data: Assignment = req.body;
-        await createAssignmentAndClass(client, data);
-        res.status(200).json({ message: "Success" });
+        const createResult = await createAssignmentAndClass(client, data);
+        res.status(200).json({ status: "Success", result: createResult });
       } catch (err) {
         console.error("Error creating assignment", err);
         res.status(500).json({ message: "Internal server error" });
@@ -145,8 +157,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "PUT":
       try {
         const data: Assignment = req.body;
-        updateAssignmentAndClass(client, data);
-        res.status(200).json({ message: "Success" });
+        const updateResult = await updateAssignmentAndClass(client, data);
+        res.status(200).json({ status: "Success", result: updateResult });
       } catch (err) {
         console.error("Error updating assignment", err);
         res.status(500).json({ message: "Internal server error" });
