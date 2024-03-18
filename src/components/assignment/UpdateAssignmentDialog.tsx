@@ -1,59 +1,70 @@
-import { DatePicker } from "@mui/x-date-pickers";
+import {
+  DatePicker,
+  DateValidationError,
+  PickerChangeHandlerContext,
+} from "@mui/x-date-pickers";
 import { FormEvent, FormEventHandler } from "react";
 import * as React from "react";
 import Button from "@mui/material/Button";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import useSWR from "swr";
 
 import { Assignment } from "../../../pages/api/assignments";
 import { Class } from "../../../pages/api/classes";
 import fetcher from "../../../utils/fetcher";
+import { Moment } from "moment";
 
-export interface IUpdateCreateAssignmentDialogProps {
+export interface IUpdateAssignmentDialogProps {
   assignment: Assignment | null;
   open: boolean;
   onClose: () => void;
   onSubmit;
 }
 
-export default function UpdateCreateAssignmentDialog({
+export default function UpdateAssignmentDialog({
   assignment,
   open,
   onClose,
   onSubmit,
-}: IUpdateCreateAssignmentDialogProps) {
+}: IUpdateAssignmentDialogProps) {
   // TODO create two functions, one for update and one for create and make the form components reusable
-  const [formData, setFormData] = React.useState({
-    name: "",
-    dueDate: dayjs("00:00:00"),
-    classId: null as number | null,
-    description: "",
-  });
+  const [formData, setFormData] = React.useState({} as Assignment);
   const { data } = useSWR("/api/classes", fetcher);
   const classes = data || [];
 
   React.useEffect(() => {
     if (assignment) {
-      setFormData({
-        name: assignment.name,
-        dueDate: dayjs(assignment.dueDate || "00:00:00"),
-        classId: assignment.classInfo?.id || null,
-        description: assignment.description,
-      });
+      setFormData(assignment);
     }
   }, [assignment]);
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData!,
+      [name]: value,
+    }));
+  };
+
+  const handleSelectChange = (event: SelectChangeEvent<number>) => {
+    const { value } = event.target;
     setFormData((prevData) => ({
       ...prevData,
-      [field]: field === "classId" ? Number(value) : value,
+      classInfo: { id: value as number },
+    }));
+  };
+
+  const handleDateChange = (value: Dayjs | null) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      dueDate: value as unknown as Date,
     }));
   };
 
@@ -78,13 +89,13 @@ export default function UpdateCreateAssignmentDialog({
               variant="outlined"
               margin="dense"
               value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
+              onChange={handleInputChange}
             />
             <DatePicker
               label="Due Date"
               format="YYYY-MM-DD"
-              value={formData.dueDate}
-              onChange={(date) => handleInputChange("dueDate", date)}
+              value={dayjs(formData.dueDate)}
+              onChange={handleDateChange}
               sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
               slotProps={{
                 textField: {
@@ -99,8 +110,8 @@ export default function UpdateCreateAssignmentDialog({
               name="classId"
               label="Assign to a class"
               margin="dense"
-              value={formData.classId ? formData.classId.toString() : ""}
-              onChange={(e) => handleInputChange("classId", e.target.value)}
+              value={formData.classInfo?.id ? formData.classInfo?.id : ""}
+              onChange={handleSelectChange}
             >
               {classes &&
                 classes.map((item: Class) => (
@@ -118,7 +129,7 @@ export default function UpdateCreateAssignmentDialog({
               variant="outlined"
               margin="dense"
               value={formData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
+              onChange={handleInputChange}
               multiline
               maxRows={3}
             />

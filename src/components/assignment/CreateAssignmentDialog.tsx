@@ -28,12 +28,7 @@ export default function UpdateCreateAssignmentDialog({
   onSubmit,
 }: IUpdateCreateAssignmentDialogProps) {
   // TODO create two functions, one for update and one for create and make the form components reusable
-  const [newAssignment, setNewAssignment] = React.useState({
-    name: "",
-    dueDate: dayjs("00:00:00"),
-    classId: null as number | null,
-    description: "",
-  });
+  const [newAssignment, setNewAssignment] = React.useState({} as Assignment);
   const { data } = useSWR("/api/classes", fetcher);
   const classes = data || [];
 
@@ -87,7 +82,9 @@ export default function UpdateCreateAssignmentDialog({
               label="Assign to a class"
               margin="dense"
               value={
-                newAssignment.classId ? newAssignment.classId.toString() : ""
+                newAssignment.classInfo?.id
+                  ? newAssignment.classInfo.id.toString()
+                  : ""
               }
               onChange={(e) => handleInputChange("classId", e.target.value)}
             >
