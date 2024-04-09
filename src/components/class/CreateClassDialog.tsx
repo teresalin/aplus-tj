@@ -1,27 +1,26 @@
-import { FormEvent, FormEventHandler } from "react";
+import { TimePicker } from "@mui/x-date-pickers";
 import * as React from "react";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import dayjs, { Dayjs } from "dayjs";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Grid from "@mui/material/Grid";
 import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { Assignment } from "../../../pages/api/assignments";
 import { Class } from "../../../pages/api/classes";
-import fetcher from "../../../utils/fetcher";
-import { DatePicker, TimePicker } from "@mui/x-date-pickers";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
-import { Staff } from "../../../pages/api/persons/staffs";
+import { Grade } from "../../../pages/api/grades";
 import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
-import Select from "@mui/material/Select";
+import { Staff } from "../../../pages/api/persons/staffs";
+import fetcher from "../../../utils/fetcher";
 
 export interface ICreateClassDialogProps {
   open: boolean;
@@ -55,40 +54,47 @@ export default function CreateClassDialog({
   onSubmit,
 }: ICreateClassDialogProps) {
   const [newClass, setNewClass] = React.useState({} as Class);
-  const [updatedSchedules, setUpdatedSchedules] = React.useState(
-    [] as Schedule[]
+  const [schedules, setSchedules] = React.useState([] as Schedule[]);
+  const { data: staffsData, error: staffsError } = useSWR(
+    open ? "/api/persons/staffs" : null,
+    fetcher
   );
-  const { data } = useSWR(open ? "/api/persons/staffs" : null, fetcher);
-  const teachers = data || [];
+  const { data: gradesData, error: gradesError } = useSWR(
+    open ? "/api/grades" : null,
+    fetcher
+  );
+  const teachers = staffsData || [];
+  const grades = gradesData || [];
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setNewClass((prevData) => ({
-      ...prevData!,
+      ...prevData,
       [name]: value,
     }));
   };
 
   const handleTeacherChange = (event) => {
     const { value } = event.target;
+    const selectedTeacher = teachers.find((teacher) => teacher.id === value);
     setNewClass((prevData) => ({
       ...prevData,
-      teacher: { staffId: value as number },
+      teacher: selectedTeacher || {},
     }));
   };
 
-  // const handleTeacherChange = (
-  //   event: React.SelectChangeEvent<{ value: number }>
-  // ) => {
-  //   const { value } = event.target;
-  //   setNewClass((prevData) => ({
-  //     ...prevData,
-  //     teacher: { staffId: value as number },
-  //   }));
-  // };
+  const handleGradeChange = (event) => {
+    const { value } = event.target;
+    // Find the selected grade object from your grades array
+    const selectedGrade = grades.find((grade) => grade.id === value);
+    setNewClass((prevData) => ({
+      ...prevData,
+      grade: selectedGrade || {},
+    }));
+  };
 
   const handleSwitchChange = (day: string) => {
-    setUpdatedSchedules((prevSchedules) => {
+    setSchedules((prevSchedules) => {
       const existingScheduleIndex = prevSchedules.findIndex(
         (schedule) => schedule.dayOfWeek === day
       );
@@ -108,8 +114,8 @@ export default function CreateClassDialog({
     });
   };
 
-  const handleTimeChange = (field, day: string, newValue) => {
-    setUpdatedSchedules((prevSchedules) => {
+  const handleTimeChange = (field: string, day: string, newValue) => {
+    setSchedules((prevSchedules) => {
       return prevSchedules.map((schedule) => {
         if (schedule.dayOfWeek === day) {
           return {
@@ -122,24 +128,13 @@ export default function CreateClassDialog({
     });
   };
 
-  const hasSchedule = (schedule: Schedule) => {
-    const emptyTime = "00:00:00";
-    if (schedule) {
-      return schedule.startTime !== emptyTime && schedule.endTime !== emptyTime;
-    }
-    return false;
-  };
-
-  const handleDateChange = (fieldName, date) => {
-    // setEditedData((prevData) => ({
-    //   ...prevData,
-    //   [fieldName]: date,
-    // }));
-  };
-
-  const handleSubmit: FormEventHandler = (event: FormEvent) => {
-    event.preventDefault();
-    // onSubmit(editedData);
+  const handleSubmit = () => {
+    // Combine the newClass state with schedules
+    const classDataToSubmit = {
+      ...newClass,
+      schedules: schedules,
+    };
+    onSubmit(classDataToSubmit);
   };
 
   return (
@@ -155,12 +150,35 @@ export default function CreateClassDialog({
               required
               margin="dense"
               id="name"
+              name="name"
               label="Class Name"
               type="text"
-              defaultValue={newClass ? newClass.name : null}
+              value={newClass.name || ""}
               fullWidth
               variant="outlined"
+              onChange={handleInputChange}
             />
+            <Typography variant="body2" display="block">
+              Grade
+            </Typography>
+            {/* TODO fix default value */}
+            <Select
+              id="grade"
+              name="grade"
+              label="Select a grade"
+              margin="dense"
+              required
+              fullWidth
+              value={newClass.grade?.id || ""}
+              onChange={handleGradeChange}
+            >
+              {grades &&
+                grades.map((grade: Grade) => (
+                  <MenuItem key={grade.id} value={grade.id}>
+                    {grade.name}
+                  </MenuItem>
+                ))}
+            </Select>
             <RedBar />
             <Typography variant="body2" display="block">
               Schedule
@@ -198,12 +216,12 @@ export default function CreateClassDialog({
                         label="Start Time"
                         slotProps={{ textField: { size: "small" } }}
                         value={
-                          updatedSchedules &&
-                          updatedSchedules.find(
+                          schedules &&
+                          schedules.find(
                             (schedule) => schedule.dayOfWeek === day
                           )
                             ? dayjs(
-                                updatedSchedules.find(
+                                schedules.find(
                                   (schedule) => schedule.dayOfWeek === day
                                 )?.startTime,
                                 "HH:mm:ss"
@@ -224,12 +242,12 @@ export default function CreateClassDialog({
                           },
                         }}
                         value={
-                          updatedSchedules &&
-                          updatedSchedules.find(
+                          schedules &&
+                          schedules.find(
                             (schedule) => schedule.dayOfWeek === day
                           )
                             ? dayjs(
-                                updatedSchedules.find(
+                                schedules.find(
                                   (schedule) => schedule.dayOfWeek === day
                                 )?.endTime,
                                 "HH:mm:ss"
@@ -273,12 +291,14 @@ export default function CreateClassDialog({
             <TextField
               required
               margin="dense"
-              id="name"
+              id="capacity"
+              name="capacity"
               label="Student Capacity"
               type="number"
               fullWidth
               variant="outlined"
               value={newClass.capacity}
+              onChange={handleInputChange}
             />
           </DialogContent>
           <DialogActions>

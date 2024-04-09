@@ -173,7 +173,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
       break;
     case "POST":
-      await client.query("BEGIN");
       try {
         const data: Class = req.body;
         console.log(data);

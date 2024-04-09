@@ -6,9 +6,10 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
+import CircularProgress from "@mui/material/CircularProgress";
 import dayjs from "dayjs";
-import Grid from "@mui/material/Grid";
 import EditIcon from "@mui/icons-material/Edit";
+import Grid from "@mui/material/Grid";
 import Link from "next/link";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
@@ -16,11 +17,10 @@ import Typography from "@mui/material/Typography";
 import useSWR, { mutate } from "swr";
 
 import { Class } from "../../api/classes";
+import { Schedule } from "../../api/classes/[class_id]/schedules";
 import fetcher from "../../../utils/fetcher";
 import UpdateClassDetailsDialog from "../../../src/components/class/UpdateClassDetailsDialog";
 import UpdateClassStudentsDialog from "../../../src/components/class/UpdateClassStudentsDialog";
-import CircularProgress from "@mui/material/CircularProgress";
-import { Schedule } from "../../api/classes/[class_id]/schedules";
 
 const columns: GridColDef[] = [
   {

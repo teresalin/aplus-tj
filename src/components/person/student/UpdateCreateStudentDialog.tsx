@@ -15,7 +15,7 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
 import fetcher from "../../../../utils/fetcher";
-import { Grade } from "../../../../pages/api/persons/students/grades";
+import { Grade } from "../../../../pages/api/grades";
 import { Student } from "../../../../pages/api/persons/students";
 
 function RedBar() {

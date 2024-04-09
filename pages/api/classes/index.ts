@@ -1,6 +1,6 @@
-import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
 import { Assignment } from "../assignments";
-import { Grade } from "../persons/students/grades";
+import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
+import { Grade } from "../grades";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseClass } from "../../../utils/apiUtils";
 import { Person } from "../persons";
@@ -10,7 +10,7 @@ import { Staff } from "../persons/staffs";
 export interface Class {
   id: number;
   name: string;
-  teacher: Partial<Staff>;
+  teacher: Staff;
   grade: Grade;
   schedules: Schedule[];
   capacity: number;
@@ -62,7 +62,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       `,
     };
     const result = await client.query(query);
-    console.log(result.rows);
     res.status(200).json(result.rows.map(parseClass));
   } catch (error) {
     console.error("Error retrieving classes", error);

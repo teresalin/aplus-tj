@@ -2,7 +2,6 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { FormEvent, FormEventHandler } from "react";
 import * as React from "react";
 import Button from "@mui/material/Button";
-import dayjs from "dayjs";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -16,17 +15,17 @@ import { Assignment } from "../../../pages/api/assignments";
 import { Class } from "../../../pages/api/classes";
 import fetcher from "../../../utils/fetcher";
 
-export interface IUpdateCreateAssignmentDialogProps {
+export interface ICreateAssignmentDialogProps {
   open: boolean;
   onClose: () => void;
   onSubmit;
 }
 
-export default function UpdateCreateAssignmentDialog({
+export default function CreateAssignmentDialog({
   open,
   onClose,
   onSubmit,
-}: IUpdateCreateAssignmentDialogProps) {
+}: ICreateAssignmentDialogProps) {
   // TODO create two functions, one for update and one for create and make the form components reusable
   const [newAssignment, setNewAssignment] = React.useState({} as Assignment);
   const { data } = useSWR("/api/classes", fetcher);

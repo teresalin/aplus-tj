@@ -5,6 +5,7 @@ import ChildCareIcon from "@mui/icons-material/ChildCare";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
 import Link from "next/link";
+import Paper from "@mui/material/Paper";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import TodayIcon from "@mui/icons-material/Today";
 import Tooltip from "@mui/material/Tooltip";
@@ -13,9 +14,8 @@ import useSWR from "swr";
 
 import { Class } from "../api/classes";
 import { Schedule } from "../api/classes/[class_id]/schedules";
-import fetcher from "../../utils/fetcher";
-import Paper from "@mui/material/Paper";
 import CreateClassDialog from "../../src/components/class/CreateClassDialog";
+import fetcher from "../../utils/fetcher";
 
 function AddIconButton({ onClick }) {
   return (

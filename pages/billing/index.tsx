@@ -1,20 +1,16 @@
 import * as React from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Button from "@mui/material/Button";
-import ChildCareIcon from "@mui/icons-material/ChildCare";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
 import Link from "next/link";
-import SupportAgentIcon from "@mui/icons-material/SupportAgent";
-import TodayIcon from "@mui/icons-material/Today";
-import Tooltip from "@mui/material/Tooltip";
+import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
 import { Class } from "../api/classes";
 import { Schedule } from "../api/classes/[class_id]/schedules";
 import fetcher from "../../utils/fetcher";
-import Paper from "@mui/material/Paper";
 
 function AddIconButton({ onClick }) {
   return (

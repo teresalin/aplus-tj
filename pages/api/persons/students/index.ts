@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../../lib/db-connector";
-import { Grade } from "./grades";
+import { Grade } from "../../grades";
 import { parseStudent } from "../../../../utils/apiUtils";
 import { Person } from "../../persons";
 
