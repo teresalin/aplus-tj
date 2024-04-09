@@ -17,7 +17,7 @@ const config = {
 
 const pool = new Pool(config);
 
-// Use this function to get a database client from the pool.
+// Use this function to get a database client from the pool
 export async function getDBClient() {
   try {
     const client = await pool.connect();
@@ -28,7 +28,7 @@ export async function getDBClient() {
   }
 }
 
-// Release the database client back to the pool when done with it.
+// Release the database client back to the pool when done with it
 export async function releaseDBClient(client) {
   try {
     client.release();

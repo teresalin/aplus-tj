@@ -1,19 +1,19 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { getDBClient } from "../../../../lib/db-connector";
-import { PoolClient } from "pg";
 import { Assignment } from "..";
+import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
+import { NextApiRequest, NextApiResponse } from "next";
+import { PoolClient } from "pg";
 
 async function createAssignmentAndClass(client: PoolClient, data: Assignment) {
   const { id, name, classInfo, description, dueDate } = data;
 
   try {
-    await client.query("BEGIN"); // Start a transaction
+    await client.query("BEGIN");
     const assignmentInsertQuery = {
       text: `
-      INSERT INTO assignment(name, description, due_date, time_created, time_updated) 
-      VALUES ($1, $2, $3, NOW(), NOW())
-      RETURNING id;
-    `,
+        INSERT INTO assignment(name, description, due_date, time_created, time_updated) 
+        VALUES ($1, $2, $3, NOW(), NOW())
+        RETURNING id;
+      `,
       values: [name, description, dueDate],
     };
 
@@ -21,18 +21,20 @@ async function createAssignmentAndClass(client: PoolClient, data: Assignment) {
 
     const classInsertQuery = {
       text: `
-      INSERT INTO class_assignment(class_id, assignment_id, time_created, time_updated) 
-      VALUES ($1, $2, NOW(), NOW())
-      RETURNING id;
-    `,
+        INSERT INTO class_assignment(class_id, assignment_id, time_created, time_updated) 
+        VALUES ($1, $2, NOW(), NOW())
+        RETURNING id;
+      `,
       values: [classInfo.id, id],
     };
 
     const classResult = await client.query(classInsertQuery);
-    await client.query("COMMIT"); // Commit the transaction
-    return classResult.rows[0].id;
+    const classId = classResult.rows[0].id;
+
+    await client.query("COMMIT");
+    return classId;
   } catch (err) {
-    await client.query("ROLLBACK"); // Roll back the transaction on error
+    await client.query("ROLLBACK");
     throw err;
   }
 }
@@ -41,46 +43,47 @@ async function updateAssignmentAndClass(client: PoolClient, data: Assignment) {
   const { id, name, classInfo, description, dueDate } = data;
 
   try {
-    await client.query("BEGIN"); // Start a transaction
+    await client.query("BEGIN");
 
     const assignmentUpdateQuery = {
       text: `
-      UPDATE assignment 
-      SET name = $2, description = $3, due_date = $4, time_updated = NOW()
-      WHERE id = $1
-      RETURNING id;
-    `,
+        UPDATE assignment 
+        SET name = $2, description = $3, due_date = $4, time_updated = NOW()
+        WHERE id = $1
+        RETURNING id;
+      `,
       values: [id, name, description, dueDate],
     };
 
     const assignmentResult = await client.query(assignmentUpdateQuery);
+    const assignmentId = assignmentResult.rows[0]?.id;
 
     const classUpdateQuery = {
       text: `
-      UPDATE class_assignment 
-      SET class_id = $2, time_updated = NOW()
-      WHERE assignment_id = $1
-      RETURNING class_id;
-    `,
+        UPDATE class_assignment 
+        SET class_id = $2, time_updated = NOW()
+        WHERE assignment_id = $1
+        RETURNING class_id;
+      `,
       values: [id, classInfo.id],
     };
 
     const classResult = await client.query(classUpdateQuery);
-    console.log(classResult[0]);
+    const classId = classResult.rows[0]?.id;
 
-    await client.query("COMMIT"); // Commit the transaction
+    await client.query("COMMIT");
     return {
       assignmentUpdate: {
         affectedRows: assignmentResult.rowCount,
-        updatedAssignmentId: assignmentResult.rows[0]?.id, // Number of rows updated in the assignment table
+        updatedAssignmentId: assignmentId,
       },
       classUpdate: {
-        affectedRows: classResult.rowCount, // Number of rows updated in the class_assignment table
-        updatedClassId: classResult.rows[0]?.id, // Assuming you use a RETURNING clause
+        affectedRows: classResult.rowCount,
+        updatedClassId: classId,
       },
     };
   } catch (err) {
-    await client.query("ROLLBACK"); // Roll back the transaction on error
+    await client.query("ROLLBACK");
     throw err;
   }
 }
@@ -90,7 +93,7 @@ async function deleteAssignmentAndClass(
   assignmentID: string | string[] | undefined
 ) {
   try {
-    await client.query("BEGIN"); // Start a transaction
+    await client.query("BEGIN");
 
     const assignmentDeleteQuery = {
       text: `
@@ -109,11 +112,12 @@ async function deleteAssignmentAndClass(
     };
 
     const classResult = await client.query(classDeleteQuery);
+    const classId = classResult.rows[0].id;
 
-    await client.query("COMMIT"); // Commit the transaction
-    return classResult.rows[0].id;
+    await client.query("COMMIT");
+    return classId;
   } catch (err) {
-    await client.query("ROLLBACK"); // Roll back the transaction on error
+    await client.query("ROLLBACK");
     throw err;
   }
 }
@@ -142,26 +146,40 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       } catch (err) {
         console.error("Error retrieving assignment", err);
         res.status(500).json({ message: "Internal server error" });
+      } finally {
+        await releaseDBClient(client);
       }
       break;
     case "POST":
       try {
         const data: Assignment = req.body;
         const createResult = await createAssignmentAndClass(client, data);
-        res.status(200).json({ status: "Success", result: createResult });
+        res.status(200).json({
+          status: "Success",
+          result: createResult,
+          message: "Assignment created successfully.",
+        });
       } catch (err) {
         console.error("Error creating assignment", err);
         res.status(500).json({ message: "Internal server error" });
+      } finally {
+        await releaseDBClient(client);
       }
       break;
     case "PUT":
       try {
         const data: Assignment = req.body;
         const updateResult = await updateAssignmentAndClass(client, data);
-        res.status(200).json({ status: "Success", result: updateResult });
+        res.status(200).json({
+          status: "Success",
+          result: updateResult,
+          message: "Class updated successfully.",
+        });
       } catch (err) {
         console.error("Error updating assignment", err);
         res.status(500).json({ message: "Internal server error" });
+      } finally {
+        await releaseDBClient(client);
       }
       break;
     case "DELETE":
@@ -171,6 +189,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       } catch (err) {
         console.error("Error deleting assignment", err);
         res.status(500).json({ message: "Internal server error" });
+      } finally {
+        await releaseDBClient(client);
       }
       break;
     default:

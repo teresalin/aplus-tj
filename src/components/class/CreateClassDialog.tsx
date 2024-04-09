@@ -283,7 +283,7 @@ export default function CreateClassDialog({
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
-            <Button autoFocus type="submit">
+            <Button autoFocus type="submit" onClick={handleSubmit}>
               Submit
             </Button>
           </DialogActions>
