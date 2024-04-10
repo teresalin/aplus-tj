@@ -57,7 +57,7 @@ export default function AssignmentGrid() {
     null
   );
 
-  const { data, mutate } = useSWR(`api/assignments`, fetcher);
+  const { data, mutate } = useSWR(`/api/assignments?filter=${tab}`, fetcher);
   const assignments = data || [];
 
   const handleTabChange = (event: React.SyntheticEvent, newTab: string) => {

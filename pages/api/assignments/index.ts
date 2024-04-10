@@ -26,7 +26,18 @@ function parseAssignment(row: any): Assignment {
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+  const { filter } = req.query; // Destructure the filter parameter from query
   const client = await getDBClient();
+
+  let additionalConditions = "";
+  const now = new Date().toISOString();
+
+  if (filter === "upcoming") {
+    additionalConditions = `WHERE a.due_date > '${now}'`;
+  } else if (filter === "past") {
+    additionalConditions = `WHERE a.due_date <= '${now}'`;
+  }
+
   try {
     const query = {
       text: `
@@ -42,6 +53,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           assignment a
           INNER JOIN class_assignment ca ON a.id = ca.assignment_id
           INNER JOIN class c ON ca.class_id = c.id
+        ${additionalConditions}
         ORDER BY
           due_date;
       `,

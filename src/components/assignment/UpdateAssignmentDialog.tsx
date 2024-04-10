@@ -72,7 +72,7 @@ export default function UpdateAssignmentDialog({
     <>
       <Dialog disablePortal open={open} onClose={onClose}>
         <form onSubmit={handleSubmit}>
-          <DialogTitle>New assignment</DialogTitle>
+          <DialogTitle>Update assignment</DialogTitle>
           <DialogContent>
             <TextField
               fullWidth
@@ -83,7 +83,7 @@ export default function UpdateAssignmentDialog({
               type="text"
               variant="outlined"
               margin="dense"
-              value={formData.name}
+              value={formData.name || ""}
               onChange={handleInputChange}
             />
             <DatePicker

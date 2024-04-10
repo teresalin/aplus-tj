@@ -1,5 +1,4 @@
 import { DatePicker } from "@mui/x-date-pickers";
-import { FormEvent, FormEventHandler } from "react";
 import * as React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -31,14 +30,23 @@ export default function CreateAssignmentDialog({
   const { data } = useSWR("/api/classes", fetcher);
   const classes = data || [];
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: string, value) => {
     setNewAssignment((prevData) => ({
       ...prevData,
       [field]: field === "classId" ? Number(value) : value,
     }));
   };
 
-  const handleSubmit: FormEventHandler = (event: FormEvent) => {
+  const handleClassChange = (event) => {
+    const { value } = event.target;
+    const selectedClass = classes.find((c) => c.id === value);
+    setNewAssignment((prevData) => ({
+      ...prevData,
+      classInfo: selectedClass || {},
+    }));
+  };
+
+  const handleSubmit: React.FormEventHandler = (event: React.FormEvent) => {
     event.preventDefault();
     onSubmit(newAssignment);
   };
@@ -58,13 +66,13 @@ export default function CreateAssignmentDialog({
               type="text"
               variant="outlined"
               margin="dense"
-              value={newAssignment.name}
+              value={newAssignment.name || ""}
               onChange={(e) => handleInputChange("name", e.target.value)}
             />
             <DatePicker
               label="Due Date"
               format="YYYY-MM-DD"
-              value={newAssignment.dueDate}
+              value={newAssignment.dueDate || null}
               onChange={(date) => handleInputChange("dueDate", date)}
               sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
               slotProps={{
@@ -73,19 +81,20 @@ export default function CreateAssignmentDialog({
                 },
               }}
             />
+            {/* TODO fix label */}
             <Select
-              fullWidth
-              required
-              id="classId"
-              name="classId"
-              label="Assign to a class"
+              id="class"
+              name="class"
+              label="Select a class"
               margin="dense"
+              required
+              fullWidth
               value={
                 newAssignment.classInfo?.id
                   ? newAssignment.classInfo.id.toString()
                   : ""
               }
-              onChange={(e) => handleInputChange("classId", e.target.value)}
+              onChange={handleClassChange}
             >
               {classes &&
                 classes.map((item: Class) => (

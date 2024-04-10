@@ -128,7 +128,7 @@ export default function CreateClassDialog({
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit: React.FormEventHandler = (event: React.FormEvent) => {
     // Combine the newClass state with schedules
     const classDataToSubmit = {
       ...newClass,
