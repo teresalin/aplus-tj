@@ -297,13 +297,17 @@ export default function CreateClassDialog({
               type="number"
               fullWidth
               variant="outlined"
-              value={newClass.capacity}
+              value={newClass.capacity || ""}
               onChange={handleInputChange}
             />
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
-            <Button autoFocus type="submit" onClick={handleSubmit}>
+            {/* calling onSubmit at the <form> level instead of the button level ensures that 
+            the form can be submitted not only when the submit button is clicked but also 
+            when the user presses the Enter key while focusing on any input within the form.
+            This is more ideal because it works with keyboard actions and ensures accessibility */}
+            <Button autoFocus type="submit">
               Submit
             </Button>
           </DialogActions>

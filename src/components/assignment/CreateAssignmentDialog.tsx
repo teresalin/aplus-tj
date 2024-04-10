@@ -110,7 +110,7 @@ export default function CreateAssignmentDialog({
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
-            <Button autoFocus type="submit" onClick={handleSubmit}>
+            <Button autoFocus type="submit">
               Submit
             </Button>
           </DialogActions>

@@ -28,16 +28,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const query = {
       text: `
         SELECT
-          c.id AS class_id,
-          c.name AS class_name,
-          c.capacity,
-          c.teacher_id,
-          g.id AS grade_id,
-          g.name AS grade_name,
-          COUNT(cs.id) AS student_count,
-          p.*,
-          sr.id AS staff_role_id,
-          sr.name AS staff_role_name,
+          class.id AS class_id,
+          class.name AS class_name,
+          class.capacity,
+          class.teacher_id,
+          grade.id AS grade_id,
+          grade.name AS grade_name,
+          COUNT(class_student.id) AS student_count,
+          person.*,
+          staff_role.id AS staff_role_id,
+          staff_role.name AS staff_role_name,
           (
             SELECT JSON_AGG(
               JSON_BUILD_OBJECT(
@@ -48,17 +48,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
               )
             )
             FROM schedule
-            WHERE schedule.class_id = c.id
+            WHERE schedule.class_id = class.id
           ) AS "schedules"
-        FROM class AS c
-        JOIN staff AS s ON c.teacher_id = s.id
-        JOIN person AS p ON s.person_id = p.id
-        JOIN grade AS g ON c.grade_id = g.id
-        LEFT JOIN class_student AS cs ON c.id = cs.class_id AND cs.active = true
-        LEFT JOIN staff_role AS sr ON s.role_id = sr.id
-        WHERE c.active = true
-        GROUP BY c.id, c.name, g.id, g.name, c.capacity, p.id, sr.id, sr.name
-        ORDER BY c.id;
+        FROM class
+        JOIN staff ON class.teacher_id = staff.id
+        JOIN person ON staff.person_id = person.id
+        JOIN grade ON class.grade_id = grade.id
+        LEFT JOIN class_student ON class.id = class_student.class_id AND class_student.active = true
+        LEFT JOIN staff_role ON staff.role_id = staff_role.id
+        WHERE class.active = true
+        GROUP BY class.id, class.name, grade.id, grade.name, class.capacity, person.id, staff_role.id, staff_role.name
+        ORDER BY class.id;
       `,
     };
     const result = await client.query(query);

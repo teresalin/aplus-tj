@@ -21,7 +21,6 @@ async function createClassAndSchedule(client: PoolClient, data: Class) {
     const classResult = await client.query(classInsertQuery);
     const classId = classResult.rows[0].id;
 
-    // Use Promise.all to wait for all insert operations to complete
     await Promise.all(
       schedules.map(async (schedule) => {
         const insertQuery = `
@@ -39,11 +38,10 @@ async function createClassAndSchedule(client: PoolClient, data: Class) {
       })
     );
 
-    await client.query("COMMIT"); // Commit the transaction
-    // If you need to return something specific, adjust this return statement
+    await client.query("COMMIT");
     return classId;
   } catch (err) {
-    await client.query("ROLLBACK"); // Roll back the transaction on error
+    await client.query("ROLLBACK");
     throw err;
   }
 }
@@ -175,7 +173,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "POST":
       try {
         const data: Class = req.body;
-        console.log(data);
         const createResult = await createClassAndSchedule(client, data);
         res.status(200).json({
           status: "Success",
