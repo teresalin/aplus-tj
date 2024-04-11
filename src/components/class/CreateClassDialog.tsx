@@ -7,8 +7,10 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Switch from "@mui/material/Switch";
@@ -144,44 +146,90 @@ export default function CreateClassDialog({
           <DialogTitle>New Class</DialogTitle>
           <DialogContent>
             <Typography variant="body2" display="block">
-              Name
+              Class Information
             </Typography>
             <TextField
               required
               margin="dense"
               id="name"
               name="name"
-              label="Class Name"
+              label="Name"
               type="text"
               value={newClass.name || ""}
               fullWidth
               variant="outlined"
               onChange={handleInputChange}
             />
-            <Typography variant="body2" display="block">
+            {/* <Typography variant="body2" display="block">
               Grade
-            </Typography>
-            {/* TODO fix default value */}
-            <Select
-              id="grade"
-              name="grade"
-              label="Select a grade"
-              margin="dense"
-              required
-              fullWidth
-              value={newClass.grade?.id || ""}
-              onChange={handleGradeChange}
-            >
-              {grades &&
-                grades.map((grade: Grade) => (
-                  <MenuItem key={grade.id} value={grade.id}>
-                    {grade.name}
-                  </MenuItem>
-                ))}
-            </Select>
+            </Typography> */}
+            <Box mt="8px">
+              <FormControl fullWidth>
+                <InputLabel id="grade-select-label">Select a grade</InputLabel>
+                <Select
+                  fullWidth
+                  required
+                  variant="outlined"
+                  id="grade"
+                  name="grade"
+                  label={"Select a grade"}
+                  labelId="grade-select-label"
+                  margin="dense"
+                  value={newClass.grade?.id || ""}
+                  onChange={handleGradeChange}
+                >
+                  {grades &&
+                    grades.map((grade: Grade) => (
+                      <MenuItem key={grade.id} value={grade.id}>
+                        {grade.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <Box mt="12px">
+              <FormControl fullWidth>
+                <InputLabel id="teacher-select-label">
+                  Select a teacher
+                </InputLabel>
+                <Select
+                  fullWidth
+                  required
+                  variant="outlined"
+                  id="teacher"
+                  name="teacher"
+                  label={"Select a teacher"}
+                  labelId="teacher-select-label"
+                  margin="dense"
+                  value={newClass.teacher?.staffId || ""}
+                  onChange={handleTeacherChange}
+                >
+                  {teachers &&
+                    teachers.map((teacher: Staff) => (
+                      <MenuItem key={teacher.id} value={teacher.id}>
+                        {teacher.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <Box mt="4px">
+              <TextField
+                required
+                margin="dense"
+                id="capacity"
+                name="capacity"
+                label="Student Capacity"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={newClass.capacity || ""}
+                onChange={handleInputChange}
+              />
+            </Box>
             <RedBar />
             <Typography variant="body2" display="block">
-              Schedule
+              Class Schedule
             </Typography>
             <Grid container spacing={1}>
               {newClass &&
@@ -262,44 +310,6 @@ export default function CreateClassDialog({
                   </Grid>
                 ))}
             </Grid>
-            <RedBar />
-            <Typography variant="body2" display="block">
-              Teacher
-            </Typography>
-            {/* TODO fix default value */}
-            <Select
-              id="teacher"
-              name="teacher"
-              label="Select a teacher"
-              margin="dense"
-              required
-              fullWidth
-              value={newClass.teacher?.staffId || ""}
-              onChange={handleTeacherChange}
-            >
-              {teachers &&
-                teachers.map((teacher: Staff) => (
-                  <MenuItem key={teacher.id} value={teacher.id}>
-                    {teacher.name}
-                  </MenuItem>
-                ))}
-            </Select>
-            <RedBar />
-            <Typography variant="body2" display="block">
-              Capacity
-            </Typography>
-            <TextField
-              required
-              margin="dense"
-              id="capacity"
-              name="capacity"
-              label="Student Capacity"
-              type="number"
-              fullWidth
-              variant="outlined"
-              value={newClass.capacity || ""}
-              onChange={handleInputChange}
-            />
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>

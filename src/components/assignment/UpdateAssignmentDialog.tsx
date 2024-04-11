@@ -1,12 +1,15 @@
 import { DatePicker } from "@mui/x-date-pickers";
 import { FormEvent, FormEventHandler } from "react";
 import * as React from "react";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import dayjs, { Dayjs } from "dayjs";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
@@ -98,36 +101,45 @@ export default function UpdateAssignmentDialog({
                 },
               }}
             />
-            <Select
-              fullWidth
-              required
-              id="classId"
-              name="classId"
-              label="Assign to a class"
-              margin="dense"
-              value={formData.classInfo?.id ? formData.classInfo?.id : ""}
-              onChange={handleSelectChange}
-            >
-              {classes &&
-                classes.map((item: Class) => (
-                  <MenuItem key={item.id} value={item.id}>
-                    {item.name}
-                  </MenuItem>
-                ))}
-            </Select>
-            <TextField
-              fullWidth
-              id="description"
-              name="description"
-              label="Description"
-              type="text"
-              variant="outlined"
-              margin="dense"
-              value={formData.description}
-              onChange={handleInputChange}
-              multiline
-              maxRows={3}
-            />
+            <Box mt="8px">
+              <FormControl fullWidth>
+                <InputLabel id="select-label">Assign to a class</InputLabel>
+                <Select
+                  fullWidth
+                  required
+                  variant="outlined"
+                  id="class"
+                  name="class"
+                  label={"Assign to a class"}
+                  labelId="select-label"
+                  margin="dense"
+                  value={formData.classInfo?.id ? formData.classInfo?.id : null}
+                  onChange={handleSelectChange}
+                >
+                  {classes &&
+                    classes.map((item: Class) => (
+                      <MenuItem key={item.id} value={item.id}>
+                        {item.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <Box mt="4px">
+              <TextField
+                fullWidth
+                id="description"
+                name="description"
+                label="Description"
+                type="text"
+                variant="outlined"
+                margin="dense"
+                value={formData.description || ""}
+                onChange={handleInputChange}
+                multiline
+                maxRows={3}
+              />
+            </Box>
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
