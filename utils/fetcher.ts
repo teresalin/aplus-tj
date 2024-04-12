@@ -1,12 +1,10 @@
-// const fetcher = (url: string) => fetch(url).then((res) => res.json())
-
-const fetcher = async (url: string) => fetch(url).then(res => {
-  if (!res.ok) {
-    return res.json().then((error) => {
-      throw new Error(error.message);
-    });
+const fetcher = async (url: string) => {
+  const response = await fetch(url);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "An error occurred while fetching data.");
   }
-  return res.json()
-});
+  return data.result;
+};
 
 export default fetcher;

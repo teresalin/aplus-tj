@@ -1,9 +1,10 @@
+import { getDBClient, releaseDBClient } from "../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getDBClient } from "../../lib/db-connector";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
   const { email } = req.query;
+
   const query = {
     text: `
       SELECT * FROM users WHERE users.email = $1;
@@ -11,9 +12,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     values: [email],
   };
   try {
-    const r = await client.query(query);
-    res.status(200).json(r.rows[0]);
+    const result = await client.query(query);
+    res.status(200).json({
+      status: "Success",
+      result: result.rows[0],
+      message: "User retrieved successfully.",
+    });
   } catch (err) {
-    res.status(err.response.status).json({ message: err.response.data });
+    console.error("Error retrieving user", err);
+    res.status(500).json({
+      status: "Error",
+      message: "Internal server error",
+    });
+  } finally {
+    if (client) {
+      await releaseDBClient(client);
+    }
   }
 };

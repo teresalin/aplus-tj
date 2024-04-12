@@ -1,8 +1,8 @@
-import { PoolClient } from "pg";
-import { getDBClient } from "../../../../../lib/db-connector";
+import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Staff } from "..";
 import { parseStaff } from "../../../../../utils/apiUtils";
+import { PoolClient } from "pg";
+import { Staff } from "..";
 
 async function createPersonAndStaff(client: PoolClient, data: Staff) {
   const {
@@ -18,7 +18,7 @@ async function createPersonAndStaff(client: PoolClient, data: Staff) {
   } = data;
 
   try {
-    await client.query("BEGIN"); // Start a transaction
+    await client.query("BEGIN");
     const personInsertQuery = {
       text: `
         INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, time_created, time_updated) 
@@ -40,17 +40,17 @@ async function createPersonAndStaff(client: PoolClient, data: Staff) {
     };
 
     const staffResult = await client.query(staffInsertQuery);
-    await client.query("COMMIT"); // Commit the transaction
+    await client.query("COMMIT");
     return staffResult.rows[0].id;
   } catch (err) {
-    await client.query("ROLLBACK"); // Roll back the transaction on error
+    await client.query("ROLLBACK");
     throw err;
   }
 }
 
 async function updatePersonAndStaff(client: PoolClient, data: Staff) {
   const {
-    id,
+    personId,
     name,
     gender,
     phone,
@@ -63,7 +63,7 @@ async function updatePersonAndStaff(client: PoolClient, data: Staff) {
   } = data;
 
   try {
-    await client.query("BEGIN"); // Start a transaction
+    await client.query("BEGIN");
 
     const personUpdateQuery = {
       text: `
@@ -72,7 +72,7 @@ async function updatePersonAndStaff(client: PoolClient, data: Staff) {
         WHERE id = $7
         RETURNING id;
       `,
-      values: [name, gender, phone, email, dateOfBirth, notes, id],
+      values: [name, gender, phone, email, dateOfBirth, notes, personId],
     };
 
     const personResult = await client.query(personUpdateQuery);
@@ -89,10 +89,10 @@ async function updatePersonAndStaff(client: PoolClient, data: Staff) {
 
     const staffResult = await client.query(staffUpdateQuery);
 
-    await client.query("COMMIT"); // Commit the transaction
-    return staffResult.rows[0].id;
+    await client.query("COMMIT");
+    return staffResult.rows[0].id; // TODO return updated objects
   } catch (err) {
-    await client.query("ROLLBACK"); // Roll back the transaction on error
+    await client.query("ROLLBACK");
     throw err;
   }
 }
@@ -128,26 +128,48 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           values: [personID],
         };
         const result = await client.query(staffSelectQuery);
-        res.status(200).json(result.rows.map(parseStaff)[0]);
+        res.status(200).json({
+          status: "Success",
+          result: result.rows.map(parseStaff)[0],
+          message: "Staff information retrieved successfully.",
+        });
       } catch (err) {
-        res.status(500).json({ message: "Something went wrong" });
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
+      } finally {
+        if (client) {
+          await releaseDBClient(client);
+        }
       }
       break;
     case "POST":
       try {
         const data: Staff = req.body;
-        console.log("data: ", data);
         await createPersonAndStaff(client, data);
-        res.status(200).json({ message: "Success" });
+        res.status(200).json({
+          status: "Success",
+          result: {},
+          message: "Staff information created successfully.",
+        });
       } catch (err) {
         if (err.code === "23505") {
           // PostgreSQL unique constraint violation error
-          res
-            .status(409)
-            .json({ message: "A person with the same details already exists" });
+          res.status(409).json({
+            status: "Error",
+            message: "A person with the same details already exists",
+          });
         } else {
-          console.log(err);
-          res.status(500).json({ message: "Something went wrong" });
+          console.error("Error retrieving staff information", err);
+          res.status(500).json({
+            status: "Error",
+            message: "Internal server error",
+          });
+        }
+      } finally {
+        if (client) {
+          await releaseDBClient(client);
         }
       }
       break;
@@ -155,21 +177,45 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       try {
         const data: Staff = req.body;
         await updatePersonAndStaff(client, data);
-        res.status(200).json({ message: "Success" });
+        res.status(200).json({
+          status: "Success",
+          result: {},
+          message: "Staff information updated successfully.",
+        });
       } catch (err) {
-        res.status(500).json({ message: "Something went wrong" });
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
+      } finally {
+        if (client) {
+          await releaseDBClient(client);
+        }
       }
       break;
-    // TODO set to inactive instead of delete
-    case "DELETE":
-      const staffDeleteQuery = {
-        text: `
-          DELETE FROM staff WHERE id = $1;
-        `,
-        values: [personID],
-      };
-      await client.query(staffDeleteQuery);
-      res.status(200).json({ message: "Success" });
+    case "DELETE": // TODO set to inactive instead of delete
+      try {
+        const staffDeleteQuery = {
+          text: `
+            DELETE FROM staff WHERE id = $1;
+          `,
+          values: [personID],
+        };
+        await client.query(staffDeleteQuery);
+        res.status(200).json({
+          status: "Success",
+          message: "Staff deleted successfully.",
+        });
+      } catch (err) {
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
+      } finally {
+        if (client) {
+          await releaseDBClient(client);
+        }
+      }
       break;
     default:
       res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);

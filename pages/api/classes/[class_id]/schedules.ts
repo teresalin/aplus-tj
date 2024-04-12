@@ -1,5 +1,6 @@
+import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getDBClient } from "../../../../lib/db-connector";
+import { parseSchedule } from "../../../../utils/apiUtils";
 
 export interface Schedule {
   id?: number;
@@ -10,8 +11,9 @@ export interface Schedule {
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
+
   try {
-    const getQuery = {
+    const query = {
       text: `
         SELECT
           schedule.id, 
@@ -25,10 +27,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         WHERE class.id = $1;
         `,
     };
-    const result = await client.query(getQuery);
-    res.status(200).json(result.rows as Schedule[]);
+    const result = await client.query(query);
+    res.status(200).json({
+      status: "Success",
+      result: result.rows.map(parseSchedule)[0],
+      message: "Schedules retrieved successfully.",
+    });
   } catch (error) {
     console.error("Error retrieving schedules", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      status: "Error",
+      message: "Internal server error",
+    });
+  } finally {
+    if (client) {
+      await releaseDBClient(client);
+    }
   }
 };

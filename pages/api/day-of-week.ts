@@ -1,8 +1,9 @@
+import { getDBClient, releaseDBClient } from "../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getDBClient } from "../../lib/db-connector";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
+
   try {
     const query = {
       text: `
@@ -14,9 +15,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const enumRangeArray = enumRangeString
       .substring(1, enumRangeString.length - 1)
       .split(",");
-    res.status(200).json(enumRangeArray);
+    res.status(200).json({
+      status: "Success",
+      result: enumRangeArray,
+      message: "Days of week retrieved successfully.",
+    });
   } catch (error) {
-    // Handle the error or rethrow it if needed
-    throw error;
+    console.error("Error retrieving days of week", error);
+    res.status(500).json({
+      status: "Error",
+      message: "Internal server error",
+    });
+  } finally {
+    if (client) {
+      await releaseDBClient(client);
+    }
   }
 };

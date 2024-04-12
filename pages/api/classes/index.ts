@@ -62,10 +62,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       `,
     };
     const result = await client.query(query);
-    res.status(200).json(result.rows.map(parseClass));
+    res.status(200).json({
+      status: "Success",
+      result: result.rows.map(parseClass),
+      message: "Classes retrieved successfully.",
+    });
   } catch (error) {
     console.error("Error retrieving classes", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      status: "Error",
+      message: "Internal server error",
+    });
   } finally {
     // Make sure to release the client in both success and error cases.
     if (client) {

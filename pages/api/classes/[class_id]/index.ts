@@ -265,12 +265,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "GET":
       try {
         const getResult = await getClass(client, classID);
-        res.status(200).json(getResult);
+        res.status(200).json({
+          status: "Success",
+          result: getResult,
+          message: "Class retrieved successfully.",
+        });
       } catch (err) {
         console.error("Error retrieving class", err);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
       } finally {
-        await releaseDBClient(client);
+        if (client) {
+          await releaseDBClient(client);
+        }
       }
       break;
     case "POST":
@@ -279,14 +288,19 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const createResult = await createClassAndSchedule(client, data);
         res.status(200).json({
           status: "Success",
-          // result: createResult,
+          result: createResult,
           message: "Class created successfully.",
         });
       } catch (err) {
         console.error("Error creating class", err);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
       } finally {
-        await releaseDBClient(client);
+        if (client) {
+          await releaseDBClient(client);
+        }
       }
       break;
     case "PUT":
@@ -300,9 +314,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         });
       } catch (err) {
         console.error("Error updating class", err);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
       } finally {
-        await releaseDBClient(client);
+        if (client) {
+          await releaseDBClient(client);
+        }
       }
       break;
   }

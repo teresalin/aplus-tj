@@ -1,5 +1,5 @@
+import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getDBClient } from "../../../lib/db-connector";
 
 export interface Grade {
   id: number;
@@ -8,6 +8,7 @@ export interface Grade {
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
+
   try {
     const query = {
       text: `
@@ -15,9 +16,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         `,
     };
     const result = await client.query(query);
-    res.status(200).json(result.rows as Grade[]);
+    res.status(200).json({
+      status: "Success",
+      result: result.rows as Grade[],
+      message: "Grades retrieved successfully.",
+    });
   } catch (error) {
     console.error("Error retrieving grades", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      status: "Error",
+      message: "Internal server error",
+    });
+  } finally {
+    if (client) {
+      await releaseDBClient(client);
+    }
   }
 };

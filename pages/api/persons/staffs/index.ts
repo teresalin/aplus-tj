@@ -1,8 +1,8 @@
+import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getDBClient } from "../../../../lib/db-connector";
+import { parseStaff } from "../../../../utils/apiUtils";
 import { Person } from "..";
 import { Role } from "./roles";
-import { parseStaff } from "../../../../utils/apiUtils";
 
 export interface Staff extends Person {
   staffId: number;
@@ -35,9 +35,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       `,
     };
     const result = await client.query(query);
-    res.status(200).json(result.rows.map(parseStaff));
+    res.status(200).json({
+      status: "Success",
+      result: result.rows.map(parseStaff),
+      message: "Staffs retrieved successfully.",
+    });
   } catch (error) {
     console.error("Error retrieving staffs", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      status: "Error",
+      message: "Internal server error",
+    });
+  } finally {
+    if (client) {
+      await releaseDBClient(client);
+    }
   }
 };

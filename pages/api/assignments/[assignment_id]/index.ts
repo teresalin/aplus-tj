@@ -141,13 +141,22 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           `,
           values: [assignmentID],
         };
-        const result = await client.query(query);
-        res.status(200).json(result.rows[0]);
+        const getResult = await client.query(query);
+        res.status(200).json({
+          status: "Success",
+          result: getResult.rows[0],
+          message: "Assignment retrieved successfully.",
+        });
       } catch (err) {
         console.error("Error retrieving assignment", err);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
       } finally {
-        await releaseDBClient(client);
+        if (client) {
+          await releaseDBClient(client);
+        }
       }
       break;
     case "POST":
@@ -161,9 +170,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         });
       } catch (err) {
         console.error("Error creating assignment", err);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
       } finally {
-        await releaseDBClient(client);
+        if (client) {
+          await releaseDBClient(client);
+        }
       }
       break;
     case "PUT":
@@ -177,20 +191,33 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         });
       } catch (err) {
         console.error("Error updating assignment", err);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
       } finally {
-        await releaseDBClient(client);
+        if (client) {
+          await releaseDBClient(client);
+        }
       }
       break;
     case "DELETE":
       try {
-        deleteAssignmentAndClass(client, assignmentID);
-        res.status(200).json({ message: "Success" });
+        await deleteAssignmentAndClass(client, assignmentID);
+        res.status(200).json({
+          status: "Success",
+          message: "Assignment deleted successfully.",
+        });
       } catch (err) {
         console.error("Error deleting assignment", err);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
       } finally {
-        await releaseDBClient(client);
+        if (client) {
+          await releaseDBClient(client);
+        }
       }
       break;
     default:

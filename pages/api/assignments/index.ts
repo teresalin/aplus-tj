@@ -1,6 +1,7 @@
 import { Class } from "../classes";
 import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
+import { parseAssignment } from "../../../utils/apiUtils";
 
 export interface Assignment {
   id: number;
@@ -9,20 +10,6 @@ export interface Assignment {
   description?: string;
   dueDate: Date;
   created: Date;
-}
-
-function parseAssignment(row: any): Assignment {
-  return {
-    id: row.id,
-    classInfo: {
-      id: row.class_id,
-      name: row.class_name,
-    },
-    name: row.assignment_name,
-    description: row.description,
-    dueDate: row.due_date,
-    created: row.time_created,
-  };
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -56,11 +43,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       values: [filter],
     };
     const result = await client.query(query);
-    res.status(200).json(result.rows.map(parseAssignment));
+    res.status(200).json({
+      status: "Success",
+      result: result.rows.map(parseAssignment),
+      message: "Assignments retrieved successfully.",
+    });
   } catch (error) {
     console.error("Error retrieving assignments", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      status: "Error",
+      message: "Internal server error",
+    });
   } finally {
-    await releaseDBClient(client);
+    if (client) {
+      await releaseDBClient(client);
+    }
   }
 };

@@ -123,6 +123,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(200).json(result.rows.map(parseClass)[0]);
   } catch (error) {
     console.error("Error retrieving class", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      status: "Error",
+      message: "Internal server error",
+    });
   }
 };

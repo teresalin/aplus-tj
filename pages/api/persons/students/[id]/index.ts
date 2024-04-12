@@ -1,8 +1,8 @@
-import { PoolClient } from "pg";
-import { getDBClient } from "../../../../../lib/db-connector";
+import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Student } from "..";
 import { parseStudent } from "../../../../../utils/apiUtils";
+import { PoolClient } from "pg";
+import { Student } from "..";
 
 async function createPersonAndStudent(client: PoolClient, data: Student) {
   const {
@@ -21,7 +21,7 @@ async function createPersonAndStudent(client: PoolClient, data: Student) {
   } = data;
 
   try {
-    await client.query("BEGIN"); // Start a transaction
+    await client.query("BEGIN");
     const personInsertQuery = {
       text: `
         INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, time_created, time_updated) 
@@ -51,17 +51,17 @@ async function createPersonAndStudent(client: PoolClient, data: Student) {
     };
 
     const studentResult = await client.query(studentInsertQuery);
-    await client.query("COMMIT"); // Commit the transaction
+    await client.query("COMMIT");
     return studentResult.rows[0].id;
   } catch (err) {
-    await client.query("ROLLBACK"); // Roll back the transaction on error
+    await client.query("ROLLBACK");
     throw err;
   }
 }
 
 async function updatePersonAndStudent(client: PoolClient, data: Student) {
   const {
-    student_id,
+    personId,
     name,
     gender,
     phone,
@@ -77,7 +77,7 @@ async function updatePersonAndStudent(client: PoolClient, data: Student) {
   } = data;
 
   try {
-    await client.query("BEGIN"); // Start a transaction
+    await client.query("BEGIN");
 
     const personUpdateQuery = {
       text: `
@@ -86,7 +86,7 @@ async function updatePersonAndStudent(client: PoolClient, data: Student) {
         WHERE id = $7
         RETURNING id;
       `,
-      values: [name, gender, phone, email, dateOfBirth, notes, id],
+      values: [name, gender, phone, email, dateOfBirth, notes, personId],
     };
 
     const personResult = await client.query(personUpdateQuery);
@@ -111,10 +111,10 @@ async function updatePersonAndStudent(client: PoolClient, data: Student) {
 
     const studentResult = await client.query(studentUpdateQuery);
 
-    await client.query("COMMIT"); // Commit the transaction
+    await client.query("COMMIT");
     return studentResult.rows[0].id;
   } catch (err) {
-    await client.query("ROLLBACK"); // Roll back the transaction on error
+    await client.query("ROLLBACK");
     throw err;
   }
 }
@@ -153,36 +153,71 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           values: [personID],
         };
         const result = await client.query(studentSelectQuery);
-        res.status(200).json(result.rows.map(parseStudent)[0]);
-      } catch (err) {
-        res.status(500).json({ message: "Something went wrong" });
+        res.status(200).json({
+          status: "Success",
+          result: result.rows.map(parseStudent)[0],
+          message: "Student information retrieved successfully.",
+        });
+      } catch (error) {
+        console.error("Error retrieving student information", error);
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
+      } finally {
+        if (client) {
+          await releaseDBClient(client);
+        }
       }
       break;
     case "POST":
       try {
         const data: Student = req.body;
-        await createPersonAndStudent(client, data);
-        res.status(200).json({ message: "Success" });
-      } catch (err) {
-        if (err.code === "23505") {
+        await createPersonAndStudent(client, data); // TODO return created objects
+        res.status(200).json({
+          status: "Success",
+          result: {},
+          message: "Student created successfully.",
+        });
+      } catch (error) {
+        if (error.code === "23505") {
           // PostgreSQL unique constraint violation error
           res.status(409).json({
+            status: "Error",
             message: "A student with the same details already exists",
           });
         } else {
-          console.error("Error creating student", err);
-          res.status(500).json({ message: "Something went wrong" });
+          console.error("Error creating student", error);
+          res.status(500).json({
+            status: "Error",
+            message: "Internal server error",
+          });
+        }
+      } finally {
+        if (client) {
+          await releaseDBClient(client);
         }
       }
       break;
     case "PUT":
       try {
         const data: Student = req.body;
-        await updatePersonAndStudent(client, data);
-        res.status(200).json({ message: "Success" });
-      } catch (err) {
-        console.error("Error updating student", err);
-        res.status(500).json({ message: "Something went wrong" });
+        await updatePersonAndStudent(client, data); // TODO return updated objects
+        res.status(200).json({
+          status: "Success",
+          result: {},
+          message: "Student updated successfully.",
+        });
+      } catch (error) {
+        console.error("Error updating student", error);
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
+      } finally {
+        if (client) {
+          await releaseDBClient(client);
+        }
       }
       break;
     // TODO set to inactive instead of delete
@@ -194,7 +229,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         values: [personID],
       };
       await client.query(studentDeleteQuery);
-      res.status(200).json({ message: "Success" });
+      res.status(200).json({
+        status: "Success",
+        message: "Student deleted successfully.",
+      });
       break;
     default:
       res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);

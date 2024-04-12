@@ -1,5 +1,5 @@
+import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getDBClient } from "../../../lib/db-connector";
 
 export interface Session {
   id: number;
@@ -13,6 +13,7 @@ export interface Session {
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
+
   try {
     const { range } = req.query;
     const query = {
@@ -40,9 +41,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       values: [range],
     };
     const result = await client.query(query);
-    res.status(200).json(result.rows as Session[]);
-  } catch (err) {
-    console.error("Error retrieving sessions", err);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(200).json({
+      status: "Success",
+      result: result.rows as Session[],
+      message: "Sessions retrieved successfully.",
+    });
+  } catch (error) {
+    console.error("Error retrieving sessions", error);
+    res.status(500).json({
+      status: "Error",
+      message: "Internal server error",
+    });
+  } finally {
+    if (client) {
+      await releaseDBClient(client);
+    }
   }
 };

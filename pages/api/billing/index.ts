@@ -1,5 +1,6 @@
+import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getDBClient } from "../../../lib/db-connector";
+import { parseBilling } from "../../../utils/apiUtils";
 
 export interface Billing {
   id: number;
@@ -14,23 +15,9 @@ export interface Billing {
   created: Date;
 }
 
-function parseBilling(row: any): Billing {
-  return {
-    id: row.id,
-    studentId: row.student_id,
-    studentName: row.student_name,
-    billingDate: row.billing_date,
-    description: row.description,
-    amount: row.amount,
-    paymentMethod: row.payment_method,
-    invoiceNumber: row.invoice_number,
-    paid: row.paid,
-    created: row.time_created,
-  };
-}
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
+
   try {
     const query = {
       text: `
@@ -60,9 +47,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         `,
     };
     const result = await client.query(query);
-    res.status(200).json(result.rows.map(parseBilling));
+    res.status(200).json({
+      status: "Success",
+      result: result.rows.map(parseBilling),
+      message: "Billing records retrieved successfully.",
+    });
   } catch (error) {
     console.error("Error retrieving billing records", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      status: "Error",
+      message: "Internal server error",
+    });
+  } finally {
+    if (client) {
+      await releaseDBClient(client);
+    }
   }
 };
