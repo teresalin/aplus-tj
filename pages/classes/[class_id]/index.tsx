@@ -92,7 +92,7 @@ export default function ClassDetails() {
   };
 
   // TODO function and mutate not working
-  const handleUpdateDetails = async (data) => {
+  const handleUpdateDetails = async (data: Class) => {
     const response = await fetch(`/api/classes/${data.id}`, {
       method: "PUT",
       headers: {
@@ -262,7 +262,7 @@ export default function ClassDetails() {
           </Box>
         </Paper>
         <UpdateClassDetailsDialog
-          existingData={classData}
+          existingClass={classData}
           open={isEditDetailsDialogOpen}
           onClose={handleCloseEditDetailsDialog}
           onSubmit={handleUpdateDetails}

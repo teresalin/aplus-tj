@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
-import { parseClass } from "../../../../utils/apiUtils";
 import { Class } from "..";
+import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
+import { NextApiRequest, NextApiResponse } from "next";
+import { parseClass } from "../../../../utils/apiUtils";
 import { PoolClient } from "pg";
 
 async function createClassAndSchedule(client: PoolClient, data: Class) {
@@ -15,7 +15,7 @@ async function createClassAndSchedule(client: PoolClient, data: Class) {
         VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
         RETURNING id;
       `,
-      values: [name, teacher.id, grade.id, capacity, true],
+      values: [name, teacher.staffId, grade.id, capacity, true],
     };
 
     const classResult = await client.query(classInsertQuery);
@@ -46,6 +46,97 @@ async function createClassAndSchedule(client: PoolClient, data: Class) {
   }
 }
 
+async function updateClass(client: PoolClient, data: Class) {
+  const {
+    id,
+    name,
+    teacher,
+    grade,
+    schedules,
+    capacity,
+    activeStudents,
+    assignments,
+  } = data;
+
+  try {
+    await client.query("BEGIN");
+
+    // Update class details
+    const classUpdateQuery = `
+      UPDATE class 
+      SET name = $2, teacher_id = $3, grade_id = $4, capacity = $5, time_updated = NOW()
+      WHERE id = $1
+      RETURNING id;
+    `;
+    await client.query(classUpdateQuery, [
+      id,
+      name,
+      teacher.staffId,
+      grade.id,
+      capacity,
+    ]);
+
+    // Retrieve current schedules
+    const currentSchedulesQuery = `SELECT * FROM schedule WHERE class_id = $1`;
+    const currentSchedulesResult = await client.query(currentSchedulesQuery, [
+      id,
+    ]);
+    const currentSchedules = currentSchedulesResult.rows;
+
+    // Identify schedules to add, update, and delete
+    const schedulesToUpdate = schedules.filter((schedule) =>
+      currentSchedules.some((cs) => cs.id === schedule.id)
+    );
+    const schedulesToAdd = schedules.filter((schedule) => !schedule.id);
+    const schedulesToDelete = currentSchedules.filter(
+      (cs) => !schedules.some((schedule) => schedule.id === cs.id)
+    );
+
+    // Add new schedules
+    for (const schedule of schedulesToAdd) {
+      const insertScheduleQuery = `
+        INSERT INTO schedule (class_id, day_of_week, start_time, end_time, time_updated)
+        VALUES ($1, $2, $3, $4, NOW())
+        RETURNING id;
+      `;
+      await client.query(insertScheduleQuery, [
+        id,
+        schedule.dayOfWeek,
+        schedule.startTime,
+        schedule.endTime,
+      ]);
+    }
+
+    // Update existing schedules
+    for (const schedule of schedulesToUpdate) {
+      const updateScheduleQuery = `
+        UPDATE schedule
+        SET day_of_week = $2, start_time = $3, end_time = $4, time_updated = NOW()
+        WHERE id = $1
+        RETURNING id;
+      `;
+      await client.query(updateScheduleQuery, [
+        schedule.id,
+        schedule.dayOfWeek,
+        schedule.startTime,
+        schedule.endTime,
+      ]);
+    }
+
+    // Delete obsolete schedules
+    for (const schedule of schedulesToDelete) {
+      const deleteScheduleQuery = `DELETE FROM schedule WHERE id = $1`;
+      await client.query(deleteScheduleQuery, [schedule.id]);
+    }
+
+    await client.query("COMMIT");
+    // You can return some success response here
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  }
+}
+
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const classID = req.query.class_id;
   const client = await getDBClient();
@@ -56,7 +147,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const query = {
           text: `
             SELECT 
-              c.id,
+              c.id AS class_id,
               c.name AS class_name,
               c.capacity,
               g.id AS grade_id,
@@ -176,11 +267,26 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const createResult = await createClassAndSchedule(client, data);
         res.status(200).json({
           status: "Success",
-          result: createResult,
+          // result: createResult,
           message: "Class created successfully.",
         });
       } catch (err) {
         console.error("Error creating class", err);
+        res.status(500).json({ message: "Internal server error" });
+      } finally {
+        await releaseDBClient(client);
+      }
+    case "PUT":
+      try {
+        const data: Class = req.body;
+        const updateResult = await updateClass(client, data);
+        res.status(200).json({
+          status: "Success",
+          result: updateResult,
+          message: "Class updated successfully.",
+        });
+      } catch (err) {
+        console.error("Error updating class", err);
         res.status(500).json({ message: "Internal server error" });
       } finally {
         await releaseDBClient(client);

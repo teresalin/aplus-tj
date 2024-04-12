@@ -8,20 +8,21 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
 import { Class } from "../../../pages/api/classes";
-import { FormEvent, FormEventHandler } from "react";
-import { Person } from "../../../pages/api/persons";
+import { Grade } from "../../../pages/api/grades";
 import { Staff } from "../../../pages/api/persons/staffs";
 import fetcher from "../../../utils/fetcher";
-import Select from "@mui/material/Select";
 
 const dayOfWeek = [
   "Monday",
@@ -43,54 +44,69 @@ function RedBar() {
   );
 }
 
-export interface IUpdateexistingDataDialogProps {
-  existingData: Class;
+export interface IUpdateClassDetailsDialogProps {
+  existingClass: Class;
   open: boolean;
-  onClose;
-  onSubmit;
+  onClose: () => void;
+  onSubmit: (data: Class) => Promise<void>;
 }
 
-export default function UpdateCreateStudentDialog({
-  existingData,
+export default function UpdateClassDetailsDialogProps({
+  existingClass,
   open,
   onClose,
   onSubmit,
-}: IUpdateexistingDataDialogProps) {
+}: IUpdateClassDetailsDialogProps) {
   const classID = useRouter().query.class_id;
-  const [editedData, setEditedData] = React.useState(existingData);
+  const [formData, setFormData] = React.useState({} as Class);
   const [updatedSchedules, setUpdatedSchedules] = React.useState(
-    existingData.schedules
+    existingClass.schedules
   );
-  const { data } = useSWR(open ? "/api/persons/staffs" : null, fetcher);
-  const teachers = (data as Person[]) || [];
-
-  console.log(updatedSchedules);
+  const { data: staffsData, error: staffsError } = useSWR(
+    open ? "/api/persons/staffs" : null,
+    fetcher
+  );
+  const { data: gradesData, error: gradesError } = useSWR(
+    open ? "/api/grades" : null,
+    fetcher
+  );
+  const teachers = staffsData || [];
+  const grades = gradesData || [];
 
   React.useEffect(() => {
-    setEditedData(existingData);
-  }, [existingData]);
+    setFormData(existingClass);
+  }, [existingClass]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setEditedData((prevData) => ({
+    setFormData((prevData) => ({
       ...prevData!,
       [name]: value,
     }));
   };
 
-  const handleTeacherChange = (
-    event: React.ChangeEvent<{ name: string; value: unknown }>
-  ) => {
-    const { name, value } = event.target;
-    setEditedData((prevData) => ({
+  const handleTeacherChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    const selectedTeacher = teachers.find((teacher) => teacher.id === value);
+    setFormData((prevData) => ({
       ...prevData,
-      grade: { id: value as number, name: name },
+      teacher: selectedTeacher || {},
+    }));
+  };
+
+  const handleGradeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    // Find the selected grade object from your grades array
+    const selectedGrade = grades.find((grade) => grade.id === value);
+    setFormData((prevData) => ({
+      ...prevData,
+      grade: selectedGrade || {},
     }));
   };
 
   const handleSwitchChange = (day: string) => {
-    setUpdatedSchedules((prevSchedules) => {
-      const existingScheduleIndex = prevSchedules.findIndex(
+    setFormData((prevData) => {
+      const existingScheduleIndex = prevData.schedules.findIndex(
         (schedule) => schedule.dayOfWeek === day
       );
 
@@ -101,29 +117,47 @@ export default function UpdateCreateStudentDialog({
           startTime: "",
           endTime: "",
         };
-        return [...prevSchedules, newSchedule];
+        return {
+          ...prevData,
+          schedules: [...prevData.schedules, newSchedule],
+        };
       } else {
         // If the schedule exists, remove it
-        return prevSchedules.filter((schedule) => schedule.dayOfWeek !== day);
+        const updatedSchedules = prevData.schedules.filter(
+          (schedule) => schedule.dayOfWeek !== day
+        );
+        return {
+          ...prevData,
+          schedules: updatedSchedules,
+        };
       }
     });
   };
 
-  const handleTimeChange = (field, day: string, newValue) => {
-    setUpdatedSchedules((prevSchedules) => {
-      return prevSchedules.map((schedule) => {
-        if (schedule.dayOfWeek === day) {
-          return {
-            ...schedule,
-            [field]: newValue ? dayjs(newValue).format("HH:mm:ss") : "00:00:00",
-          };
-        }
-        return schedule;
-      });
+  const handleTimeChange = (
+    field: string,
+    day: string,
+    newValue: Dayjs | null
+  ) => {
+    setFormData((prevData) => {
+      return {
+        ...prevData,
+        schedules: prevData.schedules.map((schedule) => {
+          if (schedule.dayOfWeek === day) {
+            return {
+              ...schedule,
+              [field]: newValue
+                ? dayjs(newValue).format("HH:mm:ss")
+                : "00:00:00",
+            };
+          }
+          return schedule;
+        }),
+      };
     });
   };
 
-  // custom validation is required since form is unable to detected the required field in TimePicker
+  // Custom validation is required since form is unable to detected the required field in TimePicker
   function hasEmptyOrInvalidTimeValues() {
     return updatedSchedules.some(
       (schedule) =>
@@ -135,15 +169,12 @@ export default function UpdateCreateStudentDialog({
   }
 
   // TODO fix submit
-  const handleSubmit: FormEventHandler = (event: FormEvent) => {
-    event.preventDefault();
-
+  const handleSubmit: React.FormEventHandler = (event: React.FormEvent) => {
     if (hasEmptyOrInvalidTimeValues()) {
-      // Display an error message to the user
       alert("Please fill out all time values.");
     } else {
       // Proceed with the form submission
-      onSubmit(editedData);
+      onSubmit(formData);
     }
   };
 
@@ -154,24 +185,89 @@ export default function UpdateCreateStudentDialog({
           <DialogTitle>Update Class Details</DialogTitle>
           <DialogContent>
             <Typography variant="body2" display="block">
-              Name
+              Class Information
             </Typography>
             <TextField
               required
               margin="dense"
               id="name"
               name="name"
-              label="Class Name"
+              label="Name"
               type="text"
-              defaultValue={editedData.name || ""}
+              defaultValue={formData.name || ""}
               fullWidth
               variant="outlined"
+              onChange={handleInputChange}
             />
+            <Box mt="8px">
+              <FormControl fullWidth>
+                <InputLabel id="grade-select-label">Select a grade</InputLabel>
+                <Select
+                  fullWidth
+                  required
+                  variant="outlined"
+                  id="grade"
+                  name="grade"
+                  label={"Select a grade"}
+                  labelId="grade-select-label"
+                  margin="dense"
+                  value={formData.grade?.id || ""}
+                  onChange={handleGradeChange}
+                >
+                  {grades &&
+                    grades.map((grade: Grade) => (
+                      <MenuItem key={grade.id} value={grade.id}>
+                        {grade.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <Box mt="12px">
+              <FormControl fullWidth>
+                <InputLabel id="teacher-select-label">
+                  Select a teacher
+                </InputLabel>
+                <Select
+                  fullWidth
+                  required
+                  variant="outlined"
+                  id="teacher"
+                  name="teacher"
+                  label={"Select a teacher"}
+                  labelId="teacher-select-label"
+                  margin="dense"
+                  value={formData.teacher?.staffId || ""}
+                  onChange={handleTeacherChange}
+                >
+                  {teachers &&
+                    teachers.map((teacher: Staff) => (
+                      <MenuItem key={teacher.staffId} value={teacher.staffId}>
+                        {teacher.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <Box mt="4px">
+              <TextField
+                required
+                margin="dense"
+                id="capacity"
+                name="capacity"
+                label="Student Capacity"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={formData.capacity || ""}
+                onChange={handleInputChange}
+              />
+            </Box>
             <RedBar />
             <Typography variant="body2" display="block">
-              Schedule
+              Class Schedule
             </Typography>
-            {existingData &&
+            {existingClass &&
               dayOfWeek.map((day) => (
                 <Box key={day} my={1}>
                   <Grid
@@ -185,11 +281,15 @@ export default function UpdateCreateStudentDialog({
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={Boolean(
-                              updatedSchedules.find(
-                                (schedule) => schedule.dayOfWeek === day
-                              )
-                            )}
+                            checked={
+                              formData.schedules
+                                ? Boolean(
+                                    formData.schedules.find(
+                                      (schedule) => schedule.dayOfWeek === day
+                                    )
+                                  )
+                                : false
+                            }
                             onChange={() => handleSwitchChange(day)}
                           />
                         }
@@ -201,12 +301,12 @@ export default function UpdateCreateStudentDialog({
                         label="Start Time"
                         slotProps={{ textField: { size: "small" } }}
                         value={
-                          updatedSchedules &&
-                          updatedSchedules.find(
+                          formData.schedules &&
+                          formData.schedules.find(
                             (schedule) => schedule.dayOfWeek === day
                           )
                             ? dayjs(
-                                updatedSchedules.find(
+                                formData.schedules.find(
                                   (schedule) => schedule.dayOfWeek === day
                                 )?.startTime,
                                 "HH:mm:ss"
@@ -227,12 +327,12 @@ export default function UpdateCreateStudentDialog({
                           },
                         }}
                         value={
-                          updatedSchedules &&
-                          updatedSchedules.find(
+                          formData.schedules &&
+                          formData.schedules.find(
                             (schedule) => schedule.dayOfWeek === day
                           )
                             ? dayjs(
-                                updatedSchedules.find(
+                                formData.schedules.find(
                                   (schedule) => schedule.dayOfWeek === day
                                 )?.endTime,
                                 "HH:mm:ss"
@@ -247,63 +347,10 @@ export default function UpdateCreateStudentDialog({
                   </Grid>
                 </Box>
               ))}
-            <RedBar />
-            <Typography variant="body2" display="block">
-              Teacher
-            </Typography>
-            <Select
-              id="teacher"
-              name="teacher"
-              label="Select a teacher"
-              margin="dense"
-              required
-              fullWidth
-              value={editedData.teacher?.staffId || ""}
-              // onChange={handleGradeChange}
-            >
-              {teachers &&
-                teachers.map((teacher: Staff) => (
-                  <MenuItem key={teacher.id} value={teacher.id}>
-                    {teacher.name}
-                  </MenuItem>
-                ))}
-            </Select>
-            {/* <TextField
-              id="teacher"
-              name="teacher"
-              label="Select a teacher"
-              margin="dense"
-              required
-              select
-              fullWidth
-              value={editedData.teacher?.staffId || ""}
-              onChange={handleGradeChange}
-            >
-              {teachers &&
-                teachers.map((teacher: Staff) => (
-                  <MenuItem key={teacher.id} value={teacher.id}>
-                    {teacher.name}
-                  </MenuItem>
-                ))}
-            </TextField> */}
-            <RedBar />
-            <Typography variant="body2" display="block">
-              Capacity
-            </Typography>
-            <TextField
-              required
-              margin="dense"
-              id="name"
-              label="Student Capacity"
-              type="number"
-              fullWidth
-              variant="outlined"
-              value={editedData.capacity || 0}
-            />
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
-            <Button autoFocus type="submit" onClick={handleSubmit}>
+            <Button autoFocus type="submit">
               Submit
             </Button>
           </DialogActions>

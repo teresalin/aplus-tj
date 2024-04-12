@@ -4,7 +4,7 @@ import { Student } from "../pages/api/persons/students";
 
 export function parseStudent(row: any): Student {
   return {
-    id: row.id,
+    personId: row.person_id,
     studentId: row.student_id,
     name: row.name,
     englishName: row.english_name,
@@ -27,7 +27,7 @@ export function parseStudent(row: any): Student {
 
 export function parseStaff(row: any): Staff {
   return {
-    id: row.id,
+    personId: row.person_id,
     staffId: row.staff_id,
     name: row.name,
     role: {
@@ -52,6 +52,16 @@ export function parseClass(row: any): Class {
     teacher: {
       staffId: row.staff_id,
       name: row.name,
+      role: undefined,
+      joinDate: undefined,
+      leaveDate: undefined,
+      id: 0,
+      gender: "",
+      phone: "",
+      email: "",
+      dateOfBirth: undefined,
+      notes: "",
+      active: false,
     },
     grade: {
       id: row.grade_id,

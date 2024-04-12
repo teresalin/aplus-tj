@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getDBClient } from "../../../lib/db-connector";
 
 export interface Person {
-  id: number;
+  personId: number;
   name: string;
   gender: string;
   phone: string;
@@ -14,7 +14,7 @@ export interface Person {
 
 function parsePerson(row: any): Person {
   return {
-    id: row.id,
+    personId: row.id,
     name: row.name,
     gender: row.gender,
     phone: row.phone,
