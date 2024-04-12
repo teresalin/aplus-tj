@@ -44,7 +44,7 @@ export default function UpdateCreateStudentDialog({
   onSubmit,
 }: IUpdateCreateStudentDialogProps) {
   const [editedData, setEditedData] = React.useState(existingData);
-  const { data } = useSWR("/api/persons/students/grades", fetcher);
+  const { data } = useSWR("/api/grades", fetcher);
   const grades = data || [];
 
   React.useEffect(() => {

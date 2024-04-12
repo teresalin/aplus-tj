@@ -20,7 +20,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const query = {
       text: `
         SELECT 
-          person.id,
+          person.id AS person_id,
           person.name,
           person.gender,
           person.phone,

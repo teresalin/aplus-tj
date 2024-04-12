@@ -61,7 +61,7 @@ async function createPersonAndStudent(client: PoolClient, data: Student) {
 
 async function updatePersonAndStudent(client: PoolClient, data: Student) {
   const {
-    id,
+    student_id,
     name,
     gender,
     phone,
@@ -129,7 +129,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const studentSelectQuery = {
           text: `
               SELECT 
-                person.id,
+                person.id AS person_id,
                 person.name,
                 person.gender,
                 person.phone,
@@ -166,11 +166,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       } catch (err) {
         if (err.code === "23505") {
           // PostgreSQL unique constraint violation error
-          res
-            .status(409)
-            .json({
-              message: "A student with the same details already exists",
-            });
+          res.status(409).json({
+            message: "A student with the same details already exists",
+          });
         } else {
           console.error("Error creating student", err);
           res.status(500).json({ message: "Something went wrong" });

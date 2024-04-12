@@ -42,7 +42,7 @@ export default function PersonGrid() {
   const [columnVisibilityModel, setColumnVisibilityModel] =
     React.useState<GridColumnVisibilityModel>({
       detailPanel: true,
-      id: false,
+      personId: false,
       name: true,
       gender: false,
       phone: true,
@@ -127,7 +127,7 @@ export default function PersonGrid() {
 
   const handleUpdateOrCreatePerson = async (data) => {
     const url = isUpdate
-      ? `/api/persons/${tab}/${data.id}`
+      ? `/api/persons/${tab}/${data.personId}`
       : `/api/persons/${tab}/index`;
     const method = isUpdate ? "PUT" : "POST";
 
@@ -159,15 +159,15 @@ export default function PersonGrid() {
   //   setRowToEdit({});
   // };
 
-  const onRowClick = (data: { id: string }) => {
-    router.push(`/persons/[tab]/[id]`, `/persons/${tab}/${data.id}`);
+  const onRowClick = (data: { personId: string }) => {
+    router.push(`/persons/[tab]/[id]`, `/persons/${tab}/${data.personId}`);
   };
 
   const getTogglableColumns = (columns: GridColDef[]) => {
     return columns
       .filter(
         (column) =>
-          column.field !== "id" &&
+          column.field !== "personId" &&
           column.field !== "action" &&
           column.field !== "detailPanel" &&
           column.field !== "created"
@@ -222,7 +222,7 @@ export default function PersonGrid() {
 
   const columns: GridColDef[] = [
     {
-      field: "id",
+      field: "personId",
       headerName: "id",
       minWidth: 50,
       flex: 1,
@@ -311,6 +311,7 @@ export default function PersonGrid() {
       </Box>
       {persons && (
         <DataGrid
+          getRowId={(row) => row.personId}
           autoHeight={true}
           sx={{
             width: "100%",

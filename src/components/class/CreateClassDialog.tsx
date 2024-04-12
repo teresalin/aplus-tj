@@ -206,7 +206,7 @@ export default function CreateClassDialog({
                 >
                   {teachers &&
                     teachers.map((teacher: Staff) => (
-                      <MenuItem key={teacher.id} value={teacher.id}>
+                      <MenuItem key={teacher.staffId} value={teacher.staffId}>
                         {teacher.name}
                       </MenuItem>
                     ))}

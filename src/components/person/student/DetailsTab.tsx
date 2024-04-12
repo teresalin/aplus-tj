@@ -11,7 +11,13 @@ import Paper from "@mui/material/Paper";
 import React from "react";
 import Typography from "@mui/material/Typography";
 
-const DetailsTab = ({ details }) => {
+import { Student } from "../../../../pages/api/persons/students";
+
+type DetailsTabProps = {
+  details: Student;
+};
+
+const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
   const theme = useTheme();
 
   if (!details) {
@@ -90,7 +96,8 @@ const DetailsTab = ({ details }) => {
                     fontSize: 12,
                   }}
                 >
-                  {details.dateOfBirth}
+                  {/* TODO format date correctly */}
+                  {new Date(details.dateOfBirth).toDateString()}
                 </Button>
               </Grid>
             </Grid>
@@ -143,7 +150,10 @@ const DetailsTab = ({ details }) => {
             >
               Join Date
             </Typography>
-            <Typography variant="body2">{details.joinDate}</Typography>
+            <Typography variant="body2">
+              {/* TODO format date correctly */}
+              {details.joinDate.toString()}
+            </Typography>
           </Grid>
           <Grid item sm={12} md={4}>
             <Typography
@@ -152,7 +162,10 @@ const DetailsTab = ({ details }) => {
             >
               Leave Date
             </Typography>
-            <Typography variant="body2">{details.leaveDate}</Typography>
+            <Typography variant="body2">
+              {/* TODO format date correctly */}
+              {details.leaveDate?.toString()}
+            </Typography>
           </Grid>
           <Grid item sm={12} md={4}>
             <Typography
