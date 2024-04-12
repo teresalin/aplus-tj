@@ -91,7 +91,7 @@ export default function ClassDetails() {
     setIsEditDetailsDialogOpen(false);
   };
 
-  // TODO function and mutate not working
+  // TODO maybe prevent whole page from re-rendering when the dialog is submitted?
   const handleUpdateDetails = async (data: Class) => {
     const response = await fetch(`/api/classes/${data.id}`, {
       method: "PUT",
@@ -102,8 +102,10 @@ export default function ClassDetails() {
     });
 
     if (response.ok) {
+      const updatedClass = await response.json();
       setIsEditDetailsDialogOpen(false);
-      mutate(`/api/classes/${data.id}`);
+      // Update SWR cache with the complete updated class data
+      mutate(`/api/classes/${data.id}`, updatedClass.result, false);
     } else {
       console.error("Error updating class details:", response.statusText);
     }
@@ -112,162 +114,161 @@ export default function ClassDetails() {
   if (!classData) return <CircularProgress />;
 
   return (
-    classData && (
-      <>
-        <Box mt={-1} mb={2}>
-          <Button
-            component={Link}
-            href="/classes"
-            startIcon={<ArrowBackIosIcon />}
-            sx={{
-              "&:hover": {
-                backgroundColor: "transparent",
-              },
-            }}
-          >
-            Back
-          </Button>
-        </Box>
-        <Box mb={2}>
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Typography variant="h6" gutterBottom>
-              Details
-            </Typography>
-            <Button
-              variant="text"
-              color="primary"
-              startIcon={<EditIcon />}
-              onClick={handleEditDetailsClick}
-            >
-              Edit
-            </Button>
-          </Grid>
-          <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-            <Grid
-              container
-              rowSpacing={0}
-              columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-            >
-              <Grid item xs={12} md={4}>
-                <Card variant="outlined" sx={{ p: 2 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                  >
-                    Grade
-                  </Typography>
-                  <Typography>{classData && classData.grade.name}</Typography>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Card variant="outlined" sx={{ p: 2 }}>
-                  {/* add class time */}
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                  >
-                    Schedule
-                  </Typography>
-                  <Typography>
-                    {classData.schedules
-                      ? formatDaysOfWeek(classData.schedules)
-                      : "N/A"}
-                  </Typography>
-                </Card>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Card variant="outlined" sx={{ p: 2 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                  >
-                    Teacher
-                  </Typography>
-                  <Typography>
-                    {classData ? classData.teacher.name : "No teacher assigned"}
-                  </Typography>
-                </Card>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Box>
-        <Typography variant="h6" gutterBottom>
-          Assignments
-        </Typography>
-        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-          {classData && classData.assignments ? (
-            classData.assignments.slice(0, 3).map((detail, index, array) => (
-              <Card
-                style={{
-                  display: "flex",
-                  backgroundColor: "#f8f6fc",
-                  marginBottom: index < array.length - 1 ? "1em" : "0",
-                  boxShadow: "none",
-                  height: "4.4em",
-                  padding: "0.8em",
-                }}
-              >
-                <Button
-                  sx={{
-                    backgroundColor: "#59addd",
-                    color: "#fff",
-                    // margin: 10,
-                    mr: 2,
-                  }}
-                >
-                  {dayjs(detail.dueDate).format("MMM DD")}
-                </Button>
-                {/* <AssignmentStyledCardContent> */}
-                <Stack direction="column" justifyContent="center">
-                  <Typography>{detail.name}</Typography>
-                  {detail.description && (
-                    <Typography variant="subtitle2" sx={{ color: "#808080" }}>
-                      {detail.description}
-                    </Typography>
-                  )}
-                </Stack>
-              </Card>
-            ))
-          ) : (
-            <p>No upcoming assignments</p>
-          )}
-        </Paper>
+    <>
+      <Box mt={-1} mb={2}>
+        <Button
+          component={Link}
+          href="/classes"
+          startIcon={<ArrowBackIosIcon />}
+          sx={{
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
+          }}
+        >
+          Back
+        </Button>
+      </Box>
+      <Box mb={2}>
         <Grid container justifyContent="space-between" alignItems="center">
           <Typography variant="h6" gutterBottom>
-            Students
+            Details
           </Typography>
-          {classData && <UpdateClassStudentsDialog classDetails={classData} />}
+          <Button
+            variant="text"
+            color="primary"
+            startIcon={<EditIcon />}
+            onClick={handleEditDetailsClick}
+          >
+            Edit
+          </Button>
         </Grid>
         <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-          <Box sx={{ width: "100%" }}>
-            {classData && classData.activeStudents ? (
-              <DataGrid
-                rows={classData.activeStudents}
-                columns={columns}
-                initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 5,
-                    },
-                  },
-                }}
-                autoHeight={true}
-                pageSizeOptions={[5]}
-                disableRowSelectionOnClick
-                density="compact"
-              />
-            ) : (
-              <p>No active students data available</p>
-            )}
-          </Box>
+          <Grid
+            container
+            rowSpacing={0}
+            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          >
+            <Grid item xs={12} md={4}>
+              <Card variant="outlined" sx={{ p: 2 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                >
+                  Grade
+                </Typography>
+                <Typography>{classData && classData.grade.name}</Typography>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Card variant="outlined" sx={{ p: 2 }}>
+                {/* add class time */}
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                >
+                  Schedule
+                </Typography>
+                <Typography>
+                  {classData.schedules
+                    ? formatDaysOfWeek(classData.schedules)
+                    : "N/A"}
+                </Typography>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Card variant="outlined" sx={{ p: 2 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                >
+                  Teacher
+                </Typography>
+                <Typography>
+                  {classData ? classData.teacher.name : "No teacher assigned"}
+                </Typography>
+              </Card>
+            </Grid>
+          </Grid>
         </Paper>
-        <UpdateClassDetailsDialog
-          existingClass={classData}
-          open={isEditDetailsDialogOpen}
-          onClose={handleCloseEditDetailsDialog}
-          onSubmit={handleUpdateDetails}
-        />
-      </>
-    )
+      </Box>
+      <Typography variant="h6" gutterBottom>
+        Assignments
+      </Typography>
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        {classData && classData.assignments ? (
+          classData.assignments.slice(0, 3).map((detail, index, array) => (
+            <Card
+              key={index}
+              style={{
+                display: "flex",
+                backgroundColor: "#f8f6fc",
+                marginBottom: index < array.length - 1 ? "1em" : "0",
+                boxShadow: "none",
+                height: "4.4em",
+                padding: "0.8em",
+              }}
+            >
+              <Button
+                sx={{
+                  backgroundColor: "#59addd",
+                  color: "#fff",
+                  // margin: 10,
+                  mr: 2,
+                }}
+              >
+                {dayjs(detail.dueDate).format("MMM DD")}
+              </Button>
+              {/* <AssignmentStyledCardContent> */}
+              <Stack direction="column" justifyContent="center">
+                <Typography>{detail.name}</Typography>
+                {detail.description && (
+                  <Typography variant="subtitle2" sx={{ color: "#808080" }}>
+                    {detail.description}
+                  </Typography>
+                )}
+              </Stack>
+            </Card>
+          ))
+        ) : (
+          <p>No upcoming assignments</p>
+        )}
+      </Paper>
+      <Grid container justifyContent="space-between" alignItems="center">
+        <Typography variant="h6" gutterBottom>
+          Students
+        </Typography>
+        {classData && <UpdateClassStudentsDialog classDetails={classData} />}
+      </Grid>
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        <Box sx={{ width: "100%" }}>
+          {classData && classData.activeStudents ? (
+            <DataGrid
+              rows={classData.activeStudents}
+              columns={columns}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 5,
+                  },
+                },
+              }}
+              autoHeight={true}
+              pageSizeOptions={[5]}
+              disableRowSelectionOnClick
+              density="compact"
+            />
+          ) : (
+            <p>No active students data available</p>
+          )}
+        </Box>
+      </Paper>
+      <UpdateClassDetailsDialog
+        existingClass={classData}
+        open={isEditDetailsDialogOpen}
+        onClose={handleCloseEditDetailsDialog}
+        onSubmit={handleUpdateDetails}
+      />
+    </>
   );
 }
