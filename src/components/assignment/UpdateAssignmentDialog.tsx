@@ -46,7 +46,7 @@ export default function UpdateAssignmentDialog({
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({
-      ...prevData!,
+      ...prevData,
       [name]: value,
     }));
   };
@@ -92,7 +92,7 @@ export default function UpdateAssignmentDialog({
             <DatePicker
               label="Due Date"
               format="YYYY-MM-DD"
-              value={dayjs(formData.dueDate)}
+              value={formData.dueDate ? dayjs(formData.dueDate) : null}
               onChange={handleDateChange}
               sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
               slotProps={{

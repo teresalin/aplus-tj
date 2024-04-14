@@ -22,7 +22,7 @@ import CustomToolBar from "../../../src/components/grid/CustomToolBar";
 import DetailPanel from "../../../src/components/grid/DetailPanel";
 import RenderMenu from "../../../src/components/grid/RenderMenu";
 import StudentDetailPanel from "../../../src/components/person/StudentDetailPanel";
-import UpdateCreateStudentDialog from "../../../src/components/person/student/UpdateCreateStudentDialog";
+import UpdateCreateStudentDialog from "../../../src/components/person/student/UpdateStudentDialog";
 import { Student } from "../../api/persons/students";
 import DeactivateStudentDialog from "../../../src/components/person/student/DeactivateStudentDialog";
 

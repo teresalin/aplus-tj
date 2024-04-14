@@ -28,61 +28,48 @@ function RedBar() {
   );
 }
 
-export interface IUpdateCreateStudentDialogProps {
-  isUpdate: boolean;
-  existingData: Student;
+export interface IUpdateStudentDialogProps {
+  student: Student;
   open: boolean;
   onClose;
   onSubmit;
 }
 
-export default function UpdateCreateStudentDialog({
-  isUpdate,
-  existingData,
+export default function UpdateStudentDialog({
+  student,
   open,
   onClose,
   onSubmit,
-}: IUpdateCreateStudentDialogProps) {
-  const [editedData, setEditedData] = React.useState(existingData);
+}: IUpdateStudentDialogProps) {
+  const [formData, setFormData] = React.useState({} as Student);
   const { data } = useSWR("/api/grades", fetcher);
   const grades = data || [];
 
   React.useEffect(() => {
-    if (isUpdate) {
-      setEditedData(existingData);
-    } else {
-      setEditedData({} as Student);
+    if (student) {
+      setFormData(student);
     }
-  }, [existingData]);
+  }, [student]);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setEditedData((prevData) => ({
-      ...prevData!,
-      [name]: value,
-    }));
-  };
-
-  const handleDateChange = (fieldName, date) => {
-    setEditedData((prevData) => ({
+  const handleInputChange = (field: string, value) => {
+    setFormData((prevData) => ({
       ...prevData,
-      [fieldName]: date,
+      [field]: value,
     }));
   };
 
-  const handleGradeChange = (
-    event: React.ChangeEvent<{ name: string; value: unknown }>
-  ) => {
-    const { name, value } = event.target;
-    setEditedData((prevData) => ({
+  const handleGradeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    // Find the selected grade object from your grades array
+    const selectedGrade = grades.find((grade) => grade.id === value);
+    setFormData((prevData) => ({
       ...prevData,
-      grade: { id: value as number, name: name },
+      grade: selectedGrade || {},
     }));
   };
 
-  const handleSubmit: FormEventHandler = (event: FormEvent) => {
-    event.preventDefault();
-    onSubmit(editedData);
+  const handleSubmit: React.FormEventHandler = (event: React.FormEvent) => {
+    onSubmit(formData);
   };
 
   return (
@@ -97,39 +84,41 @@ export default function UpdateCreateStudentDialog({
             <Grid container direction="row" spacing={{ xs: 0, sm: 1 }}>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  fullWidth
                   required
-                  margin="dense"
                   id="name"
                   name="name"
                   label="Full Name"
                   type="text"
-                  fullWidth
                   variant="outlined"
-                  value={editedData.name || ""}
-                  onChange={handleInputChange}
+                  margin="dense"
+                  value={formData.name || ""}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  margin="dense"
+                  fullWidth
                   id="englishName"
                   name="englishName"
                   label="English Name"
                   type="text"
-                  fullWidth
                   variant="outlined"
-                  value={editedData.englishName || ""}
-                  onChange={handleInputChange}
+                  margin="dense"
+                  value={formData.englishName || ""}
+                  onChange={(e) =>
+                    handleInputChange("englishName", e.target.value)
+                  }
                 />
               </Grid>
             </Grid>
             <DatePicker
               label="Date of Birth"
               format="YYYY-MM-DD"
-              value={
-                editedData.dateOfBirth ? dayjs(editedData.dateOfBirth) : null
-              }
-              onChange={(date) => handleDateChange("dateOfBirth", date)}
+              // We want to put a null value here so the date picker field
+              // does not complain anad show a red error outline
+              value={formData.dateOfBirth ? dayjs(formData.dateOfBirth) : null}
+              onChange={(date) => handleInputChange("dateOfBirth", date)}
               sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
               slotProps={{
                 textField: {
@@ -137,35 +126,36 @@ export default function UpdateCreateStudentDialog({
                 },
               }}
             />
+            {/* TODO update to Select */}
             <TextField
+              fullWidth
+              required
               id="gender"
               name="gender"
               label="Select a gender"
               margin="dense"
-              required
               select
-              fullWidth
-              value={editedData.gender || ""}
-              onChange={handleInputChange}
+              value={formData.gender || ""}
+              onChange={(e) => handleInputChange("gender", e.target.value)}
             >
               <MenuItem value="Male">Male</MenuItem>
               <MenuItem value="Female">Female</MenuItem>
               <MenuItem value="Other">Other</MenuItem>
             </TextField>
             <TextField
+              fullWidth
               multiline
-              margin="dense"
               id="notes"
               name="notes"
               label="Notes"
-              type="text"
-              fullWidth
               maxRows={3}
+              type="text"
               variant="outlined"
+              margin="dense"
               placeholder="Hobbies, nicknames, etc."
               InputLabelProps={{ shrink: true }}
-              value={editedData.notes || ""}
-              onChange={handleInputChange}
+              value={formData.notes || ""}
+              onChange={(e) => handleInputChange("notes", e.target.value)}
             />
             <RedBar />
             {/* TODO lowercase before storing into db */}
@@ -173,54 +163,57 @@ export default function UpdateCreateStudentDialog({
               Contact Information
             </Typography>
             <TextField
+              fullWidth
               required
-              margin="dense"
               id="email"
               name="email"
               label="Email Address"
               type="email"
-              fullWidth
               variant="outlined"
-              value={editedData.email || ""}
-              onChange={handleInputChange}
+              margin="dense"
+              value={formData.email || ""}
+              onChange={(e) => handleInputChange("email", e.target.value)}
             />
             <TextField
+              fullWidth
               required
-              margin="dense"
               id="phone"
               name="phone"
               label="Phone Number"
               type="tel"
-              fullWidth
               variant="outlined"
-              value={editedData.phone || ""}
-              onChange={handleInputChange}
+              margin="dense"
+              value={formData.phone || ""}
+              onChange={(e) => handleInputChange("phone", e.target.value)}
             />
             <RedBar />
             <Typography variant="body2" display="block" gutterBottom>
               School Information
             </Typography>
             <TextField
+              fullWidth
               required
-              margin="dense"
               id="currentSchool"
               name="currentSchool"
               label="Current School"
               type="text"
-              fullWidth
               variant="outlined"
-              value={editedData.currentSchool || ""}
-              onChange={handleInputChange}
+              margin="dense"
+              value={formData.currentSchool || ""}
+              onChange={(e) =>
+                handleInputChange("currentSchool", e.target.value)
+              }
             />
+            {/* TODO update to Select */}
             <TextField
+              fullWidth
+              required
               id="grade"
               name="grade"
               label="Select a grade"
               margin="dense"
-              required
               select
-              fullWidth
-              value={editedData.grade?.id || ""}
+              value={formData.grade?.id || ""}
               onChange={handleGradeChange}
             >
               {grades &&
@@ -231,16 +224,18 @@ export default function UpdateCreateStudentDialog({
                 ))}
             </TextField>
             <TextField
+              fullWidth
               required
-              margin="dense"
               id="textbookPublisher"
               name="textbookPublisher"
               label="Textbook Publisher"
               type="text"
-              fullWidth
               variant="outlined"
-              value={editedData.textbookPublisher}
-              onChange={handleInputChange}
+              margin="dense"
+              value={formData.textbookPublisher || ""}
+              onChange={(e) =>
+                handleInputChange("textbookPublisher", e.target.value)
+              }
             />
             <RedBar />
             <Typography variant="body2" display="block" gutterBottom>
@@ -251,8 +246,8 @@ export default function UpdateCreateStudentDialog({
                 <DatePicker
                   label="Join Date"
                   format="YYYY-MM-DD"
-                  value={editedData.joinDate && dayjs(editedData.joinDate)}
-                  onChange={(date) => handleDateChange("joinDate", date)}
+                  value={formData.joinDate ? dayjs(formData.joinDate) : null}
+                  onChange={(date) => handleInputChange("joinDate", date)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
                   slotProps={{
                     textField: {
@@ -265,8 +260,8 @@ export default function UpdateCreateStudentDialog({
                 <DatePicker
                   label="Leave Date"
                   format="YYYY-MM-DD"
-                  value={editedData.leaveDate && dayjs(editedData.leaveDate)}
-                  onChange={(date) => handleDateChange("leaveDate", date)}
+                  value={formData.leaveDate ? dayjs(formData.leaveDate) : null}
+                  onChange={(date) => handleInputChange("leaveDate", date)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
                 />
               </Grid>

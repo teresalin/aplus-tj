@@ -23,7 +23,7 @@ import { Student } from "../../api/persons/students";
 import CustomToolBar from "../../../src/components/grid/CustomToolBar";
 import fetcher from "../../../utils/fetcher";
 import UpdateCreateStaffDialog from "../../../src/components/person/staff/UpdateCreateStaffDialog";
-import UpdateCreateStudentDialog from "../../../src/components/person/student/UpdateCreateStudentDialog";
+import UpdateCreateStudentDialog from "../../../src/components/person/student/UpdateStudentDialog";
 
 function a11yProps(key: string) {
   return {

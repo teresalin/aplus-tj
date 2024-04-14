@@ -1,31 +1,75 @@
+import { mutate } from "swr";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CakeIcon from "@mui/icons-material/Cake";
 import Card from "@mui/material/Card";
 import CircularProgress from "@mui/material/CircularProgress";
+import EditIcon from "@mui/icons-material/Edit";
 import EmailIcon from "@mui/icons-material/Email";
 import Grid from "@mui/material/Grid";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
-import Paper from "@mui/material/Paper";
 import React from "react";
 import Typography from "@mui/material/Typography";
 
 import { Student } from "../../../../pages/api/persons/students";
+import UpdateStudentDialog from "./UpdateStudentDialog";
 
 type DetailsTabProps = {
-  details: Student;
+  student: Student;
 };
 
-const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
+function formatDate(date: Date): string {
+  const isoString = new Date(date).toISOString();
+  return isoString.split(/[T ]/i, 1)[0];
+}
+
+const DetailsTab: React.FC<DetailsTabProps> = ({ student }) => {
   const theme = useTheme();
 
-  if (!details) {
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = React.useState(false);
+
+  const handleEditClick = () => {
+    setIsUpdateDialogOpen(true);
+  };
+
+  const handleCloseUpdateDialog = () => {
+    setIsUpdateDialogOpen(false);
+  };
+
+  const handleUpdateStudent = async (data: Student) => {
+    const response = await fetch(`/api/persons/students/${data.personId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      setIsUpdateDialogOpen(false);
+      mutate({ ...data });
+    } else {
+      console.error("Error updating student:", response.statusText);
+    }
+  };
+
+  if (!student) {
     return <CircularProgress />;
   }
 
   return (
     <>
+      <Box sx={{ display: "flex", flexDirection: "row-reverse" }} m={1}>
+        <Button
+          variant="text"
+          color="primary"
+          startIcon={<EditIcon />}
+          onClick={handleEditClick}
+        >
+          Edit
+        </Button>
+      </Box>
       <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Grid container direction="row" spacing={3}>
           <Grid item>
@@ -37,19 +81,19 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
                 // maxHeight: { xs: 100, md: 180 },
                 // maxWidth: { xs: 100, md: 180 },
               }}
-              alt="The house from the offer."
+              alt="User profile picture"
               src={`${
-                details.gender === "Male"
+                student.gender === "Male"
                   ? "/student-boy.png"
-                  : details.gender === "Female"
+                  : student.gender === "Female"
                   ? "/student-girl.png"
                   : "/student-other.png"
               }`}
             />
           </Grid>
           <Grid item>
-            <Typography variant="h6">{details.name}</Typography>
-            <Typography variant="subtitle2">{details.englishName}</Typography>
+            <Typography variant="h6">{student.name}</Typography>
+            <Typography variant="subtitle2">{student.englishName}</Typography>
             <Grid container>
               <Grid item>
                 <Button
@@ -64,7 +108,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
                     fontSize: 12,
                   }}
                 >
-                  {details.email}
+                  {student.email}
                 </Button>
               </Grid>
               <Grid item>
@@ -80,7 +124,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
                     fontSize: 12,
                   }}
                 >
-                  {details.phone}
+                  {student.phone}
                 </Button>
               </Grid>
               <Grid item>
@@ -96,8 +140,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
                     fontSize: 12,
                   }}
                 >
-                  {/* TODO format date correctly */}
-                  {new Date(details.dateOfBirth).toDateString()}
+                  {formatDate(student.dateOfBirth)}
                 </Button>
               </Grid>
             </Grid>
@@ -116,7 +159,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
             >
               Current School
             </Typography>
-            <Typography variant="body2">{details.currentSchool}</Typography>
+            <Typography variant="body2">{student.currentSchool}</Typography>
           </Grid>
           <Grid item sm={12} md={4}>
             <Typography
@@ -125,7 +168,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
             >
               Grade
             </Typography>
-            <Typography variant="body2">{details.grade.name}</Typography>
+            <Typography variant="body2">{student.grade.name}</Typography>
           </Grid>
           <Grid item sm={12} md={4}>
             <Typography
@@ -134,7 +177,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
             >
               Textbook Publisher
             </Typography>
-            <Typography variant="body2">{details.textbookPublisher}</Typography>
+            <Typography variant="body2">{student.textbookPublisher}</Typography>
           </Grid>
         </Grid>
       </Card>
@@ -151,8 +194,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
               Join Date
             </Typography>
             <Typography variant="body2">
-              {/* TODO format date correctly */}
-              {details.joinDate.toString()}
+              {formatDate(student.joinDate)}
             </Typography>
           </Grid>
           <Grid item sm={12} md={4}>
@@ -163,8 +205,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
               Leave Date
             </Typography>
             <Typography variant="body2">
-              {/* TODO format date correctly */}
-              {details.leaveDate?.toString()}
+              {formatDate(student.leaveDate)}
             </Typography>
           </Grid>
           <Grid item sm={12} md={4}>
@@ -175,7 +216,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
               Status
             </Typography>
             <Typography variant="body2">
-              {details.active ? "Active" : "Inactive"}
+              {student.active ? "Active" : "Inactive"}
             </Typography>
           </Grid>
         </Grid>
@@ -190,8 +231,14 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ details }) => {
         >
           Notes
         </Typography>
-        <Typography variant="body2">{details.notes || "N/A"}</Typography>
+        <Typography variant="body2">{student.notes || "N/A"}</Typography>
       </Card>
+      <UpdateStudentDialog
+        student={student}
+        open={isUpdateDialogOpen}
+        onClose={handleCloseUpdateDialog}
+        onSubmit={handleUpdateStudent}
+      />
     </>
   );
 };

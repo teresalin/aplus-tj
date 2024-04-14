@@ -78,10 +78,12 @@ function formatDaysOfWeek(schedules: Schedule[]): string {
 export default function ClassDetails() {
   const theme = useTheme();
   const classID = useRouter().query.class_id;
-  const [isEditDetailsDialogOpen, setIsEditDetailsDialogOpen] =
-    React.useState(false);
+
   const { data } = useSWR(classID ? `/api/classes/${classID}` : null, fetcher);
   const classData = data as Class;
+
+  const [isEditDetailsDialogOpen, setIsEditDetailsDialogOpen] =
+    React.useState(false);
 
   const handleEditDetailsClick = () => {
     setIsEditDetailsDialogOpen(true);

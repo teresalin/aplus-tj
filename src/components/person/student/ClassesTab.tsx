@@ -1,23 +1,32 @@
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
-import fetcher from "../../../../utils/fetcher";
+import EditIcon from "@mui/icons-material/Edit";
 import Grid from "@mui/material/Grid";
 import React from "react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
+import fetcher from "../../../../utils/fetcher";
+
 const ClassesTab = ({ id }) => {
   const theme = useTheme();
+
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = React.useState(false);
   const { data } = useSWR(`/api/persons/students/${id}/classes`, fetcher);
   const classes = data || [];
 
-  if (!classes) {
-    return <CircularProgress />;
-  }
+  const handleEditClick = () => {
+    setIsUpdateDialogOpen(true);
+  };
+
+  const handleCloseUpdateDialog = () => {
+    setIsUpdateDialogOpen(false);
+  };
 
   const renderChip = (params) => {
     return params ? (
@@ -37,8 +46,22 @@ const ClassesTab = ({ id }) => {
     );
   };
 
+  if (!classes) {
+    return <CircularProgress />;
+  }
+
   return (
     <>
+      <Box sx={{ display: "flex", flexDirection: "row-reverse" }} m={1}>
+        <Button
+          variant="text"
+          color="primary"
+          startIcon={<EditIcon />}
+          onClick={handleEditClick}
+        >
+          Edit
+        </Button>
+      </Box>
       {classes.map((classData) => (
         <>
           <Stack direction="row" alignItems="center">
@@ -74,8 +97,10 @@ const ClassesTab = ({ id }) => {
                 >
                   Recent Attendance
                 </Typography>
-                {classData.sessionDates.map((date) => (
-                  <Typography variant="body2">{date}</Typography>
+                {classData.sessionDates.map((index, date) => (
+                  <Typography key={index} variant="body2">
+                    {date}
+                  </Typography>
                 ))}
               </Grid>
             </Grid>

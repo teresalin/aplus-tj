@@ -31,7 +31,7 @@ function CustomTabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ py: 0 }}>{children}</Box>}
     </div>
   );
 }
@@ -45,15 +45,21 @@ function a11yProps(index: number) {
 
 export default function ClassDetails() {
   const theme = useTheme();
-
   const router = useRouter();
+
   const { tab, id } = router.query;
   const { data } = useSWR(id ? `/api/persons/${tab}/${id}` : null, fetcher);
   const details = data || null;
+
   const [value, setValue] = React.useState(0);
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+  };
+
+  const handleEditClick = () => {
+    setIsEditDialogOpen(true);
   };
 
   return (
@@ -90,7 +96,7 @@ export default function ClassDetails() {
           </Tabs>
         </Box>
         <CustomTabPanel value={value} index={0}>
-          <DetailsTab details={details} />
+          <DetailsTab student={details} />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
           <ClassesTab id={id} />

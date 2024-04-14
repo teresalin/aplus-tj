@@ -10,6 +10,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import ClassIcon from "@mui/icons-material/Class";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import Divider from "@mui/material/Divider";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import GridViewIcon from "@mui/icons-material/GridView";
 import GroupIcon from "@mui/icons-material/Group";
 import Link from "next/link";
@@ -93,7 +94,7 @@ export default function SelectedListItem({ toggleTheme }) {
           <Link href="/attendance">
             <ListItemButton selected={isActive("/attendance")}>
               <ListItemIcon>
-                <AccessTimeFilledIcon />
+                <EventAvailableIcon />
               </ListItemIcon>
               <ListItemText primary="Attendance" />
             </ListItemButton>
