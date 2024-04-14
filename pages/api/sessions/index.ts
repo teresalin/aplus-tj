@@ -1,15 +1,6 @@
 import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-
-export interface Session {
-  id: number;
-  classId: number;
-  className: string;
-  teacher: string;
-  date: Date;
-  startTime: Date;
-  endTime: Date;
-}
+import { Session } from "../../../src/components/session/types";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();

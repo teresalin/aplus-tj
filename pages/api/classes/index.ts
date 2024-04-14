@@ -1,23 +1,6 @@
-import { Assignment } from "../assignments";
 import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
-import { Grade } from "../grades";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseClass } from "../../../utils/apiUtils";
-import { Person } from "../persons";
-import { Schedule } from "./[class_id]/schedules";
-import { Staff } from "../persons/staffs";
-
-export interface Class {
-  id: number;
-  name: string;
-  teacher: Staff;
-  grade: Grade;
-  schedules: Schedule[];
-  capacity: number;
-  studentCount?: number;
-  activeStudents?: Person[];
-  assignments?: Assignment[];
-}
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   let client; // Declare the client variable outside the try-catch block.

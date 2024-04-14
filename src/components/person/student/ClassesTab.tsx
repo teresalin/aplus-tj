@@ -65,12 +65,12 @@ const ClassesTab = ({ id }) => {
       {classes.map((classData) => (
         <>
           <Stack direction="row" alignItems="center">
-            <Typography variant="h6" gutterBottom mr={1}>
-              {classData.name}
-            </Typography>
-            <Box sx={{ pb: "7px" }}>{renderChip(classData.active)}</Box>
+            <Typography variant="h6">{classData.name}</Typography>
+            <Box sx={{ pb: "7px", ml: "0.5em" }}>
+              {renderChip(classData.active)}
+            </Box>
           </Stack>
-          <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
+          <Card variant="outlined" sx={{ p: 2, my: 1 }}>
             <Grid container spacing={3}>
               <Grid item sm={12} md={4}>
                 <Typography

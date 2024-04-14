@@ -16,11 +16,13 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import useSWR, { mutate } from "swr";
 
-import { Class } from "../../api/classes";
+import { Class } from "../../../src/components/class/types";
 import { Schedule } from "../../api/classes/[class_id]/schedules";
+import {
+  UpdateClassDetailsDialog,
+  UpdateClassStudentsDialog,
+} from "../../../src/components/class";
 import fetcher from "../../../utils/fetcher";
-import UpdateClassDetailsDialog from "../../../src/components/class/UpdateClassDetailsDialog";
-import UpdateClassStudentsDialog from "../../../src/components/class/UpdateClassStudentsDialog";
 
 const columns: GridColDef[] = [
   {

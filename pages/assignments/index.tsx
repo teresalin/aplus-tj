@@ -15,13 +15,15 @@ import {
   GridColumnVisibilityModel,
 } from "@mui/x-data-grid";
 
-import { Assignment } from "../api/assignments";
-import CreateAssignmentDialog from "../../src/components/assignment/CreateAssignmentDialog";
+import { Assignment } from "../../src/components/assignment/types";
+import {
+  CreateAssignmentDialog,
+  DeleteAssignmentDialog,
+  UpdateAssignmentDialog,
+} from "../../src/components/assignment";
 import CustomToolBar from "../../src/components/grid/CustomToolBar";
-import DeleteAssignmentDialog from "../../src/components/assignment/DeleteAssignmentDialog";
 import fetcher from "../../utils/fetcher";
 import RenderMenu from "../../src/components/grid/RenderMenu";
-import UpdateAssignmentDialog from "../../src/components/assignment/UpdateAssignmentDialog";
 
 function a11yProps(key: string) {
   return {

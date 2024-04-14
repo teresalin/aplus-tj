@@ -1,18 +1,6 @@
 import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
-import { Grade } from "../../grades";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseStudent } from "../../../../utils/apiUtils";
-import { Person } from "../../persons";
-
-export interface Student extends Person {
-  studentId: number;
-  englishName: string;
-  currentSchool: string;
-  textbookPublisher: string;
-  grade: Grade;
-  joinDate: Date;
-  leaveDate: Date;
-}
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();

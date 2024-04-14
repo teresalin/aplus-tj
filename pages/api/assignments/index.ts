@@ -1,16 +1,6 @@
-import { Class } from "../classes";
 import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseAssignment } from "../../../utils/apiUtils";
-
-export interface Assignment {
-  id: number;
-  classInfo: Partial<Class>;
-  name: string;
-  description?: string;
-  dueDate: Date;
-  created: Date;
-}
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { filter } = req.query;

@@ -12,8 +12,8 @@ import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import React from "react";
 import Typography from "@mui/material/Typography";
 
-import { Student } from "../../../../pages/api/persons/students";
-import UpdateStudentDialog from "./UpdateStudentDialog";
+import { Student } from "./types";
+import UpdateStudentDialog from "./forms/UpdateStudentDialog";
 
 type DetailsTabProps = {
   student: Student;

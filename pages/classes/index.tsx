@@ -12,9 +12,9 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { Class } from "../api/classes";
+import { Class } from "../../src/components/class/types";
+import { CreateClassDialog } from "../../src/components/class";
 import { Schedule } from "../api/classes/[class_id]/schedules";
-import CreateClassDialog from "../../src/components/class/CreateClassDialog";
 import fetcher from "../../utils/fetcher";
 
 function AddIconButton({ onClick }) {

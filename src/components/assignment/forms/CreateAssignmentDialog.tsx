@@ -13,9 +13,9 @@ import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import useSWR from "swr";
 
-import { Assignment } from "../../../pages/api/assignments";
-import { Class } from "../../../pages/api/classes";
-import fetcher from "../../../utils/fetcher";
+import { Assignment } from "../../../../pages/api/assignments";
+import { Class } from "../../../../pages/api/classes";
+import fetcher from "../../../../utils/fetcher";
 
 export interface ICreateAssignmentDialogProps {
   open: boolean;

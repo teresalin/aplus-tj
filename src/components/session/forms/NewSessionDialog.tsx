@@ -9,12 +9,12 @@ import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import useSWR from "swr";
 
-import fetcher from "../../../utils/fetcher";
-import { Class } from "../../../pages/api/classes";
+import fetcher from "../../../../utils/fetcher";
+import { Class } from "../../../../pages/api/classes";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-import { Session } from "../../../pages/api/sessions";
+import { Session } from "../../../../pages/api/sessions";
 import Select from "@mui/material/Select";
 import dayjs from "dayjs";
 import InputLabel from "@mui/material/InputLabel";

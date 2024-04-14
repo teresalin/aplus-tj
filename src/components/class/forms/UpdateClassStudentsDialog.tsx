@@ -15,9 +15,9 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import fetcher from "../../../utils/fetcher";
-import { Person } from "../../../pages/api/persons";
-import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
+import fetcher from "../../../../utils/fetcher";
+import { Person } from "../../../../pages/api/persons";
+import { Schedule } from "../../../../pages/api/classes/[class_id]/schedules";
 
 function RedBar() {
   return (

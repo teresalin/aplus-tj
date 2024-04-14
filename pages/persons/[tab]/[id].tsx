@@ -9,9 +9,11 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import useSWR from "swr";
 
-import BillingTab from "../../../src/components/person/student/BillingTab";
-import ClassesTab from "../../../src/components/person/student/ClassesTab";
-import DetailsTab from "../../../src/components/person/student/DetailsTab";
+import {
+  BillingTab,
+  ClassesTab,
+  DetailsTab,
+} from "../../../src/components/person/student";
 import fetcher from "../../../utils/fetcher";
 
 interface TabPanelProps {

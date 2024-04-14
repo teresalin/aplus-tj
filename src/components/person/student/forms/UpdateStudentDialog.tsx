@@ -14,9 +14,9 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import fetcher from "../../../../utils/fetcher";
-import { Grade } from "../../../../pages/api/grades";
-import { Student } from "../../../../pages/api/persons/students";
+import fetcher from "../../../../../utils/fetcher";
+import { Grade } from "../../../../../pages/api/grades";
+import { Student } from "../types";
 
 function RedBar() {
   return (
@@ -28,23 +28,31 @@ function RedBar() {
   );
 }
 
-export interface ICreateStudentDialogProps {
+export interface IUpdateStudentDialogProps {
+  student: Student;
   open: boolean;
-  onClose: () => void;
-  onSubmit: (data: Student) => Promise<void>;
+  onClose;
+  onSubmit;
 }
 
-export default function CreateStudentDialog({
+export default function UpdateStudentDialog({
+  student,
   open,
   onClose,
   onSubmit,
-}: ICreateStudentDialogProps) {
-  const [newStudent, setNewStudent] = React.useState({} as Student);
+}: IUpdateStudentDialogProps) {
+  const [formData, setFormData] = React.useState({} as Student);
   const { data } = useSWR("/api/grades", fetcher);
   const grades = data || [];
 
+  React.useEffect(() => {
+    if (student) {
+      setFormData(student);
+    }
+  }, [student]);
+
   const handleInputChange = (field: string, value) => {
-    setNewStudent((prevData) => ({
+    setFormData((prevData) => ({
       ...prevData,
       [field]: value,
     }));
@@ -54,14 +62,14 @@ export default function CreateStudentDialog({
     const { value } = event.target;
     // Find the selected grade object from your grades array
     const selectedGrade = grades.find((grade) => grade.id === value);
-    setNewStudent((prevData) => ({
+    setFormData((prevData) => ({
       ...prevData,
       grade: selectedGrade || {},
     }));
   };
 
   const handleSubmit: React.FormEventHandler = (event: React.FormEvent) => {
-    onSubmit(newStudent);
+    onSubmit(formData);
   };
 
   return (
@@ -84,7 +92,7 @@ export default function CreateStudentDialog({
                   type="text"
                   variant="outlined"
                   margin="dense"
-                  value={newStudent.name || ""}
+                  value={formData.name || ""}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                 />
               </Grid>
@@ -97,7 +105,7 @@ export default function CreateStudentDialog({
                   type="text"
                   variant="outlined"
                   margin="dense"
-                  value={newStudent.englishName || ""}
+                  value={formData.englishName || ""}
                   onChange={(e) =>
                     handleInputChange("englishName", e.target.value)
                   }
@@ -107,7 +115,9 @@ export default function CreateStudentDialog({
             <DatePicker
               label="Date of Birth"
               format="YYYY-MM-DD"
-              value={newStudent.dateOfBirth || null}
+              // We want to put a null value here so the date picker field
+              // does not complain anad show a red error outline
+              value={formData.dateOfBirth ? dayjs(formData.dateOfBirth) : null}
               onChange={(date) => handleInputChange("dateOfBirth", date)}
               sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
               slotProps={{
@@ -125,7 +135,7 @@ export default function CreateStudentDialog({
               label="Select a gender"
               margin="dense"
               select
-              value={newStudent.gender || ""}
+              value={formData.gender || ""}
               onChange={(e) => handleInputChange("gender", e.target.value)}
             >
               <MenuItem value="Male">Male</MenuItem>
@@ -144,7 +154,7 @@ export default function CreateStudentDialog({
               margin="dense"
               placeholder="Hobbies, nicknames, etc."
               InputLabelProps={{ shrink: true }}
-              value={newStudent.notes || ""}
+              value={formData.notes || ""}
               onChange={(e) => handleInputChange("notes", e.target.value)}
             />
             <RedBar />
@@ -161,7 +171,7 @@ export default function CreateStudentDialog({
               type="email"
               variant="outlined"
               margin="dense"
-              value={newStudent.email || ""}
+              value={formData.email || ""}
               onChange={(e) => handleInputChange("email", e.target.value)}
             />
             <TextField
@@ -173,7 +183,7 @@ export default function CreateStudentDialog({
               type="tel"
               variant="outlined"
               margin="dense"
-              value={newStudent.phone || ""}
+              value={formData.phone || ""}
               onChange={(e) => handleInputChange("phone", e.target.value)}
             />
             <RedBar />
@@ -189,7 +199,7 @@ export default function CreateStudentDialog({
               type="text"
               variant="outlined"
               margin="dense"
-              value={newStudent.currentSchool || ""}
+              value={formData.currentSchool || ""}
               onChange={(e) =>
                 handleInputChange("currentSchool", e.target.value)
               }
@@ -203,7 +213,7 @@ export default function CreateStudentDialog({
               label="Select a grade"
               margin="dense"
               select
-              value={newStudent.grade?.id || ""}
+              value={formData.grade?.id || ""}
               onChange={handleGradeChange}
             >
               {grades &&
@@ -222,7 +232,7 @@ export default function CreateStudentDialog({
               type="text"
               variant="outlined"
               margin="dense"
-              value={newStudent.textbookPublisher || ""}
+              value={formData.textbookPublisher || ""}
               onChange={(e) =>
                 handleInputChange("textbookPublisher", e.target.value)
               }
@@ -236,8 +246,8 @@ export default function CreateStudentDialog({
                 <DatePicker
                   label="Join Date"
                   format="YYYY-MM-DD"
-                  value={newStudent.joinDate || null}
-                  onChange={(date) => handleInputChange("dueDate", date)}
+                  value={formData.joinDate ? dayjs(formData.joinDate) : null}
+                  onChange={(date) => handleInputChange("joinDate", date)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
                   slotProps={{
                     textField: {
@@ -250,7 +260,7 @@ export default function CreateStudentDialog({
                 <DatePicker
                   label="Leave Date"
                   format="YYYY-MM-DD"
-                  value={newStudent.leaveDate || null}
+                  value={formData.leaveDate ? dayjs(formData.leaveDate) : null}
                   onChange={(date) => handleInputChange("leaveDate", date)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
                 />
@@ -259,7 +269,7 @@ export default function CreateStudentDialog({
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
-            <Button autoFocus type="submit">
+            <Button autoFocus type="submit" onClick={handleSubmit}>
               Submit
             </Button>
           </DialogActions>

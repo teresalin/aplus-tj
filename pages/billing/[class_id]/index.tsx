@@ -22,9 +22,9 @@ import CustomToolBar from "../../../src/components/grid/CustomToolBar";
 import DetailPanel from "../../../src/components/grid/DetailPanel";
 import RenderMenu from "../../../src/components/grid/RenderMenu";
 import StudentDetailPanel from "../../../src/components/person/StudentDetailPanel";
-import UpdateCreateStudentDialog from "../../../src/components/person/student/UpdateStudentDialog";
+import UpdateCreateStudentDialog from "../../../src/components/person/student/forms/UpdateStudentDialog";
 import { Student } from "../../api/persons/students";
-import DeactivateStudentDialog from "../../../src/components/person/student/DeactivateStudentDialog";
+import DeactivateStudentDialog from "../../../src/components/person/student/forms/DeactivateStudentDialog";
 
 function a11yProps(key: string) {
   return {

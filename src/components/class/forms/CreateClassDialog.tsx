@@ -18,11 +18,11 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { Class } from "../../../pages/api/classes";
-import { Grade } from "../../../pages/api/grades";
-import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
-import { Staff } from "../../../pages/api/persons/staffs";
-import fetcher from "../../../utils/fetcher";
+import { Class } from "../../../../pages/api/classes";
+import { Grade } from "../../../../pages/api/grades";
+import { Schedule } from "../../../../pages/api/classes/[class_id]/schedules";
+import { Staff } from "../../../../pages/api/persons/staffs";
+import fetcher from "../../../../utils/fetcher";
 
 export interface ICreateClassDialogProps {
   open: boolean;
