@@ -1,4 +1,4 @@
-import { Assignment } from "..";
+import { Assignment } from "../../../../src/components/assignment/types";
 import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { PoolClient } from "pg";

@@ -2,7 +2,7 @@ import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseStudent } from "../../../../../utils/apiUtils";
 import { PoolClient } from "pg";
-import { Student } from "..";
+import { Student } from "../../../../../src/components/person/student/types";
 
 async function createPersonAndStudent(client: PoolClient, data: Student) {
   const {
@@ -128,28 +128,28 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       try {
         const studentSelectQuery = {
           text: `
-              SELECT 
-                person.id AS person_id,
-                person.name,
-                person.gender,
-                person.phone,
-                person.email,
-                person.date_of_birth,
-                person.notes,
-                person.active,
-                student.id AS student_id,
-                student.english_name,
-                student.current_school,
-                student.textbook_publisher,
-                student.join_date, 
-                student.leave_date, 
-                grade.id AS grade_id,
-                grade.name AS grade_name
-              FROM student
-              INNER JOIN person ON student.person_id = person.id
-              INNER JOIN grade ON student.grade_id = grade.id
-              WHERE person.id = $1;
-            `,
+            SELECT 
+              person.id AS person_id,
+              person.name,
+              person.gender,
+              person.phone,
+              person.email,
+              person.date_of_birth,
+              person.notes,
+              person.active,
+              student.id AS student_id,
+              student.english_name,
+              student.current_school,
+              student.textbook_publisher,
+              student.join_date, 
+              student.leave_date, 
+              grade.id AS grade_id,
+              grade.name AS grade_name
+            FROM student
+            INNER JOIN person ON student.person_id = person.id
+            INNER JOIN grade ON student.grade_id = grade.id
+            WHERE person.id = $1;
+          `,
           values: [personID],
         };
         const result = await client.query(studentSelectQuery);

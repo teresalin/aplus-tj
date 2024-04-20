@@ -97,11 +97,11 @@ const ClassesTab = ({ id }) => {
                 >
                   Recent Attendance
                 </Typography>
-                {classData.sessionDates.map((index, date) => (
+                {/* {classData.sessionDates.map((index, date) => (
                   <Typography key={index} variant="body2">
                     {date}
                   </Typography>
-                ))}
+                ))} */}
               </Grid>
             </Grid>
           </Card>

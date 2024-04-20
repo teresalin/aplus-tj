@@ -1,33 +1,34 @@
 import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
+import { parseSession } from "../../../../utils/apiUtils";
+import { PoolClient } from "pg";
+import { Session } from "../../../../src/components/session/types";
 
-// TODO reformat?
-export interface SessionDetail {
-  id: number;
-  teacher: string;
-  className: string;
-  sessionDate: Date;
-  startTime: Date;
-  endTime: Date;
-  attended: Attendee[];
-  absent: Attendee[];
+async function getSession(
+  client: PoolClient,
+  sessionID: string | string[] | undefined | number
+) {
+  const query = {
+    text: `
+      SELECT id, class_id, date, start_time, end_time
+      FROM session
+      WHERE id = $1;
+    `,
+    values: [sessionID],
+  };
+
+  const result = await client.query(query);
+  return result.rows.map(parseSession)[0];
 }
 
-export interface Attendee {
-  id: number;
-  name: string;
-  gender: string;
-  englishName: string;
-  currentSchool: string;
-}
-
-// TODO replace hard-coded values
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const sessionID = req.query.session_id;
-  const client = await getDBClient();
-
+async function getSessionDetail(
+  client: PoolClient,
+  sessionID: string | string[] | undefined
+) {
   try {
-    const query = {
+    await client.query("BEGIN");
+
+    const sessionGetQuery = {
       text: `
         WITH attended_students AS (
           SELECT
@@ -109,21 +110,153 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         JOIN absent_students ON attended_students.session_id = absent_students.session_id
       `,
     };
-    const result = await client.query(query);
-    res.status(200).json({
-      status: "Success",
-      result: result.rows[0],
-      message: "Session retrieved successfully.",
-    });
+
+    const sessionResult = await client.query(sessionGetQuery);
+
+    await client.query("COMMIT");
+    return sessionResult.rows[0];
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  }
+}
+
+async function createSession(client: PoolClient, data: Session) {
+  const { id, classId, date, startTime, endTime } = data;
+
+  try {
+    await client.query("BEGIN");
+
+    const query = {
+      text: `
+        INSERT INTO session(class_id, date, start_time, end_time, time_created, time_updated)
+        VALUES($1, $2, $3, $4, NOW(), NOW());
+      `,
+      values: [classId, date, startTime, endTime],
+    };
+    await client.query(query);
+
+    // Fetch updated data after update within the same transaction
+    const updatedResult = await getSession(client, id);
+
+    await client.query("COMMIT");
+    return updatedResult;
   } catch (error) {
-    console.error("Error retrieving session", error);
-    res.status(500).json({
-      status: "Error",
-      message: "Internal server error",
-    });
-  } finally {
-    if (client) {
-      await releaseDBClient(client);
-    }
+    await client.query("ROLLBACK");
+    throw error;
+  }
+}
+
+async function updateSession(client: PoolClient, data: Session) {
+  const { id, classId, date, startTime, endTime } = data;
+
+  try {
+    await client.query("BEGIN");
+
+    const query = {
+      text: `
+        UPDATE session 
+        SET class_id = $2, date = $3, start_time = $4, end_time = $5, time_created = NOW(), time_updated = NOW()
+        WHERE id = $1
+        RETURNING id;
+      `,
+      values: [id, classId, date, startTime, endTime],
+    };
+    await client.query(query);
+
+    // Fetch updated data after update within the same transaction
+    const updatedResult = await getSession(client, id);
+
+    await client.query("COMMIT");
+    return updatedResult;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  }
+}
+
+// TODO replace hard-coded values
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  const sessionID = req.query.session_id;
+  const client = await getDBClient();
+
+  switch (req.method) {
+    case "GET":
+      try {
+        const getResult = await getSessionDetail(client, sessionID);
+        res.status(200).json({
+          status: "Success",
+          result: getResult,
+          message: "Session retrieved successfully.",
+        });
+      } catch (error) {
+        console.error("Error retrieving session", error);
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
+      } finally {
+        if (client) {
+          await releaseDBClient(client);
+        }
+      }
+      break;
+    case "POST":
+      try {
+        const data: Session = req.body;
+        const createResult = await createSession(client, data);
+        res.status(200).json({
+          status: "Success",
+          result: createResult,
+          message: "Class created successfully.",
+        });
+      } catch (error) {
+        console.error("Error creating session", error);
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
+      } finally {
+        if (client) {
+          await releaseDBClient(client);
+        }
+      }
+      break;
+    case "PUT":
+      try {
+        const data: Session = req.body;
+        const updateResult = await updateSession(client, data);
+        res.status(200).json({
+          status: "Success",
+          result: updateResult,
+          message: "Class updated successfully.",
+        });
+      } catch (error) {
+        console.error("Error updating session", error);
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
+      } finally {
+        if (client) {
+          await releaseDBClient(client);
+        }
+      }
+      break;
+    case "DELETE":
+      try {
+        // TODO implement delete API
+      } catch (error) {
+        console.error("Error deleting session", error);
+        res.status(500).json({
+          status: "Error",
+          message: "Internal server error",
+        });
+      } finally {
+        if (client) {
+          await releaseDBClient(client);
+        }
+      }
+      break;
   }
 };

@@ -16,7 +16,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import useSWR, { mutate } from "swr";
 
-import { Class } from "../../../src/components/class/types";
+import { Class, ClassDetail } from "../../../src/components/class/types";
 import { Schedule } from "../../api/classes/[class_id]/schedules";
 import {
   UpdateClassDetailsDialog,
@@ -82,7 +82,7 @@ export default function ClassDetails() {
   const classID = useRouter().query.class_id;
 
   const { data } = useSWR(classID ? `/api/classes/${classID}` : null, fetcher);
-  const classData = data as Class;
+  const classDetail = data as ClassDetail;
 
   const [isEditDetailsDialogOpen, setIsEditDetailsDialogOpen] =
     React.useState(false);
@@ -115,7 +115,7 @@ export default function ClassDetails() {
     }
   };
 
-  if (!classData) return <CircularProgress />;
+  if (!classDetail) return <CircularProgress />;
 
   return (
     <>
@@ -161,7 +161,7 @@ export default function ClassDetails() {
                 >
                   Grade
                 </Typography>
-                <Typography>{classData && classData.grade.name}</Typography>
+                <Typography>{classDetail && classDetail.grade.name}</Typography>
               </Card>
             </Grid>
             <Grid item xs={12} md={4}>
@@ -174,8 +174,8 @@ export default function ClassDetails() {
                   Schedule
                 </Typography>
                 <Typography>
-                  {classData.schedules
-                    ? formatDaysOfWeek(classData.schedules)
+                  {classDetail.schedules
+                    ? formatDaysOfWeek(classDetail.schedules)
                     : "N/A"}
                 </Typography>
               </Card>
@@ -189,7 +189,9 @@ export default function ClassDetails() {
                   Teacher
                 </Typography>
                 <Typography>
-                  {classData ? classData.teacher.name : "No teacher assigned"}
+                  {classDetail
+                    ? classDetail.teacher.name
+                    : "No teacher assigned"}
                 </Typography>
               </Card>
             </Grid>
@@ -200,8 +202,8 @@ export default function ClassDetails() {
         Assignments
       </Typography>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        {classData && classData.assignments ? (
-          classData.assignments.slice(0, 3).map((detail, index, array) => (
+        {classDetail && classDetail.assignments ? (
+          classDetail.assignments.slice(0, 3).map((detail, index, array) => (
             <Card
               key={index}
               style={{
@@ -242,13 +244,15 @@ export default function ClassDetails() {
         <Typography variant="h6" gutterBottom>
           Students
         </Typography>
-        {classData && <UpdateClassStudentsDialog classDetails={classData} />}
+        {classDetail && (
+          <UpdateClassStudentsDialog classDetails={classDetail} />
+        )}
       </Grid>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Box sx={{ width: "100%" }}>
-          {classData && classData.activeStudents ? (
+          {classDetail && classDetail.activeStudents ? (
             <DataGrid
-              rows={classData.activeStudents}
+              rows={classDetail.activeStudents}
               columns={columns}
               initialState={{
                 pagination: {
@@ -268,7 +272,7 @@ export default function ClassDetails() {
         </Box>
       </Paper>
       <UpdateClassDetailsDialog
-        existingClass={classData}
+        existingClass={classDetail}
         open={isEditDetailsDialogOpen}
         onClose={handleCloseEditDetailsDialog}
         onSubmit={handleUpdateDetails}

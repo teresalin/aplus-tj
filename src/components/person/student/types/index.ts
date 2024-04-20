@@ -10,3 +10,11 @@ export interface Student extends Person {
   joinDate: Date;
   leaveDate: Date;
 }
+
+export interface StudentSummary {
+  studentId: number;
+  name: string;
+  gender: string;
+  englishName: string;
+  currentSchool: string;
+}

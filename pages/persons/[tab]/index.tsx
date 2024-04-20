@@ -18,12 +18,12 @@ import {
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
-import { Staff } from "../../api/persons/staffs";
-import { Student } from "../../api/persons/students";
 import CustomToolBar from "../../../src/components/grid/CustomToolBar";
 import fetcher from "../../../utils/fetcher";
-import UpdateCreateStaffDialog from "../../../src/components/person/staff/UpdateCreateStaffDialog";
+import UpdateCreateStaffDialog from "../../../src/components/person/staff/forms/UpdateCreateStaffDialog";
 import UpdateCreateStudentDialog from "../../../src/components/person/student/forms/UpdateStudentDialog";
+import { Staff } from "../../../src/components/person/staff/types";
+import { Student } from "../../../src/components/person/student/types";
 
 function a11yProps(key: string) {
   return {
@@ -363,7 +363,7 @@ export default function PersonGrid() {
           hideFooterSelectedRowCount
         />
       )}
-      <UpdateCreateStudentDialog
+      {/* <UpdateCreateStudentDialog
         isUpdate={isUpdate}
         existingData={rowToEdit as Student}
         open={isCreateStudentDialogOpen}
@@ -376,7 +376,7 @@ export default function PersonGrid() {
         open={isCreateStaffDialogOpen}
         onClose={closeDialog}
         onSubmit={handleUpdateOrCreatePerson}
-      />
+      /> */}
       {/* <DeactivateStudentDialog
         open={isDeactivateDialogOpen}
         onClose={handleCloseDeactivateDialog}

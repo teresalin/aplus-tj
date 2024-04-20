@@ -19,9 +19,12 @@ type DetailsTabProps = {
   student: Student;
 };
 
-function formatDate(date: Date): string {
-  const isoString = new Date(date).toISOString();
-  return isoString.split(/[T ]/i, 1)[0];
+function formatDate(date: Date): string | null {
+  if (date) {
+    const isoString = new Date(date).toISOString();
+    return isoString.split(/[T ]/i, 1)[0];
+  }
+  return null;
 }
 
 const DetailsTab: React.FC<DetailsTabProps> = ({ student }) => {

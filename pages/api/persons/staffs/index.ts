@@ -1,23 +1,15 @@
 import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseStaff } from "../../../../utils/apiUtils";
-import { Person } from "..";
-import { Role } from "./roles";
-
-export interface Staff extends Person {
-  staffId: number;
-  role: Role;
-  joinDate: Date;
-  leaveDate: Date;
-}
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
+
   try {
     const query = {
       text: `
         SELECT
-          person.id,
+          person.id AS person_id,
           person.name,
           person.gender,
           person.phone,

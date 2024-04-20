@@ -1,11 +1,12 @@
-import { Assignment } from "../pages/api/assignments";
+import { Assignment } from "../src/components/assignment/types";
 import { Billing } from "../pages/api/billing";
-import { Class } from "../pages/api/classes";
+import { Class, ClassDetail } from "../src/components/class/types";
 import { Parent } from "../pages/api/persons/parents";
 import { Person } from "../pages/api/persons";
 import { Schedule } from "../pages/api/classes/[class_id]/schedules";
-import { Staff } from "../pages/api/persons/staffs";
-import { Student } from "../pages/api/persons/students";
+import { Session, SessionDetail } from "../src/components/session/types";
+import { Staff } from "../src/components/person/staff/types";
+import { Student } from "../src/components/person/student/types";
 
 export function parsePerson(row: any): Person {
   return {
@@ -65,31 +66,67 @@ export function parseStaff(row: any): Staff {
 
 export function parseClass(row: any): Class {
   return {
+    id: row.id,
+    name: row.name,
+    teacherId: row.teacher_id,
+    gradeId: row.grade_id,
+    capacity: row.capacity,
+    active: row.active,
+  };
+}
+
+export function parseClassDetail(row: any): ClassDetail {
+  return {
     id: row.class_id,
     name: row.class_name,
+    teacherId: row.teacher_id,
+    gradeId: row.grade_id,
+    capacity: row.capacity,
+    active: row.active,
     teacher: {
       staffId: row.staff_id,
-      name: row.name,
-      role: undefined,
-      joinDate: undefined,
-      leaveDate: undefined,
-      id: 0,
-      gender: "",
-      phone: "",
-      email: "",
-      dateOfBirth: undefined,
-      notes: "",
-      active: false,
+      name: row.staff_name,
     },
     grade: {
       id: row.grade_id,
       name: row.grade_name,
     },
     schedules: row.schedules,
-    capacity: row.capacity,
     studentCount: row.student_count,
     activeStudents: row.active_students,
     assignments: row.assignments,
+  };
+}
+
+export function parseSession(row: any): Session {
+  return {
+    id: row.id,
+    classId: row.class_id,
+    date: row.date,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    classSummary: {
+      id: row.class_id,
+      name: row.class_name,
+      teacherName: row.staff_name,
+    },
+  };
+}
+
+export function parseSessionDetail(row: any): SessionDetail {
+  return {
+    id: row.id,
+    classId: row.class_id,
+    date: row.date,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    classSummary: {
+      id: row.class_id,
+      name: row.class_name,
+      teacherName: row.staff_name,
+    },
+    present: row.present,
+    absent: row.absent,
   };
 }
 

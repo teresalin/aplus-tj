@@ -71,13 +71,13 @@ VALUES (1, 'Account ID', '12345', false, NOW(), NOW());
 
 CREATE TABLE class (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(50) UNIQUE,
+  name VARCHAR(50) UNIQUE NOT NULL,
   teacher_id INT REFERENCES staff(id) NOT NULL,
   grade_id INT REFERENCES grade(id) NOT NULL,
-  capacity INTEGER,
-  active BOOLEAN,
-  time_created TIMESTAMP,
-  time_updated TIMESTAMP
+  capacity INTEGER NOT NUL,
+  active BOOLEAN DEFAULT TRUE,
+  time_created TIMESTAMP DEFAULT NOW(),
+  time_updated TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE class_cost (

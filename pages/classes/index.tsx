@@ -12,7 +12,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { Class } from "../../src/components/class/types";
+import { Class, ClassDetail } from "../../src/components/class/types";
 import { CreateClassDialog } from "../../src/components/class";
 import { Schedule } from "../api/classes/[class_id]/schedules";
 import fetcher from "../../utils/fetcher";
@@ -97,7 +97,7 @@ export default function Classes() {
         </Button> */}
         <AddIconButton onClick={handleAddButtonClick} />
       </Grid>
-      {classes.map((row: Class) => (
+      {classes.map((row: ClassDetail) => (
         <Link href={`classes/${row.id}`} key={row.id}>
           <Paper key={row.id} sx={{ my: 2, p: 2 }}>
             <Grid

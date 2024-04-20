@@ -1,10 +1,10 @@
-import { Class } from "..";
+import { ClassDetail } from "../../../../src/components/class/types";
 import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { parseClass } from "../../../../utils/apiUtils";
+import { parseClass, parseClassDetail } from "../../../../utils/apiUtils";
 import { PoolClient } from "pg";
 
-async function createClassAndSchedule(client: PoolClient, data: Class) {
+async function createClassAndSchedule(client: PoolClient, data: ClassDetail) {
   const { name, teacher, grade, schedules, capacity } = data;
 
   try {
@@ -46,7 +46,7 @@ async function createClassAndSchedule(client: PoolClient, data: Class) {
   }
 }
 
-async function getClass(client: PoolClient, classID) {
+async function getClassDetail(client: PoolClient, classID) {
   try {
     const query = {
       text: `
@@ -56,7 +56,7 @@ async function getClass(client: PoolClient, classID) {
         c.capacity,
         g.id AS grade_id,
         g.name AS grade_name,
-        p.name,
+        p.name AS staff_name,
         s.id AS staff_id,
         (
           SELECT JSON_AGG(
@@ -157,13 +157,13 @@ async function getClass(client: PoolClient, classID) {
       values: [classID],
     };
     const result = await client.query(query);
-    return result.rows.map(parseClass)[0];
-  } catch (err) {
-    throw err;
+    return result.rows.map(parseClassDetail)[0];
+  } catch (error) {
+    throw error;
   }
 }
 
-async function updateClass(client: PoolClient, data: Class) {
+async function updateClass(client: PoolClient, data: ClassDetail) {
   const {
     id,
     name,
@@ -249,7 +249,7 @@ async function updateClass(client: PoolClient, data: Class) {
     await client.query("COMMIT");
 
     // After commit, fetch the complete updated class data to return
-    const fetchedUpdatedClass = await getClass(client, id);
+    const fetchedUpdatedClass = await getClassDetail(client, id);
     return fetchedUpdatedClass;
   } catch (err) {
     await client.query("ROLLBACK");
@@ -264,7 +264,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case "GET":
       try {
-        const getResult = await getClass(client, classID);
+        const getResult = await getClassDetail(client, classID);
         res.status(200).json({
           status: "Success",
           result: getResult,
@@ -284,7 +284,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "POST":
       try {
-        const data: Class = req.body;
+        const data: ClassDetail = req.body;
         const createResult = await createClassAndSchedule(client, data);
         res.status(200).json({
           status: "Success",
@@ -305,7 +305,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "PUT":
       try {
-        const data: Class = req.body;
+        const data: ClassDetail = req.body;
         const updateResult = await updateClass(client, data);
         res.status(200).json({
           status: "Success",
