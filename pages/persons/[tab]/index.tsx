@@ -309,60 +309,58 @@ export default function PersonGrid() {
           ))}
         </Tabs>
       </Box>
-      {persons && (
-        <DataGrid
-          getRowId={(row) => row.personId}
-          autoHeight={true}
-          sx={{
-            width: "100%",
-            overflow: "hidden",
-            ".MuiDataGrid-cell:focus": {
-              outline: "none",
-            },
-            "& .MuiDataGrid-row:hover": {
-              cursor: "pointer",
-            },
-          }}
-          columnVisibilityModel={columnVisibilityModel}
-          onColumnVisibilityModelChange={(newModel) => {
-            onColumnVisibilityChange(newModel);
-          }}
-          rows={persons}
-          columns={columns}
-          rowSelectionModel={rowSelectionModel}
-          onRowClick={(params) => onRowClick(params.row)}
-          localeText={{
-            toolbarColumns: "",
-            toolbarFilters: "",
-            toolbarDensity: "",
-            toolbarExport: "",
-          }}
-          initialState={{
-            pagination: { paginationModel: { pageSize: 10 } },
-            columns: {
-              columnVisibilityModel: columnVisibilityModel,
-            },
-          }}
-          slots={{
-            toolbar: CustomToolBar,
-          }}
-          slotProps={{
-            panel: {
-              anchorEl: buttonEl,
-              placement: "bottom-end",
-            },
-            toolbar: {
-              children: <AddIconButton onClick={handleAddButtonClick} />,
-              setButtonEl,
-            },
-            columnsPanel: {
-              getTogglableColumns,
-            },
-          }}
-          pageSizeOptions={[5, 10, 25]}
-          hideFooterSelectedRowCount
-        />
-      )}
+      <DataGrid
+        getRowId={(row) => row.personId}
+        autoHeight={true}
+        sx={{
+          width: "100%",
+          overflow: "hidden",
+          ".MuiDataGrid-cell:focus": {
+            outline: "none",
+          },
+          "& .MuiDataGrid-row:hover": {
+            cursor: "pointer",
+          },
+        }}
+        columnVisibilityModel={columnVisibilityModel}
+        onColumnVisibilityModelChange={(newModel) => {
+          onColumnVisibilityChange(newModel);
+        }}
+        rows={persons}
+        columns={columns}
+        rowSelectionModel={rowSelectionModel}
+        onRowClick={(params) => onRowClick(params.row)}
+        localeText={{
+          toolbarColumns: "",
+          toolbarFilters: "",
+          toolbarDensity: "",
+          toolbarExport: "",
+        }}
+        initialState={{
+          pagination: { paginationModel: { pageSize: 10 } },
+          columns: {
+            columnVisibilityModel: columnVisibilityModel,
+          },
+        }}
+        slots={{
+          toolbar: CustomToolBar,
+        }}
+        slotProps={{
+          panel: {
+            anchorEl: buttonEl,
+            placement: "bottom-end",
+          },
+          toolbar: {
+            children: <AddIconButton onClick={handleAddButtonClick} />,
+            setButtonEl,
+          },
+          columnsPanel: {
+            getTogglableColumns,
+          },
+        }}
+        pageSizeOptions={[5, 10, 25]}
+        hideFooterSelectedRowCount
+      />
       {/* <UpdateCreateStudentDialog
         isUpdate={isUpdate}
         existingData={rowToEdit as Student}

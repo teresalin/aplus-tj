@@ -82,7 +82,7 @@ export default function ClassDetails() {
   const classID = useRouter().query.class_id;
 
   const { data } = useSWR(classID ? `/api/classes/${classID}` : null, fetcher);
-  const classDetail = data as ClassDetail;
+  const classDetail = (data as ClassDetail) || [];
 
   const [isEditDetailsDialogOpen, setIsEditDetailsDialogOpen] =
     React.useState(false);

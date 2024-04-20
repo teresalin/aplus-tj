@@ -21,30 +21,30 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const query = {
       text: `
-          SELECT
-            student.id AS student_id,  
-            person.name AS student_name,
-            sbr.id,
-            sbr.billing_date,
-            sbr.description,
-            sbr.amount,
-            sbr.payment_method,
-            sbr.invoice_number,
-            sbr.time_created,
-            CASE
-              WHEN COALESCE(SUM(sbd.amount), 0) >= sbr.amount THEN true
-              ELSE false
-            END AS paid
-          FROM
-            student_billing_record sbr
-            INNER JOIN student ON sbr.student_id = student.id
-            INNER JOIN person ON student.person_id = person.id
-            LEFT JOIN student_billing_details sbd ON sbr.id = sbd.billing_record_id
-          GROUP BY
-            sbr.id, student.id, person.name
-          ORDER BY
-            sbr.time_created;
-        `,
+        SELECT
+          student.id AS student_id,  
+          person.name AS student_name,
+          sbr.id,
+          sbr.billing_date,
+          sbr.description,
+          sbr.amount,
+          sbr.payment_method,
+          sbr.invoice_number,
+          sbr.time_created,
+          CASE
+            WHEN COALESCE(SUM(sbd.amount), 0) >= sbr.amount THEN true
+            ELSE false
+          END AS paid
+        FROM
+          student_billing_record sbr
+          INNER JOIN student ON sbr.student_id = student.id
+          INNER JOIN person ON student.person_id = person.id
+          LEFT JOIN student_billing_details sbd ON sbr.id = sbd.billing_record_id
+        GROUP BY
+          sbr.id, student.id, person.name
+        ORDER BY
+          sbr.time_created;
+      `,
     };
     const result = await client.query(query);
     res.status(200).json({

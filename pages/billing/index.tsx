@@ -8,9 +8,9 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { Class } from "../api/classes";
 import { Schedule } from "../api/classes/[class_id]/schedules";
 import fetcher from "../../utils/fetcher";
+import { Class } from "../../src/components/class/types";
 
 function AddIconButton({ onClick }) {
   return (

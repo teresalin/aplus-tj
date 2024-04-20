@@ -252,7 +252,7 @@ export default function AssignmentGrid() {
   if (!assignments) return <CircularProgress />;
 
   return (
-    <Box style={{ width: "100%" }}>
+    <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={tab}
