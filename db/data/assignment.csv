@@ -1,4 +1,4 @@
-id,name,description,due_date,time_created,time_updated
+id,name,description,due_date,created,updated
 1,English Composition 1,"Lorem ipsum dolor sit amet, consectetur adipiscing elit.",2023-11-01,2023-08-28 06:18:34.937524,2023-08-28 06:18:34.937524
 2,ESL Mock Essay,sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.,2023-12-14,2023-08-28 06:18:35.743402,2023-08-28 06:18:35.743402
 16,English Composition 2,"",2023-09-02,2023-09-16 03:50:24.454508,2023-09-16 03:50:24.454508

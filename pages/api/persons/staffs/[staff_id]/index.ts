@@ -21,7 +21,7 @@ async function createPersonAndStaff(client: PoolClient, data: Staff) {
     await client.query("BEGIN");
     const personInsertQuery = {
       text: `
-        INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, time_created, time_updated) 
+        INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, created, updated) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
         RETURNING id;
       `,
@@ -32,7 +32,7 @@ async function createPersonAndStaff(client: PoolClient, data: Staff) {
 
     const staffInsertQuery = {
       text: `
-        INSERT INTO staff(person_id, role_id, join_date, leave_date, time_created, time_updated) 
+        INSERT INTO staff(person_id, role_id, join_date, leave_date, created, updated) 
         VALUES ($1, $2, $3, $4, NOW(), NOW())
         RETURNING id;
       `,
@@ -68,7 +68,7 @@ async function updatePersonAndStaff(client: PoolClient, data: Staff) {
     const personUpdateQuery = {
       text: `
         UPDATE person
-        SET name = $1, gender = $2, phone = $3, email = $4, date_of_birth = $5, notes = $6, time_updated = NOW()
+        SET name = $1, gender = $2, phone = $3, email = $4, date_of_birth = $5, notes = $6, updated = NOW()
         WHERE id = $7
         RETURNING id;
       `,
@@ -80,7 +80,7 @@ async function updatePersonAndStaff(client: PoolClient, data: Staff) {
     const staffUpdateQuery = {
       text: `
         UPDATE staff
-        SET role_id = $1, join_date = $1, leave_date = $3, time_updated = NOW()
+        SET role_id = $1, join_date = $1, leave_date = $3, updated = NOW()
         WHERE person_id = $4
         RETURNING id;
       `,

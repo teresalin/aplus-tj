@@ -1,5 +1,5 @@
 import { Assignment } from "../src/components/assignment/types";
-import { Billing } from "../pages/api/billing";
+import { Billing } from "../src/components/billing/types";
 import { Class, ClassDetail } from "../src/components/class/types";
 import { Parent } from "../pages/api/persons/parents";
 import { Person } from "../pages/api/persons";
@@ -149,7 +149,7 @@ export function parseAssignment(row: any): Assignment {
     name: row.assignment_name,
     description: row.description,
     dueDate: row.due_date,
-    created: row.time_created,
+    created: row.created,
   };
 }
 
@@ -164,7 +164,7 @@ export function parseBilling(row: any): Billing {
     paymentMethod: row.payment_method,
     invoiceNumber: row.invoice_number,
     paid: row.paid,
-    created: row.time_created,
+    created: row.created,
   };
 }
 

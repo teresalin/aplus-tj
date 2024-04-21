@@ -2,19 +2,6 @@ import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseBilling } from "../../../utils/apiUtils";
 
-export interface Billing {
-  id: number;
-  studentId: number;
-  studentName: string;
-  billingDate: Date;
-  description: string;
-  amount: number;
-  paymentMethod: string;
-  invoiceNumber: string;
-  paid: boolean;
-  created: Date;
-}
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
 
@@ -30,7 +17,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           sbr.amount,
           sbr.payment_method,
           sbr.invoice_number,
-          sbr.time_created,
+          sbr.created,
           CASE
             WHEN COALESCE(SUM(sbd.amount), 0) >= sbr.amount THEN true
             ELSE false
@@ -43,7 +30,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         GROUP BY
           sbr.id, student.id, person.name
         ORDER BY
-          sbr.time_created;
+          sbr.created;
       `,
     };
     const result = await client.query(query);

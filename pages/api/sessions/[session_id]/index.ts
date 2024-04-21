@@ -129,7 +129,7 @@ async function createSession(client: PoolClient, data: Session) {
 
     const query = {
       text: `
-        INSERT INTO session(class_id, date, start_time, end_time, time_created, time_updated)
+        INSERT INTO session(class_id, date, start_time, end_time, created, updated)
         VALUES($1, $2, $3, $4, NOW(), NOW());
       `,
       values: [classId, date, startTime, endTime],
@@ -156,7 +156,7 @@ async function updateSession(client: PoolClient, data: Session) {
     const query = {
       text: `
         UPDATE session 
-        SET class_id = $2, date = $3, start_time = $4, end_time = $5, time_created = NOW(), time_updated = NOW()
+        SET class_id = $2, date = $3, start_time = $4, end_time = $5, created = NOW(), updated = NOW()
         WHERE id = $1
         RETURNING id;
       `,

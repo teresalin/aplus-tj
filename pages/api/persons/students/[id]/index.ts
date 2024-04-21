@@ -24,7 +24,7 @@ async function createPersonAndStudent(client: PoolClient, data: Student) {
     await client.query("BEGIN");
     const personInsertQuery = {
       text: `
-        INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, time_created, time_updated) 
+        INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, created, updated) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
         RETURNING id;
       `,
@@ -35,7 +35,7 @@ async function createPersonAndStudent(client: PoolClient, data: Student) {
 
     const studentInsertQuery = {
       text: `
-        INSERT INTO student(person_id, english_name, current_school, textbook_publisher, grade_id, join_date, leave_date, time_created, time_updated) 
+        INSERT INTO student(person_id, english_name, current_school, textbook_publisher, grade_id, join_date, leave_date, created, updated) 
         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
         RETURNING id;
       `,
@@ -82,7 +82,7 @@ async function updatePersonAndStudent(client: PoolClient, data: Student) {
     const personUpdateQuery = {
       text: `
         UPDATE person
-        SET name = $1, gender = $2, phone = $3, email = $4, date_of_birth = $5, notes = $6, time_updated = NOW()
+        SET name = $1, gender = $2, phone = $3, email = $4, date_of_birth = $5, notes = $6, updated = NOW()
         WHERE id = $7
         RETURNING id;
       `,
@@ -94,7 +94,7 @@ async function updatePersonAndStudent(client: PoolClient, data: Student) {
     const studentUpdateQuery = {
       text: `
         UPDATE student
-        SET english_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, time_updated = NOW()
+        SET english_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, updated = NOW()
         WHERE person_id = $7
         RETURNING id;
       `,

@@ -10,7 +10,7 @@ async function createAssignmentAndClass(client: PoolClient, data: Assignment) {
     await client.query("BEGIN");
     const assignmentInsertQuery = {
       text: `
-        INSERT INTO assignment(name, description, due_date, time_created, time_updated) 
+        INSERT INTO assignment(name, description, due_date, created, updated) 
         VALUES ($1, $2, $3, NOW(), NOW())
         RETURNING id;
       `,
@@ -21,7 +21,7 @@ async function createAssignmentAndClass(client: PoolClient, data: Assignment) {
 
     const classInsertQuery = {
       text: `
-        INSERT INTO class_assignment(class_id, assignment_id, time_created, time_updated) 
+        INSERT INTO class_assignment(class_id, assignment_id, created, updated) 
         VALUES ($1, $2, NOW(), NOW())
         RETURNING id;
       `,
@@ -48,7 +48,7 @@ async function updateAssignmentAndClass(client: PoolClient, data: Assignment) {
     const assignmentUpdateQuery = {
       text: `
         UPDATE assignment 
-        SET name = $2, description = $3, due_date = $4, time_updated = NOW()
+        SET name = $2, description = $3, due_date = $4, updated = NOW()
         WHERE id = $1
         RETURNING id;
       `,
@@ -61,7 +61,7 @@ async function updateAssignmentAndClass(client: PoolClient, data: Assignment) {
     const classUpdateQuery = {
       text: `
         UPDATE class_assignment 
-        SET class_id = $2, time_updated = NOW()
+        SET class_id = $2, updated = NOW()
         WHERE assignment_id = $1
         RETURNING class_id;
       `,

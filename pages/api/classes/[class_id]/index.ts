@@ -11,7 +11,7 @@ async function createClassAndSchedule(client: PoolClient, data: ClassDetail) {
     await client.query("BEGIN");
     const classInsertQuery = {
       text: `
-        INSERT INTO class(name, teacher_id, grade_id, capacity, active, time_created, time_updated)
+        INSERT INTO class(name, teacher_id, grade_id, capacity, active, created, updated)
         VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
         RETURNING id;
       `,
@@ -24,7 +24,7 @@ async function createClassAndSchedule(client: PoolClient, data: ClassDetail) {
     await Promise.all(
       schedules.map(async (schedule) => {
         const insertQuery = `
-        INSERT INTO schedule(class_id, day_of_week, start_time, end_time, time_created, time_updated)
+        INSERT INTO schedule(class_id, day_of_week, start_time, end_time, created, updated)
         VALUES ($1, $2, $3, $4, NOW(), NOW())
         RETURNING id;
       `;
@@ -56,11 +56,12 @@ async function getClassDetail(client: PoolClient, classID) {
         c.capacity,
         g.id AS grade_id,
         g.name AS grade_name,
-        p.name AS staff_name,
         s.id AS staff_id,
+        p.name AS staff_name,
         (
           SELECT JSON_AGG(
             JSON_BUILD_OBJECT(
+              'id', schedule.id,
               'dayOfWeek', schedule.day_of_week,
               'startTime', schedule.start_time,
               'endTime', schedule.end_time
@@ -102,7 +103,7 @@ async function getClassDetail(client: PoolClient, classID) {
               'name', a.name,
               'description', a.description,
               'dueDate', a.due_date,
-              'created', a.time_created
+              'created', a.created
             ) ORDER BY a.due_date -- Order by due_date here
           )
           FROM class_assignment AS ca
@@ -181,7 +182,7 @@ async function updateClass(client: PoolClient, data: ClassDetail) {
     // Update class details
     const classUpdateQuery = `
       UPDATE class 
-      SET name = $2, teacher_id = $3, grade_id = $4, capacity = $5, time_updated = NOW()
+      SET name = $2, teacher_id = $3, grade_id = $4, capacity = $5, updated = NOW()
       WHERE id = $1
       RETURNING id;
     `;
@@ -212,7 +213,7 @@ async function updateClass(client: PoolClient, data: ClassDetail) {
     // Add new schedules
     for (const schedule of schedulesToAdd) {
       const insertScheduleQuery = `
-        INSERT INTO schedule (class_id, day_of_week, start_time, end_time, time_updated)
+        INSERT INTO schedule (class_id, day_of_week, start_time, end_time, updated)
         VALUES ($1, $2, $3, $4, NOW())
         RETURNING id;
       `;
@@ -228,7 +229,7 @@ async function updateClass(client: PoolClient, data: ClassDetail) {
     for (const schedule of schedulesToUpdate) {
       const updateScheduleQuery = `
         UPDATE schedule
-        SET day_of_week = $2, start_time = $3, end_time = $4, time_updated = NOW()
+        SET day_of_week = $2, start_time = $3, end_time = $4, updated = NOW()
         WHERE id = $1
         RETURNING id;
       `;

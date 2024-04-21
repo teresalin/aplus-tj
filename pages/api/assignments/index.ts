@@ -16,7 +16,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           class.id AS class_id,
           class.name AS class_name,
           assignment.due_date,
-          assignment.time_created
+          assignment.created
         FROM
           assignment
           INNER JOIN class_assignment ON assignment.id = class_assignment.assignment_id

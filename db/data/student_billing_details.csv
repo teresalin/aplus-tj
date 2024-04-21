@@ -1,4 +1,4 @@
-id,billing_record_id,category_id,amount,time_created,time_updated
+id,billing_record_id,category_id,amount,created,updated
 1,1,1,1000.00,2023-10-22 01:40:50.877143,2023-10-22 01:40:50.877143
 2,1,1,1000.00,2023-10-22 01:40:51.974148,2023-10-22 01:40:51.974148
 3,1,1,1000.00,2023-10-22 01:40:52.816263,2023-10-22 01:40:52.816263

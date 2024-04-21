@@ -82,7 +82,7 @@ export default function ClassDetails() {
   const classID = useRouter().query.class_id;
 
   const { data } = useSWR(classID ? `/api/classes/${classID}` : null, fetcher);
-  const classDetail = (data as ClassDetail) || [];
+  const classDetail = data as ClassDetail;
 
   const [isEditDetailsDialogOpen, setIsEditDetailsDialogOpen] =
     React.useState(false);
@@ -106,10 +106,11 @@ export default function ClassDetails() {
     });
 
     if (response.ok) {
-      const updatedClass = await response.json();
+      // const updatedClass = await response.json();
       setIsEditDetailsDialogOpen(false);
       // Update SWR cache with the complete updated class data
-      mutate(`/api/classes/${data.id}`, updatedClass.result, false);
+      // mutate(`/api/classes/${data.id}`, updatedClass.result, false);
+      mutate(`/api/classes/${data.id}`);
     } else {
       console.error("Error updating class details:", response.statusText);
     }

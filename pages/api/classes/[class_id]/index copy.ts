@@ -63,7 +63,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                       'assignmentName', a.name,
                       'description', a.description,
                       'dueDate', a.due_date,
-                      'timeCreated', a.time_created
+                      'timeCreated', a.created
                   ) ORDER BY a.due_date -- Order by due_date here
               )
               FROM class_assignment AS ca
@@ -80,7 +80,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     'assignmentName', a.name,
                     'description', a.description,
                     'dueDate', a.due_date,
-                    'timeCreated', a.time_created
+                    'timeCreated', a.created
                 ) ORDER BY a.due_date
             ), '[]'::json)
             FROM class_assignment AS ca

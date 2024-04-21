@@ -1,3 +1,3 @@
-id,class_id,day_of_week,start_time,end_time,time_created,time_updated
+id,class_id,day_of_week,start_time,end_time,created,updated
 1,3,Monday,18:00:00,19:30:00,2023-08-28 06:18:16.215312,2023-08-28 06:18:16.215312
 2,3,Wednesday,18:00:00,19:30:00,2023-09-01 02:14:40.10554,2023-09-01 02:14:40.10554
