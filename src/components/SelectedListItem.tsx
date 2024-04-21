@@ -1,6 +1,6 @@
 import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
-import * as React from "react";
+import React from "react";
 import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -141,12 +141,14 @@ export default function SelectedListItem({ toggleTheme }) {
         </List>
         <Divider />
         <List component="nav" aria-label="secondary navigations">
-          <ListItemButton selected={isActive("/settings")}>
-            <ListItemIcon>
-              <SettingsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Settings" />
-          </ListItemButton>
+          <Link href="/settings/general">
+            <ListItemButton selected={isActive("/settings/general")}>
+              <ListItemIcon>
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Settings" />
+            </ListItemButton>
+          </Link>
         </List>
       </Stack>
       <Stack direction="column">

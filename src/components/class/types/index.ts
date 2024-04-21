@@ -25,5 +25,4 @@ export interface ClassDetail extends Class {
 export interface ClassSummary {
   id: number;
   name: string;
-  teacherName: string;
 }

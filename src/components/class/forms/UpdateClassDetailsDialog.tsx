@@ -1,6 +1,6 @@
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { useRouter } from "next/router";
-import * as React from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import dayjs, { Dayjs } from "dayjs";

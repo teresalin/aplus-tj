@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import * as React from "react";
+import React from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";

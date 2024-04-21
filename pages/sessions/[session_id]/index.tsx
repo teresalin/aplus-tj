@@ -2,7 +2,7 @@ import { GridColDef } from "@mui/x-data-grid";
 import { SessionDetail } from "../../api/sessions/[session_id]";
 import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
-import * as React from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";

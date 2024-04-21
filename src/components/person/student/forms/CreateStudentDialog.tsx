@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { DatePicker } from "@mui/x-date-pickers";
 import { FormEvent, FormEventHandler } from "react";
 import Box from "@mui/material/Box";

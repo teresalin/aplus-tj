@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";

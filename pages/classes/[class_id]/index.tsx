@@ -1,7 +1,7 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useRouter } from "next/router";
 import { useTheme } from "@mui/material/styles";
-import * as React from "react";
+import React from "react";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
