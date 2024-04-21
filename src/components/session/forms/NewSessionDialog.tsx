@@ -10,15 +10,17 @@ import TextField from "@mui/material/TextField";
 import useSWR from "swr";
 
 import fetcher from "../../../../utils/fetcher";
-import { Class } from "../../../../pages/api/classes";
+
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
-import { Session } from "../../../../pages/api/sessions";
+
 import Select from "@mui/material/Select";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
+import { Session } from "../types";
+import { Class } from "../../class/types";
 
 export interface INewSessionDialogProps {
   open: boolean;
@@ -31,7 +33,7 @@ export default function NewSessionDialog({
   onClose,
   onSubmit,
 }: INewSessionDialogProps) {
-  const [newSession, setnewSession] = React.useState({} as Session);
+  const [newSession, setNewSession] = React.useState({} as Session);
   const { data } = useSWR("/api/classes", fetcher);
   const classes = data || [];
 
@@ -41,9 +43,16 @@ export default function NewSessionDialog({
   };
 
   const handleInputChange = (field, value) => {
-    setnewSession((prevData) => ({
+    setNewSession((prevData) => ({
       ...prevData,
       [field]: field === "classId" ? Number(value) : value,
+    }));
+  };
+
+  const handleTimeChange = (field: string, value: dayjs.Dayjs | null) => {
+    setNewSession((prevData) => ({
+      ...prevData,
+      [field]: value ? dayjs(value).format("HH:mm:ss") : "00:00:00",
     }));
   };
 
@@ -56,8 +65,8 @@ export default function NewSessionDialog({
             <DatePicker
               label="Session Date"
               format="YYYY-MM-DD"
-              value={newSession.date}
-              onChange={handleInputChange}
+              value={newSession.date || null}
+              onChange={(date) => handleInputChange("date", date)}
               sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
               slotProps={{
                 textField: {
@@ -98,7 +107,9 @@ export default function NewSessionDialog({
                     ? dayjs(newSession.startTime, "HH:mm:ss")
                     : null
                 }
-                onChange={handleInputChange}
+                onChange={(value: Dayjs | null) =>
+                  handleTimeChange("startTime", value)
+                }
               />
               <TimePicker
                 label="End Time"
@@ -107,7 +118,9 @@ export default function NewSessionDialog({
                     ? dayjs(newSession.endTime, "HH:mm:ss")
                     : null
                 }
-                onChange={handleInputChange}
+                onChange={(value: Dayjs | null) =>
+                  handleTimeChange("endTime", value)
+                }
               />
             </Stack>
           </DialogContent>

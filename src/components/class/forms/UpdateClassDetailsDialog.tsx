@@ -19,9 +19,9 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { Class } from "../../../../pages/api/classes";
+import { Class, ClassDetail } from "../types";
 import { Grade } from "../../../../pages/api/grades";
-import { Staff } from "../../../../pages/api/persons/staffs";
+import { Staff } from "../../person/staff/types";
 import fetcher from "../../../../utils/fetcher";
 
 const dayOfWeek = [
@@ -45,10 +45,10 @@ function RedBar() {
 }
 
 export interface IUpdateClassDetailsDialogProps {
-  existingClass: Class;
+  existingClass: ClassDetail;
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: Class) => Promise<void>;
+  onSubmit: (data: ClassDetail) => Promise<void>;
 }
 
 export default function UpdateClassDetailsDialogProps({
@@ -58,7 +58,7 @@ export default function UpdateClassDetailsDialogProps({
   onSubmit,
 }: IUpdateClassDetailsDialogProps) {
   const classID = useRouter().query.class_id;
-  const [formData, setFormData] = React.useState({} as Class);
+  const [formData, setFormData] = React.useState({} as ClassDetail);
   const { data: staffsData, error: staffsError } = useSWR(
     "/api/persons/staffs",
     fetcher

@@ -26,6 +26,7 @@ import DeleteSessionDialog from "../../src/components/session/forms/DeleteSessio
 import fetcher from "../../utils/fetcher";
 import NewSessionDialog from "../../src/components/session/forms/NewSessionDialog";
 import RenderMenu from "../../src/components/grid/RenderMenu";
+import { ClassSummary } from "../../src/components/class/types";
 
 dayjs.extend(CustomParseFormat);
 dayjs.extend(utc);
@@ -168,13 +169,19 @@ export default function SessionGrid() {
       flex: 1,
     },
     {
-      field: "className",
+      field: "classSummary",
       headerName: "Class Name",
       minWidth: 200,
       flex: 1,
+      valueFormatter: (params: GridValueFormatterParams<ClassSummary>) => {
+        if (params.value == null) {
+          return "";
+        }
+        return params.value.name;
+      },
     },
     {
-      field: "sessionDate",
+      field: "date",
       headerName: "Session Date",
       minWidth: 150,
       flex: 1,

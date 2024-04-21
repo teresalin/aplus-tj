@@ -57,7 +57,7 @@ async function getSessionDetail(
         active_class_students AS (
           SELECT
             session.id AS session_id,
-            session.session_date,
+            session.date,
             session.start_time,
             session.end_time,
             class.name AS "class_name",
@@ -76,7 +76,7 @@ async function getSessionDetail(
           LEFT JOIN student ON class_student.student_id = student.id
           LEFT JOIN person ON student.person_id = person.id
           WHERE class_student.active = TRUE AND session.id = 3
-          GROUP BY session.id, session.session_date, session.start_time, session.end_time, class.name
+          GROUP BY session.id, session.date, session.start_time, session.end_time, class.name
         ),
 
         absent_students AS (
@@ -100,7 +100,7 @@ async function getSessionDetail(
           attended_students.teacher,
           attended_students.student_details AS "attended",
           acs.session_id AS "sessionId",
-          acs.session_date AS "sessionDate",
+          acs.date AS "sessionDate",
           acs.start_time AS "startTime",
           acs.end_time AS "endTime",
           acs.class_name AS "className",
