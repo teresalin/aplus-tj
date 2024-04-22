@@ -1,8 +1,7 @@
 import { GridColDef } from "@mui/x-data-grid";
-import { SessionDetail } from "../../api/sessions/[session_id]";
+import { SessionDetail } from "../../../src/components/sessions/types";
 import { styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
-import React from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -13,6 +12,7 @@ import fetcher from "../../../utils/fetcher";
 import Grid from "@mui/material/Grid";
 import HailIcon from "@mui/icons-material/Hail";
 import HelpCenterIcon from "@mui/icons-material/HelpCenter";
+import React from "react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
@@ -119,9 +119,9 @@ export default function SessionDetails() {
                   <CardContent>
                     <Box>
                       {/* <Typography variant="subtitle1">Class</Typography> */}
-                      <Typography>{details?.className}</Typography>
+                      <Typography>{details?.classSummary?.name}</Typography>
                       <Typography variant="caption">
-                        {details?.teacher}
+                        {/* {details?.teacherName} */}
                       </Typography>
                     </Box>
                   </CardContent>
@@ -146,7 +146,7 @@ export default function SessionDetails() {
                       <Typography variant="subtitle1">Attended</Typography>
                       <Typography variant="h5">
                         {details
-                          ? details.attended.length
+                          ? details.present.length
                           : "Info not available"}
                       </Typography>
                     </Box>
@@ -189,7 +189,7 @@ export default function SessionDetails() {
           </Typography>
           <Stack direction="row" spacing={1}>
             {details &&
-              details.attended.map((student) => (
+              details.present.map((student) => (
                 <Chip label={student.name} onClick={handleClick} />
               ))}
           </Stack>

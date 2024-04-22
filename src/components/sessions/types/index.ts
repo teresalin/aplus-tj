@@ -1,5 +1,5 @@
-import { ClassSummary } from "../../class/types";
-import { StudentSummary } from "../../person/student/types";
+import { ClassSummary } from "../../classes/types";
+import { StudentSummary } from "../../persons/students/types";
 
 export interface Session {
   id: number;

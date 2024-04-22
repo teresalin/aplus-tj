@@ -2,7 +2,7 @@ import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseStaff } from "../../../../../utils/apiUtils";
 import { PoolClient } from "pg";
-import { Staff } from "../../../../../src/components/person/staff/types";
+import { Staff } from "../../../../../src/components/persons/staffs/types";
 
 async function createPersonAndStaff(client: PoolClient, data: Staff) {
   const {

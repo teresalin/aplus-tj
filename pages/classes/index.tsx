@@ -12,8 +12,8 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { Class, ClassDetail } from "../../src/components/class/types";
-import { CreateClassDialog } from "../../src/components/class";
+import { Class, ClassDetail } from "../../src/components/classes/types";
+import { CreateClassDialog } from "../../src/components/classes";
 import { Schedule } from "../api/classes/[class_id]/schedules";
 import fetcher from "../../utils/fetcher";
 

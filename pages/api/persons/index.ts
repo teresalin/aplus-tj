@@ -2,17 +2,6 @@ import { getDBClient, releaseDBClient } from "../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parsePerson } from "../../../utils/apiUtils";
 
-export interface Person {
-  personId: number;
-  name: string;
-  gender: string;
-  phone: string;
-  email: string;
-  dateOfBirth: Date;
-  notes: string;
-  active: boolean;
-}
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
 

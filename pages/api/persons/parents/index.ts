@@ -1,7 +1,7 @@
 import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseParent } from "../../../../utils/apiUtils";
-import { Person } from "..";
+import { Person } from "../../../../src/components/persons/types";
 
 export interface Parent extends Person {
   parentId: number;

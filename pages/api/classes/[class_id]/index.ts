@@ -1,4 +1,4 @@
-import { ClassDetail } from "../../../../src/components/class/types";
+import { ClassDetail } from "../../../../src/components/classes/types";
 import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseClass, parseClassDetail } from "../../../../utils/apiUtils";

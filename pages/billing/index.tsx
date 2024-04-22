@@ -10,7 +10,7 @@ import useSWR from "swr";
 
 import { Schedule } from "../api/classes/[class_id]/schedules";
 import fetcher from "../../utils/fetcher";
-import { Class } from "../../src/components/class/types";
+import { Class } from "../../src/components/classes/types";
 
 function AddIconButton({ onClick }) {
   return (

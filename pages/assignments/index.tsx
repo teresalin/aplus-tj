@@ -15,12 +15,12 @@ import {
   GridColumnVisibilityModel,
 } from "@mui/x-data-grid";
 
-import { Assignment } from "../../src/components/assignment/types";
+import { Assignment } from "../../src/components/assignments/types";
 import {
   CreateAssignmentDialog,
   DeleteAssignmentDialog,
   UpdateAssignmentDialog,
-} from "../../src/components/assignment";
+} from "../../src/components/assignments";
 import CustomToolBar from "../../src/components/grid/CustomToolBar";
 import fetcher from "../../utils/fetcher";
 import RenderMenu from "../../src/components/grid/RenderMenu";

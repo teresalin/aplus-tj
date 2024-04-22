@@ -1,4 +1,4 @@
-import { Person } from "../../../../../pages/api/persons";
+import { Person } from "../../types";
 import { Role } from "../../../../../pages/api/persons/staffs/roles";
 
 export interface Staff extends Person {

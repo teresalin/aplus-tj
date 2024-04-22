@@ -19,14 +19,14 @@ import {
   GridRowSelectionModel,
 } from "@mui/x-data-grid";
 
-import { Assignment } from "../../src/components/assignment/types";
-import { Session } from "../../src/components/session/types";
+import { Assignment } from "../../src/components/assignments/types";
+import { ClassSummary } from "../../src/components/classes/types";
+import { Session } from "../../src/components/sessions/types";
 import CustomToolBar from "../../src/components/grid/CustomToolBar";
-import DeleteSessionDialog from "../../src/components/session/forms/DeleteSessionDialog";
+import DeleteSessionDialog from "../../src/components/sessions/forms/DeleteSessionDialog";
 import fetcher from "../../utils/fetcher";
-import NewSessionDialog from "../../src/components/session/forms/NewSessionDialog";
+import NewSessionDialog from "../../src/components/sessions/forms/NewSessionDialog";
 import RenderMenu from "../../src/components/grid/RenderMenu";
-import { ClassSummary } from "../../src/components/class/types";
 
 dayjs.extend(CustomParseFormat);
 dayjs.extend(utc);

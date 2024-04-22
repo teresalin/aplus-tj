@@ -1,8 +1,8 @@
-import { Assignment } from "../../assignment/types";
+import { Assignment } from "../../assignments/types";
 import { Grade } from "../../../../pages/api/grades";
-import { Person } from "../../../../pages/api/persons";
 import { Schedule } from "../../../../pages/api/classes/[class_id]/schedules";
-import { StaffSummary } from "../../person/staff/types";
+import { StaffSummary } from "../../persons/staffs/types";
+import { Student } from "../../persons/students/types";
 
 export interface Class {
   id: number;
@@ -18,11 +18,12 @@ export interface ClassDetail extends Class {
   grade: Grade;
   schedules: Schedule[];
   studentCount?: number;
-  activeStudents?: Person[];
+  activeStudents?: Student[];
   assignments?: Assignment[];
 }
 
 export interface ClassSummary {
   id: number;
   name: string;
+  teacherName?: string;
 }

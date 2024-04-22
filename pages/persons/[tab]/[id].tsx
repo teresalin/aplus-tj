@@ -13,7 +13,7 @@ import {
   BillingTab,
   ClassesTab,
   DetailsTab,
-} from "../../../src/components/person/student";
+} from "../../../src/components/persons/students";
 import fetcher from "../../../utils/fetcher";
 
 interface TabPanelProps {

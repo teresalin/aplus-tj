@@ -1,5 +1,5 @@
 import { Grade } from "../../../../../pages/api/grades";
-import { Person } from "../../../../../pages/api/persons";
+import { Person } from "../../types";
 
 export interface Student extends Person {
   studentId: number;

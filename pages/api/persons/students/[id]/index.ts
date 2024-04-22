@@ -2,7 +2,7 @@ import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseStudent } from "../../../../../utils/apiUtils";
 import { PoolClient } from "pg";
-import { Student } from "../../../../../src/components/person/student/types";
+import { Student } from "../../../../../src/components/persons/students/types";
 
 async function createPersonAndStudent(client: PoolClient, data: Student) {
   const {

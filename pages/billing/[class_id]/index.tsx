@@ -21,7 +21,7 @@ import fetcher from "../../../utils/fetcher";
 import CustomToolBar from "../../../src/components/grid/CustomToolBar";
 import DetailPanel from "../../../src/components/grid/DetailPanel";
 import RenderMenu from "../../../src/components/grid/RenderMenu";
-import StudentDetailPanel from "../../../src/components/person/StudentDetailPanel";
+import StudentDetailPanel from "../../../src/components/persons/StudentDetailPanel";
 import { useRouter } from "next/router";
 
 function a11yProps(key: string) {
