@@ -65,7 +65,7 @@ const BaseDataGrid: React.FC<BaseDataGridProps> = ({
 
   return (
     <DataGrid
-      getRowId={(row) => row.personId}
+      getRowId={() => self.crypto.randomUUID()}
       autoHeight
       sx={{
         width: "100%",

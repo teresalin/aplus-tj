@@ -63,7 +63,7 @@ const ClassesTab = ({ id }) => {
         </Button>
       </Box>
       {classes.map((classData) => (
-        <>
+        <Box key={classData.id}>
           <Stack direction="row" alignItems="center">
             <Typography variant="h6">{classData.name}</Typography>
             <Box sx={{ pb: "7px", ml: "0.5em" }}>
@@ -105,7 +105,7 @@ const ClassesTab = ({ id }) => {
               </Grid>
             </Grid>
           </Card>
-        </>
+        </Box>
       ))}
     </>
   );

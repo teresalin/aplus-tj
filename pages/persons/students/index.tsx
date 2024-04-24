@@ -49,8 +49,12 @@ export default function PersonGrid() {
     }
   };
 
-  const onRowClick = (data: { personId: string }) => {
-    router.push(`/persons/students/[id]`, `/persons/students/${data.personId}`);
+  const onRowClick = (data: { studentId: number }) => {
+    console.log(data.studentId);
+    router.push(
+      `/persons/students/[student_id]`,
+      `/persons/students/${data.studentId}`
+    );
   };
 
   const renderChip = (params) => {
@@ -170,7 +174,7 @@ export default function PersonGrid() {
         data={students}
         columns={columns}
         onAddClick={handleAddButtonClick}
-        onRowClick={onRowClick}
+        onRowClick={(params) => onRowClick(params.row)}
         getTogglableColumns={getTogglableColumns}
         initialColumnVisibilityModel={initialColumnVisibilityModel}
       />

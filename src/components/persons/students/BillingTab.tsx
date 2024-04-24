@@ -120,7 +120,7 @@ const BillingTab = ({ details }) => {
             >
               Grade
             </Typography>
-            <Typography variant="body2">{details.grade.name}</Typography>
+            <Typography variant="body2">test</Typography>
           </Grid>
           <Grid item xs={4}>
             <Typography

@@ -41,7 +41,7 @@ const DetailsTab: React.FC<DetailsTabProps> = ({ student }) => {
   };
 
   const handleUpdateStudent = async (data: Student) => {
-    const response = await fetch(`/api/persons/students/${data.personId}`, {
+    const response = await fetch(`/api/persons/students/${data.studentId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

@@ -2,7 +2,7 @@ import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const personID = req.query.id;
+  const studentID = req.query.student_id;
   const client = await getDBClient();
 
   try {
@@ -15,9 +15,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           class_student.active
         FROM class_student
         INNER JOIN student ON class_student.student_id = student.id
-        INNER JOIN person ON student.person_id = person.id
         INNER JOIN class ON class_student.class_id = class.id
-        WHERE person.id = $1
+        WHERE student.id = $1
         GROUP BY 
           class.id, 
           class.name,
@@ -25,7 +24,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           class_student.end_date,
           class_student.active;
       `,
-      values: [personID],
+      values: [studentID],
     };
     const result = await client.query(query);
     res.status(200).json({

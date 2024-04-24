@@ -119,8 +119,9 @@ async function updatePersonAndStudent(client: PoolClient, data: Student) {
   }
 }
 
+// TODO update all apis (except GET request) to use studentID instead of personID
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const personID = req.query.id;
+  const studentID = req.query.student_id;
   const client = await getDBClient();
 
   switch (req.method) {
@@ -148,9 +149,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             FROM student
             INNER JOIN person ON student.person_id = person.id
             INNER JOIN grade ON student.grade_id = grade.id
-            WHERE person.id = $1;
+            WHERE student.id = $1;
           `,
-          values: [personID],
+          values: [studentID],
         };
         const result = await client.query(studentSelectQuery);
         res.status(200).json({
@@ -224,9 +225,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "DELETE":
       const studentDeleteQuery = {
         text: `
-          DELETE FROM student WHERE id = $1;
+          DELETE FROM student WHERE student_id = $1;
         `,
-        values: [personID],
+        values: [studentID],
       };
       await client.query(studentDeleteQuery);
       res.status(200).json({
