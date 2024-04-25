@@ -5,6 +5,7 @@ import React from "react";
 // The component allows navigation between different tabs and updates the URL accordingly.
 const StudentsTabs = ({ currentTab }) => {
   const router = useRouter();
+  const { student_id } = router.query;
 
   // Define the available tabs and their corresponding routes.
   const tabConfig = [
@@ -18,7 +19,12 @@ const StudentsTabs = ({ currentTab }) => {
 
   const handleTabChange = (event, newIndex) => {
     const selectedTab = tabConfig[newIndex]; // Get the selected tab
-    router.push(`/persons/students/[student_id]/${selectedTab.route}`); // Update the URL based on the selected tab
+    // router.push(`/persons/students/[student_id]/${selectedTab.route}`); // Update the URL based on the selected tab
+    if (student_id) {
+      router.push(`/persons/students/${student_id}/${selectedTab.route}`); // Build the correct URL with student_id
+    } else {
+      console.error("Missing student_id in router.query"); // Log an error if student_id is missing
+    }
   };
 
   return (
