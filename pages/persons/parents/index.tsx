@@ -10,10 +10,11 @@ import {
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
-import { Parent } from "../../api/persons/parents";
 import BaseDataGrid from "../../../src/components/persons/BaseDataGrid";
 import fetcher from "../../../utils/fetcher";
 import PersonsTabs from "../../../src/components/persons/PersonsTabs";
+import { CreateParentDialog } from "../../../src/components/persons/parents";
+import { Parent } from "../../../src/components/persons/parents/types";
 
 export default function PersonGrid() {
   const router = useRouter();
@@ -28,7 +29,11 @@ export default function PersonGrid() {
   }
 
   const handleAddButtonClick = () => {
-    // TODO open dialog
+    setIsCreateParentDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsCreateParentDialogOpen(false);
   };
 
   const handleCreateParent = async (data) => {
@@ -43,7 +48,7 @@ export default function PersonGrid() {
     });
 
     if (response.ok) {
-      // TODO close dialog
+      closeDialog();
     } else {
       console.error("Error creating parent:", response.statusText);
     }
@@ -164,15 +169,22 @@ export default function PersonGrid() {
   };
 
   return (
-    <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
-      <PersonsTabs currentTab="parents" />
-      <BaseDataGrid
-        data={parents}
-        columns={columns}
-        onAddClick={handleAddButtonClick}
-        getTogglableColumns={getTogglableColumns}
-        initialColumnVisibilityModel={initialColumnVisibilityModel}
+    <>
+      <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
+        <PersonsTabs currentTab="parents" />
+        <BaseDataGrid
+          data={parents}
+          columns={columns}
+          onAddClick={handleAddButtonClick}
+          getTogglableColumns={getTogglableColumns}
+          initialColumnVisibilityModel={initialColumnVisibilityModel}
+        />
+      </Box>
+      <CreateParentDialog
+        open={isCreateParentDialogOpen}
+        onClose={closeDialog}
+        onSubmit={handleCreateParent}
       />
-    </Box>
+    </>
   );
 }

@@ -10,6 +10,7 @@ import {
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
+import { CreateStudentDialog } from "../../../src/components/persons/students";
 import { Student } from "../../../src/components/persons/students/types";
 import BaseDataGrid from "../../../src/components/persons/BaseDataGrid";
 import fetcher from "../../../utils/fetcher";
@@ -28,7 +29,11 @@ export default function PersonGrid() {
   }
 
   const handleAddButtonClick = () => {
-    // TODO open dialog
+    setIsCreateStudentDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsCreateStudentDialogOpen(false);
   };
 
   const handleCreateStudent = async (data) => {
@@ -168,16 +173,23 @@ export default function PersonGrid() {
   };
 
   return (
-    <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
-      <PersonsTabs currentTab="students" />
-      <BaseDataGrid
-        data={students}
-        columns={columns}
-        onAddClick={handleAddButtonClick}
-        onRowClick={(params) => onRowClick(params.row)}
-        getTogglableColumns={getTogglableColumns}
-        initialColumnVisibilityModel={initialColumnVisibilityModel}
+    <>
+      <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
+        <PersonsTabs currentTab="students" />
+        <BaseDataGrid
+          data={students}
+          columns={columns}
+          onAddClick={handleAddButtonClick}
+          onRowClick={(params) => onRowClick(params.row)}
+          getTogglableColumns={getTogglableColumns}
+          initialColumnVisibilityModel={initialColumnVisibilityModel}
+        />
+      </Box>
+      <CreateStudentDialog
+        open={isCreateStudentDialogOpen}
+        onClose={closeDialog}
+        onSubmit={handleCreateStudent}
       />
-    </Box>
+    </>
   );
 }
