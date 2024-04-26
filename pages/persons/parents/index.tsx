@@ -15,6 +15,7 @@ import fetcher from "../../../utils/fetcher";
 import PersonsTabs from "../../../src/components/persons/PersonsTabs";
 import { CreateParentDialog } from "../../../src/components/persons/parents";
 import { Parent } from "../../../src/components/persons/parents/types";
+import BackButton from "../../../src/components/BackButton";
 
 export default function PersonGrid() {
   const router = useRouter();

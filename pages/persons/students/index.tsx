@@ -15,6 +15,7 @@ import { Student } from "../../../src/components/persons/students/types";
 import BaseDataGrid from "../../../src/components/persons/BaseDataGrid";
 import fetcher from "../../../utils/fetcher";
 import PersonsTabs from "../../../src/components/persons/PersonsTabs";
+import BackButton from "../../../src/components/BackButton";
 
 export default function PersonGrid() {
   const router = useRouter();

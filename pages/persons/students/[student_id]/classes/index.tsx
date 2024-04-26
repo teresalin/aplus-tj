@@ -13,7 +13,8 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
 import fetcher from "../../../../../utils/fetcher";
-import StudentsTabs from "../../../../../src/components/persons/students/StudentsTabs";
+import StudentLayout from "../../../../../src/components/layout/StudentLayout";
+import LinearProgress from "@mui/material/LinearProgress";
 
 export default function ClassesTab() {
   const theme = useTheme();
@@ -54,67 +55,68 @@ export default function ClassesTab() {
   };
 
   if (!classes) {
-    return <CircularProgress />;
+    return <LinearProgress />;
   }
 
   return (
     <>
-      <StudentsTabs currentTab="classes" />
-      <Box sx={{ display: "flex", flexDirection: "row-reverse" }} m={1}>
-        <Button
-          variant="text"
-          color="primary"
-          startIcon={<EditIcon />}
-          onClick={handleEditClick}
-        >
-          Edit
-        </Button>
-      </Box>
-      {classes.map((classData) => (
-        <Box key={classData.id}>
-          <Stack direction="row" alignItems="center">
-            <Typography variant="h6">{classData.name}</Typography>
-            <Box sx={{ pb: "7px", ml: "0.5em" }}>
-              {renderChip(classData.active)}
-            </Box>
-          </Stack>
-          <Card variant="outlined" sx={{ p: 2, my: 1 }}>
-            <Grid container spacing={3}>
-              <Grid item sm={12} md={4}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                >
-                  Started On
-                </Typography>
-                <Typography variant="body2">{classData.startDate}</Typography>
-              </Grid>
-              <Grid item sm={12} md={4}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                >
-                  Ended On
-                </Typography>
-                <Typography variant="body2">{classData.endDate}</Typography>
-              </Grid>
-              <Grid item sm={12} md={4}>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                >
-                  Recent Attendance
-                </Typography>
-                {/* {classData.sessionDates.map((index, date) => (
+      <StudentLayout currentTab="classes">
+        <Box sx={{ display: "flex", flexDirection: "row-reverse" }} m={1}>
+          <Button
+            variant="text"
+            color="primary"
+            startIcon={<EditIcon />}
+            onClick={handleEditClick}
+          >
+            Edit
+          </Button>
+        </Box>
+        {classes.map((classData) => (
+          <Box key={classData.id}>
+            <Stack direction="row" alignItems="center">
+              <Typography variant="h6">{classData.name}</Typography>
+              <Box sx={{ pb: "7px", ml: "0.5em" }}>
+                {renderChip(classData.active)}
+              </Box>
+            </Stack>
+            <Card variant="outlined" sx={{ p: 2, my: 1 }}>
+              <Grid container spacing={3}>
+                <Grid item sm={12} md={4}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                  >
+                    Started On
+                  </Typography>
+                  <Typography variant="body2">{classData.startDate}</Typography>
+                </Grid>
+                <Grid item sm={12} md={4}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                  >
+                    Ended On
+                  </Typography>
+                  <Typography variant="body2">{classData.endDate}</Typography>
+                </Grid>
+                <Grid item sm={12} md={4}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                  >
+                    Recent Attendance
+                  </Typography>
+                  {/* {classData.sessionDates.map((index, date) => (
                   <Typography key={index} variant="body2">
                     {date}
                   </Typography>
                 ))} */}
+                </Grid>
               </Grid>
-            </Grid>
-          </Card>
-        </Box>
-      ))}
+            </Card>
+          </Box>
+        ))}
+      </StudentLayout>
     </>
   );
 }
