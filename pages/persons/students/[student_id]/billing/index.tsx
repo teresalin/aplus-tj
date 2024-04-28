@@ -4,13 +4,13 @@ import Button from "@mui/material/Button";
 import CakeIcon from "@mui/icons-material/Cake";
 import EmailIcon from "@mui/icons-material/Email";
 import Grid from "@mui/material/Grid";
+import LinearProgress from "@mui/material/LinearProgress";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import Paper from "@mui/material/Paper";
 import React from "react";
 import Typography from "@mui/material/Typography";
 
 import StudentLayout from "../../../../../src/components/layout/StudentLayout";
-import LinearProgress from "@mui/material/LinearProgress";
 
 export default function BillingTab({ details }) {
   const theme = useTheme();

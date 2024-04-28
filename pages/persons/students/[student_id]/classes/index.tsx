@@ -18,15 +18,18 @@ import LinearProgress from "@mui/material/LinearProgress";
 
 export default function ClassesTab() {
   const theme = useTheme();
-
   const studentID = useRouter().query.student_id;
 
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = React.useState(false);
-  const { data } = useSWR(
+  const { data, isLoading, error } = useSWR(
     studentID ? `/api/persons/students/${studentID}/classes` : null,
     fetcher
   );
   const classes = data || [];
+
+  if (error) {
+    return <div>Error fetching data</div>;
+  }
 
   const handleEditClick = () => {
     setIsUpdateDialogOpen(true);
@@ -54,10 +57,6 @@ export default function ClassesTab() {
     );
   };
 
-  if (!classes) {
-    return <LinearProgress />;
-  }
-
   return (
     <>
       <StudentLayout currentTab="classes">
@@ -71,51 +70,72 @@ export default function ClassesTab() {
             Edit
           </Button>
         </Box>
-        {classes.map((classData) => (
-          <Box key={classData.id}>
-            <Stack direction="row" alignItems="center">
-              <Typography variant="h6">{classData.name}</Typography>
-              <Box sx={{ pb: "7px", ml: "0.5em" }}>
-                {renderChip(classData.active)}
-              </Box>
-            </Stack>
-            <Card variant="outlined" sx={{ p: 2, my: 1 }}>
-              <Grid container spacing={3}>
-                <Grid item sm={12} md={4}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                  >
-                    Started On
-                  </Typography>
-                  <Typography variant="body2">{classData.startDate}</Typography>
-                </Grid>
-                <Grid item sm={12} md={4}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                  >
-                    Ended On
-                  </Typography>
-                  <Typography variant="body2">{classData.endDate}</Typography>
-                </Grid>
-                <Grid item sm={12} md={4}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
-                  >
-                    Recent Attendance
-                  </Typography>
-                  {/* {classData.sessionDates.map((index, date) => (
+
+        {/* Display LinearProgress inside the layout if still loading */}
+        {isLoading && <LinearProgress />}
+
+        {data && classes.length === 0 ? (
+          <Card variant="outlined" sx={{ p: 2 }}>
+            This student is not currently enrolled in any classes.
+          </Card>
+        ) : (
+          classes.map((classData) => (
+            <Box key={classData.id}>
+              <Stack direction="row" alignItems="center">
+                <Typography variant="h6">{classData.name}</Typography>
+                <Box sx={{ pb: "7px", ml: "0.5em" }}>
+                  {renderChip(classData.active)}
+                </Box>
+              </Stack>
+              <Card variant="outlined" sx={{ p: 2, my: 1 }}>
+                <Grid container spacing={3}>
+                  <Grid item sm={12} md={4}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 700,
+                        color: theme.palette.primary.main,
+                      }}
+                    >
+                      Started On
+                    </Typography>
+                    <Typography variant="body2">
+                      {classData.startDate}
+                    </Typography>
+                  </Grid>
+                  <Grid item sm={12} md={4}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 700,
+                        color: theme.palette.primary.main,
+                      }}
+                    >
+                      Ended On
+                    </Typography>
+                    <Typography variant="body2">{classData.endDate}</Typography>
+                  </Grid>
+                  <Grid item sm={12} md={4}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 700,
+                        color: theme.palette.primary.main,
+                      }}
+                    >
+                      Recent Attendance
+                    </Typography>
+                    {/* {classData.sessionDates.map((index, date) => (
                   <Typography key={index} variant="body2">
                     {date}
                   </Typography>
                 ))} */}
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Card>
-          </Box>
-        ))}
+              </Card>
+            </Box>
+          ))
+        )}
       </StudentLayout>
     </>
   );

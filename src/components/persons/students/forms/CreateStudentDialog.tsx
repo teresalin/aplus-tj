@@ -237,7 +237,7 @@ export default function CreateStudentDialog({
                   label="Join Date"
                   format="YYYY-MM-DD"
                   value={newStudent.joinDate || null}
-                  onChange={(date) => handleInputChange("dueDate", date)}
+                  onChange={(date) => handleInputChange("joinDate", date)}
                   sx={{ marginTop: "8px", marginBottom: "4px" }}
                   slotProps={{
                     textField: {
