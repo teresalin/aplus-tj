@@ -11,7 +11,7 @@ import { Class } from "../../src/components/classes/types";
 import fetcher from "../../utils/fetcher";
 
 export default function Attendance() {
-  const { data, error, isLoading } = useSWR("api/classes", fetcher);
+  const { data, isLoading, error } = useSWR("api/classes", fetcher);
   const classes = data || [];
 
   if (error) {
@@ -27,7 +27,6 @@ export default function Attendance() {
         </Typography>
       </Grid>
 
-      {/* Display LinearProgress inside the layout if still loading */}
       {isLoading && <LinearProgress />}
 
       {data && classes.length === 0 ? (
@@ -36,7 +35,7 @@ export default function Attendance() {
         </Card>
       ) : (
         classes.map((row: Class) => (
-          <Link href={`billing/${row.id}`} key={row.id}>
+          <Link href={`attendance/${row.id}`} key={row.id}>
             <Paper key={row.id} sx={{ my: 2, p: 2 }}>
               <Grid
                 container
