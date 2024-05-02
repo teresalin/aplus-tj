@@ -15,19 +15,14 @@ import fetcher from "../../../utils/fetcher";
 import PersonsTabs from "../../../src/components/persons/PersonsTabs";
 import { CreateParentDialog } from "../../../src/components/persons/parents";
 import { Parent } from "../../../src/components/persons/parents/types";
-import BackButton from "../../../src/components/BackButton";
 
 export default function PersonGrid() {
   const router = useRouter();
   const [isCreateParentDialogOpen, setIsCreateParentDialogOpen] =
     React.useState(false);
 
-  const { data, error } = useSWR("/api/persons/parents", fetcher);
+  const { data, isLoading, error } = useSWR("/api/persons/parents", fetcher);
   const parents = (data as Parent[]) || [];
-
-  if (error) {
-    return <div>Error fetching data</div>;
-  }
 
   const handleAddButtonClick = () => {
     setIsCreateParentDialogOpen(true);
@@ -169,6 +164,10 @@ export default function PersonGrid() {
     action: true,
   };
 
+  if (error) {
+    return <div>Error fetching data</div>;
+  }
+
   return (
     <>
       <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
@@ -176,6 +175,7 @@ export default function PersonGrid() {
         <BaseDataGrid
           data={parents}
           columns={columns}
+          isLoading={isLoading}
           onAddClick={handleAddButtonClick}
           getTogglableColumns={getTogglableColumns}
           initialColumnVisibilityModel={initialColumnVisibilityModel}

@@ -15,19 +15,14 @@ import { Student } from "../../../src/components/persons/students/types";
 import BaseDataGrid from "../../../src/components/persons/BaseDataGrid";
 import fetcher from "../../../utils/fetcher";
 import PersonsTabs from "../../../src/components/persons/PersonsTabs";
-import BackButton from "../../../src/components/BackButton";
 
 export default function PersonGrid() {
   const router = useRouter();
   const [isCreateStudentDialogOpen, setIsCreateStudentDialogOpen] =
     React.useState(false);
 
-  const { data, error } = useSWR("/api/persons/students", fetcher);
+  const { data, isLoading, error } = useSWR("/api/persons/students", fetcher);
   const students = (data as Student[]) || [];
-
-  if (error) {
-    return <div>Error fetching data</div>;
-  }
 
   const handleAddButtonClick = () => {
     setIsCreateStudentDialogOpen(true);
@@ -173,6 +168,10 @@ export default function PersonGrid() {
     action: true,
   };
 
+  if (error) {
+    return <div>Error fetching data</div>;
+  }
+
   return (
     <>
       <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
@@ -180,6 +179,7 @@ export default function PersonGrid() {
         <BaseDataGrid
           data={students}
           columns={columns}
+          isLoading={isLoading}
           onAddClick={handleAddButtonClick}
           onRowClick={(params) => onRowClick(params.row)}
           getTogglableColumns={getTogglableColumns}

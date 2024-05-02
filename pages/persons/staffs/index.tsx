@@ -17,15 +17,12 @@ import PersonsTabs from "../../../src/components/persons/PersonsTabs";
 
 export default function PersonGrid() {
   const router = useRouter();
+
   const [isCreateStaffDialogOpen, setIsCreateStaffDialogOpen] =
     React.useState(false);
 
-  const { data, error } = useSWR("/api/persons/staffs", fetcher);
+  const { data, isLoading, error } = useSWR("/api/persons/staffs", fetcher);
   const staffs = (data as Staff[]) || [];
-
-  if (error) {
-    return <div>Error fetching data</div>;
-  }
 
   const handleAddButtonClick = () => {
     // TODO open dialog
@@ -163,12 +160,17 @@ export default function PersonGrid() {
     action: true,
   };
 
+  if (error) {
+    return <div>Error fetching data</div>;
+  }
+
   return (
     <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
       <PersonsTabs currentTab="staffs" />
       <BaseDataGrid
         data={staffs}
         columns={columns}
+        isLoading={isLoading}
         onAddClick={handleAddButtonClick}
         onRowClick={onRowClick}
         getTogglableColumns={getTogglableColumns}

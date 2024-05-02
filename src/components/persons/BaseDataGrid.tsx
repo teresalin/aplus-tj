@@ -1,5 +1,4 @@
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import CircularProgress from "@mui/material/CircularProgress";
 import IconButton from "@mui/material/IconButton";
 import React from "react";
 import {
@@ -14,8 +13,9 @@ import CustomToolBar from "../../../src/components/grid/CustomToolBar";
 interface BaseDataGridProps {
   data: any[];
   columns: GridColDef[];
-  onAddClick?: () => void; // Optional handler for add icon click
-  onRowClick?: (row: any) => void; // Optional handler for row click
+  isLoading: boolean;
+  onAddClick?: () => void;
+  onRowClick?: (row: any) => void;
   getTogglableColumns?: (columns: GridColDef[]) => string[]; // Optional function to determine which columns are togglable
   initialColumnVisibilityModel: GridColumnVisibilityModel;
 }
@@ -34,6 +34,7 @@ const AddIconButton = ({ onClick }) => (
 const BaseDataGrid: React.FC<BaseDataGridProps> = ({
   data,
   columns,
+  isLoading,
   onAddClick,
   onRowClick,
   getTogglableColumns,
@@ -59,10 +60,6 @@ const BaseDataGrid: React.FC<BaseDataGridProps> = ({
     setColumnVisibilityModel(model);
   };
 
-  if (!data) {
-    return <CircularProgress />;
-  }
-
   return (
     <DataGrid
       getRowId={() => self.crypto.randomUUID()}
@@ -78,6 +75,7 @@ const BaseDataGrid: React.FC<BaseDataGridProps> = ({
         },
       }}
       rows={data}
+      loading={isLoading}
       columns={columns}
       rowSelectionModel={rowSelectionModel}
       columnVisibilityModel={columnVisibilityModel}
@@ -106,7 +104,7 @@ const BaseDataGrid: React.FC<BaseDataGridProps> = ({
           placement: "bottom-end",
         },
         toolbar: {
-          children: <AddIconButton onClick={onAddClick} />,
+          children: onAddClick && <AddIconButton onClick={onAddClick} />,
           setButtonEl,
         },
         columnsPanel: {
