@@ -1,17 +1,12 @@
 import React from "react";
-import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import dayjs from "dayjs";
-import IconButton from "@mui/material/IconButton";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import useSWR from "swr";
 import {
-  DataGrid,
   GridColDef,
   GridValueFormatterParams,
-  GridRowSelectionModel,
   GridColumnVisibilityModel,
 } from "@mui/x-data-grid";
 
@@ -21,14 +16,14 @@ import {
   DeleteAssignmentDialog,
   UpdateAssignmentDialog,
 } from "../../src/components/assignments";
-import CustomToolBar from "../../src/components/grid/CustomToolBar";
 import fetcher from "../../utils/fetcher";
 import RenderMenu from "../../src/components/grid/RenderMenu";
+import BaseDataGrid from "../../src/components/persons/BaseDataGrid";
 
-function a11yProps(key: string) {
+function a11yProps(index) {
   return {
-    id: `simple-tab-${key}`,
-    "aria-controls": `simple-tabpanel-${key}`,
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
   };
 }
 
@@ -36,30 +31,15 @@ const assignmentTypes = ["all", "upcoming", "past due"];
 
 export default function AssignmentGrid() {
   const [tab, setTab] = React.useState("all");
-  const [rowSelectionModel, setRowSelectionModel] =
-    React.useState<GridRowSelectionModel>([]);
-  const [columnVisibilityModel, setColumnVisibilityModel] =
-    React.useState<GridColumnVisibilityModel>({
-      detailPanel: true,
-      id: false,
-      name: true,
-      gender: false,
-      phone: true,
-      email: true,
-      dateOfBirth: true,
-      active: true,
-      created: false,
-      action: true,
-    });
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = React.useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<Assignment | null>(null);
-  const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
-    null
-  );
 
-  const { data, mutate } = useSWR(`/api/assignments?filter=${tab}`, fetcher);
+  const { data, isLoading, error, mutate } = useSWR(
+    `/api/assignments?filter=${tab}`,
+    fetcher
+  );
   const assignments = data || [];
 
   const handleTabChange = (event: React.SyntheticEvent, newTab: string) => {
@@ -147,42 +127,6 @@ export default function AssignmentGrid() {
     }
   };
 
-  const getTogglableColumns = (columns: GridColDef[]) => {
-    return columns
-      .filter(
-        (column) =>
-          column.field !== "id" &&
-          column.field !== "action" &&
-          column.field !== "created"
-      )
-      .map((column) => column.field);
-  };
-
-  const onColumnVisibilityChange = (
-    model: React.SetStateAction<GridColumnVisibilityModel>
-  ) => {
-    let count = 0;
-    for (const key in model) {
-      if (model[key] === true) {
-        count++;
-      }
-    }
-    setColumnVisibilityModel(model);
-  };
-
-  function AddIconButton({ onClick }) {
-    return (
-      <IconButton
-        aria-label="Add box icon"
-        onClick={onClick}
-        color="primary"
-        sx={{ padding: "4px" }}
-      >
-        <AddBoxIcon />
-      </IconButton>
-    );
-  }
-
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -249,7 +193,29 @@ export default function AssignmentGrid() {
     },
   ];
 
-  if (!assignments) return <CircularProgress />;
+  const getTogglableColumns = (columns: GridColDef[]) => {
+    return columns
+      .filter(
+        (column) =>
+          column.field !== "id" &&
+          column.field !== "action" &&
+          column.field !== "created"
+      )
+      .map((column) => column.field);
+  };
+
+  // TODO update columns
+  const initialColumnVisibilityModel: GridColumnVisibilityModel = {
+    id: false,
+    name: true,
+    active: true,
+    created: false,
+    action: true,
+  };
+
+  if (error) {
+    return <div>Error fetching data</div>;
+  }
 
   return (
     <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
@@ -264,59 +230,15 @@ export default function AssignmentGrid() {
           ))}
         </Tabs>
       </Box>
-      {/* TODO disable filter on certain columns */}
-      <DataGrid
-        sx={{
-          width: "100%",
-          overflow: "hidden",
-          ".MuiDataGrid-cell:focus": {
-            outline: "none",
-          },
-          "& .MuiDataGrid-row:hover": {
-            cursor: "pointer",
-          },
-        }}
-        columnVisibilityModel={columnVisibilityModel}
-        onColumnVisibilityModelChange={(newModel) => {
-          onColumnVisibilityChange(newModel);
-        }}
-        rows={assignments}
+      <BaseDataGrid
+        data={assignments}
         columns={columns}
-        rowSelectionModel={rowSelectionModel}
-        localeText={{
-          toolbarColumns: "",
-          toolbarFilters: "",
-          toolbarDensity: "",
-          toolbarExport: "",
-        }}
-        initialState={{
-          pagination: { paginationModel: { pageSize: 10 } },
-          columns: {
-            columnVisibilityModel: {
-              id: false,
-              created: false,
-            },
-          },
-        }}
-        slots={{
-          toolbar: CustomToolBar,
-        }}
-        slotProps={{
-          panel: {
-            anchorEl: buttonEl,
-            placement: "bottom-end",
-          },
-          toolbar: {
-            children: <AddIconButton onClick={handleAddButtonClick} />,
-            setButtonEl,
-          },
-          columnsPanel: {
-            getTogglableColumns,
-          },
-        }}
-        pageSizeOptions={[5, 10, 25]}
-        hideFooterSelectedRowCount
+        isLoading={isLoading}
+        onAddClick={handleAddButtonClick}
+        getTogglableColumns={getTogglableColumns}
+        initialColumnVisibilityModel={initialColumnVisibilityModel}
       />
+      {/* TODO fix overlapping input fields */}
       <UpdateAssignmentDialog
         assignment={selectedRow}
         open={isUpdateDialogOpen}
