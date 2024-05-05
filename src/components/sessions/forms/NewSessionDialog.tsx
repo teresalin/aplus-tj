@@ -1,26 +1,23 @@
-import React from "react";
+import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { FormEvent, FormEventHandler } from "react";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import dayjs, { Dayjs } from "dayjs";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import TextField from "@mui/material/TextField";
+import React from "react";
+import Select from "@mui/material/Select";
+import Stack from "@mui/material/Stack";
 import useSWR from "swr";
 
-import fetcher from "../../../../utils/fetcher";
-
-import { DatePicker, TimePicker } from "@mui/x-date-pickers";
-import Stack from "@mui/material/Stack";
-import Box from "@mui/material/Box";
-
-import Select from "@mui/material/Select";
-import dayjs, { Dayjs } from "dayjs";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
 import { Session } from "../types";
-import { Class } from "../../class/types";
+import { Class } from "../../classes/types";
+import fetcher from "../../../../utils/fetcher";
 
 export interface INewSessionDialogProps {
   open: boolean;

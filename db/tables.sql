@@ -117,6 +117,7 @@ CREATE TABLE session (
   date DATE,
   start_time TIME,
   end_time TIME,
+  status VARCHAR(20) DEFAULT 'Scheduled', -- Scheduled, Rescheduled, Canceled
   created TIMESTAMP,
   updated TIMESTAMP
 );
@@ -126,6 +127,7 @@ CREATE TABLE session_date_history (
   session_id INT REFERENCES session(id) NOT NULL,
   old_date DATE, -- The old date before modification
   new_date DATE, -- The new modified date
+  status VARCHAR(20) DEFAULT 'Scheduled', -- Scheduled, Rescheduled, Canceled
   modification_reason VARCHAR(255), -- Reason for the modification
   modified_at TIMESTAMP DEFAULT NOW(), -- Timestamp of modification
   created TIMESTAMP DEFAULT NOW(),

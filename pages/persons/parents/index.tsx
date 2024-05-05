@@ -10,11 +10,11 @@ import {
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
+import { CreateParentDialog } from "../../../src/components/persons/parents";
+import { Parent } from "../../../src/components/persons/parents/types";
 import BaseDataGrid from "../../../src/components/persons/BaseDataGrid";
 import fetcher from "../../../utils/fetcher";
 import PersonsTabs from "../../../src/components/persons/PersonsTabs";
-import { CreateParentDialog } from "../../../src/components/persons/parents";
-import { Parent } from "../../../src/components/persons/parents/types";
 
 export default function PersonGrid() {
   const router = useRouter();

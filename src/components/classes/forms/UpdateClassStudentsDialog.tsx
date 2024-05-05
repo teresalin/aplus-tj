@@ -1,6 +1,5 @@
 import { FormEvent, FormEventHandler } from "react";
 import { useRouter } from "next/router";
-import React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import dayjs from "dayjs";
@@ -10,14 +9,15 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import EditIcon from "@mui/icons-material/Edit";
 import MenuItem from "@mui/material/MenuItem";
+import React from "react";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import fetcher from "../../../../utils/fetcher";
-import { Person } from "../../../../pages/api/persons";
 import { Schedule } from "../../../../pages/api/classes/[class_id]/schedules";
+import { Person } from "../../persons/types";
+import fetcher from "../../../../utils/fetcher";
 
 function RedBar() {
   return (
@@ -37,7 +37,7 @@ export default function UpdateClassStudentsDialog({ classDetails }) {
     classDetails.schedules
   );
   const { data } = useSWR(open ? "/api/staffs" : null, fetcher);
-  const staffs = data as Person[] | null;
+  const staffs = (data as Person[]) || null;
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -145,7 +145,7 @@ export default function UpdateClassStudentsDialog({ classDetails }) {
             >
               {staffs &&
                 staffs.map((staff: Person) => (
-                  <MenuItem key={staff.id} value={staff.id}>
+                  <MenuItem key={staff.personId} value={staff.personId}>
                     {staff.name}
                   </MenuItem>
                 ))}

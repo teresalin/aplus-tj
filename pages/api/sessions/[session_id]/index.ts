@@ -2,7 +2,7 @@ import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseSession } from "../../../../utils/apiUtils";
 import { PoolClient } from "pg";
-import { Session } from "../../../../src/components/session/types";
+import { Session } from "../../../../src/components/sessions/types";
 
 async function getSession(
   client: PoolClient,

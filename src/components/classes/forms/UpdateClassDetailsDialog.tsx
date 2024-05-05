@@ -19,9 +19,9 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { Class, ClassDetail } from "../types";
+import { ClassDetail } from "../types";
 import { Grade } from "../../../../pages/api/grades";
-import { Staff } from "../../person/staff/types";
+import { Staff } from "../../persons/staffs/types";
 import fetcher from "../../../../utils/fetcher";
 
 const dayOfWeek = [

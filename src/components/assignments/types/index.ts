@@ -1,4 +1,4 @@
-import { Class } from "../../class/types";
+import { Class } from "../../classes/types";
 
 export interface Assignment {
   id: number;

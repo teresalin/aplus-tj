@@ -1,17 +1,13 @@
 import React from "react";
-import useSWR from "swr";
-import { css } from "@emotion/react";
-import { withStyles, Theme } from "@mui/material/styles";
-import CheckIcon from "@mui/icons-material/Check";
-import ClearIcon from "@mui/icons-material/Clear";
-// import DotLoader from "react-spinners/DotLoader";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
-import { Person } from "../../pages/api/persons";
+import useSWR from "swr";
+
+import { Person } from "./persons/types";
 
 // import { UserDetail } from '../pages/api/patients/[patient_id]';
 
@@ -88,7 +84,7 @@ export default function PersonDetailsTable(props: {
       </TableHead>
       <TableBody>
         {details.map((detail: Person) => (
-          <TableRow key={detail.id}>
+          <TableRow key={detail.personId}>
             {Object.values(detail).map((value, index) => (
               <TableCell key={index} component="th" scope="row">
                 {value}

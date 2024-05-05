@@ -14,7 +14,7 @@ import TextField from "@mui/material/TextField";
 import useSWR from "swr";
 
 import { Assignment } from "../types";
-import { Class } from "../../class/types";
+import { Class } from "../../classes/types";
 import fetcher from "../../../../utils/fetcher";
 
 export interface ICreateAssignmentDialogProps {
