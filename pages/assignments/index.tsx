@@ -218,27 +218,29 @@ export default function AssignmentGrid() {
   }
 
   return (
-    <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={tab}
-          onChange={handleTabChange}
-          aria-label="assignment tabs"
-        >
-          {assignmentTypes.map((key) => (
-            <Tab key={key} value={key} label={key} {...a11yProps(key)} />
-          ))}
-        </Tabs>
+    <>
+      <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={tab}
+            onChange={handleTabChange}
+            aria-label="assignment tabs"
+          >
+            {assignmentTypes.map((key) => (
+              <Tab key={key} value={key} label={key} {...a11yProps(key)} />
+            ))}
+          </Tabs>
+        </Box>
+        <BaseDataGrid
+          data={assignments}
+          columns={columns}
+          isLoading={isLoading}
+          onAddClick={handleAddButtonClick}
+          getTogglableColumns={getTogglableColumns}
+          initialColumnVisibilityModel={initialColumnVisibilityModel}
+        />
+        {/* TODO fix overlapping input fields */}
       </Box>
-      <BaseDataGrid
-        data={assignments}
-        columns={columns}
-        isLoading={isLoading}
-        onAddClick={handleAddButtonClick}
-        getTogglableColumns={getTogglableColumns}
-        initialColumnVisibilityModel={initialColumnVisibilityModel}
-      />
-      {/* TODO fix overlapping input fields */}
       <UpdateAssignmentDialog
         assignment={selectedRow}
         open={isUpdateDialogOpen}
@@ -255,6 +257,6 @@ export default function AssignmentGrid() {
         onClose={handleCloseDeleteDialog}
         onSubmit={handleDeleteAssignment}
       />
-    </Box>
+    </>
   );
 }

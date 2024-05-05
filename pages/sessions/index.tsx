@@ -1,11 +1,8 @@
 import React from "react";
-import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import CustomParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
 import FormControl from "@mui/material/FormControl";
-import IconButton from "@mui/material/IconButton";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
@@ -13,16 +10,15 @@ import tz from "dayjs/plugin/timezone";
 import useSWR from "swr";
 import utc from "dayjs/plugin/utc";
 import {
-  DataGrid,
   GridColDef,
   GridValueFormatterParams,
-  GridRowSelectionModel,
+  GridColumnVisibilityModel,
 } from "@mui/x-data-grid";
 
 import { Assignment } from "../../src/components/assignments/types";
 import { ClassSummary } from "../../src/components/classes/types";
 import { Session } from "../../src/components/sessions/types";
-import CustomToolBar from "../../src/components/grid/CustomToolBar";
+import BaseDataGrid from "../../src/components/persons/BaseDataGrid";
 import DeleteSessionDialog from "../../src/components/sessions/forms/DeleteSessionDialog";
 import fetcher from "../../utils/fetcher";
 import NewSessionDialog from "../../src/components/sessions/forms/NewSessionDialog";
@@ -34,26 +30,24 @@ dayjs.extend(tz);
 
 export default function SessionGrid() {
   const [timeRange, setTimeRange] = React.useState("thisMonth");
-  const [rowSelectionModel, setRowSelectionModel] =
-    React.useState<GridRowSelectionModel>([]);
   const [selectedRowData, setSelectedRowData] = React.useState<
     Assignment | undefined
   >({} as Assignment);
   const [isNewDialogOpen, setIsNewDialogOpen] = React.useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-  const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
-    null
-  );
 
-  const { data } = useSWR(`api/sessions?range=${timeRange}`, fetcher);
-  const sessions = data as Session[];
+  const { data, isLoading, error } = useSWR(
+    `api/sessions?range=${timeRange}`,
+    fetcher
+  );
+  const sessions = (data as Session[]) || [];
 
   const handleSelectChange = (event: SelectChangeEvent) => {
     setTimeRange(event.target.value);
   };
 
-  const handleOpenNewDialog = () => {
+  const handleAddButtonClick = () => {
     setIsNewDialogOpen(true);
   };
 
@@ -135,27 +129,6 @@ export default function SessionGrid() {
     }
   };
 
-  // TODO pass this into DataGrid
-  const getTogglableColumns = (columns: GridColDef[]) => {
-    // hide the column with field `id` from list of togglable columns
-    return columns
-      .filter((column) => column.field !== "id")
-      .map((column) => column.field);
-  };
-
-  function AddIconButton({ onClick }) {
-    return (
-      <IconButton
-        aria-label="Add box icon"
-        onClick={onClick}
-        color="primary"
-        sx={{ padding: "4px" }}
-      >
-        <AddBoxIcon />
-      </IconButton>
-    );
-  }
-
   const convertToTime = (ft) =>
     dayjs(ft, "HH:mm:ss", "en", true).isValid()
       ? dayjs(ft, "HH:mm:ss").format("hh:ss A")
@@ -231,70 +204,58 @@ export default function SessionGrid() {
     },
   ];
 
-  if (!sessions) return <CircularProgress />;
+  const getTogglableColumns = (columns: GridColDef[]) => {
+    // hide the column with field `id` from list of togglable columns
+    return columns
+      .filter((column) => column.field !== "id")
+      .map((column) => column.field);
+  };
+
+  // TODO update columns
+  const initialColumnVisibilityModel: GridColumnVisibilityModel = {
+    id: false,
+    name: true,
+    active: true,
+    created: false,
+    action: true,
+  };
+
+  if (error) {
+    return <div>Error fetching data</div>;
+  }
 
   return (
-    <Box style={{ width: "100%" }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <FormControl sx={{ my: 1, minWidth: 150 }}>
-          <InputLabel id="demo-select-small-label"></InputLabel>
-          <Select
-            id="demo-select-small"
-            value={timeRange}
-            displayEmpty
-            label=""
-            onChange={handleSelectChange}
-            style={{ height: "30px" }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value="last7Days">Last 7 days</MenuItem>
-            <MenuItem value="thisMonth">This month</MenuItem>
-            <MenuItem value="yearToDate">Year to date</MenuItem>
-          </Select>
-        </FormControl>
+    <>
+      <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <FormControl sx={{ my: 1, minWidth: 150 }}>
+            <InputLabel id="demo-select-small-label"></InputLabel>
+            <Select
+              id="demo-select-small"
+              value={timeRange}
+              displayEmpty
+              label=""
+              onChange={handleSelectChange}
+              style={{ height: "30px" }}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              <MenuItem value="last7Days">Last 7 days</MenuItem>
+              <MenuItem value="thisMonth">This month</MenuItem>
+              <MenuItem value="yearToDate">Year to date</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+        <BaseDataGrid
+          data={sessions}
+          columns={columns}
+          isLoading={isLoading}
+          onAddClick={handleAddButtonClick}
+          getTogglableColumns={getTogglableColumns}
+          initialColumnVisibilityModel={initialColumnVisibilityModel}
+        />
       </Box>
-      <DataGrid
-        sx={{
-          width: "100%",
-          overflow: "hidden",
-        }}
-        rows={sessions}
-        columns={columns}
-        rowSelectionModel={rowSelectionModel}
-        onRowSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
-        localeText={{
-          toolbarColumns: "",
-          toolbarFilters: "",
-          toolbarDensity: "",
-          toolbarExport: "",
-        }}
-        initialState={{
-          pagination: { paginationModel: { pageSize: 10 } },
-          columns: {
-            columnVisibilityModel: {
-              id: false,
-              created: false,
-            },
-          },
-        }}
-        slots={{
-          toolbar: CustomToolBar,
-        }}
-        slotProps={{
-          panel: {
-            anchorEl: buttonEl,
-            placement: "bottom-end",
-          },
-          toolbar: {
-            children: <AddIconButton onClick={handleOpenNewDialog} />,
-            setButtonEl,
-          },
-        }}
-        pageSizeOptions={[5, 10, 25]}
-        hideFooterSelectedRowCount
-      />
       <NewSessionDialog
         open={isNewDialogOpen}
         onClose={handleCloseNewDialog}
@@ -305,6 +266,6 @@ export default function SessionGrid() {
         onClose={handleCloseDeleteDialog}
         onSubmit={handleDeleteRowData}
       />
-    </Box>
+    </>
   );
 }
