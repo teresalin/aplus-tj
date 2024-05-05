@@ -64,8 +64,6 @@ export default function Attendance() {
     return Object.values(attendanceByStudent);
   }, [data, dates]);
 
-  console.log(dates);
-
   useEffect(() => {
     setDates(generateWeekDates(startDate));
   }, [startDate]);

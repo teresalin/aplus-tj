@@ -46,12 +46,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         WHERE
             cl.id = $1
             AND cst.active = TRUE
-            AND ss.date >= date_trunc('week', $2::date) AND ss.date < date_trunc('week', $2::date) + interval '1 week'
+            AND ss.date >= $2::date
+            AND ss.date < $2::date + interval '7 days'
         ORDER BY
             ss.date, ss.start_time;
         `,
       values: [classID, startDate],
     };
+
     const result = await client.query(query);
     res.status(200).json({
       status: "Success",

@@ -51,7 +51,6 @@ export default function PersonGrid() {
   };
 
   const onRowClick = (data: { studentId }) => {
-    console.log(data.studentId);
     router.push(
       `/persons/students/[student_id]/details`,
       `/persons/students/${data.studentId}/details`

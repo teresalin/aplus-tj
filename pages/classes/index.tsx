@@ -1,4 +1,3 @@
-import React from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Button from "@mui/material/Button";
 import ChildCareIcon from "@mui/icons-material/ChildCare";
@@ -6,13 +5,14 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
 import Link from "next/link";
 import Paper from "@mui/material/Paper";
+import React from "react";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import TodayIcon from "@mui/icons-material/Today";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { Class, ClassDetail } from "../../src/components/classes/types";
+import { ClassDetail } from "../../src/components/classes/types";
 import { CreateClassDialog } from "../../src/components/classes";
 import { Schedule } from "../api/classes/[class_id]/schedules";
 import fetcher from "../../utils/fetcher";

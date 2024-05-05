@@ -65,10 +65,10 @@ export default function SelectedListItem({ toggleTheme }) {
             </ListItemButton>
           </Link>
           <Link
-            href="/overview"
+            href="/dashboard"
             style={{ textDecoration: "none", color: "inherit" }}
           >
-            <ListItemButton selected={isActive("/overview")}>
+            <ListItemButton selected={isActive("/dashboard")}>
               <ListItemIcon>
                 <GridViewIcon />
               </ListItemIcon>
