@@ -1,61 +1,54 @@
 import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/router";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
 import Chip from "@mui/material/Chip";
-import CircularProgress from "@mui/material/CircularProgress";
-import EditIcon from "@mui/icons-material/Edit";
+import DoDisturbOnIcon from "@mui/icons-material/DoDisturbOn";
 import Grid from "@mui/material/Grid";
+import LinearProgress from "@mui/material/LinearProgress";
+import Paper from "@mui/material/Paper";
 import React from "react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
+import ClassEnrollmentDialog from "../../../../../src/components/persons/students/forms/ClassEnrollmentDialog";
 import fetcher from "../../../../../utils/fetcher";
 import StudentLayout from "../../../../../src/components/layout/StudentLayout";
-import LinearProgress from "@mui/material/LinearProgress";
 
 export default function ClassesTab() {
   const theme = useTheme();
   const studentID = useRouter().query.student_id;
 
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = React.useState(false);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const { data, isLoading, error } = useSWR(
     studentID ? `/api/persons/students/${studentID}/classes` : null,
     fetcher
   );
   const classes = data || [];
 
+  const availableClasses = [
+    { id: 1, name: "Mathematics" },
+    { id: 2, name: "Science" },
+  ];
+
+  const handleEditClick = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  const handleSubmit = (data) => {
+    // TODO implement submit
+    console.log(data);
+  };
+
   if (error) {
     return <div>Error fetching data</div>;
   }
-
-  const handleEditClick = () => {
-    setIsUpdateDialogOpen(true);
-  };
-
-  const handleCloseUpdateDialog = () => {
-    setIsUpdateDialogOpen(false);
-  };
-
-  const renderChip = (params) => {
-    return params ? (
-      <Chip
-        label="Active"
-        size="small"
-        sx={{ height: "20px", paddingX: 1 }}
-        style={{ backgroundColor: "#bef0cc", color: "#507b67" }}
-      />
-    ) : (
-      <Chip
-        label="Inactive"
-        size="small"
-        sx={{ height: "20px" }}
-        style={{ backgroundColor: "#f9e8e8", color: "#9f3d49" }}
-      />
-    );
-  };
 
   return (
     <>
@@ -64,10 +57,10 @@ export default function ClassesTab() {
           <Button
             variant="text"
             color="primary"
-            startIcon={<EditIcon />}
+            startIcon={<AddBoxIcon />}
             onClick={handleEditClick}
           >
-            Edit
+            Enroll in New Class
           </Button>
         </Box>
 
@@ -75,19 +68,28 @@ export default function ClassesTab() {
         {isLoading && <LinearProgress />}
 
         {data && classes.length === 0 ? (
-          <Card variant="outlined" sx={{ p: 2 }}>
+          <Paper variant="outlined" sx={{ p: 2 }}>
             This student is not currently enrolled in any classes.
-          </Card>
+          </Paper>
         ) : (
           classes.map((classData) => (
-            <Box key={classData.id}>
-              <Stack direction="row" alignItems="center">
+            <Paper variant="outlined" sx={{ p: 2, my: 1 }}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 <Typography variant="h6">{classData.name}</Typography>
-                <Box sx={{ pb: "7px", ml: "0.5em" }}>
-                  {renderChip(classData.active)}
-                </Box>
+                <Button
+                  variant="text"
+                  color="warning"
+                  startIcon={<DoDisturbOnIcon />}
+                  onClick={handleEditClick}
+                >
+                  Unenroll
+                </Button>
               </Stack>
-              <Card variant="outlined" sx={{ p: 2, my: 1 }}>
+              <Box mt={1}>
                 <Grid container spacing={3}>
                   <Grid item sm={12} md={4}>
                     <Typography
@@ -132,11 +134,18 @@ export default function ClassesTab() {
                 ))} */}
                   </Grid>
                 </Grid>
-              </Card>
-            </Box>
+              </Box>
+            </Paper>
           ))
         )}
       </StudentLayout>
+      <ClassEnrollmentDialog
+        open={isDialogOpen}
+        onClose={handleCloseDialog}
+        onSubmit={handleSubmit}
+        availableClasses={availableClasses}
+        studentClasses={classes}
+      />
     </>
   );
 }

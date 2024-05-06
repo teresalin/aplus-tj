@@ -4,17 +4,17 @@ import { useRouter } from "next/router";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CakeIcon from "@mui/icons-material/Cake";
-import Card from "@mui/material/Card";
 import EditIcon from "@mui/icons-material/Edit";
 import EmailIcon from "@mui/icons-material/Email";
 import Grid from "@mui/material/Grid";
+import LinearProgress from "@mui/material/LinearProgress";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
+import Paper from "@mui/material/Paper";
 import React from "react";
 import Typography from "@mui/material/Typography";
 
 import { Student } from "../../../../../src/components/persons/students/types";
 import fetcher from "../../../../../utils/fetcher";
-import LinearProgress from "@mui/material/LinearProgress";
 import StudentLayout from "../../../../../src/components/layout/StudentLayout";
 import UpdateStudentDialog from "../../../../../src/components/persons/students/forms/UpdateStudentDialog";
 
@@ -36,10 +36,6 @@ export default function DetailsTab() {
     fetcher
   );
   const student = data || null;
-
-  if (error) {
-    return <div>Error fetching data</div>;
-  }
 
   const handleEditClick = () => {
     setIsUpdateDialogOpen(true);
@@ -66,6 +62,10 @@ export default function DetailsTab() {
     }
   };
 
+  if (error) {
+    return <div>Error fetching data</div>;
+  }
+
   return (
     <>
       <StudentLayout currentTab="details">
@@ -85,7 +85,7 @@ export default function DetailsTab() {
 
         {student && (
           <>
-            <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
+            <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
               <Grid container direction="row" spacing={3}>
                 <Grid item>
                   <Box
@@ -163,11 +163,11 @@ export default function DetailsTab() {
                   </Grid>
                 </Grid>
               </Grid>
-            </Card>
+            </Paper>
             <Typography variant="h6" gutterBottom>
               School Information
             </Typography>
-            <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
+            <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
               <Grid container spacing={3}>
                 <Grid item sm={12} md={4}>
                   <Typography
@@ -201,11 +201,11 @@ export default function DetailsTab() {
                   </Typography>
                 </Grid>
               </Grid>
-            </Card>
+            </Paper>
             <Typography variant="h6" gutterBottom>
               A Plus Enrollment
             </Typography>
-            <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
+            <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
               <Grid container spacing={3}>
                 <Grid item sm={12} md={4}>
                   <Typography
@@ -241,11 +241,11 @@ export default function DetailsTab() {
                   </Typography>
                 </Grid>
               </Grid>
-            </Card>
+            </Paper>
             <Typography variant="h6" gutterBottom>
               Other
             </Typography>
-            <Card variant="outlined" sx={{ p: 2, mb: 2 }}>
+            <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
               <Typography
                 variant="body2"
                 sx={{ fontWeight: 700, color: theme.palette.primary.main }}
@@ -253,7 +253,7 @@ export default function DetailsTab() {
                 Notes
               </Typography>
               <Typography variant="body2">{student.notes || "N/A"}</Typography>
-            </Card>
+            </Paper>
           </>
         )}
       </StudentLayout>
