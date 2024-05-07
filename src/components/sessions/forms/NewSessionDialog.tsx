@@ -32,7 +32,7 @@ export default function NewSessionDialog({
 }: INewSessionDialogProps) {
   const [newSession, setNewSession] = React.useState({} as Session);
   const { data } = useSWR("/api/classes", fetcher);
-  const classes = data || [];
+  const classes = (data as Class[]) || [];
 
   const handleSubmit: FormEventHandler = (event: FormEvent) => {
     event.preventDefault();

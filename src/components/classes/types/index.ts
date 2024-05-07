@@ -27,3 +27,12 @@ export interface ClassSummary {
   name: string;
   teacherName?: string;
 }
+
+export interface ClassStudent {
+  id: number;
+  classId: number;
+  studentId: number;
+  startDate: Date;
+  endDate?: Date;
+  active: boolean;
+}

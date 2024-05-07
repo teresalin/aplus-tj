@@ -28,11 +28,6 @@ export default function ClassesTab() {
   );
   const classes = data || [];
 
-  const availableClasses = [
-    { id: 1, name: "Mathematics" },
-    { id: 2, name: "Science" },
-  ];
-
   const handleEditClick = () => {
     setIsDialogOpen(true);
   };
@@ -143,7 +138,6 @@ export default function ClassesTab() {
         open={isDialogOpen}
         onClose={handleCloseDialog}
         onSubmit={handleSubmit}
-        availableClasses={availableClasses}
         studentClasses={classes}
       />
     </>
