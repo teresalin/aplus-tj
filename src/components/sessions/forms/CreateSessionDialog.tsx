@@ -19,18 +19,19 @@ import { Session } from "../types";
 import { Class } from "../../classes/types";
 import fetcher from "../../../../utils/fetcher";
 
-export interface INewSessionDialogProps {
+export interface ICreateSessionDialogProps {
   open: boolean;
   onClose: () => void;
   onSubmit;
 }
 
-export default function NewSessionDialog({
+export default function CreateSessionDialog({
   open,
   onClose,
   onSubmit,
-}: INewSessionDialogProps) {
+}: ICreateSessionDialogProps) {
   const [newSession, setNewSession] = React.useState({} as Session);
+
   const { data } = useSWR("/api/classes", fetcher);
   const classes = (data as Class[]) || [];
 

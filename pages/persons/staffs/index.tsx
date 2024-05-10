@@ -14,6 +14,7 @@ import { Staff } from "../../../src/components/persons/staffs/types";
 import BaseDataGrid from "../../../src/components/persons/BaseDataGrid";
 import fetcher from "../../../utils/fetcher";
 import PersonsTabs from "../../../src/components/persons/PersonsTabs";
+import CreateStaffDialog from "../../../src/components/persons/staffs/forms/CreateStaffDialog";
 
 export default function PersonGrid() {
   const router = useRouter();
@@ -25,7 +26,11 @@ export default function PersonGrid() {
   const staffs = (data as Staff[]) || [];
 
   const handleAddButtonClick = () => {
-    // TODO open dialog
+    setIsCreateStaffDialogOpen(true);
+  };
+
+  const closeDialog = () => {
+    setIsCreateStaffDialogOpen(false);
   };
 
   const handleCreateStaff = async (data) => {
@@ -165,17 +170,24 @@ export default function PersonGrid() {
   }
 
   return (
-    <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
-      <PersonsTabs currentTab="staffs" />
-      <BaseDataGrid
-        data={staffs}
-        columns={columns}
-        isLoading={isLoading}
-        onAddClick={handleAddButtonClick}
-        onRowClick={onRowClick}
-        getTogglableColumns={getTogglableColumns}
-        initialColumnVisibilityModel={initialColumnVisibilityModel}
+    <>
+      <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
+        <PersonsTabs currentTab="staffs" />
+        <BaseDataGrid
+          data={staffs}
+          columns={columns}
+          isLoading={isLoading}
+          onAddClick={handleAddButtonClick}
+          onRowClick={onRowClick}
+          getTogglableColumns={getTogglableColumns}
+          initialColumnVisibilityModel={initialColumnVisibilityModel}
+        />
+      </Box>
+      <CreateStaffDialog
+        open={isCreateStaffDialogOpen}
+        onClose={closeDialog}
+        onSubmit={handleCreateStaff}
       />
-    </Box>
+    </>
   );
 }

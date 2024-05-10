@@ -21,7 +21,7 @@ import { Session } from "../../src/components/sessions/types";
 import BaseDataGrid from "../../src/components/persons/BaseDataGrid";
 import DeleteSessionDialog from "../../src/components/sessions/forms/DeleteSessionDialog";
 import fetcher from "../../utils/fetcher";
-import NewSessionDialog from "../../src/components/sessions/forms/NewSessionDialog";
+import NewSessionDialog from "../../src/components/sessions/forms/CreateSessionDialog";
 import RenderMenu from "../../src/components/grid/RenderMenu";
 
 dayjs.extend(CustomParseFormat);
