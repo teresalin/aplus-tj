@@ -1,12 +1,12 @@
-import { Assignment } from "../src/components/assignments/types";
-import { Billing } from "../src/components/billing/types";
-import { Class, ClassDetail } from "../src/components/classes/types";
-import { Parent } from "../src/components/persons/parents/types";
-import { Person } from "../src/components/persons/types";
-import { Schedule } from "../pages/api/classes/[class_id]/schedules";
-import { Session, SessionDetail } from "../src/components/sessions/types";
-import { Staff } from "../src/components/persons/staffs/types";
-import { Student } from "../src/components/persons/students/types";
+import { Assignment } from "../src/modules/assignments";
+import { Billing } from "../src/modules/billing/types";
+import { Class, ClassDetail } from "../src/modules/classes";
+import { Parent } from "../src/modules/persons/parents";
+import { Person } from "../src/modules/persons/types";
+import { Schedule } from "../src/pages/api/classes/[class_id]/schedules";
+import { Session, SessionDetail } from "../src/modules/sessions";
+import { Staff } from "../src/modules/persons/staffs";
+import { Student } from "../src/modules/persons/students";
 
 export function parsePerson(row: any): Person {
   return {

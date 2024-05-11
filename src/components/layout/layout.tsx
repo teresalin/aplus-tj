@@ -1,8 +1,8 @@
 import "../../../styles/globals.css";
 import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import SelectedListItem from "../../../src/components/SelectedListItem";
-import Box from "@mui/material/Box";
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
   width: 250,

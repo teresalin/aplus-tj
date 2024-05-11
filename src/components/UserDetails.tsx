@@ -7,7 +7,7 @@ import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { Person } from "./persons/types";
+import { Person } from "../modules/persons/types";
 
 // import { UserDetail } from '../pages/api/patients/[patient_id]';
 
