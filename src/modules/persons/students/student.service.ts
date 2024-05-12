@@ -1,0 +1,186 @@
+import { CreateStudentDTO, UpdateStudentDTO } from "./dtos";
+import { getDBClient } from "../../../../lib/db-connector";
+import { Student } from "./student.model";
+
+export async function findAllStudents(): Promise<Student[]> {
+  const client = await getDBClient();
+  try {
+    const { rows } = await client.query(
+      `
+      SELECT
+        person.id AS person_id,
+        person.name,
+        person.gender,
+        person.phone,
+        person.email,
+        person.date_of_birth,
+        person.notes,
+        person.active,
+        student.id AS student_id,
+        student.english_name,
+        student.current_school,
+        student.textbook_publisher,
+        student.join_date, 
+        student.leave_date, 
+        grade.id AS grade_id,
+        grade.name AS grade_name
+      FROM student
+      INNER JOIN person ON student.person_id = person.id
+      INNER JOIN grade ON student.grade_id = grade.id;
+    `
+    );
+    return rows.map((row) => new Student(row));
+  } catch (error) {
+    console.error("Error fetching students from database:", error);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+export async function findStudentById(
+  studentId: number
+): Promise<Student | null> {
+  const client = await getDBClient();
+  try {
+    const { rows } = await client.query(
+      `
+      SELECT 
+        person.id AS person_id,
+        person.name,
+        person.gender,
+        person.phone,
+        person.email,
+        person.date_of_birth,
+        person.notes,
+        person.active,
+        student.id AS student_id,
+        student.english_name,
+        student.current_school,
+        student.textbook_publisher,
+        student.join_date, 
+        student.leave_date, 
+        grade.id AS grade_id,
+        grade.name AS grade_name
+      FROM student
+      INNER JOIN person ON student.person_id = person.id
+      INNER JOIN grade ON student.grade_id = grade.id
+      WHERE student.id = $1;
+    `,
+      [studentId]
+    );
+    return rows.length ? new Student(rows[0]) : null;
+  } catch (error) {
+    console.error("Error retrieving student from database:", error);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+export async function createStudent(dto: CreateStudentDTO): Promise<Student> {
+  const client = await getDBClient();
+  try {
+    await client.query("BEGIN");
+    if (!Student.validateEmail(dto.email)) {
+      throw new Error("Invalid email format.");
+    }
+    // Create person and student in the database
+    const personResult = await client.query(
+      `
+      INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, created, updated)
+      VALUES ($1, $2, $3, $4, $5, $6, true, NOW(), NOW()) RETURNING id;
+    `,
+      [dto.name, dto.gender, dto.phone, dto.email, dto.dateOfBirth, dto.notes]
+    );
+
+    const personId = personResult.rows[0].id;
+
+    const studentResult = await client.query(
+      `
+      INSERT INTO student(person_id, english_name, current_school, textbook_publisher, grade_id, join_date, leave_date, created, updated)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW()) RETURNING id;
+    `,
+      [
+        personId,
+        dto.englishName,
+        dto.currentSchool,
+        dto.textbookPublisher,
+        dto.grade.id,
+        dto.joinDate,
+        dto.leaveDate,
+      ]
+    );
+
+    await client.query("COMMIT");
+    return new Student({
+      ...dto,
+      personId,
+      studentId: studentResult.rows[0].id,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+export async function updateStudent(
+  studentId: number,
+  dto: UpdateStudentDTO
+): Promise<Student> {
+  const client = await getDBClient();
+  try {
+    await client.query("BEGIN");
+    const personUpdateQuery = {
+      text: `
+          UPDATE person
+          SET name = $1, gender = $2, phone = $3, email = $4, date_of_birth = $5, notes = $6, updated = NOW()
+          WHERE id = $7
+          RETURNING id;
+        `,
+      values: [
+        dto.name,
+        dto.gender,
+        dto.phone,
+        dto.email,
+        dto.dateOfBirth,
+        dto.notes,
+        dto.personId,
+      ],
+    };
+
+    const personResult = await client.query(personUpdateQuery);
+
+    const studentUpdateQuery = {
+      text: `
+          UPDATE student
+          SET english_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, updated = NOW()
+          WHERE person_id = $7
+          RETURNING id;
+        `,
+      values: [
+        dto.englishName,
+        dto.currentSchool,
+        dto.textbookPublisher,
+        dto.grade?.id,
+        dto.joinDate,
+        dto.leaveDate,
+        personResult.rows[0].id,
+      ],
+    };
+
+    const studentResult = await client.query(studentUpdateQuery);
+    await client.query("COMMIT");
+    return new Student({
+      ...dto,
+      studentId: studentResult.rows[0].id,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}

@@ -10,7 +10,7 @@ import Paper from "@mui/material/Paper";
 import React from "react";
 import Typography from "@mui/material/Typography";
 
-import StudentLayout from "../../../../../components/layout/StudentLayout";
+import StudentLayout from "../../../../../modules/persons/students/components/StudentLayout";
 
 export default function BillingTab({ details }) {
   const theme = useTheme();

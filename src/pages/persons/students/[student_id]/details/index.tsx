@@ -18,7 +18,7 @@ import {
   UpdateStudentDialog,
 } from "../../../../../modules/persons/students";
 import fetcher from "../../../../../../utils/fetcher";
-import StudentLayout from "../../../../../components/layout/StudentLayout";
+import StudentLayout from "../../../../../modules/persons/students/components/StudentLayout";
 
 function formatDate(date: Date): string | null {
   if (date) {

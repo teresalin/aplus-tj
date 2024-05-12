@@ -1,50 +1,50 @@
-import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { parseStudent } from "../../../../../utils/apiUtils";
+import { CreateStudentDTO } from "../../../../modules/persons/students/dtos";
+import {
+  createStudent,
+  findAllStudents,
+} from "../../../../modules/persons/students/student.service";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const client = await getDBClient();
-
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
-    const query = {
-      text: `
-        SELECT 
-          person.id AS person_id,
-          person.name,
-          person.gender,
-          person.phone,
-          person.email,
-          person.date_of_birth,
-          person.notes,
-          person.active,
-          student.id AS student_id,
-          student.english_name,
-          student.current_school,
-          student.textbook_publisher,
-          student.join_date, 
-          student.leave_date, 
-          grade.id AS grade_id,
-          grade.name AS grade_name
-        FROM student
-        INNER JOIN person ON student.person_id = person.id
-        INNER JOIN grade ON student.grade_id = grade.id;
-      `,
-    };
-    const result = await client.query(query);
-    res.status(200).json({
-      status: "Success",
-      result: result.rows.map(parseStudent),
-      message: "Students retrieved successfully.",
-    });
+    switch (req.method) {
+      case "GET":
+        const students = await findAllStudents();
+        res.status(200).json({
+          status: "Success",
+          result: students,
+          message: "All students retrieved successfully.",
+        });
+        break;
+      case "POST":
+        // Validate the incoming data before passing to the service
+        const studentData: CreateStudentDTO = req.body;
+        // Additional validation can be performed here
+        const newStudent = await createStudent(studentData);
+        res.status(201).json({
+          status: "Success",
+          result: newStudent,
+          message: "New student created successfully.",
+        });
+        break;
+      default:
+        res.setHeader("Allow", ["GET", "POST"]);
+        res.status(405).json({
+          status: "Error",
+          result: null,
+          message: `Method ${req.method} Not Allowed`,
+        });
+        break;
+    }
   } catch (error) {
-    console.error("Error retrieving students", error);
+    console.error("API error:", error);
     res.status(500).json({
       status: "Error",
+      result: null,
       message: "Internal server error",
     });
-  } finally {
-    if (client) {
-      await releaseDBClient(client);
-    }
   }
-};
+}

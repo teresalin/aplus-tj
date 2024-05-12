@@ -34,7 +34,7 @@ export default function UpdateAssignmentDialog({
 }: IUpdateAssignmentDialogProps) {
   // TODO create two functions, one for update and one for create and make the form components reusable
   const [formData, setFormData] = React.useState({} as Assignment);
-  const { data } = useSWR("/api/classes", fetcher);
+  const { data } = useSWR(open ? "/api/classes" : null, fetcher);
   const classes = data || [];
 
   React.useEffect(() => {
@@ -103,7 +103,9 @@ export default function UpdateAssignmentDialog({
             />
             <Box mt="8px">
               <FormControl fullWidth>
-                <InputLabel id="select-label">Assign to a class</InputLabel>
+                <InputLabel id="class-select-label">
+                  Assign to a class
+                </InputLabel>
                 <Select
                   fullWidth
                   required
@@ -111,7 +113,7 @@ export default function UpdateAssignmentDialog({
                   id="class"
                   name="class"
                   label={"Assign to a class"}
-                  labelId="select-label"
+                  labelId="class-select-label"
                   margin="dense"
                   value={formData.classInfo?.id ? formData.classInfo?.id : null}
                   onChange={handleSelectChange}
