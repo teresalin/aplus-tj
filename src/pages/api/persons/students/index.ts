@@ -4,6 +4,7 @@ import {
   createStudent,
   findAllStudents,
 } from "../../../../modules/persons/students/student.service";
+import { handleError } from "../../../../../utils/errorHandler";
 
 export default async function handler(
   req: NextApiRequest,
@@ -41,10 +42,6 @@ export default async function handler(
     }
   } catch (error) {
     console.error("API error:", error);
-    res.status(500).json({
-      status: "Error",
-      result: null,
-      message: "Internal server error",
-    });
+    handleError(res, error);
   }
 }

@@ -4,16 +4,16 @@ export interface UpdateStudentDTO {
   personId?: number;
   studentId?: number;
   name?: string;
+  englishName?: string;
   gender?: string;
-  phone?: string;
-  email?: string;
   dateOfBirth?: Date;
   notes?: string;
-  active?: boolean;
-  englishName?: string;
+  phone?: string;
+  email?: string;
   currentSchool?: string;
-  textbookPublisher?: string;
   grade?: Grade;
+  textbookPublisher?: string;
   joinDate?: Date;
   leaveDate?: Date;
+  active?: boolean;
 }

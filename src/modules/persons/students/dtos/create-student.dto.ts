@@ -1,19 +1,16 @@
 import { Grade } from "../../../../pages/api/grades";
 
 export interface CreateStudentDTO {
-  personId: number;
   name: string;
+  englishName?: string;
   gender: string;
-  phone: string;
-  email: string;
   dateOfBirth: Date;
   notes?: string;
-  active?: boolean;
-  studentId: number;
-  englishName?: string;
+  phone: string;
+  email: string;
   currentSchool: string;
-  textbookPublisher: string;
   grade: Grade;
+  textbookPublisher: string;
   joinDate: Date;
   leaveDate?: Date;
 }

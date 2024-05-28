@@ -59,6 +59,7 @@ export default function CreateStudentDialog({
   };
 
   const handleSubmit: React.FormEventHandler = (event: React.FormEvent) => {
+    event.preventDefault(); // Prevent default form submission behavior
     onSubmit(newStudent);
   };
 

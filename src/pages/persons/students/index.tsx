@@ -1,12 +1,14 @@
 import { useRouter } from "next/router";
 import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import dayjs from "dayjs";
 import React from "react";
 import useSWR from "swr";
 import {
   GridColDef,
   GridColumnVisibilityModel,
+  GridRenderCellParams,
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
@@ -35,47 +37,34 @@ export default function PersonGrid() {
   };
 
   const handleCreateStudent = async (data) => {
-    const url = "/api/persons/students/index";
+    // Normalize the email: trim whitespace and convert to lowercase
+    const normalizedEmail = data.email.trim().toLowerCase();
 
-    const response = await fetch(url, {
+    // Create a new object with the normalized email and other data
+    const normalizedData = {
+      ...data,
+      email: normalizedEmail,
+    };
+
+    const response = await fetch(`/api/persons/students`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(normalizedData),
     });
 
     if (response.ok) {
-      // TODO close dialog
+      closeDialog();
     } else {
-      console.error("Error creating student:", response.statusText);
+      console.error("Error creating student:", await response.text());
     }
   };
 
-  const onRowClick = (data: { studentId }) => {
+  const onRowClick = (data: { studentId: number }) => {
     router.push(
       `/persons/students/[student_id]/details`,
       `/persons/students/${data.studentId}/details`
-    );
-  };
-
-  const renderChip = (params) => {
-    return params.value ? (
-      <Chip
-        // icon={<CheckIcon />}
-        label="Active"
-        size="small"
-        sx={{ height: "20px", paddingX: 1 }}
-        style={{ backgroundColor: "#bef0cc", color: "#507b67" }}
-      />
-    ) : (
-      <Chip
-        // icon={<CloseIcon />}
-        label="Inactive"
-        size="small"
-        sx={{ height: "20px" }}
-        style={{ backgroundColor: "#f9e8e8", color: "#9f3d49" }}
-      />
     );
   };
 
@@ -127,9 +116,13 @@ export default function PersonGrid() {
       headerName: "Active",
       minWidth: 100,
       flex: 1,
-      renderCell: renderChip,
+      renderCell: (params: GridRenderCellParams<any, Boolean>) =>
+        params.value ? (
+          <CheckCircleIcon color="success" />
+        ) : (
+          <CancelIcon color="error" />
+        ),
     },
-    // TODO fix failed prop type warning
     {
       field: "created",
       headerName: "Created On",

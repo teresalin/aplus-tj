@@ -8,11 +8,11 @@ export class Student {
   email: string;
   phone: string;
   dateOfBirth: Date;
-  englishName: string;
+  englishName?: string;
   currentSchool: string;
   textbookPublisher: string;
   grade: Grade;
-  notes: string;
+  notes?: string;
   active: boolean;
   joinDate: Date;
   leaveDate?: Date;
