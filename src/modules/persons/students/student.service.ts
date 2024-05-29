@@ -14,7 +14,7 @@ export async function findAllStudents(): Promise<Student[]> {
         person.gender,
         person.phone,
         person.email,
-        person.date_of_birth,
+        person.date_of_birth::timestamp at time zone 'UTC' as date_of_birth,
         person.notes,
         person.active,
         student.id AS student_id,
@@ -83,10 +83,7 @@ export async function createStudent(dto: CreateStudentDTO): Promise<Student> {
   const client = await getDBClient();
   try {
     await client.query("BEGIN");
-    if (!Student.validateEmail(dto.email)) {
-      throw new Error("Invalid email format.");
-    }
-    // Create person and student in the database
+
     const personResult = await client.query(
       `
       INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, created, updated)
@@ -94,7 +91,6 @@ export async function createStudent(dto: CreateStudentDTO): Promise<Student> {
     `,
       [dto.name, dto.gender, dto.phone, dto.email, dto.dateOfBirth, dto.notes]
     );
-
     const personId = personResult.rows[0].id;
 
     const studentResult = await client.query(
@@ -112,13 +108,17 @@ export async function createStudent(dto: CreateStudentDTO): Promise<Student> {
         dto.leaveDate,
       ]
     );
+    const studentId = studentResult.rows[0].id;
 
     await client.query("COMMIT");
-    return new Student({
-      ...dto,
-      personId,
-      studentId: studentResult.rows[0].id,
-    });
+
+    // Use the existing findStudentById method to fetch the full student data
+    const newStudent = await findStudentById(studentId);
+    if (!newStudent) {
+      throw new Error("Student not found after creation.");
+    }
+
+    return newStudent;
   } catch (error) {
     await client.query("ROLLBACK");
     if (error.code === "23505") {

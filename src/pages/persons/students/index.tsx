@@ -6,7 +6,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import dayjs from "dayjs";
 import React from "react";
 import timezone from "dayjs/plugin/timezone";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import utc from "dayjs/plugin/utc";
 import {
   GridColDef,
@@ -66,6 +66,11 @@ export default function PersonGrid() {
     const responseData = await response.json();
     if (response.ok) {
       closeDialog();
+      mutate(
+        "/api/persons/students",
+        (students) => [responseData.result, ...students],
+        false
+      );
       setSnackbarMessage("Student created successfully");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);

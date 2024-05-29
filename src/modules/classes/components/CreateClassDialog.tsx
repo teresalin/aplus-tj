@@ -160,9 +160,6 @@ export default function CreateClassDialog({
               variant="outlined"
               onChange={handleInputChange}
             />
-            {/* <Typography variant="body2" display="block">
-              Grade
-            </Typography> */}
             <Box mt="8px">
               <FormControl fullWidth>
                 <InputLabel id="grade-select-label">Select a grade</InputLabel>

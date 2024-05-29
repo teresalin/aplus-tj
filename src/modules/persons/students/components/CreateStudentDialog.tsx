@@ -15,24 +15,14 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import fetcher from "../../../../../utils/fetcher";
+import { CreateStudentDTO } from "../dtos/create-student.dto";
 import { Grade } from "../../../../pages/api/grades";
-import { Student } from "../types";
-
-function RedBar() {
-  return (
-    <Box
-      sx={{
-        height: 20,
-      }}
-    />
-  );
-}
+import fetcher from "../../../../../utils/fetcher";
 
 export interface ICreateStudentDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: Student) => Promise<void>;
+  onSubmit: (data: CreateStudentDTO) => Promise<void>;
 }
 
 export default function CreateStudentDialog({
@@ -40,7 +30,7 @@ export default function CreateStudentDialog({
   onClose,
   onSubmit,
 }: ICreateStudentDialogProps) {
-  const [newStudent, setNewStudent] = React.useState({} as Student);
+  const [newStudent, setNewStudent] = React.useState({} as CreateStudentDTO);
   const { data } = useSWR("/api/grades", fetcher);
   const grades = data || [];
 
@@ -71,194 +61,200 @@ export default function CreateStudentDialog({
       <form onSubmit={handleSubmit}>
         <DialogTitle>New Student</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" display="block" gutterBottom>
-            Basic Information
-          </Typography>
-          <Grid container direction="row" spacing={{ xs: 0, sm: 1 }}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                required
-                id="name"
-                name="name"
-                label="Full Name"
-                type="text"
-                variant="outlined"
-                margin="dense"
-                value={newStudent.name || ""}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-              />
+          <Box>
+            <Typography variant="body2" display="block" gutterBottom>
+              Basic Information
+            </Typography>
+            <Grid container direction="row" spacing={{ xs: 0, sm: 1 }}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  required
+                  id="name"
+                  name="name"
+                  label="Full Name"
+                  type="text"
+                  variant="outlined"
+                  margin="normal"
+                  value={newStudent.name || ""}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="englishName"
+                  name="englishName"
+                  label="English Name"
+                  type="text"
+                  variant="outlined"
+                  margin="normal"
+                  value={newStudent.englishName || ""}
+                  onChange={(e) =>
+                    handleInputChange("englishName", e.target.value)
+                  }
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                id="englishName"
-                name="englishName"
-                label="English Name"
-                type="text"
-                variant="outlined"
-                margin="dense"
-                value={newStudent.englishName || ""}
-                onChange={(e) =>
-                  handleInputChange("englishName", e.target.value)
-                }
-              />
-            </Grid>
-          </Grid>
-          <DatePicker
-            label="Date of Birth"
-            format="YYYY-MM-DD"
-            value={newStudent.dateOfBirth || null}
-            onChange={(date) => handleInputChange("dateOfBirth", date)}
-            sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
-            slotProps={{
-              textField: {
-                required: true,
-              },
-            }}
-          />
-          {/* TODO update to Select */}
-          <TextField
-            fullWidth
-            required
-            id="gender"
-            name="gender"
-            label="Select a gender"
-            margin="dense"
-            select
-            value={newStudent.gender || ""}
-            onChange={(e) => handleInputChange("gender", e.target.value)}
-          >
-            <MenuItem value="Male">Male</MenuItem>
-            <MenuItem value="Female">Female</MenuItem>
-            <MenuItem value="Other">Other</MenuItem>
-          </TextField>
-          <TextField
-            fullWidth
-            multiline
-            id="notes"
-            name="notes"
-            label="Notes"
-            maxRows={3}
-            type="text"
-            variant="outlined"
-            margin="dense"
-            placeholder="Hobbies, nicknames, etc."
-            InputLabelProps={{ shrink: true }}
-            value={newStudent.notes || ""}
-            onChange={(e) => handleInputChange("notes", e.target.value)}
-          />
-          <RedBar />
-          <Typography variant="body2" display="block" gutterBottom>
-            Contact Information
-          </Typography>
-          <TextField
-            fullWidth
-            required
-            id="email"
-            name="email"
-            label="Email Address"
-            type="email"
-            variant="outlined"
-            margin="dense"
-            value={newStudent.email || ""}
-            onChange={(e) => handleInputChange("email", e.target.value)}
-          />
-          <TextField
-            fullWidth
-            required
-            id="phone"
-            name="phone"
-            label="Phone Number"
-            type="tel"
-            variant="outlined"
-            margin="dense"
-            value={newStudent.phone || ""}
-            onChange={(e) => handleInputChange("phone", e.target.value)}
-          />
-          <RedBar />
-          <Typography variant="body2" display="block" gutterBottom>
-            School Information
-          </Typography>
-          <TextField
-            fullWidth
-            required
-            id="currentSchool"
-            name="currentSchool"
-            label="Current School"
-            type="text"
-            variant="outlined"
-            margin="dense"
-            value={newStudent.currentSchool || ""}
-            onChange={(e) => handleInputChange("currentSchool", e.target.value)}
-          />
-          <Box mt="8px">
-            <FormControl fullWidth>
-              <InputLabel id="grade-select-label">Select a grade</InputLabel>
-              <Select
-                fullWidth
-                required
-                variant="outlined"
-                id="grade"
-                name="grade"
-                label={"Select a grade"}
-                labelId="grade-select-label"
-                margin="dense"
-                value={newStudent.grade?.id || ""}
-                onChange={handleGradeChange}
-              >
-                {grades &&
-                  grades.map((grade: Grade) => (
-                    <MenuItem key={grade.id} value={grade.id}>
-                      {grade.name}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
+            <DatePicker
+              label="Date of Birth"
+              format="YYYY-MM-DD"
+              value={newStudent.dateOfBirth || null}
+              onChange={(date) => handleInputChange("dateOfBirth", date)}
+              sx={{ marginTop: "16px", marginBottom: "8px", width: "100%" }}
+              slotProps={{
+                textField: {
+                  required: true,
+                },
+              }}
+            />
+            {/* TODO update to Select */}
+            <TextField
+              fullWidth
+              required
+              id="gender"
+              name="gender"
+              label="Select a gender"
+              margin="normal"
+              select
+              value={newStudent.gender || ""}
+              onChange={(e) => handleInputChange("gender", e.target.value)}
+            >
+              <MenuItem value="Male">Male</MenuItem>
+              <MenuItem value="Female">Female</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
+            </TextField>
+            <TextField
+              fullWidth
+              multiline
+              id="notes"
+              name="notes"
+              label="Notes"
+              maxRows={3}
+              type="text"
+              variant="outlined"
+              margin="normal"
+              placeholder="Hobbies, nicknames, etc."
+              InputLabelProps={{ shrink: true }}
+              value={newStudent.notes || ""}
+              onChange={(e) => handleInputChange("notes", e.target.value)}
+            />
           </Box>
-          <TextField
-            fullWidth
-            required
-            id="textbookPublisher"
-            name="textbookPublisher"
-            label="Textbook Publisher"
-            type="text"
-            variant="outlined"
-            margin="dense"
-            value={newStudent.textbookPublisher || ""}
-            onChange={(e) =>
-              handleInputChange("textbookPublisher", e.target.value)
-            }
-          />
-          <RedBar />
-          <Typography variant="body2" display="block" gutterBottom>
-            Enrollment Period
-          </Typography>
-          <Grid container direction="row" spacing={1}>
-            <Grid item xs={6}>
-              <DatePicker
-                label="Join Date"
-                format="YYYY-MM-DD"
-                value={newStudent.joinDate || null}
-                onChange={(date) => handleInputChange("joinDate", date)}
-                sx={{ marginTop: "8px", marginBottom: "4px" }}
-                slotProps={{
-                  textField: {
-                    required: true,
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <DatePicker
-                label="Leave Date"
-                format="YYYY-MM-DD"
-                value={newStudent.leaveDate || null}
-                onChange={(date) => handleInputChange("leaveDate", date)}
-                sx={{ marginTop: "8px", marginBottom: "4px" }}
-              />
-            </Grid>
-          </Grid>
+          <Box mt={2}>
+            <Typography variant="body2" display="block" gutterBottom>
+              Contact Information
+            </Typography>
+            <TextField
+              fullWidth
+              required
+              id="email"
+              name="email"
+              label="Email Address"
+              type="email"
+              variant="outlined"
+              margin="normal"
+              value={newStudent.email || ""}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+            />
+            <TextField
+              fullWidth
+              required
+              id="phone"
+              name="phone"
+              label="Phone Number"
+              type="tel"
+              variant="outlined"
+              margin="normal"
+              value={newStudent.phone || ""}
+              onChange={(e) => handleInputChange("phone", e.target.value)}
+            />
+          </Box>
+          <Box mt={2}>
+            <Typography variant="body2" display="block" gutterBottom>
+              School Information
+            </Typography>
+            <TextField
+              fullWidth
+              required
+              id="currentSchool"
+              name="currentSchool"
+              label="Current School"
+              type="text"
+              variant="outlined"
+              margin="normal"
+              value={newStudent.currentSchool || ""}
+              onChange={(e) =>
+                handleInputChange("currentSchool", e.target.value)
+              }
+            />
+            <Box mt="16px" mb="8px">
+              <FormControl fullWidth>
+                <InputLabel id="grade-select-label">Select a grade</InputLabel>
+                <Select
+                  fullWidth
+                  required
+                  variant="outlined"
+                  id="grade"
+                  name="grade"
+                  label={"Select a grade"}
+                  labelId="grade-select-label"
+                  value={newStudent.grade?.id || ""}
+                  onChange={handleGradeChange}
+                >
+                  {grades &&
+                    grades.map((grade: Grade) => (
+                      <MenuItem key={grade.id} value={grade.id}>
+                        {grade.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <TextField
+              fullWidth
+              required
+              id="textbookPublisher"
+              name="textbookPublisher"
+              label="Textbook Publisher"
+              type="text"
+              variant="outlined"
+              margin="normal"
+              value={newStudent.textbookPublisher || ""}
+              onChange={(e) =>
+                handleInputChange("textbookPublisher", e.target.value)
+              }
+            />
+          </Box>
+          <Box mt={2}>
+            <Typography variant="body2" display="block" gutterBottom>
+              Enrollment Period
+            </Typography>
+            <Box mt="16px">
+              <Grid container direction="row" spacing={1}>
+                <Grid item xs={6}>
+                  <DatePicker
+                    label="Join Date"
+                    format="YYYY-MM-DD"
+                    value={newStudent.joinDate || null}
+                    onChange={(date) => handleInputChange("joinDate", date)}
+                    slotProps={{
+                      textField: {
+                        required: true,
+                      },
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <DatePicker
+                    label="Leave Date"
+                    format="YYYY-MM-DD"
+                    value={newStudent.leaveDate || null}
+                    onChange={(date) => handleInputChange("leaveDate", date)}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

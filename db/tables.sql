@@ -8,8 +8,8 @@ CREATE TABLE person (
   date_of_birth DATE,
   notes VARCHAR(256),
   active BOOLEAN,
-  created TIMESTAMP,
-  updated TIMESTAMP,
+  created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- Create a unique constraint on the combination of name, phone, and date_of_birth
   CONSTRAINT unique_person_details UNIQUE (name, phone, date_of_birth)
