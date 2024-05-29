@@ -1,6 +1,7 @@
 import { CreateStudentDTO, UpdateStudentDTO } from "./dtos";
 import { getDBClient } from "../../../../lib/db-connector";
 import { Student } from "./student.model";
+import { UniqueConstraintError } from "../../../../utils/CustomError";
 
 export async function findAllStudents(): Promise<Student[]> {
   const client = await getDBClient();
@@ -51,7 +52,7 @@ export async function findStudentById(
         person.gender,
         person.phone,
         person.email,
-        person.date_of_birth,
+        person.date_of_birth::timestamp at time zone 'UTC' as date_of_birth,
         person.notes,
         person.active,
         student.id AS student_id,
@@ -120,7 +121,14 @@ export async function createStudent(dto: CreateStudentDTO): Promise<Student> {
     });
   } catch (error) {
     await client.query("ROLLBACK");
-    throw error;
+    if (error.code === "23505") {
+      // Unique violation error code in PostgreSQL
+      throw new UniqueConstraintError(
+        "A student with the same name, phone, and date of birth already exists."
+      );
+    } else {
+      throw error;
+    }
   } finally {
     client.release();
   }

@@ -1,24 +1,27 @@
+// utils/errorHandler.ts
 import { NextApiResponse } from "next";
+import { UniqueConstraintError, ValidationError } from "./CustomError";
 
-export function handleError(
-  res: NextApiResponse,
-  error: Error,
-  code: number = 500
-) {
-  const errorDetails = {
-    timestamp: new Date().toISOString(),
-    level: "ERROR",
-    message: error.message,
-    stack: error.stack,
-  };
-  console.error("API error:", JSON.stringify(errorDetails)); // Structured logging
+export function handleError(res: NextApiResponse, error: Error) {
+  console.error("API error:", error);
 
-  res.status(code).json({
+  let statusCode = 500;
+  let publicMessage = "Internal server error";
+
+  if (error instanceof UniqueConstraintError) {
+    statusCode = 409;
+    publicMessage = error.message;
+  } else if (error instanceof ValidationError) {
+    statusCode = 400;
+    publicMessage = error.message;
+  }
+
+  res.status(statusCode).json({
     status: "Error",
     error: {
-      code,
-      message: error.message || "Internal server error",
-      details: process.env.NODE_ENV === "development" ? error.stack : undefined, // Only include stack in dev mode
+      code: statusCode,
+      message: publicMessage,
+      details: process.env.NODE_ENV === "development" ? error.stack : undefined,
     },
   });
 }

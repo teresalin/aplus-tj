@@ -6,8 +6,11 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid";
+import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
@@ -146,7 +149,6 @@ export default function CreateStudentDialog({
             onChange={(e) => handleInputChange("notes", e.target.value)}
           />
           <RedBar />
-          {/* TODO lowercase before storing into db */}
           <Typography variant="body2" display="block" gutterBottom>
             Contact Information
           </Typography>
@@ -190,25 +192,30 @@ export default function CreateStudentDialog({
             value={newStudent.currentSchool || ""}
             onChange={(e) => handleInputChange("currentSchool", e.target.value)}
           />
-          {/* TODO update to Select */}
-          <TextField
-            fullWidth
-            required
-            id="grade"
-            name="grade"
-            label="Select a grade"
-            margin="dense"
-            select
-            value={newStudent.grade?.id || ""}
-            onChange={handleGradeChange}
-          >
-            {grades &&
-              grades.map((grade: Grade) => (
-                <MenuItem key={grade.id} value={grade.id}>
-                  {grade.name}
-                </MenuItem>
-              ))}
-          </TextField>
+          <Box mt="8px">
+            <FormControl fullWidth>
+              <InputLabel id="grade-select-label">Select a grade</InputLabel>
+              <Select
+                fullWidth
+                required
+                variant="outlined"
+                id="grade"
+                name="grade"
+                label={"Select a grade"}
+                labelId="grade-select-label"
+                margin="dense"
+                value={newStudent.grade?.id || ""}
+                onChange={handleGradeChange}
+              >
+                {grades &&
+                  grades.map((grade: Grade) => (
+                    <MenuItem key={grade.id} value={grade.id}>
+                      {grade.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </Box>
           <TextField
             fullWidth
             required

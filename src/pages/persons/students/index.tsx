@@ -1,10 +1,13 @@
 import { useRouter } from "next/router";
+import { Alert, AlertColor, Snackbar } from "@mui/material";
 import Box from "@mui/material/Box";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import dayjs from "dayjs";
 import React from "react";
+import timezone from "dayjs/plugin/timezone";
 import useSWR from "swr";
+import utc from "dayjs/plugin/utc";
 import {
   GridColDef,
   GridColumnVisibilityModel,
@@ -20,10 +23,18 @@ import BaseDataGrid from "../../../modules/persons/BaseDataGrid";
 import fetcher from "../../../../utils/fetcher";
 import PersonsTabs from "../../../modules/persons/PersonsTabs";
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 export default function PersonGrid() {
   const router = useRouter();
+
   const [isCreateStudentDialogOpen, setIsCreateStudentDialogOpen] =
     React.useState(false);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] =
+    React.useState<AlertColor>("error");
 
   const { data, isLoading, error } = useSWR("/api/persons/students", fetcher);
   const students = (data as Student[]) || [];
@@ -37,10 +48,8 @@ export default function PersonGrid() {
   };
 
   const handleCreateStudent = async (data) => {
-    // Normalize the email: trim whitespace and convert to lowercase
     const normalizedEmail = data.email.trim().toLowerCase();
 
-    // Create a new object with the normalized email and other data
     const normalizedData = {
       ...data,
       email: normalizedEmail,
@@ -54,10 +63,17 @@ export default function PersonGrid() {
       body: JSON.stringify(normalizedData),
     });
 
+    const responseData = await response.json();
     if (response.ok) {
       closeDialog();
+      setSnackbarMessage("Student created successfully");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
     } else {
-      console.error("Error creating student:", await response.text());
+      console.error("Error creating student:", responseData);
+      setSnackbarMessage(responseData.error.message);
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
@@ -108,7 +124,7 @@ export default function PersonGrid() {
         if (params.value == null) {
           return "";
         }
-        return dayjs(params.value).format("YYYY-MM-DD");
+        return dayjs(params.value).utc().format("YYYY-MM-DD");
       },
     },
     {
@@ -185,6 +201,20 @@ export default function PersonGrid() {
         onClose={closeDialog}
         onSubmit={handleCreateStudent}
       />
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
