@@ -47,7 +47,7 @@ export default function PersonGrid() {
     setIsCreateStudentDialogOpen(false);
   };
 
-  const handleCreateStudent = async (data) => {
+  const handleCreateStudent = async (data, resetForm) => {
     const normalizedEmail = data.email.trim().toLowerCase();
 
     const normalizedData = {
@@ -74,6 +74,7 @@ export default function PersonGrid() {
       setSnackbarMessage("Student created successfully");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
+      resetForm();
     } else {
       console.error("Error creating student:", responseData);
       setSnackbarMessage(responseData.error.message);

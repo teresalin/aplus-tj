@@ -10,7 +10,7 @@ import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
@@ -22,7 +22,7 @@ import fetcher from "../../../../../utils/fetcher";
 export interface ICreateStudentDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateStudentDTO) => Promise<void>;
+  onSubmit: (data: CreateStudentDTO, resetForm: () => void) => Promise<void>;
 }
 
 export default function CreateStudentDialog({
@@ -30,30 +30,32 @@ export default function CreateStudentDialog({
   onClose,
   onSubmit,
 }: ICreateStudentDialogProps) {
-  const [newStudent, setNewStudent] = React.useState({} as CreateStudentDTO);
+  const initialStudentState = {} as CreateStudentDTO;
+  const [newStudent, setNewStudent] = React.useState(initialStudentState);
   const { data } = useSWR("/api/grades", fetcher);
-  const grades = data || [];
+  const grades = (data as Grade[]) || [];
 
-  const handleInputChange = (field: string, value) => {
+  const handleInputChange = (field: string, value: string | Date | null) => {
     setNewStudent((prevData) => ({
       ...prevData,
       [field]: value,
     }));
   };
 
-  const handleGradeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    // Find the selected grade object from your grades array
+  const handleGradeChange = (event: SelectChangeEvent<number>) => {
+    const value = parseInt(event.target.value as unknown as string, 10); // Ensure the value is converted to a number
     const selectedGrade = grades.find((grade) => grade.id === value);
     setNewStudent((prevData) => ({
       ...prevData,
-      grade: selectedGrade || {},
+      grade: selectedGrade || ({} as Grade),
     }));
   };
 
-  const handleSubmit: React.FormEventHandler = (event: React.FormEvent) => {
+  const handleSubmit: React.FormEventHandler = async (
+    event: React.FormEvent
+  ) => {
     event.preventDefault(); // Prevent default form submission behavior
-    onSubmit(newStudent);
+    await onSubmit(newStudent, () => setNewStudent(initialStudentState));
   };
 
   return (
