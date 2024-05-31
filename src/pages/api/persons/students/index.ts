@@ -33,15 +33,10 @@ export default async function handler(
         break;
       default:
         res.setHeader("Allow", ["GET", "POST"]);
-        res.status(405).json({
-          status: "Error",
-          result: null,
-          message: `Method ${req.method} Not Allowed`,
-        });
+        handleError(res, new Error(`Method ${req.method} Not Allowed`));
         break;
     }
   } catch (error) {
-    console.error("API error:", error);
     handleError(res, error);
   }
 }

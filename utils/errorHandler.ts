@@ -1,12 +1,16 @@
-// utils/errorHandler.ts
 import { NextApiResponse } from "next";
 import { UniqueConstraintError, ValidationError } from "./CustomError";
 
-export function handleError(res: NextApiResponse, error: Error) {
+export function handleError(
+  res: NextApiResponse,
+  error: Error,
+  statusCodeOverride?: number,
+  publicMessageOverride?: string
+) {
   console.error("API error:", error);
 
-  let statusCode = 500;
-  let publicMessage = "Internal server error";
+  let statusCode = statusCodeOverride || 500;
+  let publicMessage = publicMessageOverride || "Internal server error";
 
   if (error instanceof UniqueConstraintError) {
     statusCode = 409;

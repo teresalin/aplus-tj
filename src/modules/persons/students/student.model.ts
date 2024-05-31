@@ -28,7 +28,7 @@ export class Student {
     this.englishName = data.english_name;
     this.currentSchool = data.current_school;
     this.textbookPublisher = data.textbook_publisher;
-    this.grade = { id: data.grade_id, name: data.grade_name }; // Assuming you have a constructor for Grade
+    this.grade = { id: data.grade_id, name: data.grade_name };
     this.notes = data.notes;
     this.active = data.active;
     this.joinDate = new Date(data.join_date);
