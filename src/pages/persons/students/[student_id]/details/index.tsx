@@ -1,9 +1,11 @@
 import useSWR, { mutate } from "swr";
 import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/router";
+import Alert, { AlertColor } from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CakeIcon from "@mui/icons-material/Cake";
+import dayjs from "dayjs";
 import EditIcon from "@mui/icons-material/Edit";
 import EmailIcon from "@mui/icons-material/Email";
 import Grid from "@mui/material/Grid";
@@ -11,56 +13,72 @@ import LinearProgress from "@mui/material/LinearProgress";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import Paper from "@mui/material/Paper";
 import React from "react";
+import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
+import utc from "dayjs/plugin/utc";
 
-import {
-  Student,
-  UpdateStudentDialog,
-} from "../../../../../modules/persons/students";
+import { formatDate } from "../../../../../../utils/formatDate";
+import { Student } from "../../../../../modules/persons/students/student.model";
+import { UpdateStudentDialog } from "../../../../../modules/persons/students";
+import { UpdateStudentDTO } from "../../../../../modules/persons/students/dtos";
 import fetcher from "../../../../../../utils/fetcher";
 import StudentLayout from "../../../../../modules/persons/students/components/StudentLayout";
 
-function formatDate(date: Date): string | null {
-  if (date) {
-    const isoString = new Date(date).toISOString();
-    return isoString.split(/[T ]/i, 1)[0];
-  }
-  return null;
-}
+dayjs.extend(utc);
 
 export default function DetailsTab() {
   const theme = useTheme();
   const studentID = useRouter().query.student_id;
 
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = React.useState(false);
-  const { data, isLoading, error } = useSWR(
+  const [isUpdateStudentDialogOpen, setIsUpdateStudentDialogOpen] =
+    React.useState(false);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] =
+    React.useState<AlertColor>("error");
+
+  const { data, isLoading, error } = useSWR<Student>(
     studentID ? `/api/persons/students/${studentID}` : null,
     fetcher
   );
   const student = data || null;
 
   const handleEditClick = () => {
-    setIsUpdateDialogOpen(true);
+    setIsUpdateStudentDialogOpen(true);
   };
 
-  const handleCloseUpdateDialog = () => {
-    setIsUpdateDialogOpen(false);
+  const handleCloseUpdateStudentDialog = () => {
+    setIsUpdateStudentDialogOpen(false);
   };
 
-  const handleUpdateStudent = async (data: Student) => {
+  const handleUpdateStudent = async (data: UpdateStudentDTO) => {
+    const normalizedEmail = data.email?.trim().toLowerCase();
+
+    const normalizedData = {
+      ...data,
+      email: normalizedEmail,
+    };
+
     const response = await fetch(`/api/persons/students/${data.studentId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(normalizedData),
     });
 
+    const responseData = await response.json();
     if (response.ok) {
-      setIsUpdateDialogOpen(false);
-      mutate({ ...data });
+      handleCloseUpdateStudentDialog();
+      mutate(`/api/persons/students/${studentID}`);
+      setSnackbarMessage("Student updated successfully");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
     } else {
-      console.error("Error updating student:", response.statusText);
+      console.error("Error updating student:", responseData);
+      setSnackbarMessage(responseData.error.message);
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
@@ -261,10 +279,24 @@ export default function DetailsTab() {
       </StudentLayout>
       <UpdateStudentDialog
         student={student}
-        open={isUpdateDialogOpen}
-        onClose={handleCloseUpdateDialog}
+        open={isUpdateStudentDialogOpen}
+        onClose={handleCloseUpdateStudentDialog}
         onSubmit={handleUpdateStudent}
       />
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

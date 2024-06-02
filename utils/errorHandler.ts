@@ -1,5 +1,10 @@
 import { NextApiResponse } from "next";
-import { UniqueConstraintError, ValidationError } from "./CustomError";
+import {
+  MethodNotAllowedError,
+  NotFoundError,
+  UniqueConstraintError,
+  ValidationError,
+} from "./CustomError";
 
 export function handleError(
   res: NextApiResponse,
@@ -17,6 +22,12 @@ export function handleError(
     publicMessage = error.message;
   } else if (error instanceof ValidationError) {
     statusCode = 400;
+    publicMessage = error.message;
+  } else if (error instanceof MethodNotAllowedError) {
+    statusCode = 405;
+    publicMessage = error.message;
+  } else if (error instanceof NotFoundError) {
+    statusCode = 404;
     publicMessage = error.message;
   }
 

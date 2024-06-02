@@ -1,8 +1,14 @@
+import { handleError } from "../../../../../../utils/errorHandler";
 import { NextApiRequest, NextApiResponse } from "next";
+import { UpdateStudentDTO } from "../../../../../modules/persons/students/dtos";
 import {
   findStudentById,
   updateStudent,
 } from "../../../../../modules/persons/students/student.service";
+import {
+  MethodNotAllowedError,
+  NotFoundError,
+} from "../../../../../../utils/CustomError";
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,11 +21,7 @@ export default async function handler(
       case "GET":
         const student = await findStudentById(studentId);
         if (!student) {
-          res.status(404).json({
-            status: "Error",
-            result: null,
-            message: "Student not found",
-          });
+          throw new NotFoundError("Student not found");
         } else {
           res.status(200).json({
             status: "Success",
@@ -29,11 +31,11 @@ export default async function handler(
         }
         break;
       case "PUT":
-        // Assume req.body contains the updated student data
-        await updateStudent(studentId, req.body);
+        const studentData: UpdateStudentDTO = req.body;
+        const updatedStudent = await updateStudent(studentData);
         res.status(200).json({
           status: "Success",
-          result: {},
+          result: updatedStudent,
           message: "Student updated successfully",
         });
         break;
@@ -44,11 +46,9 @@ export default async function handler(
           .json({ status: "Success", message: "Student deleted successfully" });
         break;
       default:
-        res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
-        res.status(405).end(`Method ${req.method} Not Allowed`);
+        throw new MethodNotAllowedError(req.method!);
     }
   } catch (error) {
-    console.error("API error:", error);
-    res.status(500).json({ status: "Error", message: "Internal server error" });
+    handleError(res, error);
   }
 }
