@@ -32,6 +32,9 @@ export class Student {
     this.notes = data.notes;
     this.active = data.active;
     this.joinDate = new Date(data.join_date);
+    // In TypeScript, optional properties are typically represented by `undefined`
+    // rather than `null`. This aligned with the way TypeScript defines optional
+    // parameters in function signatures and object types.
     this.leaveDate = data.leave_date ? new Date(data.leave_date) : undefined;
   }
 

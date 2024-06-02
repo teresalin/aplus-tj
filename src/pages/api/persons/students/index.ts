@@ -5,6 +5,7 @@ import {
   findAllStudents,
 } from "../../../../modules/persons/students/student.service";
 import { handleError } from "../../../../../utils/errorHandler";
+import { MethodNotAllowedError } from "../../../../../utils/CustomError";
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,9 +33,7 @@ export default async function handler(
         });
         break;
       default:
-        res.setHeader("Allow", ["GET", "POST"]);
-        handleError(res, new Error(`Method ${req.method} Not Allowed`));
-        break;
+        throw new MethodNotAllowedError(req.method!);
     }
   } catch (error) {
     handleError(res, error);

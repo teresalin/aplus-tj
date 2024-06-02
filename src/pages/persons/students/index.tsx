@@ -1,10 +1,11 @@
 import { useRouter } from "next/router";
-import { Alert, AlertColor, Snackbar } from "@mui/material";
+import Alert, { AlertColor } from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import dayjs from "dayjs";
 import React from "react";
+import Snackbar from "@mui/material/Snackbar";
 import timezone from "dayjs/plugin/timezone";
 import useSWR, { mutate } from "swr";
 import utc from "dayjs/plugin/utc";
@@ -43,7 +44,7 @@ export default function PersonGrid() {
     setIsCreateStudentDialogOpen(true);
   };
 
-  const closeDialog = () => {
+  const handleCloseCreateStudentDialog = () => {
     setIsCreateStudentDialogOpen(false);
   };
 
@@ -65,7 +66,7 @@ export default function PersonGrid() {
 
     const responseData = await response.json();
     if (response.ok) {
-      closeDialog();
+      handleCloseCreateStudentDialog();
       mutate(
         "/api/persons/students",
         (students) => [responseData.result, ...students],
@@ -204,7 +205,7 @@ export default function PersonGrid() {
       </Box>
       <CreateStudentDialog
         open={isCreateStudentDialogOpen}
-        onClose={closeDialog}
+        onClose={handleCloseCreateStudentDialog}
         onSubmit={handleCreateStudent}
       />
       <Snackbar

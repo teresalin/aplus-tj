@@ -134,10 +134,7 @@ export async function createStudent(dto: CreateStudentDTO): Promise<Student> {
   }
 }
 
-export async function updateStudent(
-  studentId: number,
-  dto: UpdateStudentDTO
-): Promise<Student> {
+export async function updateStudent(dto: UpdateStudentDTO): Promise<Student> {
   const client = await getDBClient();
   try {
     await client.query("BEGIN");
@@ -180,14 +177,27 @@ export async function updateStudent(
     };
 
     const studentResult = await client.query(studentUpdateQuery);
+    const studentId = studentResult.rows[0].id;
+
     await client.query("COMMIT");
-    return new Student({
-      ...dto,
-      studentId: studentResult.rows[0].id,
-    });
+
+    // Use the existing findStudentById method to fetch the full student data
+    const newStudent = await findStudentById(studentId);
+    if (!newStudent) {
+      throw new Error("Student not found after creation.");
+    }
+
+    return newStudent;
   } catch (error) {
     await client.query("ROLLBACK");
-    throw error;
+    if (error.code === "23505") {
+      // Unique violation error code in PostgreSQL
+      throw new UniqueConstraintError(
+        "A student with the same name, phone, and date of birth already exists."
+      );
+    } else {
+      throw error;
+    }
   } finally {
     client.release();
   }
