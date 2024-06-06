@@ -6,6 +6,7 @@ import {
 } from "../../../../modules/persons/students/student.service";
 import { handleError } from "../../../../../utils/errorHandler";
 import { MethodNotAllowedError } from "../../../../../utils/CustomError";
+import { ApiResponse } from "../../../../../utils/apiResponse";
 
 export default async function handler(
   req: NextApiRequest,
@@ -19,18 +20,16 @@ export default async function handler(
           status: "Success",
           result: students,
           message: "All students retrieved successfully.",
-        });
+        } as ApiResponse);
         break;
       case "POST":
-        // Validate the incoming data before passing to the service
         const studentData: CreateStudentDTO = req.body;
         // Additional validation can be performed here
-        const newStudent = await createStudent(studentData);
+        await createStudent(studentData);
         res.status(201).json({
           status: "Success",
-          result: newStudent,
           message: "New student created successfully.",
-        });
+        } as ApiResponse);
         break;
       default:
         throw new MethodNotAllowedError(req.method!);

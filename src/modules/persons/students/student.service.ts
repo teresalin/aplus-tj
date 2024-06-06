@@ -5,6 +5,7 @@ import { UniqueConstraintError } from "../../../../utils/CustomError";
 
 export async function findAllStudents(): Promise<Student[]> {
   const client = await getDBClient();
+
   try {
     const { rows } = await client.query(
       `
@@ -43,6 +44,7 @@ export async function findStudentById(
   studentId: number
 ): Promise<Student | null> {
   const client = await getDBClient();
+
   try {
     const { rows } = await client.query(
       `
@@ -79,26 +81,35 @@ export async function findStudentById(
   }
 }
 
-export async function createStudent(dto: CreateStudentDTO): Promise<Student> {
+export async function createStudent(dto: CreateStudentDTO) {
   const client = await getDBClient();
+
   try {
     await client.query("BEGIN");
 
-    const personResult = await client.query(
-      `
-      INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, created, updated)
-      VALUES ($1, $2, $3, $4, $5, $6, true, NOW(), NOW()) RETURNING id;
-    `,
-      [dto.name, dto.gender, dto.phone, dto.email, dto.dateOfBirth, dto.notes]
-    );
-    const personId = personResult.rows[0].id;
+    const insertPersonQuery = {
+      text: `
+        INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, created, updated)
+        VALUES ($1, $2, $3, $4, $5, $6, true, NOW(), NOW()) RETURNING id;
+      `,
+      values: [
+        dto.name,
+        dto.gender,
+        dto.phone,
+        dto.email,
+        dto.dateOfBirth,
+        dto.notes,
+      ],
+    };
+    const result = await client.query(insertPersonQuery);
+    const personId = result.rows[0].id;
 
-    const studentResult = await client.query(
-      `
-      INSERT INTO student(person_id, english_name, current_school, textbook_publisher, grade_id, join_date, leave_date, created, updated)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW()) RETURNING id;
-    `,
-      [
+    const insertStudentQuery = {
+      text: `
+        INSERT INTO student(person_id, english_name, current_school, textbook_publisher, grade_id, join_date, leave_date, created, updated)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW());
+      `,
+      values: [
         personId,
         dto.englishName,
         dto.currentSchool,
@@ -106,19 +117,12 @@ export async function createStudent(dto: CreateStudentDTO): Promise<Student> {
         dto.grade.id,
         dto.joinDate,
         dto.leaveDate,
-      ]
-    );
-    const studentId = studentResult.rows[0].id;
+      ],
+    };
+
+    await client.query(insertStudentQuery);
 
     await client.query("COMMIT");
-
-    // Use the existing findStudentById method to fetch the full student data
-    const newStudent = await findStudentById(studentId);
-    if (!newStudent) {
-      throw new Error("Student not found after creation.");
-    }
-
-    return newStudent;
   } catch (error) {
     await client.query("ROLLBACK");
     if (error.code === "23505") {
@@ -134,17 +138,19 @@ export async function createStudent(dto: CreateStudentDTO): Promise<Student> {
   }
 }
 
-export async function updateStudent(dto: UpdateStudentDTO): Promise<Student> {
+export async function updateStudent(dto: UpdateStudentDTO) {
   const client = await getDBClient();
+
   try {
     await client.query("BEGIN");
-    const personUpdateQuery = {
+
+    const updatePersonQuery = {
       text: `
-          UPDATE person
-          SET name = $1, gender = $2, phone = $3, email = $4, date_of_birth = $5, notes = $6, updated = NOW()
-          WHERE id = $7
-          RETURNING id;
-        `,
+        UPDATE person
+        SET name = $1, gender = $2, phone = $3, email = $4, date_of_birth = $5, notes = $6, updated = NOW()
+        WHERE id = $7
+        RETURNING id;
+      `,
       values: [
         dto.name,
         dto.gender,
@@ -155,10 +161,10 @@ export async function updateStudent(dto: UpdateStudentDTO): Promise<Student> {
         dto.personId,
       ],
     };
+    const result = await client.query(updatePersonQuery);
+    const personId = result.rows[0].id;
 
-    const personResult = await client.query(personUpdateQuery);
-
-    const studentUpdateQuery = {
+    const updateStudentQuery = {
       text: `
           UPDATE student
           SET english_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, updated = NOW()
@@ -172,22 +178,12 @@ export async function updateStudent(dto: UpdateStudentDTO): Promise<Student> {
         dto.grade?.id,
         dto.joinDate,
         dto.leaveDate,
-        personResult.rows[0].id,
+        personId,
       ],
     };
-
-    const studentResult = await client.query(studentUpdateQuery);
-    const studentId = studentResult.rows[0].id;
+    await client.query(updateStudentQuery);
 
     await client.query("COMMIT");
-
-    // Use the existing findStudentById method to fetch the full student data
-    const newStudent = await findStudentById(studentId);
-    if (!newStudent) {
-      throw new Error("Student not found after creation.");
-    }
-
-    return newStudent;
   } catch (error) {
     await client.query("ROLLBACK");
     if (error.code === "23505") {

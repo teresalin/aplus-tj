@@ -16,10 +16,8 @@ import {
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
-import {
-  CreateStudentDialog,
-  Student,
-} from "../../../modules/persons/students";
+import { CreateStudentDialog } from "../../../modules/persons/students";
+import { Student } from "../../../modules/persons/students/student.model";
 import BaseDataGrid from "../../../modules/persons/BaseDataGrid";
 import fetcher from "../../../../utils/fetcher";
 import PersonsTabs from "../../../modules/persons/PersonsTabs";
@@ -37,8 +35,11 @@ export default function PersonGrid() {
   const [snackbarSeverity, setSnackbarSeverity] =
     React.useState<AlertColor>("error");
 
-  const { data, isLoading, error } = useSWR("/api/persons/students", fetcher);
-  const students = (data as Student[]) || [];
+  const { data, isLoading, error } = useSWR<Student[]>(
+    "/api/persons/students",
+    fetcher
+  );
+  const students = data || [];
 
   const handleAddButtonClick = () => {
     setIsCreateStudentDialogOpen(true);
@@ -67,11 +68,7 @@ export default function PersonGrid() {
     const responseData = await response.json();
     if (response.ok) {
       handleCloseCreateStudentDialog();
-      mutate(
-        "/api/persons/students",
-        (students) => [responseData.result, ...students],
-        false
-      );
+      mutate("/api/persons/students");
       setSnackbarMessage("Student created successfully");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
