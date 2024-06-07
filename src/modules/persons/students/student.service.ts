@@ -119,7 +119,6 @@ export async function createStudent(dto: CreateStudentDTO) {
         dto.leaveDate,
       ],
     };
-
     await client.query(insertStudentQuery);
 
     await client.query("COMMIT");
@@ -168,8 +167,7 @@ export async function updateStudent(dto: UpdateStudentDTO) {
       text: `
           UPDATE student
           SET english_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, updated = NOW()
-          WHERE person_id = $7
-          RETURNING id;
+          WHERE person_id = $7;
         `,
       values: [
         dto.englishName,
