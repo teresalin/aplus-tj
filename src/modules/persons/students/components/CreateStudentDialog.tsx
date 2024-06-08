@@ -1,25 +1,16 @@
-import React from "react";
-import { DatePicker } from "@mui/x-date-pickers";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import FormControl from "@mui/material/FormControl";
-import Grid from "@mui/material/Grid";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import React from "react";
 import useSWR from "swr";
 
 import { CreateStudentDTO } from "../dtos/create-student.dto";
-import { Grade } from "../../../../pages/api/grades";
+import { Dayjs } from "dayjs";
+import { Grade } from "../../../grades";
 import fetcher from "../../../../../utils/fetcher";
 import StudentFormFields from "./StudentFormFields";
-import { Dayjs } from "dayjs";
 
 export interface ICreateStudentDialogProps {
   open: boolean;

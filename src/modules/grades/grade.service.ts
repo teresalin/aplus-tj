@@ -1,5 +1,5 @@
 import { getDBClient } from "../../../lib/db-connector";
-import { GradeResponseDTO } from "./dtos/grade-response.dto";
+import { GradeResponseDTO } from "./dtos";
 
 export async function findAllGrades(): Promise<GradeResponseDTO[]> {
   const client = await getDBClient();

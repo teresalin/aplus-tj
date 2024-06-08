@@ -1,4 +1,4 @@
-import { Grade } from "../../../../pages/api/grades";
+import { Grade } from "../../../grades";
 import { Person } from "../../types";
 
 export interface Student extends Person {

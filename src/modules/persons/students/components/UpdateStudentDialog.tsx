@@ -7,7 +7,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import React from "react";
 import useSWR, { mutate } from "swr";
 
-import { Grade } from "../../../../pages/api/grades";
+import { Grade } from "../../../grades";
 import { Student } from "../student.model";
 import { UpdateStudentDTO } from "../dtos";
 import fetcher from "../../../../../utils/fetcher";

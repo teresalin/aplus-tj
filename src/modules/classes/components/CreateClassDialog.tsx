@@ -19,7 +19,7 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
 import { ClassDetail } from "../types";
-import { Grade } from "../../../pages/api/grades";
+import { Grade } from "../../grades";
 import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
 import { Staff } from "../../persons/staffs/types";
 import fetcher from "../../../../utils/fetcher";

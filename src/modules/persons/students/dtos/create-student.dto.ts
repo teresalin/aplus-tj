@@ -1,4 +1,4 @@
-import { Grade } from "../../../../pages/api/grades";
+import { Grade } from "../../../grades";
 
 export interface CreateStudentDTO {
   name: string;

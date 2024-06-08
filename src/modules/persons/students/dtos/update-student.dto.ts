@@ -1,4 +1,4 @@
-import { Grade } from "../../../../pages/api/grades"; // TODO move up the level so its not nested too deep
+import { Grade } from "../../../grades";
 
 export interface UpdateStudentDTO {
   personId?: number;

@@ -1,5 +1,5 @@
 import { Assignment } from "../../assignments/types";
-import { Grade } from "../../../pages/api/grades";
+import { Grade } from "../../grades";
 import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
 import { StaffSummary } from "../../persons/staffs/types";
 import { Student } from "../../persons/students/types";
