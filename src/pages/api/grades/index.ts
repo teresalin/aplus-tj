@@ -1,35 +1,17 @@
-import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
+import { ApiResponse } from "../../../../utils/apiResponse";
+import { findAllGrades } from "../../../modules/grades/grade.service";
+import { handleError } from "../../../../utils/errorHandler";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export interface Grade {
-  id: number;
-  name: string;
-}
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const client = await getDBClient();
-
   try {
-    const query = {
-      text: `
-          SELECT id, name FROM grade;
-        `,
-    };
-    const result = await client.query(query);
+    const grades = await findAllGrades();
     res.status(200).json({
       status: "Success",
-      result: result.rows as Grade[],
+      result: grades,
       message: "Grades retrieved successfully.",
-    });
+    } as ApiResponse);
   } catch (error) {
-    console.error("Error retrieving grades", error);
-    res.status(500).json({
-      status: "Error",
-      message: "Internal server error",
-    });
-  } finally {
-    if (client) {
-      await releaseDBClient(client);
-    }
+    handleError(res, error);
   }
 };

@@ -130,6 +130,7 @@ export async function createStudent(dto: CreateStudentDTO) {
         "A student with the same name, phone, and date of birth already exists."
       );
     } else {
+      console.error("Error creating student in the database:", error);
       throw error;
     }
   } finally {
@@ -190,6 +191,7 @@ export async function updateStudent(dto: UpdateStudentDTO) {
         "A student with the same name, phone, and date of birth already exists."
       );
     } else {
+      console.error("Error updating student in the database:", error);
       throw error;
     }
   } finally {
