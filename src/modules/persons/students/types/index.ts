@@ -3,12 +3,12 @@ import { Person } from "../../types";
 
 export interface Student extends Person {
   studentId: number;
-  englishName: string;
+  englishName?: string;
   currentSchool: string;
   textbookPublisher: string;
   grade: Grade;
   joinDate: Date;
-  leaveDate: Date;
+  leaveDate?: Date;
 }
 
 export interface StudentSummary {
