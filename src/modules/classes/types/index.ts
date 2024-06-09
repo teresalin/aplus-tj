@@ -1,24 +1,17 @@
 import { Assignment } from "../../assignments/types";
 import { Grade } from "../../grades";
-import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
+import { Schedule } from "../../schedules";
 import { StaffSummary } from "../../persons/staffs/types";
-import { Student } from "../../persons/students/types";
+import { Student, StudentSummary } from "../../persons/students/types";
 
 export interface Class {
   id: number;
   name: string;
-  teacherId: number;
-  gradeId: number;
-  capacity: number;
-  active: boolean;
-}
-
-export interface ClassDetail extends Class {
   teacher: StaffSummary;
   grade: Grade;
+  capacity: number;
   schedules: Schedule[];
-  studentCount?: number;
-  activeStudents?: Student[];
+  students?: StudentSummary[];
   assignments?: Assignment[];
 }
 

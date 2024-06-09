@@ -18,8 +18,11 @@ import Typography from "@mui/material/Typography";
 import utc from "dayjs/plugin/utc";
 
 import { formatDate } from "../../../../../../utils/formatDate";
-import { Student } from "../../../../../modules/persons/students/student.model";
-import { UpdateStudentDialog } from "../../../../../modules/persons/students";
+
+import {
+  Student,
+  UpdateStudentDialog,
+} from "../../../../../modules/persons/students";
 import { UpdateStudentDTO } from "../../../../../modules/persons/students/dtos";
 import fetcher from "../../../../../../utils/fetcher";
 import StudentLayout from "../../../../../modules/persons/students/components/StudentLayout";

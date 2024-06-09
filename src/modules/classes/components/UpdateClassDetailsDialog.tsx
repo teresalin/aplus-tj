@@ -19,7 +19,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { ClassDetail } from "../types";
+import { Class } from "../types";
 import { Grade } from "../../grades";
 import { Staff } from "../../persons/staffs/types";
 import fetcher from "../../../../utils/fetcher";
@@ -45,10 +45,10 @@ function RedBar() {
 }
 
 export interface IUpdateClassDetailsDialogProps {
-  existingClass: ClassDetail;
+  existingClass: Class;
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: ClassDetail) => Promise<void>;
+  onSubmit: (data: Class) => Promise<void>;
 }
 
 export default function UpdateClassDetailsDialogProps({
@@ -58,7 +58,7 @@ export default function UpdateClassDetailsDialogProps({
   onSubmit,
 }: IUpdateClassDetailsDialogProps) {
   const classID = useRouter().query.class_id;
-  const [formData, setFormData] = React.useState({} as ClassDetail);
+  const [formData, setFormData] = React.useState({} as Class);
   const { data: staffsData, error: staffsError } = useSWR(
     "/api/persons/staffs",
     fetcher

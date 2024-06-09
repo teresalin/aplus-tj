@@ -1,10 +1,10 @@
-import { ClassDetail } from "../../../../modules/classes/types";
+import { Class } from "../../../../modules/classes/types";
 import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { parseClassDetail } from "../../../../../utils/apiUtils";
+import { parseClass } from "../../../../../utils/apiUtils";
 import { PoolClient } from "pg";
 
-async function createClassAndSchedule(client: PoolClient, data: ClassDetail) {
+async function createClassAndSchedule(client: PoolClient, data: Class) {
   const { name, teacher, grade, schedules, capacity } = data;
 
   try {
@@ -158,23 +158,14 @@ async function getClassDetail(client: PoolClient, classID) {
       values: [classID],
     };
     const result = await client.query(query);
-    return result.rows.map(parseClassDetail)[0];
+    return result.rows.map(parseClass)[0];
   } catch (error) {
     throw error;
   }
 }
 
-async function updateClass(client: PoolClient, data: ClassDetail) {
-  const {
-    id,
-    name,
-    teacher,
-    grade,
-    schedules,
-    capacity,
-    activeStudents,
-    assignments,
-  } = data;
+async function updateClass(client: PoolClient, data: Class) {
+  const { id, name, teacher, grade, schedules, capacity, assignments } = data;
 
   try {
     await client.query("BEGIN");
@@ -285,7 +276,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "POST":
       try {
-        const data: ClassDetail = req.body;
+        const data: Class = req.body;
         const createResult = await createClassAndSchedule(client, data);
         res.status(200).json({
           status: "Success",
@@ -306,7 +297,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "PUT":
       try {
-        const data: ClassDetail = req.body;
+        const data: Class = req.body;
         const updateResult = await updateClass(client, data);
         res.status(200).json({
           status: "Success",

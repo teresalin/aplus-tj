@@ -1,6 +1,6 @@
 import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { parseClassDetail } from "../../../../utils/apiUtils";
+import { parseClass } from "../../../../utils/apiUtils";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   let client; // Declare the client variable outside the try-catch block.
@@ -44,7 +44,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const result = await client.query(query);
     res.status(200).json({
       status: "Success",
-      result: result.rows.map(parseClassDetail),
+      result: result.rows.map(parseClass),
       message: "Classes retrieved successfully.",
     });
   } catch (error) {

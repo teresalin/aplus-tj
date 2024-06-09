@@ -13,14 +13,14 @@ import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import useSWR from "swr";
 
-import { Assignment } from "../types";
 import { Class } from "../../classes/types";
+import { CreateAssignmentDTO } from "../dtos";
 import fetcher from "../../../../utils/fetcher";
 
 export interface ICreateAssignmentDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: Assignment) => Promise<void>;
+  onSubmit: (data: CreateAssignmentDTO) => Promise<void>;
 }
 
 export default function CreateAssignmentDialog({
@@ -29,7 +29,9 @@ export default function CreateAssignmentDialog({
   onSubmit,
 }: ICreateAssignmentDialogProps) {
   // TODO create two functions, one for update and one for create and make the form components reusable
-  const [newAssignment, setNewAssignment] = React.useState({} as Assignment);
+  const [newAssignment, setNewAssignment] = React.useState(
+    {} as CreateAssignmentDTO
+  );
   const { data } = useSWR("/api/classes", fetcher);
   const classes = data || [];
 
@@ -97,8 +99,8 @@ export default function CreateAssignmentDialog({
                   labelId="select-label"
                   margin="dense"
                   value={
-                    newAssignment.classInfo?.id
-                      ? newAssignment.classInfo.id.toString()
+                    newAssignment.classId
+                      ? newAssignment.classId.toString()
                       : ""
                   }
                   onChange={handleClassChange}

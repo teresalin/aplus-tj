@@ -12,8 +12,8 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { ClassDetail, CreateClassDialog } from "../../modules/classes";
-import { Schedule } from "../api/classes/[class_id]/schedules";
+import { Class, CreateClassDialog } from "../../modules/classes";
+import { Schedule } from "../../modules/schedules";
 import fetcher from "../../../utils/fetcher";
 
 function AddIconButton({ onClick }) {
@@ -96,7 +96,7 @@ export default function Classes() {
         </Button> */}
         <AddIconButton onClick={handleAddButtonClick} />
       </Grid>
-      {classes.map((row: ClassDetail) => (
+      {classes.map((row: Class) => (
         <Link href={`classes/${row.id}`} key={row.id}>
           <Paper key={row.id} sx={{ my: 2, p: 2 }}>
             <Grid
@@ -150,7 +150,7 @@ export default function Classes() {
                         },
                       }}
                     >
-                      {row.studentCount}/{row.capacity}
+                      0/{row.capacity}
                     </Button>
                   </Tooltip>
                 </Grid>

@@ -1,12 +1,12 @@
 import { Assignment } from "../src/modules/assignments";
 import { Billing } from "../src/modules/billing/types";
-import { Class, ClassDetail } from "../src/modules/classes";
+import { Class } from "../src/modules/classes";
 import { Parent } from "../src/modules/persons/parents";
 import { Person } from "../src/modules/persons/types";
-import { Schedule } from "../src/pages/api/classes/[class_id]/schedules";
 import { Session, SessionDetail } from "../src/modules/sessions";
 import { Staff } from "../src/modules/persons/staffs";
 import { Student } from "../src/modules/persons/students";
+import { Schedule } from "../src/modules/schedules";
 
 export function parsePerson(row: any): Person {
   return {
@@ -66,23 +66,9 @@ export function parseStaff(row: any): Staff {
 
 export function parseClass(row: any): Class {
   return {
-    id: row.id,
-    name: row.name,
-    teacherId: row.teacher_id,
-    gradeId: row.grade_id,
-    capacity: row.capacity,
-    active: row.active,
-  };
-}
-
-export function parseClassDetail(row: any): ClassDetail {
-  return {
     id: row.class_id,
     name: row.class_name,
-    teacherId: row.teacher_id,
-    gradeId: row.grade_id,
     capacity: row.capacity,
-    active: row.active,
     teacher: {
       staffId: row.staff_id,
       name: row.staff_name,
@@ -92,8 +78,7 @@ export function parseClassDetail(row: any): ClassDetail {
       name: row.grade_name,
     },
     schedules: row.schedules,
-    studentCount: row.student_count,
-    activeStudents: row.active_students,
+    students: row.active_students,
     assignments: row.assignments,
   };
 }
@@ -142,12 +127,9 @@ export function parseSchedule(row: any): Schedule {
 export function parseAssignment(row: any): Assignment {
   return {
     id: row.id,
-    classInfo: {
-      id: row.class_id,
-      name: row.class_name,
-    },
     name: row.assignment_name,
     description: row.description,
+    className: row.class_name,
     dueDate: row.due_date,
     created: row.created,
   };

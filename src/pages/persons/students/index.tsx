@@ -16,8 +16,11 @@ import {
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
-import { CreateStudentDialog } from "../../../modules/persons/students";
-import { Student } from "../../../modules/persons/students/student.model";
+import {
+  CreateStudentDialog,
+  Student,
+} from "../../../modules/persons/students";
+
 import BaseDataGrid from "../../../modules/persons/BaseDataGrid";
 import fetcher from "../../../../utils/fetcher";
 import PersonsTabs from "../../../modules/persons/PersonsTabs";

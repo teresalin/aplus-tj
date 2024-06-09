@@ -8,7 +8,8 @@ import React from "react";
 import useSWR, { mutate } from "swr";
 
 import { Grade } from "../../../grades";
-import { Student } from "../student.model";
+
+import { Student } from "../types";
 import { UpdateStudentDTO } from "../dtos";
 import fetcher from "../../../../../utils/fetcher";
 import StudentFormFields from "./StudentFormFields";

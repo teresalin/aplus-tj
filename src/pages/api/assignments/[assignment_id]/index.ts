@@ -1,14 +1,20 @@
-import { Assignment } from "../../../../modules/assignments/types";
 import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { PoolClient } from "pg";
+import {
+  CreateAssignmentDTO,
+  UpdateAssignmentDTO,
+} from "../../../../modules/assignments";
 
-async function createAssignmentAndClass(client: PoolClient, data: Assignment) {
-  const { id, name, classInfo, description, dueDate } = data;
+async function createAssignmentAndClass(
+  client: PoolClient,
+  data: CreateAssignmentDTO
+) {
+  const { name, classId, description, dueDate } = data;
 
   try {
     await client.query("BEGIN");
-    const assignmentInsertQuery = {
+    const insertAssignmentQuery = {
       text: `
         INSERT INTO assignment(name, description, due_date, created, updated) 
         VALUES ($1, $2, $3, NOW(), NOW())
@@ -17,35 +23,37 @@ async function createAssignmentAndClass(client: PoolClient, data: Assignment) {
       values: [name, description, dueDate],
     };
 
-    const assignmentResult = await client.query(assignmentInsertQuery);
+    const assignmentResult = await client.query(insertAssignmentQuery);
+    const assignmentId = assignmentResult.rows[0].id;
 
-    const classInsertQuery = {
+    const insertClassQuery = {
       text: `
         INSERT INTO class_assignment(class_id, assignment_id, created, updated) 
         VALUES ($1, $2, NOW(), NOW())
         RETURNING id;
       `,
-      values: [classInfo.id, id],
+      values: [classId, assignmentId],
     };
 
-    const classResult = await client.query(classInsertQuery);
-    const classId = classResult.rows[0].id;
+    await client.query(insertClassQuery);
 
     await client.query("COMMIT");
-    return classId;
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;
   }
 }
 
-async function updateAssignmentAndClass(client: PoolClient, data: Assignment) {
-  const { id, name, classInfo, description, dueDate } = data;
+async function updateAssignmentAndClass(
+  client: PoolClient,
+  data: UpdateAssignmentDTO
+) {
+  const { id, name, classId, description, dueDate } = data;
 
   try {
     await client.query("BEGIN");
 
-    const assignmentUpdateQuery = {
+    const updateAssignmentQuery = {
       text: `
         UPDATE assignment 
         SET name = $2, description = $3, due_date = $4, updated = NOW()
@@ -54,9 +62,7 @@ async function updateAssignmentAndClass(client: PoolClient, data: Assignment) {
       `,
       values: [id, name, description, dueDate],
     };
-
-    const assignmentResult = await client.query(assignmentUpdateQuery);
-    const assignmentId = assignmentResult.rows[0]?.id;
+    await client.query(updateAssignmentQuery);
 
     const classUpdateQuery = {
       text: `
@@ -65,23 +71,12 @@ async function updateAssignmentAndClass(client: PoolClient, data: Assignment) {
         WHERE assignment_id = $1
         RETURNING class_id;
       `,
-      values: [id, classInfo.id],
+      values: [id, classId],
     };
 
-    const classResult = await client.query(classUpdateQuery);
-    const classId = classResult.rows[0]?.id;
+    await client.query(classUpdateQuery);
 
     await client.query("COMMIT");
-    return {
-      assignmentUpdate: {
-        affectedRows: assignmentResult.rowCount,
-        updatedAssignmentId: assignmentId,
-      },
-      classUpdate: {
-        affectedRows: classResult.rowCount,
-        updatedClassId: classId,
-      },
-    };
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;
@@ -161,7 +156,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "POST":
       try {
-        const data: Assignment = req.body;
+        const data: CreateAssignmentDTO = req.body;
         const createResult = await createAssignmentAndClass(client, data);
         res.status(200).json({
           status: "Success",
@@ -182,7 +177,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "PUT":
       try {
-        const data: Assignment = req.body;
+        const data: UpdateAssignmentDTO = req.body;
         const updateResult = await updateAssignmentAndClass(client, data);
         res.status(200).json({
           status: "Success",

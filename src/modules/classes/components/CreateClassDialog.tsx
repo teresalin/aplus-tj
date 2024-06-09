@@ -18,10 +18,10 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { ClassDetail } from "../types";
+import { Class } from "../types";
 import { Grade } from "../../grades";
-import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
 import { Staff } from "../../persons/staffs/types";
+import { Schedule } from "../../schedules";
 import fetcher from "../../../../utils/fetcher";
 
 export interface ICreateClassDialogProps {
@@ -55,7 +55,7 @@ export default function CreateClassDialog({
   onClose,
   onSubmit,
 }: ICreateClassDialogProps) {
-  const [newClass, setNewClass] = React.useState({} as ClassDetail);
+  const [newClass, setNewClass] = React.useState({} as Class);
   const [schedules, setSchedules] = React.useState([] as Schedule[]);
   const { data: staffsData, error: staffsError } = useSWR(
     open ? "/api/persons/staffs" : null,

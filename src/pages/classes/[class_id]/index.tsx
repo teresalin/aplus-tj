@@ -18,11 +18,10 @@ import useSWR, { mutate } from "swr";
 
 import {
   Class,
-  ClassDetail,
   UpdateClassDetailsDialog,
   UpdateClassStudentsDialog,
 } from "../../../modules/classes";
-import { Schedule } from "../../api/classes/[class_id]/schedules";
+import { Schedule } from "../../../modules/schedules";
 import fetcher from "../../../../utils/fetcher";
 
 const columns: GridColDef[] = [
@@ -83,7 +82,7 @@ export default function ClassDetails() {
   const classID = useRouter().query.class_id;
 
   const { data } = useSWR(classID ? `/api/classes/${classID}` : null, fetcher);
-  const classDetail = data as ClassDetail;
+  const classDetail = data as Class;
 
   const [isEditDetailsDialogOpen, setIsEditDetailsDialogOpen] =
     React.useState(false);
@@ -252,9 +251,9 @@ export default function ClassDetails() {
       </Grid>
       <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
         <Box sx={{ width: "100%" }}>
-          {classDetail && classDetail.activeStudents ? (
+          {classDetail && classDetail.students ? (
             <DataGrid
-              rows={classDetail.activeStudents}
+              rows={classDetail.students}
               columns={columns}
               initialState={{
                 pagination: {
