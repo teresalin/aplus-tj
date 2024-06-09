@@ -1,6 +1,7 @@
 import { CreateStudentDTO, UpdateStudentDTO } from "./dtos";
 import { getDBClient } from "../../../../lib/db-connector";
-import { Student } from "./student.model";
+import { mapRowToStudent } from "./student.mapper";
+import { Student } from "./types";
 import { UniqueConstraintError } from "../../../../utils/CustomError";
 
 export async function findAllStudents(): Promise<Student[]> {
@@ -31,7 +32,7 @@ export async function findAllStudents(): Promise<Student[]> {
       INNER JOIN grade ON student.grade_id = grade.id;
     `
     );
-    return rows.map((row) => new Student(row));
+    return rows.map(mapRowToStudent);
   } catch (error) {
     console.error("Error fetching students from database:", error);
     throw error;
@@ -72,7 +73,7 @@ export async function findStudentById(
     `,
       [studentId]
     );
-    return rows.length ? new Student(rows[0]) : null;
+    return rows.length ? mapRowToStudent(rows[0]) : null;
   } catch (error) {
     console.error("Error retrieving student from database:", error);
     throw error;
