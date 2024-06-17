@@ -1,3 +1,4 @@
+import { Grade } from "../../grades";
 import { Student } from "./types";
 
 export function mapRowToStudent(row: any): Student {
@@ -12,7 +13,7 @@ export function mapRowToStudent(row: any): Student {
     englishName: row.english_name,
     currentSchool: row.current_school,
     textbookPublisher: row.textbook_publisher,
-    grade: { id: row.grade_id, name: row.grade_name },
+    grade: { id: row.grade_id, name: row.grade_name } as Grade,
     notes: row.notes,
     active: row.active,
     joinDate: new Date(row.join_date),

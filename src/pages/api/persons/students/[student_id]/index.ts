@@ -1,3 +1,4 @@
+import { ApiResponse } from "../../../../../../utils/apiResponse";
 import { handleError } from "../../../../../../utils/errorHandler";
 import { NextApiRequest, NextApiResponse } from "next";
 import { UpdateStudentDTO } from "../../../../../modules/persons/students/dtos";
@@ -27,20 +28,19 @@ export default async function handler(
             status: "Success",
             result: student,
             message: "Student retrieved successfully",
-          });
+          } as ApiResponse);
         }
         break;
       case "PUT":
-        const studentData: UpdateStudentDTO = req.body;
-        const updatedStudent = await updateStudent(studentData);
+        const studentToUpdate: UpdateStudentDTO = req.body;
+        await updateStudent(studentToUpdate);
         res.status(200).json({
           status: "Success",
-          result: updatedStudent,
           message: "Student updated successfully",
-        });
+        } as ApiResponse);
         break;
       case "DELETE":
-        // await deleteStudent(studentId);
+        // TODO
         res
           .status(200)
           .json({ status: "Success", message: "Student deleted successfully" });

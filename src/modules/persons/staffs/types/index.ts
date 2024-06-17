@@ -1,5 +1,5 @@
-import { Role } from "../../../../pages/api/persons/staffs/roles";
 import { Person } from "../../types";
+import { Role } from "../../../../pages/api/persons/staffs/roles";
 
 export interface Staff extends Person {
   staffId: number;

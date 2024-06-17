@@ -2,7 +2,7 @@ import { Assignment } from "../../assignments/types";
 import { Grade } from "../../grades";
 import { Schedule } from "../../schedules";
 import { StaffSummary } from "../../persons/staffs/types";
-import { Student, StudentSummary } from "../../persons/students/types";
+import { StudentSummary } from "../../persons/students/types";
 
 export interface Class {
   id: number;
