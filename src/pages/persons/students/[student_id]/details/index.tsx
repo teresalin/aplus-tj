@@ -281,7 +281,7 @@ export default function DetailsTab() {
         )}
       </StudentLayout>
       <UpdateStudentDialog
-        student={student}
+        existingStudent={student}
         open={isUpdateStudentDialogOpen}
         onClose={handleCloseUpdateStudentDialog}
         onSubmit={handleUpdateStudent}

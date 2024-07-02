@@ -7,14 +7,13 @@ import DialogTitle from "@mui/material/DialogTitle";
 import useSWR from "swr";
 
 import { CreateClassDTO } from "../dtos";
-import { Schedule } from "../../schedules";
 import ClassFormFields from "./ClassFormFields";
 import fetcher from "../../../../utils/fetcher";
 
 export interface ICreateClassDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateClassDTO) => Promise<void>;
+  onSubmit: (data: CreateClassDTO, resetForm: () => void) => Promise<void>;
 }
 
 export default function CreateClassDialog({
@@ -22,8 +21,8 @@ export default function CreateClassDialog({
   onClose,
   onSubmit,
 }: ICreateClassDialogProps) {
-  const [newClass, setNewClass] = React.useState({} as CreateClassDTO);
-  const [schedules, setSchedules] = React.useState([] as Schedule[]);
+  const initialClassState = {} as CreateClassDTO;
+  const [newClass, setNewClass] = React.useState(initialClassState);
   const { data: staffsData, error: staffsError } = useSWR(
     open ? "/api/persons/staffs" : null,
     fetcher
@@ -35,20 +34,11 @@ export default function CreateClassDialog({
   const teachers = staffsData || [];
   const grades = gradesData || [];
 
-  const handleInputChange = (field: string, value: any) => {
-    setNewClass((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-  };
-
-  const handleSubmit: React.FormEventHandler = (event: React.FormEvent) => {
-    // Combine the newClass state with schedules
-    const classDataToSubmit = {
-      ...newClass,
-      schedules: schedules,
-    };
-    onSubmit(classDataToSubmit);
+  const handleSubmit: React.FormEventHandler = async (
+    event: React.FormEvent
+  ) => {
+    event.preventDefault(); // Prevent default form submission behavior
+    await onSubmit(newClass, () => setNewClass(initialClassState));
   };
 
   return (
@@ -59,7 +49,7 @@ export default function CreateClassDialog({
           <DialogContent>
             <ClassFormFields
               classData={newClass}
-              onChange={handleInputChange}
+              setFormData={setNewClass}
               grades={grades}
               teachers={teachers}
             />

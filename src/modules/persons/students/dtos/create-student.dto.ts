@@ -9,7 +9,7 @@ export interface CreateStudentDTO {
   phone: string;
   email: string;
   currentSchool: string;
-  grade: GradeDTO;
+  gradeId: number;
   textbookPublisher: string;
   joinDate: Date;
   leaveDate?: Date;

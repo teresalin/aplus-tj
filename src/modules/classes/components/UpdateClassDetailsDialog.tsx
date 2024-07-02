@@ -44,13 +44,6 @@ export default function UpdateClassDetailsDialogProps({
     }
   }, [open, existingClass]);
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-  };
-
   // Custom validation is required since form is unable to detected the required field in TimePicker
   function hasEmptyOrInvalidTimeValues() {
     return formData.schedules?.some(
@@ -73,14 +66,14 @@ export default function UpdateClassDetailsDialogProps({
 
   return (
     formData && (
-      <div>
+      <>
         <Dialog disablePortal open={open} onClose={onClose}>
           <form onSubmit={handleSubmit}>
             <DialogTitle>Update Class Details</DialogTitle>
             <DialogContent>
               <ClassFormFields
                 classData={formData}
-                onChange={handleInputChange}
+                setFormData={setFormData}
                 grades={grades}
                 teachers={teachers}
               />
@@ -93,7 +86,7 @@ export default function UpdateClassDetailsDialogProps({
             </DialogActions>
           </form>
         </Dialog>
-      </div>
+      </>
     )
   );
 }

@@ -13,49 +13,63 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
 import { CreateClassDTO, UpdateClassDTO } from "../dtos";
-import { dayOfWeek } from "../../../constants";
+import { daysOfWeek } from "../../../constants";
 import { Schedule } from "../../schedules";
-import { Staff, StaffSummary } from "../../persons/staffs";
+import { Staff } from "../../persons/staffs";
+import React from "react";
+import FormHelperText from "@mui/material/FormHelperText";
 
 export interface IClassFormFieldsProps {
   classData: CreateClassDTO | UpdateClassDTO;
-  onChange: (field: string, value: any) => void;
+  setFormData: React.Dispatch<
+    React.SetStateAction<CreateClassDTO | UpdateClassDTO>
+  >;
   grades: Grade[];
   teachers: Staff[];
 }
 
+type FieldName = "gradeId" | "teacherId";
+
 const ClassFormFields = ({
   classData,
-  onChange,
+  setFormData,
   grades,
   teachers,
 }: IClassFormFieldsProps) => {
-  const handleGradeChange = (event: SelectChangeEvent<number>) => {
-    const value = parseInt(event.target.value as string, 10);
-    const selectedGrade = grades.find((grade) => grade.id === value);
-    onChange("grade", selectedGrade || ({} as Grade));
+  const { name, gradeId, teacherId, capacity, schedules } = classData;
+
+  const [isValid, setIsValid] = React.useState(true);
+
+  React.useEffect(() => {
+    const hasActiveSchedule = schedules && schedules.length > 0;
+    setIsValid(!!hasActiveSchedule);
+  }, [schedules]);
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
   };
 
-  const handleTeacherChange = (event: SelectChangeEvent<number>) => {
-    const value = parseInt(event.target.value as string, 10);
-    const selectedTeacher = teachers.find(
-      (teacher) => teacher.staffId === value
-    );
-    onChange("teacher", selectedTeacher || ({} as StaffSummary));
-  };
+  const handleSelectChange =
+    (field: FieldName) => (event: SelectChangeEvent<number>) => {
+      const value = parseInt(event.target.value as string, 10);
+      handleInputChange(field, value || 0);
+    };
 
   const handleSwitchChange = (day: string) => {
-    const existingSchedule = classData.schedules?.find(
+    const existingSchedule = schedules?.find(
       (schedule) => schedule.dayOfWeek === day
     );
     if (existingSchedule) {
-      onChange(
+      handleInputChange(
         "schedules",
-        classData.schedules?.filter((schedule) => schedule.dayOfWeek !== day)
+        schedules?.filter((schedule) => schedule.dayOfWeek !== day)
       );
     } else {
-      onChange("schedules", [
-        ...(classData.schedules || []),
+      handleInputChange("schedules", [
+        ...(schedules || []),
         { dayOfWeek: day, startTime: "", endTime: "" },
       ] as Schedule[]);
     }
@@ -66,9 +80,9 @@ const ClassFormFields = ({
     day: string,
     newValue: Dayjs | null
   ) => {
-    onChange(
+    handleInputChange(
       "schedules",
-      classData.schedules?.map((schedule) => {
+      schedules?.map((schedule) => {
         if (schedule.dayOfWeek === day) {
           return {
             ...schedule,
@@ -82,160 +96,165 @@ const ClassFormFields = ({
 
   return (
     <>
-      <Typography variant="body2" display="block">
-        Class Information
-      </Typography>
-      <TextField
-        required
-        margin="dense"
-        id="name"
-        name="name"
-        label="Name"
-        type="text"
-        defaultValue={classData.name || ""}
-        fullWidth
-        variant="outlined"
-        onChange={(e) => onChange("name", e.target.value)}
-      />
-      <Box mt="8px">
-        <FormControl fullWidth>
-          <InputLabel id="grade-select-label">Select a grade</InputLabel>
-          <Select
-            fullWidth
-            required
-            variant="outlined"
-            id="grade"
-            name="grade"
-            label={"Select a grade"}
-            labelId="grade-select-label"
-            margin="dense"
-            value={classData.gradeId || ""}
-            onChange={handleGradeChange}
-          >
-            {grades &&
-              grades.map((grade: Grade) => (
-                <MenuItem key={grade.id} value={grade.id}>
-                  {grade.name}
-                </MenuItem>
-              ))}
-          </Select>
-        </FormControl>
-      </Box>
-      <Box mt="12px">
-        <FormControl fullWidth>
-          <InputLabel id="teacher-select-label">Select a teacher</InputLabel>
-          <Select
-            fullWidth
-            required
-            variant="outlined"
-            id="teacher"
-            name="teacher"
-            label={"Select a teacher"}
-            labelId="teacher-select-label"
-            margin="dense"
-            value={classData.teacherId || ""}
-            onChange={handleTeacherChange}
-          >
-            {teachers &&
-              teachers.map((teacher: Staff) => (
-                <MenuItem key={teacher.staffId} value={teacher.staffId}>
-                  {teacher.name}
-                </MenuItem>
-              ))}
-          </Select>
-        </FormControl>
-      </Box>
-      <Box mt="4px">
+      <Box>
+        <Typography variant="body2" display="block" gutterBottom>
+          Class Information
+        </Typography>
         <TextField
           required
           margin="dense"
-          id="capacity"
-          name="capacity"
-          label="Student Capacity"
-          type="number"
+          id="name"
+          name="name"
+          label="Name"
+          type="text"
+          defaultValue={name || ""}
           fullWidth
           variant="outlined"
-          value={classData.capacity || ""}
-          onChange={(e) => onChange("capacity", e.target.value)}
+          onChange={(e) => handleInputChange("name", e.target.value)}
         />
+        <Box mt="16px">
+          <FormControl fullWidth>
+            <InputLabel id="grade-select-label">Select a grade</InputLabel>
+            <Select
+              fullWidth
+              required
+              variant="outlined"
+              id="grade"
+              name="grade"
+              label={"Select a grade"}
+              labelId="grade-select-label"
+              margin="dense"
+              value={gradeId || ""}
+              onChange={handleSelectChange("gradeId")}
+            >
+              {grades &&
+                grades.map((grade: Grade) => (
+                  <MenuItem key={grade.id} value={grade.id}>
+                    {grade.name}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box mt="20px">
+          <FormControl fullWidth>
+            <InputLabel id="teacher-select-label">Select a teacher</InputLabel>
+            <Select
+              fullWidth
+              required
+              variant="outlined"
+              id="teacher"
+              name="teacher"
+              label={"Select a teacher"}
+              labelId="teacher-select-label"
+              margin="dense"
+              value={teacherId || ""}
+              onChange={handleSelectChange("teacherId")}
+            >
+              {teachers &&
+                teachers.map((teacher: Staff) => (
+                  <MenuItem key={teacher.staffId} value={teacher.staffId}>
+                    {teacher.name}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box mt="12px">
+          <TextField
+            required
+            margin="dense"
+            id="capacity"
+            name="capacity"
+            label="Student Capacity"
+            // MUI: We do not recommend using type="number" with a Text Field due to potential usability issues:
+            // it allows certain non-numeric characters ('e', '+', '-', '.') and silently discards others
+            // the functionality of scrolling to increment/decrement the number can cause accidental and hard-to-notice changes
+            // type="number"
+            placeholder="Enter a number"
+            fullWidth
+            variant="outlined"
+            value={capacity || ""}
+            onChange={(e) => handleInputChange("capacity", e.target.value)}
+          />
+        </Box>
       </Box>
-      <Typography variant="body2" display="block">
-        Class Schedule
-      </Typography>
-      {classData &&
-        dayOfWeek.map((day) => (
-          <Box key={day} my={1}>
-            <Grid container item key={day} spacing={1} alignItems="center">
-              <Grid item xs={12} md={4}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={
-                        classData.schedules
-                          ? Boolean(
-                              classData.schedules.find(
-                                (schedule) => schedule.dayOfWeek === day
+      <Box mt="16px">
+        <Typography variant="body2" display="block" gutterBottom>
+          Class Schedule
+        </Typography>
+        {classData &&
+          daysOfWeek.map((day) => (
+            <Box key={day} my={1}>
+              <Grid container item key={day} spacing={1} alignItems="center">
+                <Grid item xs={12} md={4}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        required={!isValid}
+                        checked={
+                          schedules
+                            ? Boolean(
+                                schedules.find(
+                                  (schedule) => schedule.dayOfWeek === day
+                                )
                               )
-                            )
-                          : false
-                      }
-                      onChange={() => handleSwitchChange(day)}
-                    />
-                  }
-                  label={day}
-                />
+                            : false
+                        }
+                        onChange={() => handleSwitchChange(day)}
+                      />
+                    }
+                    label={day}
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TimePicker
+                    label="Start Time"
+                    slotProps={{ textField: { size: "small" } }}
+                    value={
+                      schedules &&
+                      schedules.find((schedule) => schedule.dayOfWeek === day)
+                        ? dayjs(
+                            schedules.find(
+                              (schedule) => schedule.dayOfWeek === day
+                            )?.startTime,
+                            "HH:mm:ss"
+                          )
+                        : null
+                    }
+                    onChange={(newValue: Dayjs | null) =>
+                      handleTimeChange("startTime", day, newValue)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <TimePicker
+                    label="End Time"
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                      },
+                    }}
+                    value={
+                      schedules &&
+                      schedules.find((schedule) => schedule.dayOfWeek === day)
+                        ? dayjs(
+                            schedules.find(
+                              (schedule) => schedule.dayOfWeek === day
+                            )?.endTime,
+                            "HH:mm:ss"
+                          )
+                        : null
+                    }
+                    onChange={(newValue: Dayjs | null) =>
+                      handleTimeChange("endTime", day, newValue)
+                    }
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={4}>
-                <TimePicker
-                  label="Start Time"
-                  slotProps={{ textField: { size: "small" } }}
-                  value={
-                    classData.schedules &&
-                    classData.schedules.find(
-                      (schedule) => schedule.dayOfWeek === day
-                    )
-                      ? dayjs(
-                          classData.schedules.find(
-                            (schedule) => schedule.dayOfWeek === day
-                          )?.startTime,
-                          "HH:mm:ss"
-                        )
-                      : null
-                  }
-                  onChange={(newValue: Dayjs | null) =>
-                    handleTimeChange("startTime", day, newValue)
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TimePicker
-                  label="End Time"
-                  slotProps={{
-                    textField: {
-                      size: "small",
-                    },
-                  }}
-                  value={
-                    classData.schedules &&
-                    classData.schedules.find(
-                      (schedule) => schedule.dayOfWeek === day
-                    )
-                      ? dayjs(
-                          classData.schedules.find(
-                            (schedule) => schedule.dayOfWeek === day
-                          )?.endTime,
-                          "HH:mm:ss"
-                        )
-                      : null
-                  }
-                  onChange={(newValue: Dayjs | null) =>
-                    handleTimeChange("endTime", day, newValue)
-                  }
-                />
-              </Grid>
-            </Grid>
-          </Box>
-        ))}
+            </Box>
+          ))}
+      </Box>
     </>
   );
 };
