@@ -1,6 +1,6 @@
 import { DatePicker } from "@mui/x-date-pickers";
 import Box from "@mui/material/Box";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";

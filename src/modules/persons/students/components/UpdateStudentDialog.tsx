@@ -1,4 +1,3 @@
-import { Dayjs } from "dayjs";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -8,7 +7,6 @@ import React from "react";
 import useSWR, { mutate } from "swr";
 
 import { Grade } from "../../../grades";
-
 import { Student } from "../types";
 import { studentToUpdateStudentDTO } from "../student.transformers";
 import { UpdateStudentDTO } from "../dtos";
@@ -29,7 +27,8 @@ export default function UpdateStudentDialog({
   onSubmit,
 }: IUpdateStudentDialogProps) {
   const initialStudentState = {} as UpdateStudentDTO;
-  const [formData, setFormData] = React.useState(initialStudentState);
+  const [formData, setFormData] =
+    React.useState<UpdateStudentDTO>(initialStudentState);
   const { data } = useSWR("/api/grades", fetcher);
   const grades = (data as Grade[]) || [];
 

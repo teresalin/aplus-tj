@@ -1,4 +1,4 @@
-import { TimePicker } from "@mui/x-date-pickers";
+import { DateValidationError, TimePicker } from "@mui/x-date-pickers";
 import { Grade } from "../../grades";
 import Box from "@mui/material/Box";
 import dayjs, { Dayjs } from "dayjs";
@@ -17,7 +17,6 @@ import { daysOfWeek } from "../../../constants";
 import { Schedule } from "../../schedules";
 import { Staff } from "../../persons/staffs";
 import React from "react";
-import FormHelperText from "@mui/material/FormHelperText";
 
 export interface IClassFormFieldsProps {
   classData: CreateClassDTO | UpdateClassDTO;
@@ -39,11 +38,40 @@ const ClassFormFields = ({
   const { name, gradeId, teacherId, capacity, schedules } = classData;
 
   const [isValid, setIsValid] = React.useState(true);
+  const [error, setError] = React.useState<DateValidationError | null>(null);
 
   React.useEffect(() => {
     const hasActiveSchedule = schedules && schedules.length > 0;
     setIsValid(!!hasActiveSchedule);
   }, [schedules]);
+
+  const errorMessage = React.useMemo(() => {
+    switch (error) {
+      case "maxDate":
+      case "minDate": {
+        return "Please select a date in the first quarter of 2022";
+      }
+
+      case "invalidDate": {
+        return "Your date is not valid";
+      }
+
+      default: {
+        return "";
+      }
+    }
+  }, [error]);
+
+  // Custom validation is required since form is unable to detected the required field in TimePicker
+  function hasEmptyOrInvalidTimeValues() {
+    return classData.schedules?.some(
+      (schedule) =>
+        !schedule.startTime ||
+        !schedule.endTime ||
+        schedule.startTime === "Invalid Date" ||
+        schedule.endTime === "Invalid Date"
+    );
+  }
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prevData) => ({
@@ -107,7 +135,7 @@ const ClassFormFields = ({
           name="name"
           label="Name"
           type="text"
-          defaultValue={name || ""}
+          value={name || ""}
           fullWidth
           variant="outlined"
           onChange={(e) => handleInputChange("name", e.target.value)}
@@ -193,13 +221,9 @@ const ClassFormFields = ({
                       <Switch
                         required={!isValid}
                         checked={
-                          schedules
-                            ? Boolean(
-                                schedules.find(
-                                  (schedule) => schedule.dayOfWeek === day
-                                )
-                              )
-                            : false
+                          !!schedules?.find(
+                            (schedule) => schedule.dayOfWeek === day
+                          )
                         }
                         onChange={() => handleSwitchChange(day)}
                       />
@@ -210,10 +234,19 @@ const ClassFormFields = ({
                 <Grid item xs={12} md={4}>
                   <TimePicker
                     label="Start Time"
-                    slotProps={{ textField: { size: "small" } }}
+                    // onError={(newError) => setError(newError)}
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        required: !!schedules?.find(
+                          (schedule) => schedule.dayOfWeek === day
+                        ),
+                      },
+                    }}
                     value={
-                      schedules &&
-                      schedules.find((schedule) => schedule.dayOfWeek === day)
+                      !!schedules?.find(
+                        (schedule) => schedule.dayOfWeek === day
+                      )
                         ? dayjs(
                             schedules.find(
                               (schedule) => schedule.dayOfWeek === day
@@ -236,8 +269,9 @@ const ClassFormFields = ({
                       },
                     }}
                     value={
-                      schedules &&
-                      schedules.find((schedule) => schedule.dayOfWeek === day)
+                      !!schedules?.find(
+                        (schedule) => schedule.dayOfWeek === day
+                      )
                         ? dayjs(
                             schedules.find(
                               (schedule) => schedule.dayOfWeek === day
