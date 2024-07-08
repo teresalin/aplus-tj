@@ -1,4 +1,4 @@
-import { Grade } from "../../../grades";
+import { GradeDTO } from "../../../grades";
 
 export interface CreateStudentDTO {
   name: string;
@@ -9,7 +9,7 @@ export interface CreateStudentDTO {
   phone: string;
   email: string;
   currentSchool: string;
-  grade: Grade;
+  gradeId: number;
   textbookPublisher: string;
   joinDate: Date;
   leaveDate?: Date;

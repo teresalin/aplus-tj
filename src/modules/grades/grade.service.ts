@@ -1,7 +1,7 @@
 import { getDBClient } from "../../../lib/db-connector";
-import { GradeResponseDTO } from "./dtos";
+import { Grade } from "./types";
 
-export async function findAllGrades(): Promise<GradeResponseDTO[]> {
+export async function findAllGrades(): Promise<Grade[]> {
   const client = await getDBClient();
 
   try {
@@ -12,7 +12,7 @@ export async function findAllGrades(): Promise<GradeResponseDTO[]> {
     };
     const result = await client.query(selectGradesQuery);
 
-    const grades: GradeResponseDTO[] = result.rows.map((row: any) => ({
+    const grades: Grade[] = result.rows.map((row: any) => ({
       id: row.id,
       name: row.name,
     }));

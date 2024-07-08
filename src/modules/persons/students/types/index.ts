@@ -14,7 +14,8 @@ export interface Student extends Person {
 export interface StudentSummary {
   studentId: number;
   name: string;
-  gender: string;
-  englishName: string;
+  dateOfBirth: Date;
+  englishName?: string;
   currentSchool: string;
+  notes?: string;
 }

@@ -30,7 +30,7 @@ export async function findAllStudents(): Promise<Student[]> {
       FROM student
       INNER JOIN person ON student.person_id = person.id
       INNER JOIN grade ON student.grade_id = grade.id;
-    `
+      `
     );
     return rows.map(mapRowToStudent);
   } catch (error) {
@@ -70,7 +70,7 @@ export async function findStudentById(
       INNER JOIN person ON student.person_id = person.id
       INNER JOIN grade ON student.grade_id = grade.id
       WHERE student.id = $1;
-    `,
+      `,
       [studentId]
     );
     return rows.length ? mapRowToStudent(rows[0]) : null;
@@ -115,7 +115,7 @@ export async function createStudent(dto: CreateStudentDTO) {
         dto.englishName,
         dto.currentSchool,
         dto.textbookPublisher,
-        dto.grade.id,
+        dto.gradeId,
         dto.joinDate,
         dto.leaveDate,
       ],
@@ -167,15 +167,15 @@ export async function updateStudent(dto: UpdateStudentDTO) {
 
     const updateStudentQuery = {
       text: `
-          UPDATE student
-          SET english_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, updated = NOW()
-          WHERE person_id = $7;
-        `,
+        UPDATE student
+        SET english_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, updated = NOW()
+        WHERE person_id = $7;
+      `,
       values: [
         dto.englishName,
         dto.currentSchool,
         dto.textbookPublisher,
-        dto.grade?.id,
+        dto.gradeId,
         dto.joinDate,
         dto.leaveDate,
         personId,

@@ -5,6 +5,7 @@ import {
   UniqueConstraintError,
   ValidationError,
 } from "./CustomError";
+import { ApiResponse } from "./apiResponse";
 
 export function handleError(
   res: NextApiResponse,
@@ -33,10 +34,11 @@ export function handleError(
 
   res.status(statusCode).json({
     status: "Error",
+    message: publicMessage,
     error: {
       code: statusCode,
       message: publicMessage,
       details: process.env.NODE_ENV === "development" ? error.stack : undefined,
     },
-  });
+  } as ApiResponse);
 }

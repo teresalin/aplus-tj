@@ -28,16 +28,6 @@ export default function CreateStudentDialog({
   const { data } = useSWR("/api/grades", fetcher);
   const grades = (data as Grade[]) || [];
 
-  const handleInputChange = (
-    field: string,
-    value: string | Date | Dayjs | null
-  ) => {
-    setNewStudent((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-  };
-
   const handleSubmit: React.FormEventHandler = async (
     event: React.FormEvent
   ) => {
@@ -52,7 +42,7 @@ export default function CreateStudentDialog({
         <DialogContent>
           <StudentFormFields
             student={newStudent}
-            onChange={handleInputChange}
+            setFormData={setNewStudent}
             grades={grades}
           />
         </DialogContent>

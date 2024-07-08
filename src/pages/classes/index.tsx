@@ -1,5 +1,6 @@
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Button from "@mui/material/Button";
+import Alert, { AlertColor } from "@mui/material/Alert";
 import ChildCareIcon from "@mui/icons-material/ChildCare";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
@@ -10,11 +11,16 @@ import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import TodayIcon from "@mui/icons-material/Today";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
-import { ClassDetail, CreateClassDialog } from "../../modules/classes";
-import { Schedule } from "../api/classes/[class_id]/schedules";
+import { Class, CreateClassDialog } from "../../modules/classes";
+import { Schedule } from "../../modules/schedules";
 import fetcher from "../../../utils/fetcher";
+import { daysOfWeek } from "../../constants";
+import Snackbar from "@mui/material/Snackbar";
+import LinearProgress from "@mui/material/LinearProgress";
+
+// TODO allow user to select a color for each class in admin settings
 
 function AddIconButton({ onClick }) {
   return (
@@ -30,15 +36,6 @@ function AddIconButton({ onClick }) {
 }
 
 function formatDaysOfWeek(schedules: Schedule[]): string {
-  const daysOfWeek = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
   const selectedDays = schedules.map((schedule) => schedule.dayOfWeek);
 
   // Create an array of abbreviations for selected days
@@ -50,35 +47,59 @@ function formatDaysOfWeek(schedules: Schedule[]): string {
 }
 
 export default function Classes() {
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const { data } = useSWR("api/classes", fetcher);
+  const [isCreateClassDialogOpen, setIsCreateClassDialogOpen] =
+    React.useState(false);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] =
+    React.useState<AlertColor>("error");
+
+  const { data, isLoading, error } = useSWR<Class[]>("api/classes", fetcher);
   const classes = data || [];
 
   const handleAddButtonClick = () => {
-    setDialogOpen(true);
+    setIsCreateClassDialogOpen(true);
   };
 
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
+  const handleCloseCreateClassDialog = () => {
+    setIsCreateClassDialogOpen(false);
   };
 
-  const handleCreateClass = async (data) => {
-    const response = await fetch(`/api/classes/index`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+  const handleCreateClass = async (data, resetForm) => {
+    try {
+      const response = await fetch(`/api/classes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    if (response.ok) {
-    } else {
-      console.error("Error creating/updating class:", response.statusText);
+      const responseData = await response.json();
+      if (response.ok) {
+        handleCloseCreateClassDialog();
+        mutate("/api/classes");
+        setSnackbarMessage("Class created successfully");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        resetForm();
+      } else {
+        console.error("Error creating class:", responseData);
+        setSnackbarMessage(responseData.error.message);
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setSnackbarMessage("An unexpected error occurred");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
-  // allow user to select a color for each class ins ettings
-  if (!classes) return <CircularProgress />;
+  if (error) {
+    return <div>Error fetching data</div>;
+  }
 
   return (
     <>
@@ -86,17 +107,13 @@ export default function Classes() {
         <Typography variant="h6" gutterBottom>
           All Classes
         </Typography>
-        {/* <Button
-          variant="text"
-          color="primary"
-          startIcon={<EditIcon />}
-          onClick={handleOpenDialog}
-        >
-          Add
-        </Button> */}
         <AddIconButton onClick={handleAddButtonClick} />
       </Grid>
-      {classes.map((row: ClassDetail) => (
+
+      {/* Display LinearProgress inside the layout if still loading */}
+      {isLoading && <LinearProgress />}
+
+      {classes.map((row: Class) => (
         <Link href={`classes/${row.id}`} key={row.id}>
           <Paper key={row.id} sx={{ my: 2, p: 2 }}>
             <Grid
@@ -150,7 +167,7 @@ export default function Classes() {
                         },
                       }}
                     >
-                      {row.studentCount}/{row.capacity}
+                      0/{row.capacity}
                     </Button>
                   </Tooltip>
                 </Grid>
@@ -160,10 +177,24 @@ export default function Classes() {
         </Link>
       ))}
       <CreateClassDialog
-        open={dialogOpen}
-        onClose={handleCloseDialog}
+        open={isCreateClassDialogOpen}
+        onClose={handleCloseCreateClassDialog}
         onSubmit={handleCreateClass}
       />
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

@@ -1,1 +1,1 @@
-export * from "./grade-response.dto";
+export * from "./grade.dto";

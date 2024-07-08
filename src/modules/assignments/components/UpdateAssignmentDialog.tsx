@@ -17,6 +17,7 @@ import useSWR from "swr";
 
 import { Assignment } from "../types";
 import { Class } from "../../classes/types";
+import { UpdateAssignmentDTO } from "../dtos";
 import fetcher from "../../../../utils/fetcher";
 
 export interface IUpdateAssignmentDialogProps {
@@ -33,7 +34,7 @@ export default function UpdateAssignmentDialog({
   onSubmit,
 }: IUpdateAssignmentDialogProps) {
   // TODO create two functions, one for update and one for create and make the form components reusable
-  const [formData, setFormData] = React.useState({} as Assignment);
+  const [formData, setFormData] = React.useState({} as UpdateAssignmentDTO);
   const { data } = useSWR(open ? "/api/classes" : null, fetcher);
   const classes = data || [];
 
@@ -115,7 +116,7 @@ export default function UpdateAssignmentDialog({
                   label={"Assign to a class"}
                   labelId="class-select-label"
                   margin="dense"
-                  value={formData.classInfo?.id ? formData.classInfo?.id : null}
+                  value={formData.classId || null}
                   onChange={handleSelectChange}
                 >
                   {classes &&

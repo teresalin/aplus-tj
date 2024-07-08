@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
 import { Class } from "../../modules/classes";
-import { Schedule } from "../api/classes/[class_id]/schedules";
+import { Schedule } from "../../modules/schedules";
 import fetcher from "../../../utils/fetcher";
 
 function AddIconButton({ onClick }) {

@@ -16,7 +16,7 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
 import { Person } from "../../persons/types";
-import { Schedule } from "../../../pages/api/classes/[class_id]/schedules";
+import { Schedule } from "../../schedules";
 import fetcher from "../../../../utils/fetcher";
 
 function RedBar() {
