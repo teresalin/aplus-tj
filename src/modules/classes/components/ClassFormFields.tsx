@@ -1,4 +1,4 @@
-import { DateValidationError, TimePicker } from "@mui/x-date-pickers";
+import { TimePicker } from "@mui/x-date-pickers";
 import { Grade } from "../../grades";
 import Box from "@mui/material/Box";
 import dayjs, { Dayjs } from "dayjs";
@@ -7,6 +7,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
+import React from "react";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
@@ -16,7 +17,6 @@ import { CreateClassDTO, UpdateClassDTO } from "../dtos";
 import { daysOfWeek } from "../../../constants";
 import { Schedule } from "../../schedules";
 import { Staff } from "../../persons/staffs";
-import React from "react";
 
 export interface IClassFormFieldsProps {
   classData: CreateClassDTO | UpdateClassDTO;
@@ -25,6 +25,7 @@ export interface IClassFormFieldsProps {
   >;
   grades: Grade[];
   teachers: Staff[];
+  setHasError: (hasError: boolean) => void;
 }
 
 type FieldName = "gradeId" | "teacherId";
@@ -34,35 +35,33 @@ const ClassFormFields = ({
   setFormData,
   grades,
   teachers,
+  setHasError,
 }: IClassFormFieldsProps) => {
   const { name, gradeId, teacherId, capacity, schedules } = classData;
 
-  const [isValid, setIsValid] = React.useState(true);
-  const [error, setError] = React.useState<DateValidationError | null>(null);
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
-    const hasActiveSchedule = schedules && schedules.length > 0;
-    setIsValid(!!hasActiveSchedule);
-  }, [schedules]);
+    validateForm();
+  }, [classData]);
 
-  const errorMessage = React.useMemo(() => {
-    switch (error) {
-      case "maxDate":
-      case "minDate": {
-        return "Please select a date in the first quarter of 2022";
-      }
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
 
-      case "invalidDate": {
-        return "Your date is not valid";
-      }
-
-      default: {
-        return "";
-      }
+    if (capacity && isNaN(Number(capacity))) {
+      newErrors.capacity = "Capacity must be a number";
     }
-  }, [error]);
 
-  // Custom validation is required since form is unable to detected the required field in TimePicker
+    if (hasEmptyOrInvalidTimeValues()) {
+      newErrors.schedules = "All schedule times must be filled";
+    }
+
+    setErrors(newErrors);
+    setHasError(Object.keys(newErrors).length > 0);
+  };
+
+  // Implemented custom validation since frm is unable to detect the built-in required field in TimePicker
+  // https://github.com/mui/mui-x/issues/7633
   function hasEmptyOrInvalidTimeValues() {
     return classData.schedules?.some(
       (schedule) =>
@@ -204,6 +203,8 @@ const ClassFormFields = ({
             variant="outlined"
             value={capacity || ""}
             onChange={(e) => handleInputChange("capacity", e.target.value)}
+            error={!!errors.capacity}
+            helperText={errors.capacity}
           />
         </Box>
       </Box>
@@ -219,7 +220,7 @@ const ClassFormFields = ({
                   <FormControlLabel
                     control={
                       <Switch
-                        required={!isValid}
+                        required={schedules?.length === 0}
                         checked={
                           !!schedules?.find(
                             (schedule) => schedule.dayOfWeek === day
@@ -234,7 +235,6 @@ const ClassFormFields = ({
                 <Grid item xs={12} md={4}>
                   <TimePicker
                     label="Start Time"
-                    // onError={(newError) => setError(newError)}
                     slotProps={{
                       textField: {
                         size: "small",
@@ -288,6 +288,19 @@ const ClassFormFields = ({
               </Grid>
             </Box>
           ))}
+        {errors.schedules && (
+          <Typography
+            color="error"
+            // Note: probably want to remove this in the future since it is not good practice
+            sx={{
+              fontSize: "0.75em",
+              letterSpacing: "0.03333em",
+              fontWeight: "400",
+            }}
+          >
+            {errors.schedules}
+          </Typography>
+        )}
       </Box>
     </>
   );

@@ -1,16 +1,18 @@
-import React from "react";
+import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import React from "react";
 import useSWR, { mutate } from "swr";
 
 import { Class } from "../types";
 import { classToUpdateClassDTO } from "../class.transformers";
 import { UpdateClassDTO } from "../dtos";
-import fetcher from "../../../../utils/fetcher";
 import ClassFormFields from "./ClassFormFields";
+import fetcher from "../../../../utils/fetcher";
 
 export interface IUpdateClassDetailsDialogProps {
   existingClass: Class | null;
@@ -28,14 +30,19 @@ export default function UpdateClassDetailsDialogProps({
   const initialClassState = {} as UpdateClassDTO;
   const [formData, setFormData] =
     React.useState<UpdateClassDTO>(initialClassState);
-  const { data: staffsData, error: staffsError } = useSWR(
-    "/api/persons/staffs",
-    fetcher
-  );
-  const { data: gradesData, error: gradesError } = useSWR(
-    "/api/grades",
-    fetcher
-  );
+  const [hasError, setHasError] = React.useState(false);
+
+  const {
+    data: staffsData,
+    error: staffsError,
+    isLoading: staffsLoading,
+  } = useSWR("/api/persons/staffs", fetcher);
+  const {
+    data: gradesData,
+    error: gradesError,
+    isLoading: gradesLoading,
+  } = useSWR("/api/grades", fetcher);
+
   const teachers = staffsData || [];
   const grades = gradesData || [];
 
@@ -51,9 +58,11 @@ export default function UpdateClassDetailsDialogProps({
     event: React.FormEvent
   ) => {
     event.preventDefault();
-    await onSubmit(formData as UpdateClassDTO, () =>
-      setFormData(initialClassState)
-    );
+    if (!hasError) {
+      await onSubmit(formData as UpdateClassDTO, () =>
+        setFormData(initialClassState)
+      );
+    }
   };
 
   return (
@@ -62,12 +71,31 @@ export default function UpdateClassDetailsDialogProps({
         <form onSubmit={handleSubmit}>
           <DialogTitle>Update Class Details</DialogTitle>
           <DialogContent>
-            <ClassFormFields
-              classData={formData}
-              setFormData={setFormData}
-              grades={grades}
-              teachers={teachers}
-            />
+            {staffsLoading || gradesLoading ? (
+              <CircularProgress />
+            ) : (
+              <>
+                {staffsError && (
+                  <Alert severity="error">
+                    Failed to load staff data: {staffsError.message}
+                  </Alert>
+                )}
+                {gradesError && (
+                  <Alert severity="error">
+                    Failed to load grades data: {gradesError.message}
+                  </Alert>
+                )}
+                {!staffsError && !gradesError && (
+                  <ClassFormFields
+                    classData={formData}
+                    setFormData={setFormData}
+                    grades={grades}
+                    teachers={teachers}
+                    setHasError={setHasError}
+                  />
+                )}
+              </>
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
