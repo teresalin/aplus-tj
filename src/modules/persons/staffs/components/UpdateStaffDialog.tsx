@@ -28,7 +28,7 @@ function RedBar() {
   );
 }
 
-export interface IUpdateCreateStaffDialogProps {
+export interface IUpdateStaffDialogProps {
   isUpdate: boolean;
   existingData: Staff;
   open: boolean;
@@ -36,13 +36,13 @@ export interface IUpdateCreateStaffDialogProps {
   onSubmit;
 }
 
-export default function UpdateCreateStaffDialog({
+export default function UpdateStaffDialog({
   isUpdate,
   existingData,
   open,
   onClose,
   onSubmit,
-}: IUpdateCreateStaffDialogProps) {
+}: IUpdateStaffDialogProps) {
   const [editedData, setEditedData] = React.useState(existingData);
   const { data } = useSWR("/api/persons/staffs/roles", fetcher);
   const roles = data || [];

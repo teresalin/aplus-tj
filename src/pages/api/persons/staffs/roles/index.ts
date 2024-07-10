@@ -1,37 +1,25 @@
-import {
-  getDBClient,
-  releaseDBClient,
-} from "../../../../../../lib/db-connector";
+import { ApiResponse } from "../../../../../../utils/apiResponse";
+import { findAllRoles } from "../../../../../modules/persons/roles/role.service";
+import { handleError } from "../../../../../../utils/errorHandler";
+import { MethodNotAllowedError } from "../../../../../../utils/CustomError";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export interface Role {
-  id: number;
-  name: string;
-}
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const client = await getDBClient();
   try {
-    const getQuery = {
-      text: `
-          SELECT id, name FROM staff_role;
-        `,
-    };
-    const result = await client.query(getQuery);
-    res.status(200).json({
-      status: "Success",
-      result: result.rows as Role[],
-      message: "Roles retrieved successfully.",
-    });
-  } catch (error) {
-    console.error("Error retrieving staff roles", error);
-    res.status(500).json({
-      status: "Error",
-      message: "Internal server error",
-    });
-  } finally {
-    if (client) {
-      await releaseDBClient(client);
+    switch (req.method) {
+      case "GET":
+        const roles = await findAllRoles();
+        res.status(200).json({
+          status: "Success",
+          result: roles,
+          message: "All roles retrieved successfully.",
+        } as ApiResponse);
+        break;
+
+      default:
+        throw new MethodNotAllowedError(req.method!);
     }
+  } catch (error) {
+    handleError(res, error);
   }
 };
