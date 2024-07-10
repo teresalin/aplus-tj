@@ -100,6 +100,7 @@ export async function createStudent(dto: CreateStudentDTO) {
         dto.email,
         dto.dateOfBirth,
         dto.notes,
+        "t",
       ],
     };
     const result = await client.query(insertPersonQuery);

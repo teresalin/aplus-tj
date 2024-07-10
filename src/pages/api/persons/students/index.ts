@@ -1,12 +1,12 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { ApiResponse } from "../../../../../utils/apiResponse";
 import { CreateStudentDTO } from "../../../../modules/persons/students/dtos";
+import { handleError } from "../../../../../utils/errorHandler";
+import { MethodNotAllowedError } from "../../../../../utils/CustomError";
+import { NextApiRequest, NextApiResponse } from "next";
 import {
   createStudent,
   findAllStudents,
 } from "../../../../modules/persons/students/student.service";
-import { handleError } from "../../../../../utils/errorHandler";
-import { MethodNotAllowedError } from "../../../../../utils/CustomError";
-import { ApiResponse } from "../../../../../utils/apiResponse";
 
 export default async function handler(
   req: NextApiRequest,
