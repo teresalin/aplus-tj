@@ -16,12 +16,12 @@ export async function findAllStaffs(): Promise<Staff[]> {
         person.gender,
         person.phone,
         person.email,
-        person.date_of_birth,
+        person.date_of_birth::timestamp at time zone 'UTC' as date_of_birth,
         person.notes,
         person.active,
         staff.id AS staff_id,
-        staff.join_date,
-        staff.leave_date
+        staff.join_date::timestamp at time zone 'UTC' as join_date,
+        staff.leave_date::timestamp at time zone 'UTC' as leave_date
       FROM
         staff
       JOIN
@@ -44,23 +44,23 @@ export async function findStaffById(staffId: number): Promise<Staff | null> {
     const { rows } = await client.query(
       `
       SELECT 
-        person.id,
+        person.id AS person_id,
         person.name,
         person.gender,
         person.phone,
         person.email,
-        person.date_of_birth,
+        person.date_of_birth::timestamp at time zone 'UTC' as date_of_birth,
         person.notes,
         person.active,
         staff.id AS staff_id,
-        staff.join_date, 
-        staff.leave_date, 
-        role.id AS role_id,
-        role.name AS role_name
+        staff.join_date::timestamp at time zone 'UTC' as join_date, 
+        staff.leave_date::timestamp at time zone 'UTC' as leave_date, 
+        staff_role.id AS role_id,
+        staff_role.name AS role_name
       FROM staff
       INNER JOIN person ON staff.person_id = person.id
-      INNER JOIN role ON staff.role_id = role.id
-      WHERE person.id = $1;
+      INNER JOIN staff_role ON staff.role_id = staff_role.id
+      WHERE staff.id = $1;
       `,
       [staffId]
     );
@@ -155,7 +155,7 @@ export async function updateStaff(dto: UpdateStaffDTO) {
     const updateStaffQuery = {
       text: `
         UPDATE staff
-        SET role_id = $1, join_date = $1, leave_date = $3, updated = NOW()
+        SET role_id = $1, join_date = $2, leave_date = $3, updated = NOW()
         WHERE person_id = $4
         RETURNING id;
       `,

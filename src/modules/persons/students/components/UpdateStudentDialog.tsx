@@ -1,4 +1,6 @@
+import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -29,8 +31,9 @@ export default function UpdateStudentDialog({
   const initialStudentState = {} as UpdateStudentDTO;
   const [formData, setFormData] =
     React.useState<UpdateStudentDTO>(initialStudentState);
-  const { data } = useSWR("/api/grades", fetcher);
-  const grades = (data as Grade[]) || [];
+
+  const { data, error, isLoading } = useSWR<Grade[]>("/api/grades", fetcher);
+  const grades = data || [];
 
   // Initialize form data when the dialog opens with the latest student data
   React.useEffect(() => {
@@ -57,26 +60,37 @@ export default function UpdateStudentDialog({
 
   return (
     formData && (
-      <>
-        <Dialog disablePortal open={open} onClose={handleClose}>
-          <form onSubmit={handleSubmit}>
-            <DialogTitle>Update Student</DialogTitle>
-            <DialogContent>
-              <StudentFormFields
-                student={formData}
-                setFormData={setFormData}
-                grades={grades}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={onClose}>Cancel</Button>
-              <Button autoFocus type="submit">
-                Submit
-              </Button>
-            </DialogActions>
-          </form>
-        </Dialog>
-      </>
+      <Dialog disablePortal open={open} onClose={handleClose}>
+        <form onSubmit={handleSubmit}>
+          <DialogTitle>Update Student</DialogTitle>
+          <DialogContent>
+            {isLoading ? (
+              <CircularProgress />
+            ) : (
+              <>
+                {error && (
+                  <Alert severity="error">
+                    Failed to load role data: {error.message}
+                  </Alert>
+                )}
+                {!error && (
+                  <StudentFormFields
+                    student={formData}
+                    setFormData={setFormData}
+                    grades={grades}
+                  />
+                )}
+              </>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button autoFocus type="submit">
+              Submit
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     )
   );
 }

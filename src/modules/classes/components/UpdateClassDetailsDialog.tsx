@@ -10,6 +10,8 @@ import useSWR, { mutate } from "swr";
 
 import { Class } from "../types";
 import { classToUpdateClassDTO } from "../class.transformers";
+import { Grade } from "../../grades";
+import { Staff } from "../../persons/staffs";
 import { UpdateClassDTO } from "../dtos";
 import ClassFormFields from "./ClassFormFields";
 import fetcher from "../../../../utils/fetcher";
@@ -36,12 +38,12 @@ export default function UpdateClassDetailsDialogProps({
     data: staffsData,
     error: staffsError,
     isLoading: staffsLoading,
-  } = useSWR("/api/persons/staffs", fetcher);
+  } = useSWR<Staff[]>("/api/persons/staffs", fetcher);
   const {
     data: gradesData,
     error: gradesError,
     isLoading: gradesLoading,
-  } = useSWR("/api/grades", fetcher);
+  } = useSWR<Grade[]>("/api/grades", fetcher);
 
   const teachers = staffsData || [];
   const grades = gradesData || [];
@@ -66,7 +68,7 @@ export default function UpdateClassDetailsDialogProps({
   };
 
   return (
-    <>
+    formData && (
       <Dialog disablePortal open={open} onClose={onClose}>
         <form onSubmit={handleSubmit}>
           <DialogTitle>Update Class Details</DialogTitle>
@@ -105,6 +107,6 @@ export default function UpdateClassDetailsDialogProps({
           </DialogActions>
         </form>
       </Dialog>
-    </>
+    )
   );
 }

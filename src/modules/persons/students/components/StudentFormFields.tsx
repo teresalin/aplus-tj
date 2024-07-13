@@ -28,6 +28,21 @@ const StudentFormFields = ({
   setFormData,
   grades,
 }: IStudentFormFieldsProps) => {
+  const {
+    name,
+    englishName,
+    gender,
+    dateOfBirth,
+    notes,
+    phone,
+    email,
+    currentSchool,
+    gradeId,
+    textbookPublisher,
+    joinDate,
+    leaveDate,
+  } = student;
+
   const handleInputChange = (field: string, value: any) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -57,7 +72,7 @@ const StudentFormFields = ({
               type="text"
               variant="outlined"
               margin="normal"
-              value={student.name || ""}
+              value={name || ""}
               onChange={(e) => handleInputChange("name", e.target.value)}
             />
           </Grid>
@@ -70,7 +85,7 @@ const StudentFormFields = ({
               type="text"
               variant="outlined"
               margin="normal"
-              value={student.englishName || ""}
+              value={englishName || ""}
               onChange={(e) => handleInputChange("englishName", e.target.value)}
             />
           </Grid>
@@ -80,7 +95,7 @@ const StudentFormFields = ({
           format="YYYY-MM-DD"
           // We want to put a null value here so the date picker field
           // does not complain and show a red error outline
-          value={student.dateOfBirth ? dayjs(student.dateOfBirth).utc() : null}
+          value={dateOfBirth ? dayjs(dateOfBirth).utc() : null}
           onChange={(date) => handleInputChange("dateOfBirth", date)}
           sx={{ marginTop: "16px", marginBottom: "8px", width: "100%" }}
           slotProps={{
@@ -98,7 +113,7 @@ const StudentFormFields = ({
           label="Select a gender"
           margin="normal"
           select
-          value={student.gender || ""}
+          value={gender || ""}
           onChange={(e) => handleInputChange("gender", e.target.value)}
         >
           <MenuItem value="Male">Male</MenuItem>
@@ -117,7 +132,7 @@ const StudentFormFields = ({
           margin="normal"
           placeholder="Hobbies, nicknames, etc."
           InputLabelProps={{ shrink: true }}
-          value={student.notes || ""}
+          value={notes || ""}
           onChange={(e) => handleInputChange("notes", e.target.value)}
         />
       </Box>
@@ -134,7 +149,7 @@ const StudentFormFields = ({
           type="email"
           variant="outlined"
           margin="normal"
-          value={student.email || ""}
+          value={email || ""}
           onChange={(e) => handleInputChange("email", e.target.value)}
         />
         <TextField
@@ -146,7 +161,7 @@ const StudentFormFields = ({
           type="tel"
           variant="outlined"
           margin="normal"
-          value={student.phone || ""}
+          value={phone || ""}
           onChange={(e) => handleInputChange("phone", e.target.value)}
         />
       </Box>
@@ -163,7 +178,7 @@ const StudentFormFields = ({
           type="text"
           variant="outlined"
           margin="normal"
-          value={student.currentSchool || ""}
+          value={currentSchool || ""}
           onChange={(e) => handleInputChange("currentSchool", e.target.value)}
         />
         <Box mt="16px" mb="8px">
@@ -177,7 +192,7 @@ const StudentFormFields = ({
               name="grade"
               label={"Select a grade"}
               labelId="grade-select-label"
-              value={student.gradeId || ""}
+              value={gradeId || ""}
               onChange={handleGradeChange}
             >
               {grades &&
@@ -198,7 +213,7 @@ const StudentFormFields = ({
           type="text"
           variant="outlined"
           margin="normal"
-          value={student.textbookPublisher || ""}
+          value={textbookPublisher || ""}
           onChange={(e) =>
             handleInputChange("textbookPublisher", e.target.value)
           }
@@ -214,7 +229,7 @@ const StudentFormFields = ({
               <DatePicker
                 label="Join Date"
                 format="YYYY-MM-DD"
-                value={student.joinDate ? dayjs(student.joinDate).utc() : null}
+                value={joinDate ? dayjs(joinDate).utc() : null}
                 onChange={(date) => handleInputChange("joinDate", date)}
                 slotProps={{
                   textField: {
@@ -227,9 +242,7 @@ const StudentFormFields = ({
               <DatePicker
                 label="Leave Date"
                 format="YYYY-MM-DD"
-                value={
-                  student.leaveDate ? dayjs(student.leaveDate).utc() : null
-                }
+                value={leaveDate ? dayjs(leaveDate).utc() : null}
                 onChange={(date) => handleInputChange("leaveDate", date)}
               />
             </Grid>

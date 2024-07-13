@@ -1,12 +1,13 @@
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import Button from "@mui/material/Button";
 import Alert, { AlertColor } from "@mui/material/Alert";
+import Button from "@mui/material/Button";
 import ChildCareIcon from "@mui/icons-material/ChildCare";
-import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
+import LinearProgress from "@mui/material/LinearProgress";
 import Link from "next/link";
 import Paper from "@mui/material/Paper";
 import React from "react";
+import Snackbar from "@mui/material/Snackbar";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import TodayIcon from "@mui/icons-material/Today";
 import Tooltip from "@mui/material/Tooltip";
@@ -15,10 +16,8 @@ import useSWR, { mutate } from "swr";
 
 import { Class, CreateClassDialog } from "../../modules/classes";
 import { Schedule } from "../../modules/schedules";
-import fetcher from "../../../utils/fetcher";
 import { daysOfWeek } from "../../constants";
-import Snackbar from "@mui/material/Snackbar";
-import LinearProgress from "@mui/material/LinearProgress";
+import fetcher from "../../../utils/fetcher";
 
 // TODO allow user to select a color for each class in admin settings
 
@@ -65,7 +64,7 @@ export default function Classes() {
     setIsCreateClassDialogOpen(false);
   };
 
-  const handleCreateClass = async (data, resetForm) => {
+  const handleCreateClass = async (data, resetForm: () => void) => {
     try {
       const response = await fetch(`/api/classes`, {
         method: "POST",
