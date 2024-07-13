@@ -23,8 +23,8 @@ export async function findAllStudents(): Promise<Student[]> {
         student.english_name,
         student.current_school,
         student.textbook_publisher,
-        student.join_date, 
-        student.leave_date, 
+        student.join_date::timestamp at time zone 'UTC' as join_date, 
+        student.leave_date::timestamp at time zone 'UTC' as leave_date, 
         grade.id AS grade_id,
         grade.name AS grade_name
       FROM student
@@ -62,8 +62,8 @@ export async function findStudentById(
         student.english_name,
         student.current_school,
         student.textbook_publisher,
-        student.join_date, 
-        student.leave_date, 
+        student.join_date::timestamp at time zone 'UTC' as date_of_birth, 
+        student.leave_date::timestamp at time zone 'UTC' as date_of_birth, 
         grade.id AS grade_id,
         grade.name AS grade_name
       FROM student

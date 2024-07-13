@@ -9,6 +9,8 @@ import React from "react";
 import useSWR from "swr";
 
 import { CreateClassDTO } from "../dtos";
+import { Grade } from "../../grades";
+import { Staff } from "../../persons/staffs";
 import ClassFormFields from "./ClassFormFields";
 import fetcher from "../../../../utils/fetcher";
 
@@ -31,12 +33,12 @@ export default function CreateClassDialog({
     data: staffsData,
     error: staffsError,
     isLoading: staffsLoading,
-  } = useSWR("/api/persons/staffs", fetcher);
+  } = useSWR<Staff[]>("/api/persons/staffs", fetcher);
   const {
     data: gradesData,
     error: gradesError,
     isLoading: gradesLoading,
-  } = useSWR("/api/grades", fetcher);
+  } = useSWR<Grade[]>("/api/grades", fetcher);
 
   const teachers = staffsData || [];
   const grades = gradesData || [];
@@ -53,49 +55,47 @@ export default function CreateClassDialog({
   };
 
   return (
-    <>
-      <Dialog disablePortal open={open} onClose={onClose}>
-        <form onSubmit={handleSubmit}>
-          <DialogTitle>New Class</DialogTitle>
-          <DialogContent>
-            {staffsLoading || gradesLoading ? (
-              <CircularProgress />
-            ) : (
-              <>
-                {staffsError && (
-                  <Alert severity="error">
-                    Failed to load staff data: {staffsError.message}
-                  </Alert>
-                )}
-                {gradesError && (
-                  <Alert severity="error">
-                    Failed to load grades data: {gradesError.message}
-                  </Alert>
-                )}
-                {!staffsError && !gradesError && (
-                  <ClassFormFields
-                    classData={newClass}
-                    setFormData={setNewClass}
-                    grades={grades}
-                    teachers={teachers}
-                    setHasError={setHasError}
-                  />
-                )}
-              </>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose}>Cancel</Button>
-            {/* calling onSubmit at the <form> level instead of the button level ensures that 
+    <Dialog disablePortal open={open} onClose={onClose}>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>New Class</DialogTitle>
+        <DialogContent>
+          {staffsLoading || gradesLoading ? (
+            <CircularProgress />
+          ) : (
+            <>
+              {staffsError && (
+                <Alert severity="error">
+                  Failed to load staff data: {staffsError.message}
+                </Alert>
+              )}
+              {gradesError && (
+                <Alert severity="error">
+                  Failed to load grades data: {gradesError.message}
+                </Alert>
+              )}
+              {!staffsError && !gradesError && (
+                <ClassFormFields
+                  classData={newClass}
+                  setFormData={setNewClass}
+                  grades={grades}
+                  teachers={teachers}
+                  setHasError={setHasError}
+                />
+              )}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          {/* calling onSubmit at the <form> level instead of the button level ensures that 
             the form can be submitted not only when the submit button is clicked but also 
             when the user presses the Enter key while focusing on any input within the form.
             This is more ideal because it works with keyboard actions and ensures accessibility */}
-            <Button autoFocus type="submit">
-              Submit
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    </>
+          <Button autoFocus type="submit">
+            Submit
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
   );
 }

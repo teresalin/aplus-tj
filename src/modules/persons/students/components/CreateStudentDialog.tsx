@@ -1,4 +1,6 @@
+import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -7,7 +9,6 @@ import React from "react";
 import useSWR from "swr";
 
 import { CreateStudentDTO } from "../dtos/create-student.dto";
-import { Dayjs } from "dayjs";
 import { Grade } from "../../../grades";
 import fetcher from "../../../../../utils/fetcher";
 import StudentFormFields from "./StudentFormFields";
@@ -25,8 +26,9 @@ export default function CreateStudentDialog({
 }: ICreateStudentDialogProps) {
   const initialStudentState = {} as CreateStudentDTO;
   const [newStudent, setNewStudent] = React.useState(initialStudentState);
-  const { data } = useSWR("/api/grades", fetcher);
-  const grades = (data as Grade[]) || [];
+
+  const { data, error, isLoading } = useSWR<Grade[]>("/api/grades", fetcher);
+  const grades = data || [];
 
   const handleSubmit: React.FormEventHandler = async (
     event: React.FormEvent
@@ -40,11 +42,24 @@ export default function CreateStudentDialog({
       <form onSubmit={handleSubmit}>
         <DialogTitle>New Student</DialogTitle>
         <DialogContent>
-          <StudentFormFields
-            student={newStudent}
-            setFormData={setNewStudent}
-            grades={grades}
-          />
+          {isLoading ? (
+            <CircularProgress />
+          ) : (
+            <>
+              {error && (
+                <Alert severity="error">
+                  Failed to load grade data: {error.message}
+                </Alert>
+              )}
+              {!error && (
+                <StudentFormFields
+                  student={newStudent}
+                  setFormData={setNewStudent}
+                  grades={grades}
+                />
+              )}
+            </>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

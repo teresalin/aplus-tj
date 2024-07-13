@@ -20,7 +20,6 @@ import {
   CreateStudentDialog,
   Student,
 } from "../../../modules/persons/students";
-
 import BaseDataGrid from "../../../modules/persons/BaseDataGrid";
 import fetcher from "../../../../utils/fetcher";
 import PersonsTabs from "../../../modules/persons/PersonsTabs";
@@ -52,7 +51,10 @@ export default function PersonGrid() {
     setIsCreateStudentDialogOpen(false);
   };
 
-  const handleCreateStudent = async (data, resetForm) => {
+  const handleCreateStudent = async (
+    data: { email: string },
+    resetForm: () => void
+  ) => {
     try {
       const normalizedEmail = data.email.trim().toLowerCase();
 
@@ -180,7 +182,6 @@ export default function PersonGrid() {
   };
 
   const initialColumnVisibilityModel: GridColumnVisibilityModel = {
-    detailPanel: true,
     personId: false,
     name: true,
     gender: false,

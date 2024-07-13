@@ -1,12 +1,17 @@
+import Alert, { AlertColor } from "@mui/material/Alert";
 import { useRouter } from "next/router";
 import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import dayjs from "dayjs";
 import React from "react";
-import useSWR from "swr";
+import timezone from "dayjs/plugin/timezone";
+import useSWR, { mutate } from "swr";
+import utc from "dayjs/plugin/utc";
 import {
   GridColDef,
   GridColumnVisibilityModel,
+  GridRenderCellParams,
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
@@ -15,63 +20,81 @@ import BaseDataGrid from "../../../modules/persons/BaseDataGrid";
 import CreateStaffDialog from "../../../modules/persons/staffs/components/CreateStaffDialog";
 import fetcher from "../../../../utils/fetcher";
 import PersonsTabs from "../../../modules/persons/PersonsTabs";
+import Snackbar from "@mui/material/Snackbar";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export default function PersonGrid() {
   const router = useRouter();
 
   const [isCreateStaffDialogOpen, setIsCreateStaffDialogOpen] =
     React.useState(false);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] =
+    React.useState<AlertColor>("error");
 
-  const { data, isLoading, error } = useSWR("/api/persons/staffs", fetcher);
-  const staffs = (data as Staff[]) || [];
+  const { data, isLoading, error } = useSWR<Staff[]>(
+    "/api/persons/staffs",
+    fetcher
+  );
+  const staffs = data || [];
 
   const handleAddButtonClick = () => {
     setIsCreateStaffDialogOpen(true);
   };
 
-  const closeDialog = () => {
+  const handleCloseCreateStaffDialog = () => {
     setIsCreateStaffDialogOpen(false);
   };
 
-  const handleCreateStaff = async (data) => {
-    const url = "/api/persons/staffs/index";
+  const handleCreateStaff = async (
+    data: { email: string },
+    resetForm: () => void
+  ) => {
+    try {
+      const normalizedEmail = data.email.trim().toLowerCase();
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+      const normalizedData = {
+        ...data,
+        email: normalizedEmail,
+      };
 
-    if (response.ok) {
-      // TODO close dialog
-    } else {
-      console.error("Error creating staff:", response.statusText);
+      const response = await fetch(`/api/persons/staffs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(normalizedData),
+      });
+
+      const responseData = await response.json();
+      if (response.ok) {
+        handleCloseCreateStaffDialog();
+        mutate("/api/persons/staffs");
+        setSnackbarMessage("Staff created successfully");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        resetForm();
+      } else {
+        console.error("Error creating staff:", responseData);
+        setSnackbarMessage(responseData.error.message);
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setSnackbarMessage("An unexpected error occurred");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
-  const onRowClick = (data: { personId: string }) => {
-    router.push(`/persons/staffs/[id]`, `/persons/staffs/${data.personId}`);
-  };
-
-  const renderChip = (params) => {
-    return params.value ? (
-      <Chip
-        // icon={<CheckIcon />}
-        label="Active"
-        size="small"
-        sx={{ height: "20px", paddingX: 1 }}
-        style={{ backgroundColor: "#bef0cc", color: "#507b67" }}
-      />
-    ) : (
-      <Chip
-        // icon={<CloseIcon />}
-        label="Inactive"
-        size="small"
-        sx={{ height: "20px" }}
-        style={{ backgroundColor: "#f9e8e8", color: "#9f3d49" }}
-      />
+  const onRowClick = (data: { staffId: string }) => {
+    router.push(
+      `/persons/staffs/[staff_id]/details`,
+      `/persons/staffs/${data.staffId}/details`
     );
   };
 
@@ -115,7 +138,7 @@ export default function PersonGrid() {
         if (params.value == null) {
           return "";
         }
-        return dayjs(params.value).format("YYYY-MM-DD");
+        return dayjs(params.value).utc().format("YYYY-MM-DD");
       },
     },
     {
@@ -123,7 +146,12 @@ export default function PersonGrid() {
       headerName: "Active",
       minWidth: 100,
       flex: 1,
-      renderCell: renderChip,
+      renderCell: (params: GridRenderCellParams<any, Boolean>) =>
+        params.value ? (
+          <CheckCircleIcon color="success" />
+        ) : (
+          <CancelIcon color="error" />
+        ),
     },
     // TODO fix failed prop type warning
     {
@@ -153,7 +181,6 @@ export default function PersonGrid() {
   };
 
   const initialColumnVisibilityModel: GridColumnVisibilityModel = {
-    detailPanel: true,
     personId: false,
     name: true,
     gender: false,
@@ -178,16 +205,30 @@ export default function PersonGrid() {
           columns={columns}
           isLoading={isLoading}
           onAddClick={handleAddButtonClick}
-          onRowClick={onRowClick}
+          onRowClick={(params) => onRowClick(params.row)}
           getTogglableColumns={getTogglableColumns}
           initialColumnVisibilityModel={initialColumnVisibilityModel}
         />
       </Box>
       <CreateStaffDialog
         open={isCreateStaffDialogOpen}
-        onClose={closeDialog}
+        onClose={handleCloseCreateStaffDialog}
         onSubmit={handleCreateStaff}
       />
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
