@@ -5,6 +5,6 @@ export interface Person {
   phone: string;
   email: string;
   dateOfBirth: Date;
-  notes: string;
+  notes?: string;
   active: boolean;
 }

@@ -16,8 +16,10 @@ import {
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
 
-import { CreateStudentDialog } from "../../../modules/persons/students";
-import { Student } from "../../../modules/persons/students/student.model";
+import {
+  CreateStudentDialog,
+  Student,
+} from "../../../modules/persons/students";
 import BaseDataGrid from "../../../modules/persons/BaseDataGrid";
 import fetcher from "../../../../utils/fetcher";
 import PersonsTabs from "../../../modules/persons/PersonsTabs";
@@ -49,33 +51,43 @@ export default function PersonGrid() {
     setIsCreateStudentDialogOpen(false);
   };
 
-  const handleCreateStudent = async (data, resetForm) => {
-    const normalizedEmail = data.email.trim().toLowerCase();
+  const handleCreateStudent = async (
+    data: { email: string },
+    resetForm: () => void
+  ) => {
+    try {
+      const normalizedEmail = data.email.trim().toLowerCase();
 
-    const normalizedData = {
-      ...data,
-      email: normalizedEmail,
-    };
+      const normalizedData = {
+        ...data,
+        email: normalizedEmail,
+      };
 
-    const response = await fetch(`/api/persons/students`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(normalizedData),
-    });
+      const response = await fetch(`/api/persons/students`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(normalizedData),
+      });
 
-    const responseData = await response.json();
-    if (response.ok) {
-      handleCloseCreateStudentDialog();
-      mutate("/api/persons/students");
-      setSnackbarMessage("Student created successfully");
-      setSnackbarSeverity("success");
-      setSnackbarOpen(true);
-      resetForm();
-    } else {
-      console.error("Error creating student:", responseData);
-      setSnackbarMessage(responseData.error.message);
+      const responseData = await response.json();
+      if (response.ok) {
+        handleCloseCreateStudentDialog();
+        mutate("/api/persons/students");
+        setSnackbarMessage("Student created successfully");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        resetForm();
+      } else {
+        console.error("Error creating student:", responseData);
+        setSnackbarMessage(responseData.error.message);
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setSnackbarMessage("An unexpected error occurred");
       setSnackbarSeverity("error");
       setSnackbarOpen(true);
     }
@@ -170,7 +182,6 @@ export default function PersonGrid() {
   };
 
   const initialColumnVisibilityModel: GridColumnVisibilityModel = {
-    detailPanel: true,
     personId: false,
     name: true,
     gender: false,

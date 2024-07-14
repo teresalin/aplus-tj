@@ -1,5 +1,3 @@
-import { Grade } from "../../../../pages/api/grades";
-
 export interface CreateStudentDTO {
   name: string;
   englishName?: string;
@@ -9,7 +7,7 @@ export interface CreateStudentDTO {
   phone: string;
   email: string;
   currentSchool: string;
-  grade: Grade;
+  gradeId: number;
   textbookPublisher: string;
   joinDate: Date;
   leaveDate?: Date;

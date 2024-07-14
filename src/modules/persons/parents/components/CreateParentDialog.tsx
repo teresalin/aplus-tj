@@ -12,7 +12,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
-import { Grade } from "../../../../pages/api/grades";
+import { Grade } from "../../../grades";
 import { Parent } from "../types";
 import fetcher from "../../../../../utils/fetcher";
 

@@ -1,6 +1,7 @@
 import { CreateStudentDTO, UpdateStudentDTO } from "./dtos";
 import { getDBClient } from "../../../../lib/db-connector";
-import { Student } from "./student.model";
+import { mapRowToStudent } from "./student.mapper";
+import { Student } from "./types";
 import { UniqueConstraintError } from "../../../../utils/CustomError";
 
 export async function findAllStudents(): Promise<Student[]> {
@@ -22,16 +23,16 @@ export async function findAllStudents(): Promise<Student[]> {
         student.english_name,
         student.current_school,
         student.textbook_publisher,
-        student.join_date, 
-        student.leave_date, 
+        student.join_date::timestamp at time zone 'UTC' as join_date, 
+        student.leave_date::timestamp at time zone 'UTC' as leave_date, 
         grade.id AS grade_id,
         grade.name AS grade_name
       FROM student
       INNER JOIN person ON student.person_id = person.id
       INNER JOIN grade ON student.grade_id = grade.id;
-    `
+      `
     );
-    return rows.map((row) => new Student(row));
+    return rows.map(mapRowToStudent);
   } catch (error) {
     console.error("Error fetching students from database:", error);
     throw error;
@@ -61,18 +62,18 @@ export async function findStudentById(
         student.english_name,
         student.current_school,
         student.textbook_publisher,
-        student.join_date, 
-        student.leave_date, 
+        student.join_date::timestamp at time zone 'UTC' as date_of_birth, 
+        student.leave_date::timestamp at time zone 'UTC' as date_of_birth, 
         grade.id AS grade_id,
         grade.name AS grade_name
       FROM student
       INNER JOIN person ON student.person_id = person.id
       INNER JOIN grade ON student.grade_id = grade.id
       WHERE student.id = $1;
-    `,
+      `,
       [studentId]
     );
-    return rows.length ? new Student(rows[0]) : null;
+    return rows.length ? mapRowToStudent(rows[0]) : null;
   } catch (error) {
     console.error("Error retrieving student from database:", error);
     throw error;
@@ -99,6 +100,7 @@ export async function createStudent(dto: CreateStudentDTO) {
         dto.email,
         dto.dateOfBirth,
         dto.notes,
+        "t",
       ],
     };
     const result = await client.query(insertPersonQuery);
@@ -114,7 +116,7 @@ export async function createStudent(dto: CreateStudentDTO) {
         dto.englishName,
         dto.currentSchool,
         dto.textbookPublisher,
-        dto.grade.id,
+        dto.gradeId,
         dto.joinDate,
         dto.leaveDate,
       ],
@@ -130,6 +132,7 @@ export async function createStudent(dto: CreateStudentDTO) {
         "A student with the same name, phone, and date of birth already exists."
       );
     } else {
+      console.error("Error creating student in the database:", error);
       throw error;
     }
   } finally {
@@ -165,15 +168,15 @@ export async function updateStudent(dto: UpdateStudentDTO) {
 
     const updateStudentQuery = {
       text: `
-          UPDATE student
-          SET english_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, updated = NOW()
-          WHERE person_id = $7;
-        `,
+        UPDATE student
+        SET english_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, updated = NOW()
+        WHERE person_id = $7;
+      `,
       values: [
         dto.englishName,
         dto.currentSchool,
         dto.textbookPublisher,
-        dto.grade?.id,
+        dto.gradeId,
         dto.joinDate,
         dto.leaveDate,
         personId,
@@ -190,6 +193,7 @@ export async function updateStudent(dto: UpdateStudentDTO) {
         "A student with the same name, phone, and date of birth already exists."
       );
     } else {
+      console.error("Error updating student in the database:", error);
       throw error;
     }
   } finally {

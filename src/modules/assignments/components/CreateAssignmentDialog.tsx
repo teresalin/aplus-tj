@@ -6,7 +6,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import useSWR from "swr";
 
-import { Assignment } from "../types";
+import { CreateAssignmentDTO } from "../dtos";
 import { Dayjs } from "dayjs";
 import AssignmentFormFields from "./AssignmentFormFields";
 import fetcher from "../../../../utils/fetcher";
@@ -14,7 +14,7 @@ import fetcher from "../../../../utils/fetcher";
 export interface ICreateAssignmentDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: Assignment) => Promise<void>;
+  onSubmit: (data: CreateAssignmentDTO) => Promise<void>;
 }
 
 export default function CreateAssignmentDialog({
@@ -22,7 +22,10 @@ export default function CreateAssignmentDialog({
   onClose,
   onSubmit,
 }: ICreateAssignmentDialogProps) {
-  const [newAssignment, setNewAssignment] = React.useState({} as Assignment);
+  // TODO create two functions, one for update and one for create and make the form components reusable
+  const [newAssignment, setNewAssignment] = React.useState(
+    {} as CreateAssignmentDTO
+  );
   const { data } = useSWR("/api/classes", fetcher);
   const classes = data || [];
 

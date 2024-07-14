@@ -1,11 +1,11 @@
-import { Role } from "../../../../pages/api/persons/staffs/roles";
+import { Role } from "../../roles";
 import { Person } from "../../types";
 
 export interface Staff extends Person {
   staffId: number;
   role: Role;
   joinDate: Date;
-  leaveDate: Date;
+  leaveDate?: Date;
 }
 
 export interface StaffSummary {

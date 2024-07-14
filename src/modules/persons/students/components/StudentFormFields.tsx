@@ -1,6 +1,6 @@
 import { DatePicker } from "@mui/x-date-pickers";
 import Box from "@mui/material/Box";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";
@@ -10,28 +10,49 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import utc from "dayjs/plugin/utc";
 
-import { Grade } from "../../../../pages/api/grades";
+import { CreateStudentDTO, UpdateStudentDTO } from "../dtos";
+import { Grade } from "../../../grades";
 
 dayjs.extend(utc);
 
 export interface IStudentFormFieldsProps {
-  student: any;
-  onChange: (
-    field: string,
-    value: string | Date | Dayjs | null | Grade
-  ) => void;
+  student: CreateStudentDTO | UpdateStudentDTO;
+  setFormData: React.Dispatch<
+    React.SetStateAction<CreateStudentDTO | UpdateStudentDTO>
+  >;
   grades: Grade[];
 }
 
 const StudentFormFields = ({
   student,
-  onChange,
+  setFormData,
   grades,
 }: IStudentFormFieldsProps) => {
+  const {
+    name,
+    englishName,
+    gender,
+    dateOfBirth,
+    notes,
+    phone,
+    email,
+    currentSchool,
+    gradeId,
+    textbookPublisher,
+    joinDate,
+    leaveDate,
+  } = student;
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
+  };
+
   const handleGradeChange = (event: SelectChangeEvent<number>) => {
     const value = parseInt(event.target.value as string, 10);
-    const selectedGrade = grades.find((grade) => grade.id === value);
-    onChange("grade", selectedGrade || ({} as Grade));
+    handleInputChange("gradeId", value || 0);
   };
 
   return (
@@ -51,8 +72,8 @@ const StudentFormFields = ({
               type="text"
               variant="outlined"
               margin="normal"
-              value={student.name || ""}
-              onChange={(e) => onChange("name", e.target.value)}
+              value={name || ""}
+              onChange={(e) => handleInputChange("name", e.target.value)}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -64,8 +85,8 @@ const StudentFormFields = ({
               type="text"
               variant="outlined"
               margin="normal"
-              value={student.englishName || ""}
-              onChange={(e) => onChange("englishName", e.target.value)}
+              value={englishName || ""}
+              onChange={(e) => handleInputChange("englishName", e.target.value)}
             />
           </Grid>
         </Grid>
@@ -74,8 +95,8 @@ const StudentFormFields = ({
           format="YYYY-MM-DD"
           // We want to put a null value here so the date picker field
           // does not complain and show a red error outline
-          value={student.dateOfBirth ? dayjs(student.dateOfBirth).utc() : null}
-          onChange={(date) => onChange("dateOfBirth", date)}
+          value={dateOfBirth ? dayjs(dateOfBirth).utc() : null}
+          onChange={(date) => handleInputChange("dateOfBirth", date)}
           sx={{ marginTop: "16px", marginBottom: "8px", width: "100%" }}
           slotProps={{
             textField: {
@@ -92,8 +113,8 @@ const StudentFormFields = ({
           label="Select a gender"
           margin="normal"
           select
-          value={student.gender || ""}
-          onChange={(e) => onChange("gender", e.target.value)}
+          value={gender || ""}
+          onChange={(e) => handleInputChange("gender", e.target.value)}
         >
           <MenuItem value="Male">Male</MenuItem>
           <MenuItem value="Female">Female</MenuItem>
@@ -111,8 +132,8 @@ const StudentFormFields = ({
           margin="normal"
           placeholder="Hobbies, nicknames, etc."
           InputLabelProps={{ shrink: true }}
-          value={student.notes || ""}
-          onChange={(e) => onChange("notes", e.target.value)}
+          value={notes || ""}
+          onChange={(e) => handleInputChange("notes", e.target.value)}
         />
       </Box>
       <Box mt={2}>
@@ -128,8 +149,8 @@ const StudentFormFields = ({
           type="email"
           variant="outlined"
           margin="normal"
-          value={student.email || ""}
-          onChange={(e) => onChange("email", e.target.value)}
+          value={email || ""}
+          onChange={(e) => handleInputChange("email", e.target.value)}
         />
         <TextField
           fullWidth
@@ -140,8 +161,8 @@ const StudentFormFields = ({
           type="tel"
           variant="outlined"
           margin="normal"
-          value={student.phone || ""}
-          onChange={(e) => onChange("phone", e.target.value)}
+          value={phone || ""}
+          onChange={(e) => handleInputChange("phone", e.target.value)}
         />
       </Box>
       <Box mt={2}>
@@ -157,8 +178,8 @@ const StudentFormFields = ({
           type="text"
           variant="outlined"
           margin="normal"
-          value={student.currentSchool || ""}
-          onChange={(e) => onChange("currentSchool", e.target.value)}
+          value={currentSchool || ""}
+          onChange={(e) => handleInputChange("currentSchool", e.target.value)}
         />
         <Box mt="16px" mb="8px">
           <FormControl fullWidth>
@@ -171,7 +192,7 @@ const StudentFormFields = ({
               name="grade"
               label={"Select a grade"}
               labelId="grade-select-label"
-              value={student.grade?.id || ""}
+              value={gradeId || ""}
               onChange={handleGradeChange}
             >
               {grades &&
@@ -192,8 +213,10 @@ const StudentFormFields = ({
           type="text"
           variant="outlined"
           margin="normal"
-          value={student.textbookPublisher || ""}
-          onChange={(e) => onChange("textbookPublisher", e.target.value)}
+          value={textbookPublisher || ""}
+          onChange={(e) =>
+            handleInputChange("textbookPublisher", e.target.value)
+          }
         />
       </Box>
       <Box mt={2}>
@@ -206,8 +229,8 @@ const StudentFormFields = ({
               <DatePicker
                 label="Join Date"
                 format="YYYY-MM-DD"
-                value={student.joinDate ? dayjs(student.joinDate).utc() : null}
-                onChange={(date) => onChange("joinDate", date)}
+                value={joinDate ? dayjs(joinDate).utc() : null}
+                onChange={(date) => handleInputChange("joinDate", date)}
                 slotProps={{
                   textField: {
                     required: true,
@@ -219,10 +242,8 @@ const StudentFormFields = ({
               <DatePicker
                 label="Leave Date"
                 format="YYYY-MM-DD"
-                value={
-                  student.leaveDate ? dayjs(student.leaveDate).utc() : null
-                }
-                onChange={(date) => onChange("leaveDate", date)}
+                value={leaveDate ? dayjs(leaveDate).utc() : null}
+                onChange={(date) => handleInputChange("leaveDate", date)}
               />
             </Grid>
           </Grid>

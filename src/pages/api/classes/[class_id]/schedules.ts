@@ -2,13 +2,6 @@ import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseSchedule } from "../../../../../utils/apiUtils";
 
-export interface Schedule {
-  id?: number;
-  dayOfWeek: string;
-  startTime: string;
-  endTime: string;
-}
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
 

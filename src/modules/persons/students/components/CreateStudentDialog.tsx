@@ -1,25 +1,17 @@
-import React from "react";
-import { DatePicker } from "@mui/x-date-pickers";
-import Box from "@mui/material/Box";
+import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import FormControl from "@mui/material/FormControl";
-import Grid from "@mui/material/Grid";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import React from "react";
 import useSWR from "swr";
 
 import { CreateStudentDTO } from "../dtos/create-student.dto";
-import { Grade } from "../../../../pages/api/grades";
+import { Grade } from "../../../grades";
 import fetcher from "../../../../../utils/fetcher";
 import StudentFormFields from "./StudentFormFields";
-import { Dayjs } from "dayjs";
 
 export interface ICreateStudentDialogProps {
   open: boolean;
@@ -34,18 +26,9 @@ export default function CreateStudentDialog({
 }: ICreateStudentDialogProps) {
   const initialStudentState = {} as CreateStudentDTO;
   const [newStudent, setNewStudent] = React.useState(initialStudentState);
-  const { data } = useSWR("/api/grades", fetcher);
-  const grades = (data as Grade[]) || [];
 
-  const handleInputChange = (
-    field: string,
-    value: string | Date | Dayjs | null
-  ) => {
-    setNewStudent((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-  };
+  const { data, error, isLoading } = useSWR<Grade[]>("/api/grades", fetcher);
+  const grades = data || [];
 
   const handleSubmit: React.FormEventHandler = async (
     event: React.FormEvent
@@ -59,11 +42,24 @@ export default function CreateStudentDialog({
       <form onSubmit={handleSubmit}>
         <DialogTitle>New Student</DialogTitle>
         <DialogContent>
-          <StudentFormFields
-            student={newStudent}
-            onChange={handleInputChange}
-            grades={grades}
-          />
+          {isLoading ? (
+            <CircularProgress />
+          ) : (
+            <>
+              {error && (
+                <Alert severity="error">
+                  Failed to load grade data: {error.message}
+                </Alert>
+              )}
+              {!error && (
+                <StudentFormFields
+                  student={newStudent}
+                  setFormData={setNewStudent}
+                  grades={grades}
+                />
+              )}
+            </>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
