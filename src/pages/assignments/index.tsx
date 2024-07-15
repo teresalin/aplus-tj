@@ -3,7 +3,9 @@ import Box from "@mui/material/Box";
 import dayjs from "dayjs";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
+import timezone from "dayjs/plugin/timezone";
 import useSWR from "swr";
+import utc from "dayjs/plugin/utc";
 import {
   GridColDef,
   GridValueFormatterParams,
@@ -19,6 +21,9 @@ import {
 import fetcher from "../../../utils/fetcher";
 import RenderMenu from "../../components/grid/RenderMenu";
 import BaseDataGrid from "../../modules/persons/BaseDataGrid";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 function a11yProps(index) {
   return {
