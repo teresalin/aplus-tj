@@ -1,65 +1,84 @@
-import { FormEvent, FormEventHandler } from "react";
-import { Dayjs } from "dayjs";
+import React from "react";
+import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import React from "react";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 import { Assignment } from "../types";
+import { assignmentToUpdateAssignmentDTO } from "../assignment.transformers";
+import { Class } from "../../classes";
+import { UpdateAssignmentDTO } from "../dtos";
 import AssignmentFormFields from "./AssignmentFormFields";
 import fetcher from "../../../../utils/fetcher";
 
 export interface IUpdateAssignmentDialogProps {
-  assignment: Assignment | null;
+  existingAssignment: Assignment | null;
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: Assignment) => Promise<void>;
+  onSubmit: (data: UpdateAssignmentDTO, resetForm: () => void) => Promise<void>;
 }
 
 export default function UpdateAssignmentDialog({
-  assignment,
+  existingAssignment,
   open,
   onClose,
   onSubmit,
 }: IUpdateAssignmentDialogProps) {
-  const [formData, setFormData] = React.useState({} as Assignment);
-  const { data } = useSWR(open ? "/api/classes" : null, fetcher);
+  const initialAssignmentState = {} as UpdateAssignmentDTO;
+  const [formData, setFormData] = React.useState(initialAssignmentState);
+
+  const { data, error, isLoading } = useSWR<Class[]>("/api/classes", fetcher);
   const classes = data || [];
 
   React.useEffect(() => {
-    if (open && assignment) {
-      setFormData(assignment);
+    if (open && existingAssignment) {
+      mutate(`/api/assignments/${existingAssignment.id}`).then(() => {
+        setFormData(assignmentToUpdateAssignmentDTO(existingAssignment));
+      });
     }
-  }, [assignment]);
+  }, [open, existingAssignment]);
 
-  const handleInputChange = (
-    field: string,
-    value: string | Date | Dayjs | null
+  const handleSubmit: React.FormEventHandler = async (
+    event: React.FormEvent
   ) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
+    event.preventDefault();
+    await onSubmit(formData as UpdateAssignmentDTO, () =>
+      setFormData(initialAssignmentState)
+    );
   };
 
-  const handleSubmit: FormEventHandler = (event: FormEvent) => {
-    event.preventDefault();
-    onSubmit(formData);
+  const handleClose = () => {
+    onClose();
+    setFormData(initialAssignmentState);
   };
 
   return (
-    <Dialog disablePortal open={open} onClose={onClose}>
+    <Dialog disablePortal open={open} onClose={handleClose}>
       <form onSubmit={handleSubmit}>
         <DialogTitle>Update Assignment</DialogTitle>
         <DialogContent>
-          <AssignmentFormFields
-            assignment={formData}
-            onChange={handleInputChange}
-            classes={classes}
-          />
+          {isLoading ? (
+            <CircularProgress />
+          ) : (
+            <>
+              {error && (
+                <Alert severity="error">
+                  Failed to load class data: {error.message}
+                </Alert>
+              )}
+              {!error && (
+                <AssignmentFormFields
+                  assignment={formData}
+                  setFormData={setFormData}
+                  classes={classes}
+                />
+              )}
+            </>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

@@ -7,7 +7,7 @@ export function assignmentToUpdateAssignmentDTO(
   return {
     id: entity.id,
     name: entity.name,
-    description: entity.name,
+    description: entity.description,
     classId: entity.class.id,
     dueDate: entity.dueDate,
   };
@@ -19,7 +19,7 @@ export function assignmentToCreateAssignmentDTO(
   return {
     name: entity.name,
     classId: entity.class?.id,
-    description: entity.name,
+    description: entity.description,
     dueDate: entity.dueDate,
   };
 }
