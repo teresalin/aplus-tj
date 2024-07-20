@@ -6,29 +6,38 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
+import { Assignment } from "../types";
+
 export interface IDeleteAssignmentDialogProps {
+  assignment: Assignment | null;
   open: boolean;
   onClose: () => void;
-  onSubmit;
+  onSubmit: (data: Assignment) => Promise<void>;
 }
 
 export default function DeleteAssignmentDialog({
+  assignment,
   open,
   onClose,
   onSubmit,
 }: IDeleteAssignmentDialogProps) {
-  const handleSubmit = () => {
-    onSubmit();
+  const handleSubmit: React.FormEventHandler = async (
+    event: React.FormEvent
+  ) => {
+    event.preventDefault();
+    if (assignment) {
+      await onSubmit(assignment);
+    }
   };
 
   return (
-    <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+    <Dialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <form onSubmit={handleSubmit}>
         <DialogTitle id="alert-dialog-title">{"Delete Assignment"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
@@ -38,11 +47,11 @@ export default function DeleteAssignmentDialog({
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button autoFocus onClick={handleSubmit}>
+          <Button autoFocus type="submit">
             Delete
           </Button>
         </DialogActions>
-      </Dialog>
-    </>
+      </form>
+    </Dialog>
   );
 }

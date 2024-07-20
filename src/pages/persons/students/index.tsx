@@ -164,7 +164,7 @@ export default function PersonGrid() {
         if (params.value == null) {
           return "";
         }
-        return dayjs(params.value).format("YYYY-MM-DD");
+        return dayjs(params.value).utc().format("YYYY-MM-DD");
       },
     },
   ];

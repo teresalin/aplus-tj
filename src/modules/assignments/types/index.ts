@@ -1,8 +1,9 @@
+import { ClassSummary } from "../../classes";
+
 export interface Assignment {
   id: number;
   name: string;
   description?: string;
-  className?: string;
+  class: ClassSummary;
   dueDate: Date;
-  created: Date;
 }

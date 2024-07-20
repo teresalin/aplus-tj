@@ -1,5 +1,5 @@
 export interface UpdateAssignmentDTO {
-  id?: number;
+  id: number;
   name?: string;
   classId?: number;
   description?: string;

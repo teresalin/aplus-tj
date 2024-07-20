@@ -38,7 +38,6 @@ export default function ClassesTab() {
 
   const handleSubmit = (data) => {
     // TODO implement submit
-    console.log(data);
   };
 
   if (error) {

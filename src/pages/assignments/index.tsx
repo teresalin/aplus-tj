@@ -1,9 +1,13 @@
-import React from "react";
+import Alert, { AlertColor } from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import dayjs from "dayjs";
+import React from "react";
+import Snackbar from "@mui/material/Snackbar";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import useSWR from "swr";
+import timezone from "dayjs/plugin/timezone";
+import useSWR, { mutate } from "swr";
+import utc from "dayjs/plugin/utc";
 import {
   GridColDef,
   GridValueFormatterParams,
@@ -13,12 +17,16 @@ import {
 import {
   Assignment,
   CreateAssignmentDialog,
+  CreateAssignmentDTO,
   DeleteAssignmentDialog,
   UpdateAssignmentDialog,
 } from "../../modules/assignments";
+import BaseDataGrid from "../../modules/persons/BaseDataGrid";
 import fetcher from "../../../utils/fetcher";
 import RenderMenu from "../../components/grid/RenderMenu";
-import BaseDataGrid from "../../modules/persons/BaseDataGrid";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 function a11yProps(index) {
   return {
@@ -31,12 +39,19 @@ const assignmentTypes = ["all", "upcoming", "past due"];
 
 export default function AssignmentGrid() {
   const [tab, setTab] = React.useState("all");
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = React.useState(false);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [isUpdateAssignmentDialogOpen, setIsUpdateAssignmentDialogOpen] =
+    React.useState(false);
+  const [isCreateAssignmentDialogOpen, setIsCreateAssignmentDialogOpen] =
+    React.useState(false);
+  const [isDeleteAssignmentDialogOpen, setIsDeleteAssignmentDialogOpen] =
+    React.useState(false);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] =
+    React.useState<AlertColor>("error");
   const [selectedRow, setSelectedRow] = React.useState<Assignment | null>(null);
 
-  const { data, isLoading, error, mutate } = useSWR(
+  const { data, isLoading, error } = useSWR<Assignment[]>(
     `/api/assignments?filter=${tab}`,
     fetcher
   );
@@ -47,38 +62,72 @@ export default function AssignmentGrid() {
   };
 
   const handleAddButtonClick = () => {
-    setIsCreateDialogOpen(true);
+    setIsCreateAssignmentDialogOpen(true);
   };
 
-  const handleEditClick = (row) => {
+  const handleEditClick = (row: Assignment) => {
     setSelectedRow(row);
-    setIsUpdateDialogOpen(true);
+    setIsUpdateAssignmentDialogOpen(true);
   };
 
-  const handleDeleteClick = (row) => {
+  const handleDeleteClick = (row: Assignment) => {
     setSelectedRow(row);
-    setIsDeleteDialogOpen(true);
+    setIsDeleteAssignmentDialogOpen(true);
   };
 
-  const handleCloseCreateDialog = () => {
-    setIsCreateDialogOpen(false);
+  const handleCloseCreateAssignmentDialog = () => {
+    setIsCreateAssignmentDialogOpen(false);
   };
 
-  const handleCloseUpdateDialog = () => {
-    setIsUpdateDialogOpen(false);
+  const handleCloseUpdateAssignmentDialog = () => {
+    setIsUpdateAssignmentDialogOpen(false);
     setSelectedRow(null);
   };
 
-  const handleOpenDeleteDialog = () => {
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleCloseDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
+  const handleCloseDeleteAssignmentDialog = () => {
+    setIsDeleteAssignmentDialogOpen(false);
     setSelectedRow(null);
   };
 
-  const handleUpdateAssignment = async (data: Assignment) => {
+  const handleCreateAssignment = async (
+    data: CreateAssignmentDTO,
+    resetForm: () => void
+  ) => {
+    const response = await fetch("/api/assignments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const responseData = await response.json();
+    try {
+      if (response.ok) {
+        handleCloseCreateAssignmentDialog();
+        mutate(`/api/assignments?filter=${tab}`);
+        setSnackbarMessage("Assignment created successfully");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        resetForm();
+      } else {
+        console.error("Error creating assignment:", responseData);
+        setSnackbarMessage(responseData.error.message);
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setSnackbarMessage("An unexpected error occurred");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleUpdateAssignment = async (
+    data: Assignment,
+    resetForm: () => void
+  ) => {
     const response = await fetch(`/api/assignments/${data.id}`, {
       method: "PUT",
       headers: {
@@ -87,32 +136,30 @@ export default function AssignmentGrid() {
       body: JSON.stringify(data),
     });
 
-    if (response.ok) {
-      setIsUpdateDialogOpen(false);
-      mutate({ ...data });
-    } else {
-      console.error("Error updating assignment:", response.statusText);
+    const responseData = await response.json();
+    try {
+      if (response.ok) {
+        handleCloseUpdateAssignmentDialog();
+        mutate(`/api/assignments?filter=${tab}`);
+        setSnackbarMessage("Assignment updated successfully");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        resetForm();
+      } else {
+        console.error("Error updating assignment:", responseData);
+        setSnackbarMessage(responseData.error.message);
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setSnackbarMessage("An unexpected error occurred");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
-  const handleCreateAssignment = async (data) => {
-    const response = await fetch("/api/assignments/index", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      setIsCreateDialogOpen(false);
-      mutate();
-    } else {
-      console.error("Error creating assignment:", response.statusText);
-    }
-  };
-
-  const handleDeleteAssignment = async (data) => {
+  const handleDeleteAssignment = async (data: Assignment) => {
     const response = await fetch(`/api/assignments/${data.id}`, {
       method: "DELETE",
       headers: {
@@ -120,10 +167,25 @@ export default function AssignmentGrid() {
       },
     });
 
-    if (response.ok) {
-      setIsDeleteDialogOpen(false);
-    } else {
-      console.error("Error deleting assignment data:", response.statusText);
+    const responseData = await response.json();
+    try {
+      if (response.ok) {
+        handleCloseDeleteAssignmentDialog();
+        mutate(`/api/assignments?filter=${tab}`);
+        setSnackbarMessage("Assignment deleted successfully");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+      } else {
+        console.error("Error deleting assignment:", responseData);
+        setSnackbarMessage(responseData.error.message);
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setSnackbarMessage("An unexpected error occurred");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
@@ -135,22 +197,22 @@ export default function AssignmentGrid() {
       flex: 1,
     },
     {
-      field: "className",
-      headerName: "Class Name",
-      minWidth: 150,
-      flex: 1,
-      valueGetter: (params) => params.row?.classInfo?.name,
-    },
-    {
       field: "name",
       headerName: "Assignment Name",
       minWidth: 200,
       flex: 1,
     },
     {
+      field: "className",
+      headerName: "Class",
+      minWidth: 150,
+      flex: 1,
+      valueGetter: (params) => params.row?.class?.name,
+    },
+    {
       field: "description",
       headerName: "Description",
-      minWidth: 200,
+      minWidth: 220,
       flex: 1,
     },
     {
@@ -162,10 +224,9 @@ export default function AssignmentGrid() {
         if (params.value == null) {
           return "";
         }
-        return dayjs(params.value).format("YYYY-MM-DD");
+        return dayjs(params.value).utc().format("YYYY-MM-DD");
       },
     },
-    // TODO fix failed prop type warning
     {
       field: "created",
       headerName: "Created On",
@@ -175,7 +236,7 @@ export default function AssignmentGrid() {
         if (params.value == null) {
           return "";
         }
-        return dayjs(params.value).format("YYYY-MM-DD");
+        return dayjs(params.value).utc().format("YYYY-MM-DD");
       },
     },
     {
@@ -242,21 +303,38 @@ export default function AssignmentGrid() {
         {/* TODO fix overlapping input fields */}
       </Box>
       <UpdateAssignmentDialog
-        assignment={selectedRow}
-        open={isUpdateDialogOpen}
-        onClose={handleCloseUpdateDialog}
+        existingAssignment={selectedRow}
+        open={isUpdateAssignmentDialogOpen}
+        onClose={handleCloseUpdateAssignmentDialog}
         onSubmit={handleUpdateAssignment}
       />
       <CreateAssignmentDialog
-        open={isCreateDialogOpen}
-        onClose={handleCloseCreateDialog}
+        open={isCreateAssignmentDialogOpen}
+        onClose={handleCloseCreateAssignmentDialog}
         onSubmit={handleCreateAssignment}
       />
-      <DeleteAssignmentDialog
-        open={isDeleteDialogOpen}
-        onClose={handleCloseDeleteDialog}
-        onSubmit={handleDeleteAssignment}
-      />
+      {selectedRow && (
+        <DeleteAssignmentDialog
+          assignment={selectedRow}
+          open={isDeleteAssignmentDialogOpen}
+          onClose={handleCloseDeleteAssignmentDialog}
+          onSubmit={handleDeleteAssignment}
+        />
+      )}
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
