@@ -69,7 +69,7 @@ export default function UpdateClassDetailsDialogProps({
 
   return (
     formData && (
-      <Dialog disablePortal open={open} onClose={onClose}>
+      <Dialog open={open} onClose={onClose}>
         <form onSubmit={handleSubmit}>
           <DialogTitle>Update Class Details</DialogTitle>
           <DialogContent>

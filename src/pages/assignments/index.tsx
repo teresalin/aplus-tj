@@ -20,6 +20,7 @@ import {
   CreateAssignmentDTO,
   DeleteAssignmentDialog,
   UpdateAssignmentDialog,
+  UpdateAssignmentDTO,
 } from "../../modules/assignments";
 import BaseDataGrid from "../../modules/persons/BaseDataGrid";
 import fetcher from "../../../utils/fetcher";
@@ -125,7 +126,7 @@ export default function AssignmentGrid() {
   };
 
   const handleUpdateAssignment = async (
-    data: Assignment,
+    data: UpdateAssignmentDTO,
     resetForm: () => void
   ) => {
     const response = await fetch(`/api/assignments/${data.id}`, {

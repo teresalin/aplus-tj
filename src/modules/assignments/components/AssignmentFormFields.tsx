@@ -27,6 +27,7 @@ const AssignmentFormFields = ({
   classes,
 }: IAssignmentFormFieldsProps) => {
   const { name, dueDate, description, classId } = assignment;
+
   const handleInputChange = (field: string, value: any) => {
     setFormData((prevData) => ({
       ...prevData,

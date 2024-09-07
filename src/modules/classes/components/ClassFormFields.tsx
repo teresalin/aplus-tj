@@ -252,7 +252,7 @@ const ClassFormFields = ({
                               (schedule) => schedule.dayOfWeek === day
                             )?.startTime,
                             "HH:mm:ss"
-                          )
+                          ).local()
                         : null
                     }
                     onChange={(newValue: Dayjs | null) =>
@@ -277,7 +277,7 @@ const ClassFormFields = ({
                               (schedule) => schedule.dayOfWeek === day
                             )?.endTime,
                             "HH:mm:ss"
-                          )
+                          ).local()
                         : null
                     }
                     onChange={(newValue: Dayjs | null) =>

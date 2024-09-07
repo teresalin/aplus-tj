@@ -1,3 +1,4 @@
+import Alert, { AlertColor } from "@mui/material/Alert";
 import React from "react";
 import Box from "@mui/material/Box";
 import CustomParseFormat from "dayjs/plugin/customParseFormat";
@@ -5,9 +6,10 @@ import dayjs from "dayjs";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
+import RenderMenu from "../../components/grid/RenderMenu";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import tz from "dayjs/plugin/timezone";
-import useSWR from "swr";
+import timezone from "dayjs/plugin/timezone";
+import useSWR, { mutate } from "swr";
 import utc from "dayjs/plugin/utc";
 import {
   GridColDef,
@@ -15,77 +17,84 @@ import {
   GridColumnVisibilityModel,
 } from "@mui/x-data-grid";
 
-import { Assignment } from "../../modules/assignments";
 import { ClassSummary } from "../../modules/classes";
 import {
-  DeleteSessionDialog,
-  NewSessionDialog,
+  CreateSessionDialog,
+  UpdateSessionDialog,
+} from "../../modules/sessions/components";
+import {
+  CreateSessionDTO,
   Session,
+  UpdateSessionDTO,
 } from "../../modules/sessions";
 import BaseDataGrid from "../../modules/persons/BaseDataGrid";
 import fetcher from "../../../utils/fetcher";
-import RenderMenu from "../../components/grid/RenderMenu";
+import Snackbar from "@mui/material/Snackbar";
 
 dayjs.extend(CustomParseFormat);
 dayjs.extend(utc);
-dayjs.extend(tz);
+dayjs.extend(timezone);
+
+const convertToLocalTime = (utcTime) => {
+  return dayjs.utc(utcTime).local().format("YYYY-MM-DD HH:mm A");
+};
 
 export default function SessionGrid() {
   const [timeRange, setTimeRange] = React.useState("thisMonth");
-  const [selectedRowData, setSelectedRowData] = React.useState<
-    Assignment | undefined
-  >({} as Assignment);
-  const [isNewDialogOpen, setIsNewDialogOpen] = React.useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [selectedRow, setSelectedRow] = React.useState<Session | null>(null);
+  const [isCreateSessionDialogOpen, setIsCreateSessionDialogOpen] =
+    React.useState(false);
+  const [isUpdateSessionDialogOpen, setIsUpdateSessionDialogOpen] =
+    React.useState(false);
+  const [isDeleteSessionDialogOpen, setIsDeleteSessionDialogOpen] =
+    React.useState(false);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] =
+    React.useState<AlertColor>("error");
 
-  const { data, isLoading, error } = useSWR(
+  const { data, isLoading, error } = useSWR<Session[]>(
     `api/sessions?range=${timeRange}`,
     fetcher
   );
-  const sessions = (data as Session[]) || [];
+  const sessions = data || [];
 
   const handleSelectChange = (event: SelectChangeEvent) => {
     setTimeRange(event.target.value);
   };
 
   const handleAddButtonClick = () => {
-    setIsNewDialogOpen(true);
+    setIsCreateSessionDialogOpen(true);
   };
 
-  const handleCloseNewDialog = () => {
-    setIsNewDialogOpen(false);
+  const handleEditClick = (row: Session) => {
+    setSelectedRow(row);
+    setIsUpdateSessionDialogOpen(true);
   };
 
-  const handleOpenEditDialog = () => {
-    setIsEditDialogOpen(true);
+  const handleDeleteClick = (row: Session) => {
+    setSelectedRow(row);
+    setIsDeleteSessionDialogOpen(true);
   };
 
-  const handleCloseEditDialog = () => {
-    setIsEditDialogOpen(false);
+  const handleCloseCreateSessionDialog = () => {
+    setIsCreateSessionDialogOpen(false);
   };
 
-  const handleOpenDeleteDialog = () => {
-    setIsDeleteDialogOpen(true);
+  const handleCloseUpdateSessionDialog = () => {
+    setIsUpdateSessionDialogOpen(false);
+    setIsUpdateSessionDialogOpen(false);
   };
 
-  const handleCloseDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
+  const handleCloseDeleteSessionDialog = () => {
+    setIsDeleteSessionDialogOpen(false);
   };
 
-  const handleRenderMenuClick = (row) => {
-    setSelectedRowData(row);
-  };
-
-  const onRowsSelectionHandler = (ids) => {
-    const selectedRowsData = ids.map((id) =>
-      sessions.find((row) => row.id === id)
-    );
-    setSelectedRowData(selectedRowsData[0]);
-  };
-
-  const handleCreateNewSession = async (data) => {
-    const response = await fetch(`/api/sessions/[session_id]`, {
+  const handleCreateSession = async (
+    data: CreateSessionDTO,
+    resetForm: () => void
+  ) => {
+    const response = await fetch("/api/sessions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -93,48 +102,93 @@ export default function SessionGrid() {
       body: JSON.stringify(data),
     });
 
-    if (response.ok) {
-      setIsNewDialogOpen(false);
-    } else {
-      console.error("Error creating new session:", response.statusText);
+    const responseData = await response.json();
+    try {
+      if (response.ok) {
+        handleCloseCreateSessionDialog();
+        mutate(`/api/sessions?filter=${timeRange}`);
+        setSnackbarMessage("Session created successfully");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        resetForm();
+      } else {
+        console.error("Error creating session:", responseData);
+        setSnackbarMessage(responseData.error.message);
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setSnackbarMessage("An unexpected error occurred");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
-  const handleSaveRowData = async (editedData) => {
-    const response = await fetch(`/api/assignments/${editedData.id}`, {
+  const handleUpdateSession = async (
+    data: UpdateSessionDTO,
+    resetForm: () => void
+  ) => {
+    const response = await fetch(`/api/sessions/${data.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(editedData),
+      body: JSON.stringify(data),
     });
 
-    if (response.ok) {
-      setIsEditDialogOpen(false);
-    } else {
-      console.error("Error updating assignment data:", response.statusText);
+    const responseData = await response.json();
+    try {
+      if (response.ok) {
+        handleCloseUpdateSessionDialog();
+        mutate(`api/sessions?range=${timeRange}`);
+        setSnackbarMessage("Session updated successfully");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        resetForm();
+      } else {
+        console.error("Error updating session:", responseData);
+        setSnackbarMessage(responseData.error.message);
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setSnackbarMessage("An unexpected error occurred");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
-  const handleDeleteRowData = async () => {
-    const response = await fetch(`/api/assignments/${selectedRowData?.id}`, {
+  const handleDeleteSession = async (data: Session) => {
+    const response = await fetch(`/api/sessions/${data.id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
     });
 
-    if (response.ok) {
-      setIsDeleteDialogOpen(false);
-    } else {
-      console.error("Error deleting assignment data:", response.statusText);
+    const responseData = await response.json();
+    try {
+      if (response.ok) {
+        handleCloseDeleteSessionDialog();
+        mutate(`/api/sessions?filter=${timeRange}`);
+        setSnackbarMessage("Session deleted successfully");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+      } else {
+        console.error("Error deleting session:", responseData);
+        setSnackbarMessage(responseData.error.message);
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      setSnackbarMessage("An unexpected error occurred");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
-
-  const convertToTime = (ft) =>
-    dayjs(ft, "HH:mm:ss", "en", true).isValid()
-      ? dayjs(ft, "HH:mm:ss").format("hh:ss A")
-      : ft;
 
   const columns: GridColDef[] = [
     {
@@ -144,7 +198,7 @@ export default function SessionGrid() {
       flex: 1,
     },
     {
-      field: "classSummary",
+      field: "class",
       headerName: "Class Name",
       minWidth: 200,
       flex: 1,
@@ -156,18 +210,6 @@ export default function SessionGrid() {
       },
     },
     {
-      field: "date",
-      headerName: "Session Date",
-      minWidth: 150,
-      flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<Date>) => {
-        if (params.value == null) {
-          return "";
-        }
-        return dayjs.utc(params.value).tz("Asia/Taipei").format("YYYY-MM-DD");
-      },
-    },
-    {
       field: "startTime",
       headerName: "Start Time",
       minWidth: 120,
@@ -176,7 +218,7 @@ export default function SessionGrid() {
         if (params.value == null) {
           return "";
         }
-        return convertToTime(params.value);
+        return convertToLocalTime(params.value);
       },
     },
     {
@@ -188,7 +230,7 @@ export default function SessionGrid() {
         if (params.value == null) {
           return "";
         }
-        return convertToTime(params.value);
+        return convertToLocalTime(params.value);
       },
     },
     {
@@ -199,8 +241,8 @@ export default function SessionGrid() {
       flex: 1,
       renderCell: (params) => (
         <RenderMenu
-          onEditClick={handleOpenEditDialog}
-          onDeleteClick={handleOpenDeleteDialog}
+          onEditClick={() => handleEditClick(params.row)}
+          onDeleteClick={() => handleDeleteClick(params.row)}
         />
       ),
     },
@@ -258,16 +300,36 @@ export default function SessionGrid() {
           initialColumnVisibilityModel={initialColumnVisibilityModel}
         />
       </Box>
-      <NewSessionDialog
-        open={isNewDialogOpen}
-        onClose={handleCloseNewDialog}
-        onSubmit={handleCreateNewSession}
+      <CreateSessionDialog
+        open={isCreateSessionDialogOpen}
+        onClose={handleCloseCreateSessionDialog}
+        onSubmit={handleCreateSession}
       />
-      <DeleteSessionDialog
+      <UpdateSessionDialog
+        existingSession={selectedRow}
+        open={isUpdateSessionDialogOpen}
+        onClose={handleCloseUpdateSessionDialog}
+        onSubmit={handleUpdateSession}
+      />
+      {/* <DeleteSessionDialog
         open={isDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}
         onSubmit={handleDeleteRowData}
-      />
+      /> */}
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

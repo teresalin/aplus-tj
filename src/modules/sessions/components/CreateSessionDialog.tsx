@@ -1,28 +1,23 @@
-import { DatePicker, TimePicker } from "@mui/x-date-pickers";
-import { FormEvent, FormEventHandler } from "react";
-import Box from "@mui/material/Box";
+import React from "react";
+import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
-import dayjs, { Dayjs } from "dayjs";
+import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import React from "react";
-import Select from "@mui/material/Select";
-import Stack from "@mui/material/Stack";
 import useSWR from "swr";
 
-import { Session } from "../types";
 import { Class } from "../../classes/types";
+import { CreateSessionDTO } from "../dtos";
+import { Session } from "../types";
 import fetcher from "../../../../utils/fetcher";
+import SessionFormFields from "./SessionFormFields";
 
 export interface ICreateSessionDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit;
+  onSubmit: (data: CreateSessionDTO, resetForm: () => void) => Promise<void>;
 }
 
 export default function CreateSessionDialog({
@@ -30,106 +25,54 @@ export default function CreateSessionDialog({
   onClose,
   onSubmit,
 }: ICreateSessionDialogProps) {
-  const [newSession, setNewSession] = React.useState({} as Session);
+  const initialSessionState = {} as CreateSessionDTO;
+  const [newSession, setNewSession] = React.useState(initialSessionState);
+  const [hasError, setHasError] = React.useState(false);
 
-  const { data } = useSWR("/api/classes", fetcher);
-  const classes = (data as Class[]) || [];
+  const { data, error, isLoading } = useSWR<Class[]>("/api/classes", fetcher);
+  const classes = data || [];
 
-  const handleSubmit: FormEventHandler = (event: FormEvent) => {
+  const handleSubmit: React.FormEventHandler = async (
+    event: React.FormEvent
+  ) => {
     event.preventDefault();
-    onSubmit(newSession);
-  };
-
-  const handleInputChange = (field, value) => {
-    setNewSession((prevData) => ({
-      ...prevData,
-      [field]: field === "classId" ? Number(value) : value,
-    }));
-  };
-
-  const handleTimeChange = (field: string, value: dayjs.Dayjs | null) => {
-    setNewSession((prevData) => ({
-      ...prevData,
-      [field]: value ? dayjs(value).format("HH:mm:ss") : "00:00:00",
-    }));
+    if (!hasError) {
+      await onSubmit(newSession, () => setNewSession(initialSessionState));
+    }
   };
 
   return (
-    <>
-      <Dialog disablePortal open={open} onClose={onClose}>
-        <form onSubmit={handleSubmit}>
-          <DialogTitle>New session</DialogTitle>
-          <DialogContent>
-            <DatePicker
-              label="Session Date"
-              format="YYYY-MM-DD"
-              value={newSession.date || null}
-              onChange={(date) => handleInputChange("date", date)}
-              sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
-              slotProps={{
-                textField: {
-                  required: true,
-                },
-              }}
-            />
-            <Box mt={1.5}>
-              <FormControl fullWidth>
-                <InputLabel id="select-label">Assign to a class</InputLabel>
-                <Select
-                  fullWidth
-                  required
-                  id="classId"
-                  name="classId"
-                  label="Assign to a class"
-                  labelId="select-label"
-                  margin="dense"
-                  value={
-                    newSession.classId ? newSession.classId.toString() : ""
-                  }
-                  onChange={(e) => handleInputChange("classId", e.target.value)}
-                >
-                  {classes &&
-                    classes.map((item: Class) => (
-                      <MenuItem key={item.id} value={item.id}>
-                        {item.name}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-            </Box>
-            <Stack mt={2} direction="row" spacing={1}>
-              <TimePicker
-                label="Start Time"
-                value={
-                  newSession.startTime
-                    ? dayjs(newSession.startTime, "HH:mm:ss")
-                    : null
-                }
-                onChange={(value: Dayjs | null) =>
-                  handleTimeChange("startTime", value)
-                }
-              />
-              <TimePicker
-                label="End Time"
-                value={
-                  newSession.endTime
-                    ? dayjs(newSession.endTime, "HH:mm:ss")
-                    : null
-                }
-                onChange={(value: Dayjs | null) =>
-                  handleTimeChange("endTime", value)
-                }
-              />
-            </Stack>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button autoFocus type="submit" onClick={handleSubmit}>
-              Submit
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    </>
+    <Dialog open={open} onClose={onClose}>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>New session</DialogTitle>
+        <DialogContent>
+          {isLoading ? (
+            <CircularProgress />
+          ) : (
+            <>
+              {error && (
+                <Alert severity="error">
+                  Failed to load class data: {error.message}
+                </Alert>
+              )}
+              {!error && (
+                <SessionFormFields
+                  session={newSession}
+                  setFormData={setNewSession}
+                  classes={classes}
+                  setHasError={setHasError}
+                />
+              )}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button autoFocus type="submit">
+            Submit
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
   );
 }

@@ -3,11 +3,10 @@ import { StudentSummary } from "../../persons/students/types";
 
 export interface Session {
   id: number;
-  classId: number;
+  class: ClassSummary;
   date: Date;
-  startTime: Date;
-  endTime: Date;
-  classSummary?: ClassSummary;
+  startTime: string;
+  endTime: string;
 }
 
 export interface SessionDetail extends Session {

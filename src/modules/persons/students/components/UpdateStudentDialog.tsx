@@ -55,7 +55,7 @@ export default function UpdateStudentDialog({
 
   const handleClose = () => {
     onClose();
-    setFormData(initialStudentState); // Clear form data on close
+    setFormData(initialStudentState);
   };
 
   return (
