@@ -172,6 +172,7 @@ CREATE TABLE schedule (
   id SERIAL PRIMARY KEY,
   class_id INT REFERENCES class(id) NOT NULL,
   day_of_week day_of_week NOT NULL,
+  -- store time fields as timestamptz
   start_time TIMESTAMPTZ,
   end_time TIMESTAMPTZ,
   created TIMESTAMPTZ DEFAULT NOW(),

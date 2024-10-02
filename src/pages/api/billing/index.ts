@@ -1,6 +1,5 @@
 import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { parseBilling } from "../../../../utils/apiUtils";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
@@ -36,7 +35,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const result = await client.query(query);
     res.status(200).json({
       status: "Success",
-      result: result.rows.map(parseBilling),
+      result: result.rows,
       message: "Billing records retrieved successfully.",
     });
   } catch (error) {

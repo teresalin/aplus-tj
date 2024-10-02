@@ -18,7 +18,6 @@ export interface Class {
 export interface ClassSummary {
   id: number;
   name: string;
-  teacherName?: string;
 }
 
 export interface ClassStudent {

@@ -4,7 +4,6 @@ import { StudentSummary } from "../../persons/students/types";
 export interface Session {
   id: number;
   class: ClassSummary;
-  date: Date;
   startTime: string;
   endTime: string;
 }

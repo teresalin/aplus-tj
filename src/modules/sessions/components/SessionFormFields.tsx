@@ -1,7 +1,7 @@
-import { DatePicker, DateTimePicker, TimePicker } from "@mui/x-date-pickers";
+import { DateTimePicker } from "@mui/x-date-pickers";
 import React from "react";
 import Box from "@mui/material/Box";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -30,7 +30,7 @@ const SessionFormFields = ({
   classes,
   setHasError,
 }: ISessionFormFieldsProps) => {
-  const { classId, date, startTime, endTime, studentIds } = session;
+  const { classId, startTime, endTime, studentIds } = session;
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
@@ -72,18 +72,6 @@ const SessionFormFields = ({
 
   return (
     <>
-      {/* <DatePicker
-        label="Session Date"
-        format="YYYY-MM-DD"
-        value={date ? dayjs(date).local() : null}
-        onChange={handleDateChange}
-        sx={{ marginTop: "6px", width: "100%" }}
-        slotProps={{
-          textField: {
-            required: true,
-          },
-        }}
-      /> */}
       <Box mt="6px">
         <FormControl fullWidth>
           <InputLabel id="select-label">Assign to a class</InputLabel>

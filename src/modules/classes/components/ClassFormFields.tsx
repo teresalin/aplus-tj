@@ -261,6 +261,7 @@ const ClassFormFields = ({
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
+                  {/* TODO store these times as timestamptz */}
                   <TimePicker
                     label="End Time"
                     slotProps={{

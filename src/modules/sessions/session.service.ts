@@ -81,7 +81,7 @@ export async function createSession(dto: CreateSessionDTO) {
     const insertSessionQuery = {
       text: `
         INSERT INTO session(class_id, start_time, end_time, status, created, updated)
-        VALUES($1, $2, $3, $4, $5, NOW(), NOW());
+        VALUES($1, $2, $3, $4, NOW(), NOW());
       `,
       values: [
         dto.classId,
@@ -132,7 +132,7 @@ export async function updateSession(dto: UpdateSessionDTO) {
     if (error.code === "23505") {
       // Unique violation error code in PostgreSQL
       throw new UniqueConstraintError(
-        "A session with the same class and date already exists."
+        "A session with the same class and date times already exists."
       );
     } else {
       console.error("Error updating session in the database:", error);

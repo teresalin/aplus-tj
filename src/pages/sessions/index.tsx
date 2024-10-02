@@ -106,7 +106,7 @@ export default function SessionGrid() {
     try {
       if (response.ok) {
         handleCloseCreateSessionDialog();
-        mutate(`/api/sessions?filter=${timeRange}`);
+        mutate(`/api/sessions`);
         setSnackbarMessage("Session created successfully");
         setSnackbarSeverity("success");
         setSnackbarOpen(true);
