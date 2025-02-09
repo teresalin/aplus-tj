@@ -75,6 +75,8 @@ export async function findSessionById(
 export async function createSession(dto: CreateSessionDTO) {
   const client = await getDBClient();
 
+  console.log(dto);
+  ``;
   try {
     await client.query("BEGIN");
 

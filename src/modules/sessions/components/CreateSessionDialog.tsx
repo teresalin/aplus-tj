@@ -41,6 +41,8 @@ export default function CreateSessionDialog({
     }
   };
 
+  // console.log(newSession);
+
   return (
     <Dialog open={open} onClose={onClose}>
       <form onSubmit={handleSubmit}>

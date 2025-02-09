@@ -26,6 +26,7 @@ export default async function handler(
         break;
       case "POST":
         const session: CreateSessionDTO = req.body;
+        console.log(session);
         // Additional validation can be performed here
         await createSession(session);
         res.status(201).json({

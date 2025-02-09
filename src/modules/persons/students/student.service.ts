@@ -11,7 +11,7 @@ export async function findAllStudents(): Promise<Student[]> {
     const { rows } = await client.query(
       `
       SELECT
-        person.id AS person_id,
+        person.id,
         person.name,
         person.gender,
         person.phone,
