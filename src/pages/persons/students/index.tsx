@@ -1,8 +1,8 @@
-import React from "react";
-import Box from "@mui/material/Box";
-import Snackbar from "@mui/material/Snackbar";
 import Alert, { AlertColor } from "@mui/material/Alert";
-import PersonsTabs from "../../../modules/persons/PersonsTabs";
+import Box from "@mui/material/Box";
+import React from "react";
+import Snackbar from "@mui/material/Snackbar";
+
 import StudentsDashboard from "../../../modules/persons/students/components/StudentsDashboard";
 
 export default function StudentsPage() {
@@ -25,7 +25,6 @@ export default function StudentsPage() {
       <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
         <StudentsDashboard onSnackbar={handleSnackbar} />
       </Box>
-
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={snackbarOpen}

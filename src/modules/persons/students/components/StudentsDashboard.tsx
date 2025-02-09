@@ -15,16 +15,15 @@ import {
 } from "@mui/x-data-grid";
 import { AlertColor } from "@mui/material/Alert";
 
+import { Student } from "../types";
 import CreateStudentDialog from "./CreateStudentDialog";
 import BaseDataGrid from "../../../../components/DataGrid";
 import PersonsTabs from "../../PersonsTabs";
-import { Student } from "../types";
 import fetcher from "../../../../../utils/fetcher";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-// Props Interface
 interface StudentsDashboardProps {
   onSnackbar?: (message: string, severity?: AlertColor) => void;
 }
@@ -43,7 +42,6 @@ export default function StudentsDashboard({
   );
   const students = data || [];
 
-  // Handlers
   const handleAddButtonClick = () => {
     setIsCreateStudentDialogOpen(true);
   };
@@ -86,7 +84,6 @@ export default function StudentsDashboard({
     router.push(`/persons/students/${data.studentId}/details`);
   };
 
-  // Column Definitions
   const columns: GridColDef[] = [
     { field: "personId", headerName: "ID", minWidth: 50, flex: 1 },
     { field: "name", headerName: "Name", minWidth: 150, flex: 1 },
@@ -164,7 +161,6 @@ export default function StudentsDashboard({
           initialColumnVisibilityModel={initialColumnVisibilityModel}
         />
       </Box>
-
       <CreateStudentDialog
         open={isCreateStudentDialogOpen}
         onClose={handleCloseCreateStudentDialog}
