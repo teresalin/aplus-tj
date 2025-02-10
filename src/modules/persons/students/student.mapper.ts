@@ -3,8 +3,8 @@ import { Student } from "./types";
 
 export function mapRowToStudent(row: any): Student {
   return {
-    id: row.id,
-    studentId: row.student_id,
+    id: row.student_id,
+    personId: row.person_id,
     name: row.name,
     gender: row.gender,
     email: row.email,

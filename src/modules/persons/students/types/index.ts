@@ -2,7 +2,7 @@ import { Grade } from "../../../grades";
 import { Person } from "../../types";
 
 export interface Student extends Person {
-  studentId: number;
+  id: number;
   englishName?: string;
   currentSchool: string;
   textbookPublisher: string;

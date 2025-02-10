@@ -180,7 +180,7 @@ const ClassFormFields = ({
             >
               {teachers &&
                 teachers.map((teacher: Staff) => (
-                  <MenuItem key={teacher.staffId} value={teacher.staffId}>
+                  <MenuItem key={teacher.id} value={teacher.id}>
                     {teacher.name}
                   </MenuItem>
                 ))}

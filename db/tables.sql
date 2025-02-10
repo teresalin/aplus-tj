@@ -1,6 +1,6 @@
 CREATE TYPE gender AS ENUM ('Male', 'Female', 'Other'); 
 CREATE TABLE person (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY, -- TODO update in DB
   name VARCHAR(50),
   gender gender,
   phone VARCHAR(50),

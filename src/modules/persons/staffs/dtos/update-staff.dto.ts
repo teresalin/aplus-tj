@@ -1,6 +1,6 @@
 export interface UpdateStaffDTO {
+  id: number;
   personId: number;
-  staffId: number;
   name?: string;
   gender?: string;
   dateOfBirth?: Date;

@@ -3,8 +3,8 @@ import { Staff } from "./types";
 
 export function mapRowToStaff(row: any): Staff {
   return {
+    id: row.staff_id,
     personId: row.person_id,
-    staffId: row.staff_id,
     name: row.name,
     gender: row.gender,
     email: row.email,

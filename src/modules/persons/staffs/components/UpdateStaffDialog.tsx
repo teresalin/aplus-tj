@@ -41,7 +41,7 @@ export default function UpdateStaffDialog({
   // Initialize form data when the dialog opens with the latest staff data
   React.useEffect(() => {
     if (open && existingStaff) {
-      mutate(`/api/persons/staffs/${existingStaff.staffId}`).then(() => {
+      mutate(`/api/persons/staffs/${existingStaff.id}`).then(() => {
         setFormData(staffToUpdateStaffDTO(existingStaff));
       });
     }
