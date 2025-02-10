@@ -52,7 +52,7 @@ export async function findStaffById(staffId: number): Promise<Staff | null> {
         person.date_of_birth::timestamp at time zone 'UTC' as date_of_birth,
         person.notes,
         person.active,
-        staff.id AS staff_id,
+        staff.id,
         staff.join_date::timestamp at time zone 'UTC' as join_date, 
         staff.leave_date::timestamp at time zone 'UTC' as leave_date, 
         staff_role.id AS role_id,

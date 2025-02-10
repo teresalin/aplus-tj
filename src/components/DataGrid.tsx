@@ -8,6 +8,7 @@ import {
   GridColumnVisibilityModel,
   GridToolbar,
 } from "@mui/x-data-grid";
+import CustomToolBar from "./grid/CustomToolBar";
 
 interface BaseDataGridProps {
   data: any[];
@@ -34,6 +35,7 @@ const BaseDataGrid: React.FC<BaseDataGridProps> = ({
   data,
   columns,
   isLoading,
+  onAddClick,
   onRowClick,
   initialColumnVisibilityModel,
 }) => {
@@ -41,6 +43,9 @@ const BaseDataGrid: React.FC<BaseDataGridProps> = ({
     React.useState<GridColumnVisibilityModel>(initialColumnVisibilityModel);
   const [rowSelectionModel, setRowSelectionModel] =
     React.useState<GridRowSelectionModel>([]);
+  const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
+    null
+  );
 
   const onColumnVisibilityChange = (
     model: React.SetStateAction<GridColumnVisibilityModel>
@@ -78,7 +83,17 @@ const BaseDataGrid: React.FC<BaseDataGridProps> = ({
         },
       }}
       slots={{
-        toolbar: GridToolbar,
+        toolbar: CustomToolBar,
+      }}
+      slotProps={{
+        panel: {
+          anchorEl: buttonEl,
+          placement: "bottom-end",
+        },
+        toolbar: {
+          children: onAddClick && <AddIconButton onClick={onAddClick} />,
+          setButtonEl,
+        },
       }}
       pageSizeOptions={[5, 10, 25]}
       hideFooterSelectedRowCount

@@ -3,8 +3,8 @@ import { UpdateStaffDTO } from "./dtos";
 
 export function staffToUpdateStaffDTO(staff: Staff): UpdateStaffDTO {
   return {
+    id: staff.id,
     personId: staff.personId,
-    staffId: staff.staffId,
     name: staff.name,
     gender: staff.gender,
     dateOfBirth: staff.dateOfBirth,

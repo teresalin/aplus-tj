@@ -38,7 +38,7 @@ export default function UpdateStudentDialog({
   // Initialize form data when the dialog opens with the latest student data
   React.useEffect(() => {
     if (open && existingStudent) {
-      mutate(`/api/persons/students/${existingStudent.studentId}`).then(() => {
+      mutate(`/api/persons/students/${existingStudent.id}`).then(() => {
         setFormData(studentToUpdateStudentDTO(existingStudent));
       });
     }
