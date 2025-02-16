@@ -1,78 +1,83 @@
 import { useRouter } from "next/router";
-import React from "react";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
+import { AlertColor } from "@mui/material/Alert";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import Box from "@mui/material/Box";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import dayjs from "dayjs";
+import IconButton from "@mui/material/IconButton";
+import React from "react";
 import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import useSWR, { mutate } from "swr";
+import utc from "dayjs/plugin/utc";
 import {
   GridColDef,
   GridColumnVisibilityModel,
   GridRenderCellParams,
   GridValueFormatterParams,
 } from "@mui/x-data-grid";
-import { AlertColor } from "@mui/material/Alert";
 
-import { Student } from "../types";
-import BaseDataGrid from "../../../../components/DataGrid";
-import CreateStudentDialog from "./CreateStudentDialog";
+import { Staff } from "../types";
 import fetcher from "../../../../../utils/fetcher";
 import PersonsTabs from "../../PersonsTabs";
+import BaseDataGrid from "../../../../components/DataGrid";
+import CreateStaffDialog from "./CreateStaffDialog";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-interface StudentsDashboardProps {
+interface StaffsDashboardProps {
   onSnackbar?: (message: string, severity?: AlertColor) => void;
 }
 
-export default function StudentsDashboard({
-  onSnackbar,
-}: StudentsDashboardProps) {
+export default function StaffsDashboard({ onSnackbar }: StaffsDashboardProps) {
   const router = useRouter();
-  const [isCreateStudentDialogOpen, setIsCreateStudentDialogOpen] =
+
+  const [isCreateStaffDialogOpen, setIsCreateStaffDialogOpen] =
     React.useState(false);
 
-  const { data, isLoading, error } = useSWR<Student[]>(
-    "/api/persons/students",
+  const { data, isLoading, error } = useSWR<Staff[]>(
+    "/api/persons/staffs",
     fetcher
   );
-  const students = data || [];
+  const staffs = data || [];
 
   const handleAddButtonClick = () => {
-    setIsCreateStudentDialogOpen(true);
+    setIsCreateStaffDialogOpen(true);
   };
 
-  const handleCloseCreateStudentDialog = () => {
-    setIsCreateStudentDialogOpen(false);
+  const handleCloseCreateStaffDialog = () => {
+    setIsCreateStaffDialogOpen(false);
   };
 
-  const handleCreateStudent = async (
+  const handleCreateStaff = async (
     data: { email: string },
     resetForm: () => void
   ) => {
     try {
       const normalizedEmail = data.email.trim().toLowerCase();
-      const normalizedData = { ...data, email: normalizedEmail };
 
-      const response = await fetch(`/api/persons/students`, {
+      const normalizedData = {
+        ...data,
+        email: normalizedEmail,
+      };
+
+      const response = await fetch(`/api/persons/staffs`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(normalizedData),
       });
 
       const responseData = await response.json();
       if (response.ok) {
-        handleCloseCreateStudentDialog();
-        mutate("/api/persons/students");
-        onSnackbar?.("Student created successfully", "success");
+        handleCloseCreateStaffDialog();
+        mutate("/api/persons/staffs");
+        onSnackbar?.("Staff created successfully", "success");
         resetForm();
       } else {
-        console.error("Error creating student:", responseData);
+        console.error("Error creating staff:", responseData);
         onSnackbar?.(responseData.error.message, "error");
       }
     } catch (error) {
@@ -81,48 +86,85 @@ export default function StudentsDashboard({
     }
   };
 
-  const onRowClick = (data: { studentId: number }) => {
-    router.push(`/persons/students/${data.studentId}/details`);
+  const onRowClick = (data: { staffId: string }) => {
+    router.push(
+      `/persons/staffs/[staff_id]/details`,
+      `/persons/staffs/${data.staffId}/details`
+    );
   };
 
   const columns: GridColDef[] = [
-    { field: "personId", headerName: "ID", minWidth: 50, flex: 1 },
-    { field: "name", headerName: "Name", minWidth: 150, flex: 1 },
-    { field: "gender", headerName: "Gender", minWidth: 100, flex: 1 },
-    { field: "phone", headerName: "Phone", minWidth: 120, flex: 1 },
-    { field: "email", headerName: "Email", minWidth: 200, flex: 1 },
+    {
+      field: "personId",
+      headerName: "id",
+      minWidth: 50,
+      flex: 1,
+    },
+    {
+      field: "name",
+      headerName: "Name",
+      minWidth: 150,
+      flex: 1,
+    },
+    {
+      field: "gender",
+      headerName: "Gender",
+      minWidth: 100,
+      flex: 1,
+    },
+    {
+      field: "phone",
+      headerName: "Phone",
+      minWidth: 120,
+      flex: 1,
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      minWidth: 200,
+      flex: 1,
+    },
     {
       field: "dateOfBirth",
       headerName: "Date of Birth",
       minWidth: 120,
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<Date>) =>
-        params.value ? dayjs(params.value).utc().format("YYYY-MM-DD") : "",
+      valueFormatter: (params: GridValueFormatterParams<Date>) => {
+        if (params.value == null) {
+          return "";
+        }
+        return dayjs(params.value).utc().format("YYYY-MM-DD");
+      },
     },
     {
       field: "active",
       headerName: "Active",
       minWidth: 100,
       flex: 1,
-      renderCell: (params: GridRenderCellParams<any, boolean>) =>
+      renderCell: (params: GridRenderCellParams<any, Boolean>) =>
         params.value ? (
           <CheckCircleIcon color="success" />
         ) : (
           <CancelIcon color="error" />
         ),
     },
+    // TODO fix failed prop type warning
     {
       field: "created",
       headerName: "Created On",
       minWidth: 120,
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<Date>) =>
-        params.value ? dayjs(params.value).utc().format("YYYY-MM-DD") : "",
+      valueFormatter: (params: GridValueFormatterParams<Date>) => {
+        if (params.value == null) {
+          return "";
+        }
+        return dayjs(params.value).format("YYYY-MM-DD");
+      },
     },
   ];
 
-  const getTogglableColumns = (columns: GridColDef[]) =>
-    columns
+  const getTogglableColumns = (columns: GridColDef[]) => {
+    return columns
       .filter(
         (column) =>
           column.field !== "personId" &&
@@ -131,6 +173,7 @@ export default function StudentsDashboard({
           column.field !== "created"
       )
       .map((column) => column.field);
+  };
 
   const initialColumnVisibilityModel: GridColumnVisibilityModel = {
     personId: false,
@@ -157,9 +200,9 @@ export default function StudentsDashboard({
   return (
     <>
       <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
-        <PersonsTabs currentTab="students" />
+        <PersonsTabs currentTab="staffs" />
         <BaseDataGrid
-          data={students}
+          data={staffs}
           columns={columns}
           isLoading={isLoading}
           onRowClick={(params) => onRowClick(params.row)}
@@ -168,10 +211,10 @@ export default function StudentsDashboard({
           additionalToolbarButtons={toolbarButtons}
         />
       </Box>
-      <CreateStudentDialog
-        open={isCreateStudentDialogOpen}
-        onClose={handleCloseCreateStudentDialog}
-        onSubmit={handleCreateStudent}
+      <CreateStaffDialog
+        open={isCreateStaffDialogOpen}
+        onClose={handleCloseCreateStaffDialog}
+        onSubmit={handleCreateStaff}
       />
     </>
   );

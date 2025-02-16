@@ -4,7 +4,7 @@ import { Student } from "./types";
 export function studentToUpdateStudentDTO(student: Student): UpdateStudentDTO {
   return {
     id: student.id,
-    personId: student.personId,
+    studentId: student.studentId,
     name: student.name,
     englishName: student.englishName,
     gender: student.gender,

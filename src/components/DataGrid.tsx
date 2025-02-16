@@ -1,12 +1,9 @@
 import React from "react";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import IconButton from "@mui/material/IconButton";
 import {
   DataGrid,
   GridColDef,
   GridRowSelectionModel,
   GridColumnVisibilityModel,
-  GridToolbar,
 } from "@mui/x-data-grid";
 import CustomToolBar from "./grid/CustomToolBar";
 
@@ -14,30 +11,19 @@ interface BaseDataGridProps {
   data: any[];
   columns: GridColDef[];
   isLoading: boolean;
-  onAddClick?: () => void;
   onRowClick?: (row: any) => void;
   getTogglableColumns?: (columns: GridColDef[]) => string[];
   initialColumnVisibilityModel: GridColumnVisibilityModel;
+  additionalToolbarButtons?: React.ReactNode[];
 }
-
-const AddIconButton = ({ onClick }) => (
-  <IconButton
-    aria-label="Add"
-    onClick={onClick}
-    color="primary"
-    sx={{ padding: "4px" }}
-  >
-    <AddBoxIcon />
-  </IconButton>
-);
 
 const BaseDataGrid: React.FC<BaseDataGridProps> = ({
   data,
   columns,
   isLoading,
-  onAddClick,
   onRowClick,
   initialColumnVisibilityModel,
+  additionalToolbarButtons = [],
 }) => {
   const [columnVisibilityModel, setColumnVisibilityModel] =
     React.useState<GridColumnVisibilityModel>(initialColumnVisibilityModel);
@@ -91,7 +77,7 @@ const BaseDataGrid: React.FC<BaseDataGridProps> = ({
           placement: "bottom-end",
         },
         toolbar: {
-          children: onAddClick && <AddIconButton onClick={onAddClick} />,
+          children: additionalToolbarButtons,
           setButtonEl,
         },
       }}

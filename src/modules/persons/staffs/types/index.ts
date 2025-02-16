@@ -2,9 +2,9 @@ import { Role } from "../../roles";
 import { Person } from "../../types";
 
 export interface Staff extends Person {
-  id: number;
+  staffId: number;
   role: Role;
-  joinDate: Date;
+  hireDate: Date;
   leaveDate?: Date;
 }
 

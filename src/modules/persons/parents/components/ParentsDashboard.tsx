@@ -1,9 +1,11 @@
 import { useRouter } from "next/router";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import dayjs from "dayjs";
+import IconButton from "@mui/material/IconButton";
 import React from "react";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import {
   GridColDef,
   GridColumnVisibilityModel,
@@ -12,10 +14,10 @@ import {
 import { AlertColor } from "@mui/material/Alert";
 
 import { Parent } from "../types";
-import fetcher from "../../../../../utils/fetcher";
-import PersonsTabs from "../../PersonsTabs";
 import BaseDataGrid from "../../../../components/DataGrid";
 import CreateParentDialog from "./CreateParentDialog";
+import fetcher from "../../../../../utils/fetcher";
+import PersonsTabs from "../../PersonsTabs";
 
 interface ParentsDashboardProps {
   onSnackbar?: (message: string, severity?: AlertColor) => void;
@@ -38,11 +40,14 @@ export default function ParentsDashboard({
     setIsCreateParentDialogOpen(true);
   };
 
-  const closeDialog = () => {
+  const handleCloseCreateParentDialog = () => {
     setIsCreateParentDialogOpen(false);
   };
 
-  const handleCreateParent = async (data) => {
+  const handleCreateParent = async (
+    data: { email: string },
+    resetForm: () => void
+  ) => {
     const url = "/api/persons/parents/index";
 
     const response = await fetch(url, {
@@ -53,10 +58,15 @@ export default function ParentsDashboard({
       body: JSON.stringify(data),
     });
 
+    const responseData = await response.json();
     if (response.ok) {
-      closeDialog();
+      handleCloseCreateParentDialog();
+      mutate("/api/persons/students");
+      onSnackbar?.("Parent created successfully", "success");
+      resetForm();
     } else {
-      console.error("Error creating parent:", response.statusText);
+      console.error("Error creating parent:", responseData);
+      onSnackbar?.(responseData.error.message, "error");
     }
   };
 
@@ -178,6 +188,12 @@ export default function ParentsDashboard({
     return <div>Error fetching data</div>;
   }
 
+  const toolbarButtons = [
+    <IconButton key="add" onClick={handleAddButtonClick} color="primary">
+      <AddBoxIcon />
+    </IconButton>,
+  ];
+
   return (
     <>
       <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
@@ -186,15 +202,15 @@ export default function ParentsDashboard({
           data={parents}
           columns={columns}
           isLoading={isLoading}
-          onAddClick={handleAddButtonClick}
           onRowClick={(params) => onRowClick(params.row)}
           getTogglableColumns={getTogglableColumns}
           initialColumnVisibilityModel={initialColumnVisibilityModel}
+          additionalToolbarButtons={toolbarButtons}
         />
       </Box>
       <CreateParentDialog
         open={isCreateParentDialogOpen}
-        onClose={closeDialog}
+        onClose={handleCloseCreateParentDialog}
         onSubmit={handleCreateParent}
       />
     </>

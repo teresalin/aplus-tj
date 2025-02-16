@@ -1,11 +1,13 @@
 services:
   pg:
-    image: postgres:latest
+    image: postgres:15
     volumes:
       - ./.db_data/data:/var/lib/postgresql/data/
       - ./db:/docker-entrypoint-initdb.d/
     environment:
       - POSTGRES_PASSWORD=password
+    ports:
+      - 5432:5432
   web:
     build: .
     volumes:

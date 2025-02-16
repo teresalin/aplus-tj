@@ -1,7 +1,7 @@
-export interface Person {
-  id: number;
+export interface CreateParentDTO {
+  parentId?: string;
   name: string;
-  preferredName: string;
+  preferredName?: string;
   gender: string;
   phone: string;
   email: string;
