@@ -32,7 +32,6 @@ function RedBar() {
 export default function UpdateClassStudentsDialog({ classDetails }) {
   const classID = useRouter().query.class_id;
   const [open, setOpen] = React.useState(false);
-  const [teacher, setTeacher] = React.useState(classDetails.teacherName);
   const [updatedSchedules, setUpdatedSchedules] = React.useState(
     classDetails.schedules
   );
@@ -129,27 +128,6 @@ export default function UpdateClassStudentsDialog({ classDetails }) {
               fullWidth
               variant="outlined"
             />
-            <RedBar />
-            <Typography variant="body2" display="block">
-              Teacher
-            </Typography>
-            {/* TODO fix default value */}
-            <Select
-              fullWidth
-              // labelId="demo-simple-select-label"
-              id="teacher"
-              value={teacher}
-              label="Teacher"
-              displayEmpty
-              onChange={handleTeacherChange}
-            >
-              {staffs &&
-                staffs.map((staff: Person) => (
-                  <MenuItem key={staff.personId} value={staff.personId}>
-                    {staff.name}
-                  </MenuItem>
-                ))}
-            </Select>
             <RedBar />
             <Typography variant="body2" display="block">
               Capacity

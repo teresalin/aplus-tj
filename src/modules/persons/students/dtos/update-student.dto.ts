@@ -1,6 +1,6 @@
 export interface UpdateStudentDTO {
-  personId: number;
-  studentId: number;
+  id: number;
+  studentId?: number;
   name?: string;
   englishName?: string;
   gender?: string;

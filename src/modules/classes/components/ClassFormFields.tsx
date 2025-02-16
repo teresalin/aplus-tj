@@ -180,7 +180,7 @@ const ClassFormFields = ({
             >
               {teachers &&
                 teachers.map((teacher: Staff) => (
-                  <MenuItem key={teacher.staffId} value={teacher.staffId}>
+                  <MenuItem key={teacher.id} value={teacher.id}>
                     {teacher.name}
                   </MenuItem>
                 ))}
@@ -252,7 +252,7 @@ const ClassFormFields = ({
                               (schedule) => schedule.dayOfWeek === day
                             )?.startTime,
                             "HH:mm:ss"
-                          )
+                          ).local()
                         : null
                     }
                     onChange={(newValue: Dayjs | null) =>
@@ -261,6 +261,7 @@ const ClassFormFields = ({
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
+                  {/* TODO store these times as timestamptz */}
                   <TimePicker
                     label="End Time"
                     slotProps={{
@@ -277,7 +278,7 @@ const ClassFormFields = ({
                               (schedule) => schedule.dayOfWeek === day
                             )?.endTime,
                             "HH:mm:ss"
-                          )
+                          ).local()
                         : null
                     }
                     onChange={(newValue: Dayjs | null) =>

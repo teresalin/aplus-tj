@@ -1,6 +1,7 @@
 export interface Person {
-  personId: number;
+  id: number;
   name: string;
+  preferredName: string;
   gender: string;
   phone: string;
   email: string;

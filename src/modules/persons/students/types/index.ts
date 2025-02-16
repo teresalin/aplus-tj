@@ -2,20 +2,21 @@ import { Grade } from "../../../grades";
 import { Person } from "../../types";
 
 export interface Student extends Person {
-  studentId: number;
+  studentId?: number;
   englishName?: string;
-  currentSchool: string;
-  textbookPublisher: string;
+  currentSchool?: string;
+  textbookPublisher?: string;
   grade: Grade;
-  joinDate: Date;
-  leaveDate?: Date;
+  admissionDate: Date;
+  departureDate?: Date;
 }
 
 export interface StudentSummary {
-  studentId: number;
+  id: number;
+  studentId?: number;
   name: string;
   dateOfBirth: Date;
   englishName?: string;
-  currentSchool: string;
+  currentSchool?: string;
   notes?: string;
 }

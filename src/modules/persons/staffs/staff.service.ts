@@ -11,21 +11,22 @@ export async function findAllStaffs(): Promise<Staff[]> {
     const { rows } = await client.query(
       `
       SELECT
-        person.id AS person_id,
+        person.id,
         person.name,
+        person.preferred_name,
         person.gender,
         person.phone,
         person.email,
         person.date_of_birth::timestamp at time zone 'UTC' as date_of_birth,
         person.notes,
         person.active,
-        staff.id AS staff_id,
-        staff.join_date::timestamp at time zone 'UTC' as join_date,
+        staff.staff_id,
+        staff.hire_date::timestamp at time zone 'UTC' as hire_date,
         staff.leave_date::timestamp at time zone 'UTC' as leave_date
       FROM
         staff
       JOIN
-        person ON staff.person_id = person.id;
+        person ON staff.id = person.id;
       `
     );
     return rows.map(mapRowToStaff);
@@ -44,7 +45,7 @@ export async function findStaffById(staffId: number): Promise<Staff | null> {
     const { rows } = await client.query(
       `
       SELECT 
-        person.id AS person_id,
+        person.id,
         person.name,
         person.gender,
         person.phone,
@@ -52,13 +53,13 @@ export async function findStaffById(staffId: number): Promise<Staff | null> {
         person.date_of_birth::timestamp at time zone 'UTC' as date_of_birth,
         person.notes,
         person.active,
-        staff.id AS staff_id,
-        staff.join_date::timestamp at time zone 'UTC' as join_date, 
+        staff.staff_id,
+        staff.hire_date::timestamp at time zone 'UTC' as join_date, 
         staff.leave_date::timestamp at time zone 'UTC' as leave_date, 
         staff_role.id AS role_id,
         staff_role.name AS role_name
       FROM staff
-      INNER JOIN person ON staff.person_id = person.id
+      INNER JOIN person ON staff.id = person.id
       INNER JOIN staff_role ON staff.role_id = staff_role.id
       WHERE staff.id = $1;
       `,
@@ -100,7 +101,7 @@ export async function createStaff(dto: CreateStaffDTO) {
 
     const insertStaffQuery = {
       text: `
-        INSERT INTO staff(person_id, role_id, join_date, leave_date, created, updated) 
+        INSERT INTO staff(id, role_id, join_date, leave_date, created, updated) 
         VALUES ($1, $2, $3, $4, NOW(), NOW())
         RETURNING id;
       `,
@@ -145,7 +146,7 @@ export async function updateStaff(dto: UpdateStaffDTO) {
         dto.email,
         dto.dateOfBirth,
         dto.notes,
-        dto.personId,
+        dto.id,
       ],
     };
 
@@ -156,7 +157,7 @@ export async function updateStaff(dto: UpdateStaffDTO) {
       text: `
         UPDATE staff
         SET role_id = $1, join_date = $2, leave_date = $3, updated = NOW()
-        WHERE person_id = $4
+        WHERE id = $4
         RETURNING id;
       `,
       values: [dto.roleId, dto.joinDate, dto.leaveDate, personId],

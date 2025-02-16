@@ -11,24 +11,24 @@ export async function findAllStudents(): Promise<Student[]> {
     const { rows } = await client.query(
       `
       SELECT
-        person.id AS person_id,
+        person.id,
         person.name,
+        person.preferred_name,
         person.gender,
         person.phone,
         person.email,
         person.date_of_birth::timestamp at time zone 'UTC' as date_of_birth,
         person.notes,
         person.active,
-        student.id AS student_id,
-        student.english_name,
+        student.student_id,
         student.current_school,
         student.textbook_publisher,
-        student.join_date::timestamp at time zone 'UTC' as join_date, 
-        student.leave_date::timestamp at time zone 'UTC' as leave_date, 
+        student.admission_date::timestamp at time zone 'UTC' as admission_date, 
+        student.departure_date::timestamp at time zone 'UTC' as departure_date, 
         grade.id AS grade_id,
         grade.name AS grade_name
       FROM student
-      INNER JOIN person ON student.person_id = person.id
+      INNER JOIN person ON student.id = person.id
       INNER JOIN grade ON student.grade_id = grade.id;
       `
     );
@@ -160,7 +160,7 @@ export async function updateStudent(dto: UpdateStudentDTO) {
         dto.email,
         dto.dateOfBirth,
         dto.notes,
-        dto.personId,
+        dto.id,
       ],
     };
     const result = await client.query(updatePersonQuery);

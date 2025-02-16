@@ -1,6 +1,5 @@
 import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { parseParent } from "../../../../../utils/apiUtils";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const client = await getDBClient();
@@ -27,7 +26,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const result = await client.query(query);
     res.status(200).json({
       status: "Success",
-      result: result.rows.map(parseParent),
+      result: result.rows,
       message: "Parents retrieved successfully.",
     });
   } catch (error) {

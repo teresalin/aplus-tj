@@ -1,14 +1,12 @@
-import { getDBClient, releaseDBClient } from "../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
-import { parseAssignment } from "../../../../utils/apiUtils";
-import {
-  createAssignment,
-  findAllAssignments,
-} from "../../../modules/assignments/assignment.service";
 import { ApiResponse } from "../../../../utils/apiResponse";
 import { CreateAssignmentDTO } from "../../../modules/assignments";
 import { MethodNotAllowedError } from "../../../../utils/CustomError";
 import { handleError } from "../../../../utils/errorHandler";
+import {
+  createAssignment,
+  findAllAssignments,
+} from "../../../modules/assignments/assignment.service";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { filter } = req.query;

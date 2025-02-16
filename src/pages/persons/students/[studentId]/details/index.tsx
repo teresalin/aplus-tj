@@ -20,40 +20,40 @@ import utc from "dayjs/plugin/utc";
 import { formatDate } from "../../../../../../utils/formatDate";
 import fetcher from "../../../../../../utils/fetcher";
 import {
-  Staff,
-  StaffLayout,
-  UpdateStaffDialog,
-  UpdateStaffDTO,
-} from "../../../../../modules/persons/staffs";
+  Student,
+  StudentLayout,
+  UpdateStudentDialog,
+  UpdateStudentDTO,
+} from "../../../../../modules/persons/students";
 
 dayjs.extend(utc);
 
 export default function DetailsTab() {
   const theme = useTheme();
-  const staffID = useRouter().query.staff_id;
+  const studentID = useRouter().query.student_id;
 
-  const [isUpdateStaffDialogOpen, setIsUpdateStaffDialogOpen] =
+  const [isUpdateStudentDialogOpen, setIsUpdateStudentDialogOpen] =
     React.useState(false);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
   const [snackbarSeverity, setSnackbarSeverity] =
     React.useState<AlertColor>("error");
 
-  const { data, isLoading, error } = useSWR<Staff>(
-    staffID ? `/api/persons/staffs/${staffID}` : null,
+  const { data, isLoading, error } = useSWR<Student>(
+    studentID ? `/api/persons/students/${studentID}` : null,
     fetcher
   );
-  const staff = data || null;
+  const student = data || null;
 
   const handleEditClick = () => {
-    setIsUpdateStaffDialogOpen(true);
+    setIsUpdateStudentDialogOpen(true);
   };
 
-  const handleCloseUpdateStaffDialog = () => {
-    setIsUpdateStaffDialogOpen(false);
+  const handleCloseUpdateStudentDialog = () => {
+    setIsUpdateStudentDialogOpen(false);
   };
 
-  const handleUpdateStaff = async (data: UpdateStaffDTO) => {
+  const handleUpdateStudent = async (data: UpdateStudentDTO) => {
     const normalizedEmail = data.email?.trim().toLowerCase();
 
     const normalizedData = {
@@ -61,7 +61,7 @@ export default function DetailsTab() {
       email: normalizedEmail,
     };
 
-    const response = await fetch(`/api/persons/staffs/${data.staffId}`, {
+    const response = await fetch(`/api/persons/students/${data.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -71,9 +71,9 @@ export default function DetailsTab() {
 
     const responseData = await response.json();
     if (response.ok) {
-      handleCloseUpdateStaffDialog();
-      mutate(`/api/persons/staffs/${staffID}`);
-      setSnackbarMessage("Staff updated successfully");
+      handleCloseUpdateStudentDialog();
+      mutate(`/api/persons/students/${studentID}`);
+      setSnackbarMessage("Student updated successfully");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
     } else {
@@ -90,7 +90,7 @@ export default function DetailsTab() {
 
   return (
     <>
-      <StaffLayout currentTab="details">
+      <StudentLayout currentTab="details">
         <Box sx={{ display: "flex", flexDirection: "row-reverse" }} m={1}>
           <Button
             variant="text"
@@ -105,7 +105,7 @@ export default function DetailsTab() {
         {/* Display LinearProgress inside the layout if still loading */}
         {isLoading && <LinearProgress />}
 
-        {staff && (
+        {student && (
           <>
             <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
               <Grid container direction="row" spacing={3}>
@@ -120,17 +120,19 @@ export default function DetailsTab() {
                     }}
                     alt="User profile picture"
                     src={`${
-                      staff.gender === "Male"
+                      student.gender === "Male"
                         ? "/student-boy.png"
-                        : staff.gender === "Female"
+                        : student.gender === "Female"
                         ? "/student-girl.png"
                         : "/student-other.png"
                     }`}
                   />
                 </Grid>
                 <Grid item>
-                  <Typography variant="h6">{staff.name}</Typography>
-                  <Typography variant="subtitle2">{staff.role.name}</Typography>
+                  <Typography variant="h6">{student.name}</Typography>
+                  <Typography variant="subtitle2">
+                    {student.englishName}
+                  </Typography>
                   <Grid container>
                     <Grid item>
                       <Button
@@ -145,7 +147,7 @@ export default function DetailsTab() {
                           fontSize: 12,
                         }}
                       >
-                        {staff.email}
+                        {student.email}
                       </Button>
                     </Grid>
                     <Grid item>
@@ -161,7 +163,7 @@ export default function DetailsTab() {
                           fontSize: 12,
                         }}
                       >
-                        {staff.phone}
+                        {student.phone}
                       </Button>
                     </Grid>
                     <Grid item>
@@ -177,10 +179,48 @@ export default function DetailsTab() {
                           fontSize: 12,
                         }}
                       >
-                        {formatDate(staff.dateOfBirth)}
+                        {formatDate(student.dateOfBirth)}
                       </Button>
                     </Grid>
                   </Grid>
+                </Grid>
+              </Grid>
+            </Paper>
+            <Typography variant="h6" gutterBottom>
+              School Information
+            </Typography>
+            <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+              <Grid container spacing={3}>
+                <Grid item sm={12} md={4}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                  >
+                    Current School
+                  </Typography>
+                  <Typography variant="body2">
+                    {student.currentSchool}
+                  </Typography>
+                </Grid>
+                <Grid item sm={12} md={4}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                  >
+                    Grade
+                  </Typography>
+                  <Typography variant="body2">{student.grade.name}</Typography>
+                </Grid>
+                <Grid item sm={12} md={4}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: theme.palette.primary.main }}
+                  >
+                    Textbook Publisher
+                  </Typography>
+                  <Typography variant="body2">
+                    {student.textbookPublisher}
+                  </Typography>
                 </Grid>
               </Grid>
             </Paper>
@@ -197,7 +237,7 @@ export default function DetailsTab() {
                     Join Date
                   </Typography>
                   <Typography variant="body2">
-                    {formatDate(staff.joinDate)}
+                    {formatDate(student.joinDate)}
                   </Typography>
                 </Grid>
                 <Grid item sm={12} md={4}>
@@ -208,7 +248,7 @@ export default function DetailsTab() {
                     Leave Date
                   </Typography>
                   <Typography variant="body2">
-                    {formatDate(staff.leaveDate)}
+                    {formatDate(student.leaveDate)}
                   </Typography>
                 </Grid>
                 <Grid item sm={12} md={4}>
@@ -219,7 +259,7 @@ export default function DetailsTab() {
                     Status
                   </Typography>
                   <Typography variant="body2">
-                    {staff.active ? "Active" : "Inactive"}
+                    {student.active ? "Active" : "Inactive"}
                   </Typography>
                 </Grid>
               </Grid>
@@ -234,16 +274,16 @@ export default function DetailsTab() {
               >
                 Notes
               </Typography>
-              <Typography variant="body2">{staff.notes || "N/A"}</Typography>
+              <Typography variant="body2">{student.notes || "N/A"}</Typography>
             </Paper>
           </>
         )}
-      </StaffLayout>
-      <UpdateStaffDialog
-        existingStaff={staff}
-        open={isUpdateStaffDialogOpen}
-        onClose={handleCloseUpdateStaffDialog}
-        onSubmit={handleUpdateStaff}
+      </StudentLayout>
+      <UpdateStudentDialog
+        existingStudent={student}
+        open={isUpdateStudentDialogOpen}
+        onClose={handleCloseUpdateStudentDialog}
+        onSubmit={handleUpdateStudent}
       />
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}

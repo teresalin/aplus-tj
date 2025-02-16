@@ -1,190 +1,44 @@
-import { useRouter } from "next/router";
+import Alert, { AlertColor } from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
-import dayjs from "dayjs";
 import React from "react";
-import useSWR from "swr";
-import {
-  GridColDef,
-  GridColumnVisibilityModel,
-  GridValueFormatterParams,
-} from "@mui/x-data-grid";
+import Snackbar from "@mui/material/Snackbar";
 
-import { CreateParentDialog, Parent } from "../../../modules/persons/parents";
-import BaseDataGrid from "../../../modules/persons/BaseDataGrid";
-import fetcher from "../../../../utils/fetcher";
-import PersonsTabs from "../../../modules/persons/PersonsTabs";
+import { ParentsDashboard } from "../../../modules/persons/parents/components";
 
-export default function PersonGrid() {
-  const router = useRouter();
-  const [isCreateParentDialogOpen, setIsCreateParentDialogOpen] =
-    React.useState(false);
+export default function StudentsPage() {
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [snackbarSeverity, setSnackbarSeverity] =
+    React.useState<AlertColor>("error");
 
-  const { data, isLoading, error } = useSWR("/api/persons/parents", fetcher);
-  const parents = (data as Parent[]) || [];
-
-  const handleAddButtonClick = () => {
-    setIsCreateParentDialogOpen(true);
+  const handleSnackbar = (
+    message: string,
+    severity: AlertColor = "success"
+  ) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
   };
-
-  const closeDialog = () => {
-    setIsCreateParentDialogOpen(false);
-  };
-
-  const handleCreateParent = async (data) => {
-    const url = "/api/persons/parents/index";
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      closeDialog();
-    } else {
-      console.error("Error creating parent:", response.statusText);
-    }
-  };
-
-  const onRowClick = (data: { personId: string }) => {
-    router.push(`/persons/parents/[id]`, `/persons/parents/${data.personId}`);
-  };
-
-  const renderChip = (params) => {
-    return params.value ? (
-      <Chip
-        // icon={<CheckIcon />}
-        label="Active"
-        size="small"
-        sx={{ height: "20px", paddingX: 1 }}
-        style={{ backgroundColor: "#bef0cc", color: "#507b67" }}
-      />
-    ) : (
-      <Chip
-        // icon={<CloseIcon />}
-        label="Inactive"
-        size="small"
-        sx={{ height: "20px" }}
-        style={{ backgroundColor: "#f9e8e8", color: "#9f3d49" }}
-      />
-    );
-  };
-
-  const columns: GridColDef[] = [
-    {
-      field: "personId",
-      headerName: "id",
-      minWidth: 50,
-      flex: 1,
-    },
-    {
-      field: "name",
-      headerName: "Name",
-      minWidth: 150,
-      flex: 1,
-    },
-    {
-      field: "gender",
-      headerName: "Gender",
-      minWidth: 100,
-      flex: 1,
-    },
-    {
-      field: "phone",
-      headerName: "Phone",
-      minWidth: 120,
-      flex: 1,
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      minWidth: 200,
-      flex: 1,
-    },
-    {
-      field: "dateOfBirth",
-      headerName: "Date of Birth",
-      minWidth: 120,
-      flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<Date>) => {
-        if (params.value == null) {
-          return "";
-        }
-        return dayjs(params.value).format("YYYY-MM-DD");
-      },
-    },
-    {
-      field: "active",
-      headerName: "Active",
-      minWidth: 100,
-      flex: 1,
-      renderCell: renderChip,
-    },
-    // TODO fix failed prop type warning
-    {
-      field: "created",
-      headerName: "Created On",
-      minWidth: 120,
-      flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<Date>) => {
-        if (params.value == null) {
-          return "";
-        }
-        return dayjs(params.value).format("YYYY-MM-DD");
-      },
-    },
-  ];
-
-  const getTogglableColumns = (columns: GridColDef[]) => {
-    return columns
-      .filter(
-        (column) =>
-          column.field !== "personId" &&
-          column.field !== "action" &&
-          column.field !== "detailPanel" &&
-          column.field !== "created"
-      )
-      .map((column) => column.field);
-  };
-
-  const initialColumnVisibilityModel: GridColumnVisibilityModel = {
-    detailPanel: true,
-    personId: false,
-    name: true,
-    gender: false,
-    phone: true,
-    email: true,
-    dateOfBirth: true,
-    active: true,
-    created: false,
-    action: true,
-  };
-
-  if (error) {
-    return <div>Error fetching data</div>;
-  }
 
   return (
     <>
       <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
-        <PersonsTabs currentTab="parents" />
-        <BaseDataGrid
-          data={parents}
-          columns={columns}
-          isLoading={isLoading}
-          onAddClick={handleAddButtonClick}
-          getTogglableColumns={getTogglableColumns}
-          initialColumnVisibilityModel={initialColumnVisibilityModel}
-        />
+        <ParentsDashboard onSnackbar={handleSnackbar} />
       </Box>
-      <CreateParentDialog
-        open={isCreateParentDialogOpen}
-        onClose={closeDialog}
-        onSubmit={handleCreateParent}
-      />
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

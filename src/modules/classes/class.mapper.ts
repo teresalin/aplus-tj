@@ -9,7 +9,7 @@ export function mapRowToClass(row: any): Class {
   return {
     id: row.class_id,
     name: row.class_name,
-    teacher: { staffId: row.staff_id, name: row.staff_name } as StaffSummary,
+    teacher: { id: row.staff_id, name: row.staff_name } as StaffSummary,
     grade: { id: row.grade_id, name: row.grade_name } as Grade,
     capacity: row.capacity,
     schedules: (row.schedules || []).map((schedule: any) => ({

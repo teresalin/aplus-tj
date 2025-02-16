@@ -120,10 +120,8 @@ export default function SessionDetails() {
                   <CardContent>
                     <Box>
                       {/* <Typography variant="subtitle1">Class</Typography> */}
-                      <Typography>{details?.classSummary?.name}</Typography>
-                      <Typography variant="caption">
-                        {/* {details?.teacherName} */}
-                      </Typography>
+                      <Typography>test</Typography>
+                      <Typography variant="caption">test</Typography>
                     </Box>
                   </CardContent>
                 </Box>

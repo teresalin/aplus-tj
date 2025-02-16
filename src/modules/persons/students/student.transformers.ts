@@ -3,7 +3,7 @@ import { Student } from "./types";
 
 export function studentToUpdateStudentDTO(student: Student): UpdateStudentDTO {
   return {
-    personId: student.personId,
+    id: student.id,
     studentId: student.studentId,
     name: student.name,
     englishName: student.englishName,

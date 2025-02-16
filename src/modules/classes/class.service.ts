@@ -32,7 +32,7 @@ export async function findAllClasses(): Promise<Class[]> {
           ) AS "schedules"
         FROM class
         JOIN staff ON class.teacher_id = staff.id
-        JOIN person ON staff.person_id = person.id
+        JOIN person ON staff.id = person.id
         JOIN grade ON class.grade_id = grade.id
         WHERE class.active = true
         GROUP BY class.id, class.name, grade.id, grade.name, class.capacity, person.id

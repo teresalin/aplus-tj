@@ -15,21 +15,12 @@ import useSWR from "swr";
 import { Grade } from "../../../grades";
 import { Parent } from "../types";
 import fetcher from "../../../../../utils/fetcher";
-
-function RedBar() {
-  return (
-    <Box
-      sx={{
-        height: 20,
-      }}
-    />
-  );
-}
+import { CreateParentDTO } from "../dtos";
 
 export interface ICreateParentDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: Parent) => Promise<void>;
+  onSubmit: (data: CreateParentDTO, resetForm: () => void) => Promise<void>;
 }
 
 export default function CreateParentDialog({
@@ -37,7 +28,8 @@ export default function CreateParentDialog({
   onClose,
   onSubmit,
 }: ICreateParentDialogProps) {
-  const [newParent, setNewParent] = React.useState({} as Parent);
+  const initialParentState = {} as CreateParentDTO;
+  const [newParent, setNewParent] = React.useState(initialParentState);
   const { data } = useSWR("/api/grades", fetcher);
   const grades = data || [];
 
@@ -58,8 +50,11 @@ export default function CreateParentDialog({
     }));
   };
 
-  const handleSubmit: React.FormEventHandler = (event: React.FormEvent) => {
-    onSubmit(newParent);
+  const handleSubmit: React.FormEventHandler = async (
+    event: React.FormEvent
+  ) => {
+    event.preventDefault(); // Prevent default form submission behavior
+    await onSubmit(newParent, () => setNewParent(initialParentState));
   };
 
   return (
@@ -145,7 +140,6 @@ export default function CreateParentDialog({
               value={newParent.notes || ""}
               onChange={(e) => handleInputChange("notes", e.target.value)}
             />
-            <RedBar />
             {/* TODO lowercase before storing into db */}
             <Typography variant="body2" display="block" gutterBottom>
               Contact Information
@@ -174,7 +168,6 @@ export default function CreateParentDialog({
               value={newParent.phone || ""}
               onChange={(e) => handleInputChange("phone", e.target.value)}
             />
-            <RedBar />
             <Typography variant="body2" display="block" gutterBottom>
               School Information
             </Typography>
@@ -225,7 +218,6 @@ export default function CreateParentDialog({
                 handleInputChange("textbookPublisher", e.target.value)
               }
             />
-            <RedBar />
             <Typography variant="body2" display="block" gutterBottom>
               Enrollment Period
             </Typography>
