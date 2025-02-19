@@ -2,7 +2,7 @@ export interface UpdateStudentDTO {
   id: number;
   studentId?: number;
   name?: string;
-  englishName?: string;
+  preferredName?: string;
   gender?: string;
   dateOfBirth?: Date;
   notes?: string;
@@ -11,7 +11,7 @@ export interface UpdateStudentDTO {
   currentSchool?: string;
   gradeId?: number;
   textbookPublisher?: string;
-  joinDate?: Date;
-  leaveDate?: Date;
+  admissionDate?: Date;
+  departureDate?: Date;
   active?: boolean;
 }

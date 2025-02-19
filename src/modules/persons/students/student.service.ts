@@ -50,16 +50,16 @@ export async function findStudentById(
     const { rows } = await client.query(
       `
       SELECT 
-        person.id AS person_id,
+        person.id,
         person.name,
+        person.preferred_name,
         person.gender,
         person.phone,
         person.email,
         person.date_of_birth::timestamp at time zone 'UTC' as date_of_birth,
         person.notes,
         person.active,
-        student.id AS student_id,
-        student.english_name,
+        student.student_id,
         student.current_school,
         student.textbook_publisher,
         student.join_date::timestamp at time zone 'UTC' as date_of_birth, 
@@ -67,7 +67,7 @@ export async function findStudentById(
         grade.id AS grade_id,
         grade.name AS grade_name
       FROM student
-      INNER JOIN person ON student.person_id = person.id
+      INNER JOIN person ON student.id = person.id
       INNER JOIN grade ON student.grade_id = grade.id
       WHERE student.id = $1;
       `,
@@ -108,17 +108,17 @@ export async function createStudent(dto: CreateStudentDTO) {
 
     const insertStudentQuery = {
       text: `
-        INSERT INTO student(person_id, english_name, current_school, textbook_publisher, grade_id, join_date, leave_date, created, updated)
+        INSERT INTO student(id, preferred_name, current_school, textbook_publisher, grade_id, join_date, leave_date, created, updated)
         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW());
       `,
       values: [
         personId,
-        dto.englishName,
+        dto.preferredName,
         dto.currentSchool,
         dto.textbookPublisher,
         dto.gradeId,
-        dto.joinDate,
-        dto.leaveDate,
+        dto.admissionDate,
+        dto.departureDate,
       ],
     };
     await client.query(insertStudentQuery);
@@ -169,16 +169,16 @@ export async function updateStudent(dto: UpdateStudentDTO) {
     const updateStudentQuery = {
       text: `
         UPDATE student
-        SET english_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, updated = NOW()
-        WHERE person_id = $7;
+        SET preferred_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, updated = NOW()
+        WHERE id = $7;
       `,
       values: [
-        dto.englishName,
+        dto.preferredName,
         dto.currentSchool,
         dto.textbookPublisher,
         dto.gradeId,
-        dto.joinDate,
-        dto.leaveDate,
+        dto.admissionDate,
+        dto.departureDate,
         personId,
       ],
     };

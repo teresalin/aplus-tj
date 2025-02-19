@@ -98,6 +98,10 @@ CREATE TABLE grade (
   updated TIMESTAMPTZ DEFAULT NOW()
 );
 
+INSERT INTO grade (id, name) VALUES (gen_random_uuid(), '10th Grade');
+INSERT INTO grade (id, name) VALUES (gen_random_uuid(), '11th Grade');
+INSERT INTO grade (id, name) VALUES (gen_random_uuid(), '12th Grade');
+
 CREATE TABLE class_student (
   id UUID PRIMARY KEY,
   class_id UUID REFERENCES class(id) NOT NULL,

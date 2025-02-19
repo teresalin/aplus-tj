@@ -3,7 +3,6 @@ import { Person } from "../../types";
 
 export interface Student extends Person {
   studentId?: number;
-  englishName?: string;
   currentSchool?: string;
   textbookPublisher?: string;
   grade: Grade;
@@ -13,10 +12,9 @@ export interface Student extends Person {
 
 export interface StudentSummary {
   id: number;
-  studentId?: number;
   name: string;
+  preferredName?: string;
   dateOfBirth: Date;
-  englishName?: string;
   currentSchool?: string;
   notes?: string;
 }

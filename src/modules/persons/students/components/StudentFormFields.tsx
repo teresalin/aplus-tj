@@ -30,7 +30,7 @@ const StudentFormFields = ({
 }: IStudentFormFieldsProps) => {
   const {
     name,
-    englishName,
+    preferredName,
     gender,
     dateOfBirth,
     notes,
@@ -39,8 +39,8 @@ const StudentFormFields = ({
     currentSchool,
     gradeId,
     textbookPublisher,
-    joinDate,
-    leaveDate,
+    admissionDate,
+    departureDate,
   } = student;
 
   const handleInputChange = (field: string, value: any) => {
@@ -85,8 +85,10 @@ const StudentFormFields = ({
               type="text"
               variant="outlined"
               margin="normal"
-              value={englishName || ""}
-              onChange={(e) => handleInputChange("englishName", e.target.value)}
+              value={preferredName || ""}
+              onChange={(e) =>
+                handleInputChange("preferredName", e.target.value)
+              }
             />
           </Grid>
         </Grid>
@@ -227,10 +229,10 @@ const StudentFormFields = ({
           <Grid container direction="row" spacing={1}>
             <Grid item xs={6}>
               <DatePicker
-                label="Join Date"
+                label="Admission Date"
                 format="YYYY-MM-DD"
-                value={joinDate ? dayjs(joinDate).utc() : null}
-                onChange={(date) => handleInputChange("joinDate", date)}
+                value={admissionDate ? dayjs(admissionDate).utc() : null}
+                onChange={(date) => handleInputChange("admissionDate", date)}
                 slotProps={{
                   textField: {
                     required: true,
@@ -240,10 +242,10 @@ const StudentFormFields = ({
             </Grid>
             <Grid item xs={6}>
               <DatePicker
-                label="Leave Date"
+                label="Departure Date"
                 format="YYYY-MM-DD"
-                value={leaveDate ? dayjs(leaveDate).utc() : null}
-                onChange={(date) => handleInputChange("leaveDate", date)}
+                value={departureDate ? dayjs(departureDate).utc() : null}
+                onChange={(date) => handleInputChange("departureDate", date)}
               />
             </Grid>
           </Grid>

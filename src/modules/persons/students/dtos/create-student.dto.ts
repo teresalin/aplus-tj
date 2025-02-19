@@ -1,6 +1,6 @@
 export interface CreateStudentDTO {
   name: string;
-  englishName?: string;
+  preferredName?: string;
   gender: string;
   dateOfBirth: Date;
   notes?: string;
@@ -9,6 +9,6 @@ export interface CreateStudentDTO {
   currentSchool: string;
   gradeId: number;
   textbookPublisher: string;
-  joinDate: Date;
-  leaveDate?: Date;
+  admissionDate: Date;
+  departureDate?: Date;
 }
