@@ -6,7 +6,7 @@ export function studentToUpdateStudentDTO(student: Student): UpdateStudentDTO {
     id: student.id,
     studentId: student.studentId,
     name: student.name,
-    englishName: student.englishName,
+    preferredName: student.preferredName,
     gender: student.gender,
     dateOfBirth: student.dateOfBirth,
     notes: student.notes,
@@ -15,8 +15,8 @@ export function studentToUpdateStudentDTO(student: Student): UpdateStudentDTO {
     currentSchool: student.currentSchool,
     gradeId: student.grade.id,
     textbookPublisher: student.textbookPublisher,
-    joinDate: student.joinDate,
-    leaveDate: student.leaveDate,
+    admissionDate: student.admissionDate,
+    departureDate: student.departureDate,
     active: student.active,
   };
 }

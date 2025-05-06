@@ -7,7 +7,7 @@ export interface CreateStudentDTO {
   phone: string;
   email: string;
   currentSchool: string;
-  gradeId: number;
+  gradeId: string;
   textbookPublisher: string;
   admissionDate: Date;
   departureDate?: Date;

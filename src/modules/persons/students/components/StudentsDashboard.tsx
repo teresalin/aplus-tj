@@ -81,12 +81,12 @@ export default function StudentsDashboard({
     }
   };
 
-  const onRowClick = (data: { studentId: number }) => {
-    router.push(`/persons/students/${data.studentId}/details`);
+  const onRowClick = (data: { id: string }) => {
+    router.push(`/persons/students/${data.id}/details`);
   };
 
   const columns: GridColDef[] = [
-    { field: "personId", headerName: "ID", minWidth: 50, flex: 1 },
+    { field: "id", headerName: "ID", minWidth: 50, flex: 1 },
     { field: "name", headerName: "Name", minWidth: 150, flex: 1 },
     { field: "gender", headerName: "Gender", minWidth: 100, flex: 1 },
     { field: "phone", headerName: "Phone", minWidth: 120, flex: 1 },

@@ -41,9 +41,7 @@ export async function findAllStudents(): Promise<Student[]> {
   }
 }
 
-export async function findStudentById(
-  studentId: number
-): Promise<Student | null> {
+export async function findStudentById(id: string): Promise<Student | null> {
   const client = await getDBClient();
 
   try {
@@ -62,8 +60,8 @@ export async function findStudentById(
         student.student_id,
         student.current_school,
         student.textbook_publisher,
-        student.join_date::timestamp at time zone 'UTC' as date_of_birth, 
-        student.leave_date::timestamp at time zone 'UTC' as date_of_birth, 
+        student.admission_date, 
+        student.departure_date, 
         grade.id AS grade_id,
         grade.name AS grade_name
       FROM student
@@ -71,7 +69,7 @@ export async function findStudentById(
       INNER JOIN grade ON student.grade_id = grade.id
       WHERE student.id = $1;
       `,
-      [studentId]
+      [id]
     );
     return rows.length ? mapRowToStudent(rows[0]) : null;
   } catch (error) {
@@ -90,17 +88,17 @@ export async function createStudent(dto: CreateStudentDTO) {
 
     const insertPersonQuery = {
       text: `
-        INSERT INTO person(name, gender, phone, email, date_of_birth, notes, active, created, updated)
-        VALUES ($1, $2, $3, $4, $5, $6, true, NOW(), NOW()) RETURNING id;
+        INSERT INTO person(name, preferred_name, gender, phone, email, date_of_birth, notes, active, created, updated)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW(), NOW()) RETURNING id;
       `,
       values: [
         dto.name,
+        dto.preferredName,
         dto.gender,
         dto.phone,
         dto.email,
         dto.dateOfBirth,
         dto.notes,
-        "t",
       ],
     };
     const result = await client.query(insertPersonQuery);
@@ -108,12 +106,11 @@ export async function createStudent(dto: CreateStudentDTO) {
 
     const insertStudentQuery = {
       text: `
-        INSERT INTO student(id, preferred_name, current_school, textbook_publisher, grade_id, join_date, leave_date, created, updated)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW());
+        INSERT INTO student(id, current_school, textbook_publisher, grade_id, admission_date, departure_date, created, updated)
+        VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW());
       `,
       values: [
         personId,
-        dto.preferredName,
         dto.currentSchool,
         dto.textbookPublisher,
         dto.gradeId,

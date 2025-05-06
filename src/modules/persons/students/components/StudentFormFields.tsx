@@ -50,10 +50,10 @@ const StudentFormFields = ({
     }));
   };
 
-  const handleGradeChange = (event: SelectChangeEvent<number>) => {
-    const value = parseInt(event.target.value as string, 10);
-    handleInputChange("gradeId", value || 0);
-  };
+  // const handleGradeChange = (event: SelectChangeEvent<number>) => {
+  //   const value = parseInt(event.target.value as string, 10);
+  //   handleInputChange("gradeId", value || 0);
+  // };
 
   return (
     <>
@@ -97,8 +97,15 @@ const StudentFormFields = ({
           format="YYYY-MM-DD"
           // We want to put a null value here so the date picker field
           // does not complain and show a red error outline
+          // Handle date as utc at all times
+          // TODO: Deal with timezone and format here or when saving?
           value={dateOfBirth ? dayjs(dateOfBirth).utc() : null}
-          onChange={(date) => handleInputChange("dateOfBirth", date)}
+          onChange={(date) =>
+            handleInputChange(
+              "dateOfBirth",
+              date ? dayjs(date).utc().format("YYYY-MM-DD") : null
+            )
+          }
           sx={{ marginTop: "16px", marginBottom: "8px", width: "100%" }}
           slotProps={{
             textField: {
@@ -195,7 +202,7 @@ const StudentFormFields = ({
               label={"Select a grade"}
               labelId="grade-select-label"
               value={gradeId || ""}
-              onChange={handleGradeChange}
+              onChange={(e) => handleInputChange("gradeId", e.target.value)}
             >
               {grades &&
                 grades.map((grade: Grade) => (
@@ -231,7 +238,7 @@ const StudentFormFields = ({
               <DatePicker
                 label="Admission Date"
                 format="YYYY-MM-DD"
-                value={admissionDate ? dayjs(admissionDate).utc() : null}
+                value={admissionDate ? dayjs(admissionDate) : null}
                 onChange={(date) => handleInputChange("admissionDate", date)}
                 slotProps={{
                   textField: {
@@ -244,7 +251,7 @@ const StudentFormFields = ({
               <DatePicker
                 label="Departure Date"
                 format="YYYY-MM-DD"
-                value={departureDate ? dayjs(departureDate).utc() : null}
+                value={departureDate ? dayjs(departureDate) : null}
                 onChange={(date) => handleInputChange("departureDate", date)}
               />
             </Grid>

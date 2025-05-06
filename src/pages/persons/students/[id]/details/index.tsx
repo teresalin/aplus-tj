@@ -30,7 +30,7 @@ dayjs.extend(utc);
 
 export default function DetailsTab() {
   const theme = useTheme();
-  const studentID = useRouter().query.student_id;
+  const id = useRouter().query.id;
 
   const [isUpdateStudentDialogOpen, setIsUpdateStudentDialogOpen] =
     React.useState(false);
@@ -40,7 +40,7 @@ export default function DetailsTab() {
     React.useState<AlertColor>("error");
 
   const { data, isLoading, error } = useSWR<Student>(
-    studentID ? `/api/persons/students/${studentID}` : null,
+    id ? `/api/persons/students/${id}` : null,
     fetcher
   );
   const student = data || null;
@@ -72,7 +72,7 @@ export default function DetailsTab() {
     const responseData = await response.json();
     if (response.ok) {
       handleCloseUpdateStudentDialog();
-      mutate(`/api/persons/students/${studentID}`);
+      mutate(`/api/persons/students/${id}`);
       setSnackbarMessage("Student updated successfully");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
@@ -131,7 +131,7 @@ export default function DetailsTab() {
                 <Grid item>
                   <Typography variant="h6">{student.name}</Typography>
                   <Typography variant="subtitle2">
-                    {student.englishName}
+                    {student.preferredName}
                   </Typography>
                   <Grid container>
                     <Grid item>
@@ -234,10 +234,10 @@ export default function DetailsTab() {
                     variant="body2"
                     sx={{ fontWeight: 700, color: theme.palette.primary.main }}
                   >
-                    Join Date
+                    Admission Date
                   </Typography>
                   <Typography variant="body2">
-                    {formatDate(student.joinDate)}
+                    {formatDate(student.admissionDate)}
                   </Typography>
                 </Grid>
                 <Grid item sm={12} md={4}>
@@ -245,10 +245,10 @@ export default function DetailsTab() {
                     variant="body2"
                     sx={{ fontWeight: 700, color: theme.palette.primary.main }}
                   >
-                    Leave Date
+                    Departure Date
                   </Typography>
                   <Typography variant="body2">
-                    {formatDate(student.leaveDate)}
+                    {formatDate(student.departureDate)}
                   </Typography>
                 </Grid>
                 <Grid item sm={12} md={4}>

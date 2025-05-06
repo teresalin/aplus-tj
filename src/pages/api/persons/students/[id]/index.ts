@@ -15,12 +15,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const studentId = parseInt(req.query.student_id as string);
+  const id = req.query.id as string;
 
   try {
     switch (req.method) {
       case "GET":
-        const student = await findStudentById(studentId);
+        const student = await findStudentById(id);
         if (!student) {
           throw new NotFoundError("Student not found");
         } else {
