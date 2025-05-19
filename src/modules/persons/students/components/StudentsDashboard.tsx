@@ -125,7 +125,7 @@ export default function StudentsDashboard({
     columns
       .filter(
         (column) =>
-          column.field !== "personId" &&
+          column.field !== "id" &&
           column.field !== "action" &&
           column.field !== "detailPanel" &&
           column.field !== "created"
@@ -133,7 +133,7 @@ export default function StudentsDashboard({
       .map((column) => column.field);
 
   const initialColumnVisibilityModel: GridColumnVisibilityModel = {
-    personId: false,
+    id: false,
     name: true,
     gender: false,
     phone: true,

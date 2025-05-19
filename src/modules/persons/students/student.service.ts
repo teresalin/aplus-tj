@@ -146,12 +146,13 @@ export async function updateStudent(dto: UpdateStudentDTO) {
     const updatePersonQuery = {
       text: `
         UPDATE person
-        SET name = $1, gender = $2, phone = $3, email = $4, date_of_birth = $5, notes = $6, updated = NOW()
-        WHERE id = $7
+        SET name = $1, preferred_name = $2, gender = $3, phone = $4, email = $5, date_of_birth = $6, notes = $7, updated = NOW()
+        WHERE id = $8
         RETURNING id;
       `,
       values: [
         dto.name,
+        dto.preferredName,
         dto.gender,
         dto.phone,
         dto.email,
@@ -166,11 +167,10 @@ export async function updateStudent(dto: UpdateStudentDTO) {
     const updateStudentQuery = {
       text: `
         UPDATE student
-        SET preferred_name = $1, current_school = $2, textbook_publisher = $3, grade_id = $4, join_date = $5, leave_date = $6, updated = NOW()
-        WHERE id = $7;
+        SET current_school = $1, textbook_publisher = $2, grade_id = $3, admission_date = $4, departure_date = $5, updated = NOW()
+        WHERE id = $6;
       `,
       values: [
-        dto.preferredName,
         dto.currentSchool,
         dto.textbookPublisher,
         dto.gradeId,
