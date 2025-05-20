@@ -13,7 +13,7 @@ CREATE TABLE person (
   updated TIMESTAMPTZ DEFAULT NOW(),
 
   -- Create a unique constraint on the combination of name, phone, and date_of_birth
-  CONSTRAINT unique_person_details UNIQUE (name, email, date_of_birth)
+  CONSTRAINT unique_person_details UNIQUE (name, date_of_birth)
 );
 
 CREATE TABLE staff (
@@ -45,9 +45,9 @@ CREATE TABLE parent (
 CREATE TABLE student (
   id UUID PRIMARY KEY REFERENCES person(id),
   student_id VARCHAR(20) UNIQUE,
+  grade_id UUID REFERENCES grade(id) NOT NULL,
   current_school VARCHAR(50),
   textbook_publisher VARCHAR(50),
-  grade_id UUID REFERENCES grade(id) NOT NULL,
   admission_date DATE NOT NULL,
   departure_date DATE,
   created TIMESTAMPTZ DEFAULT NOW(),

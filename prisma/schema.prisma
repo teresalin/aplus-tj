@@ -6,9 +6,302 @@
 
 generator client {
   provider = "prisma-client-js"
+  output = "../generated/prisma_client"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum gender {
+  Male
+  Female
+  Other
+}
+
+enum status {
+  Scheduled
+  Rescheduled
+  Cancelled
+}
+
+enum day_of_week {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}
+
+model Person {
+  id              String             @id @default(uuid())
+  name            String
+  preferred_name  String?
+  gender          gender?
+  phone           String?
+  email           String             @unique
+  date_of_birth   DateTime
+  notes           String?
+  active          Boolean            @default(true)
+  created         DateTime           @default(now())
+  updated         DateTime           @updatedAt
+
+  // Back‐relations only:
+  staff           Staff?
+  parent          Parent?
+  student         Student?
+  userIdentifiers UserIdentifier[]
+
+  @@unique([name, date_of_birth], name: "unique_person_details")
+}
+
+model StaffRole {
+  id      String  @id @default(uuid())
+  name    String  @unique
+  created DateTime @default(now())
+  updated DateTime @updatedAt
+
+  staff   Staff[]
+}
+
+model Staff {
+  id         String    @id
+  staffId    String?   @unique
+  role       StaffRole @relation(fields: [roleId], references: [id])
+  roleId     String
+  hireDate   DateTime
+  leaveDate  DateTime?
+  created    DateTime  @default(now())
+  updated    DateTime  @updatedAt
+
+  // FK side of 1:1 with Person
+  person     Person    @relation(fields: [id], references: [id])
+
+  classes    Class[]
+}
+
+model Parent {
+  id         String   @id
+  parentId   String?  @unique
+  created    DateTime @default(now())
+  updated    DateTime @updatedAt
+
+  // FK side of 1:1 with Person
+  person     Person   @relation(fields: [id], references: [id])
+}
+
+model Grade {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  created  DateTime  @default(now())
+  updated  DateTime  @updatedAt
+
+  students Student[]
+  classes  Class[]
+}
+
+model Student {
+  id                String   @id
+  studentId         String?  @unique
+  grade             Grade    @relation(fields: [gradeId], references: [id])
+  gradeId           String
+  currentSchool     String?
+  textbookPublisher String?
+  admissionDate     DateTime
+  departureDate     DateTime?
+  created           DateTime @default(now())
+  updated           DateTime @updatedAt
+
+  // FK side of 1:1 with Person
+  person            Person   @relation(fields: [id], references: [id])
+
+  attendances   Attendance[]
+  classStudents ClassStudent[]
+  billingRecords    StudentBillingRecord[]
+  paymentMethods    StudentPaymentMethod[]
+}
+
+model UserIdentifier {
+  id             String   @id @default(uuid())
+  person         Person   @relation(fields: [personId], references: [id])
+  personId       String
+  name           String
+  value          String
+  isSocialMedia  Boolean?
+  created        DateTime @default(now())
+  updated        DateTime @updatedAt
+}
+
+model Class {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  teacher    Staff    @relation(fields: [teacherId], references: [id])
+  teacherId  String
+  grade      Grade    @relation(fields: [gradeId], references: [id])
+  gradeId    String
+  capacity   Int?
+  active     Boolean  @default(true)
+  created    DateTime @default(now())
+  updated    DateTime @updatedAt
+
+  classStudents    ClassStudent[]
+  classCosts       ClassCost[]
+  sessions         Session[]
+  schedules        Schedule[]
+  classAssignments ClassAssignment[]
+}
+
+model ClassCost {
+  id            String   @id @default(uuid())
+  class         Class    @relation(fields: [classId], references: [id])
+  classId       String
+  cost          Decimal
+  currency      String?
+  effectiveDate DateTime?
+  notes         String?
+  created       DateTime @default(now())
+  updated       DateTime @updatedAt
+}
+
+model ClassStudent {
+  id         String   @id @default(uuid())
+  class      Class    @relation(fields: [classId], references: [id])
+  classId    String
+  student    Student  @relation(fields: [studentId], references: [id])
+  studentId  String
+  startDate  DateTime
+  endDate    DateTime?
+  created    DateTime @default(now())
+  updated    DateTime @updatedAt
+}
+
+model Session {
+  id                  String                 @id @default(uuid())
+  class               Class                  @relation(fields: [classId], references: [id])
+  classId             String
+  startTime           DateTime
+  endTime             DateTime
+  status              status      @default(Scheduled)
+  created             DateTime    @default(now())
+  updated             DateTime    @updatedAt
+
+  sessionDateHistory  SessionDateHistory[]
+  attendances         Attendance[]
+
+  @@unique([classId, startTime, endTime], name: "unique_session_details")
+}
+
+model SessionDateHistory {
+  id                 String    @id @default(uuid())
+  session            Session   @relation(fields: [sessionId], references: [id])
+  sessionId          String
+  oldDate            DateTime
+  newDate            DateTime
+  status             status    @default(Scheduled)
+  modificationReason String?
+  modifiedAt         DateTime  @default(now())
+  created            DateTime  @default(now())
+  updated            DateTime  @updatedAt
+}
+
+model Attendance {
+  id         String   @id @default(uuid())
+  session    Session  @relation(fields: [sessionId], references: [id])
+  sessionId  String
+  student    Student  @relation(fields: [studentId], references: [id])
+  studentId  String
+  created    DateTime @default(now())
+  updated    DateTime @updatedAt
+}
+
+model Assignment {
+  id                String             @id @default(uuid())
+  name              String
+  description       String?
+  dueDate           DateTime?
+  created           DateTime           @default(now())
+  updated           DateTime           @updatedAt
+
+  classAssignments  ClassAssignment[]
+}
+
+model ClassAssignment {
+  id           String     @id @default(uuid())
+  class        Class      @relation(fields: [classId], references: [id])
+  classId      String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+  assignmentId String
+  created      DateTime   @default(now())
+  updated      DateTime   @updatedAt
+}
+
+model Schedule {
+  id         String      @id @default(uuid())
+  class      Class       @relation(fields: [classId], references: [id])
+  classId    String
+  dayOfWeek  day_of_week
+  startTime  DateTime
+  endTime    DateTime
+  created    DateTime    @default(now())
+  updated    DateTime    @updatedAt
+}
+
+model Holiday {
+  id         String    @id @default(uuid())
+  name       String    @unique
+  startDate  DateTime
+  endDate    DateTime
+  created    DateTime  @default(now())
+  updated    DateTime  @updatedAt
+}
+
+model StudentBillingRecord {
+  id           String                   @id @default(uuid())
+  student      Student                  @relation(fields: [studentId], references: [id])
+  studentId    String
+  billingDate  DateTime?
+  description  String?
+  amount       Int?
+  paymentMethod String?
+  invoiceNumber String?
+  created      DateTime  @default(now())
+  updated      DateTime  @updatedAt
+
+  billingDetails StudentBillingDetail[]
+}
+
+model StudentBillingDetail {
+  id               String                 @id @default(uuid())
+  billingRecord    StudentBillingRecord   @relation(fields: [billingRecordId], references: [id])
+  billingRecordId  String
+  category         BillingCategory?       @relation(fields: [categoryId], references: [id])
+  categoryId       String?
+  amount           Decimal?
+  created          DateTime  @default(now())
+  updated          DateTime  @updatedAt
+}
+
+model StudentPaymentMethod {
+  id             String   @id @default(uuid())
+  student        Student  @relation(fields: [studentId], references: [id])
+  studentId      String
+  paymentMethod  String?
+  accountNumber  String?
+  expirationDate DateTime?
+  billingAddress String?
+  created        DateTime @default(now())
+  updated        DateTime @updatedAt
+}
+
+model BillingCategory {
+  id               String                  @id @default(uuid())
+  name             String?
+  description      String?
+  created          DateTime @default(now())
+  updated          DateTime @updatedAt
+
+  billingDetails   StudentBillingDetail[]
 }
