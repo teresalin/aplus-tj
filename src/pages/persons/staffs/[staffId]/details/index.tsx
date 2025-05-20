@@ -197,7 +197,7 @@ export default function DetailsTab() {
                     Join Date
                   </Typography>
                   <Typography variant="body2">
-                    {formatDate(staff.joinDate)}
+                    {formatDate(staff.hireDate)}
                   </Typography>
                 </Grid>
                 <Grid item sm={12} md={4}>

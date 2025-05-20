@@ -105,7 +105,7 @@ export async function createStaff(dto: CreateStaffDTO) {
         VALUES ($1, $2, $3, $4, NOW(), NOW())
         RETURNING id;
       `,
-      values: [personId, dto.roleId, dto.joinDate, dto.leaveDate],
+      values: [personId, dto.roleId, dto.hireDate, dto.leaveDate],
     };
     await client.query(insertStaffQuery);
 
@@ -160,7 +160,7 @@ export async function updateStaff(dto: UpdateStaffDTO) {
         WHERE id = $4
         RETURNING id;
       `,
-      values: [dto.roleId, dto.joinDate, dto.leaveDate, personId],
+      values: [dto.roleId, dto.hireDate, dto.leaveDate, personId],
     };
     await client.query(updateStaffQuery);
 

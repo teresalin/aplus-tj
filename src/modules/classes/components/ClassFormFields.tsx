@@ -80,7 +80,7 @@ const ClassFormFields = ({
   };
 
   const handleSelectChange =
-    (field: FieldName) => (event: SelectChangeEvent<number>) => {
+    (field: FieldName) => (event: SelectChangeEvent<string>) => {
       const value = parseInt(event.target.value as string, 10);
       handleInputChange(field, value || 0);
     };

@@ -19,6 +19,7 @@ import useSWR, { mutate } from "swr";
 import {
   Class,
   UpdateClassDetailsDialog,
+  UpdateClassDTO,
   UpdateClassStudentsDialog,
 } from "../../../modules/classes";
 import { Schedule } from "../../../modules/schedules";
@@ -99,7 +100,7 @@ export default function ClassDetails() {
   };
 
   // TODO maybe prevent whole page from re-rendering when the dialog is submitted?
-  const handleUpdateDetails = async (data: Class) => {
+  const handleUpdateDetails = async (data: UpdateClassDTO) => {
     const response = await fetch(`/api/classes/${data.id}`, {
       method: "PUT",
       headers: {

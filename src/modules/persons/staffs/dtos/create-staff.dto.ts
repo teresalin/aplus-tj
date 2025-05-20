@@ -6,6 +6,6 @@ export interface CreateStaffDTO {
   phone: string;
   email: string;
   roleId: number;
-  joinDate: Date;
+  hireDate: Date;
   leaveDate?: Date;
 }

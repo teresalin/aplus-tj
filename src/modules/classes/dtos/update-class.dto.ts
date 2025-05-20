@@ -1,10 +1,10 @@
 import { ScheduleDTO } from "../../schedules";
 
 export interface UpdateClassDTO {
-  id: number;
+  id: string;
   name?: string;
-  gradeId?: number;
-  teacherId?: number;
+  gradeId?: string;
+  teacherId?: string;
   capacity?: number;
   schedules?: ScheduleDTO[];
 }

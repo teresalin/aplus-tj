@@ -12,7 +12,7 @@ export function staffToUpdateStaffDTO(staff: Staff): UpdateStaffDTO {
     phone: staff.phone,
     email: staff.email,
     roleId: staff.role.id,
-    joinDate: staff.joinDate,
+    hireDate: staff.hireDate,
     leaveDate: staff.leaveDate,
     active: staff.active,
   };

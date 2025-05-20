@@ -1,6 +1,6 @@
 export interface UpdateSessionDTO {
-  id: number;
-  classId?: number;
+  id: string;
+  classId?: string;
   startTime?: string;
   endTime?: string;
   studentIds?: number[];

@@ -5,7 +5,7 @@ import { StaffSummary } from "../../persons/staffs/types";
 import { StudentSummary } from "../../persons/students/types";
 
 export interface Class {
-  id: number;
+  id: string;
   name: string;
   teacher: StaffSummary;
   grade: Grade;
@@ -16,14 +16,14 @@ export interface Class {
 }
 
 export interface ClassSummary {
-  id: number;
+  id: string;
   name: string;
 }
 
 export interface ClassStudent {
-  id: number;
-  classId: number;
-  studentId: number;
+  id: string;
+  classId: string;
+  studentId: string;
   startDate: Date;
   endDate?: Date;
   active: boolean;

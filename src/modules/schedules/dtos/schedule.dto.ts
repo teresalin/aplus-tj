@@ -1,5 +1,5 @@
 export interface ScheduleDTO {
-  id?: number;
+  id?: string;
   dayOfWeek: string;
   startTime: string;
   endTime: string;

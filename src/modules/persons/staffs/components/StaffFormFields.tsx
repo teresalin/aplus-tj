@@ -36,7 +36,7 @@ const StaffFormFields = ({
     phone,
     email,
     roleId,
-    joinDate,
+    hireDate,
     leaveDate,
   } = staff;
 
@@ -188,7 +188,7 @@ const StaffFormFields = ({
               <DatePicker
                 label="Join Date"
                 format="YYYY-MM-DD"
-                value={joinDate ? dayjs(joinDate).utc() : null}
+                value={hireDate ? dayjs(hireDate).utc() : null}
                 onChange={(date) => handleInputChange("joinDate", date)}
                 slotProps={{
                   textField: {

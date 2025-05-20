@@ -11,7 +11,7 @@ export interface Student extends Person {
 }
 
 export interface StudentSummary {
-  id: number;
+  id: string;
   name: string;
   preferredName?: string;
   dateOfBirth: Date;

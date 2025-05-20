@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import Box from "@mui/material/Box";
@@ -11,10 +12,9 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 import utc from "dayjs/plugin/utc";
-import { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 
-import BaseDataGrid from "../../../modules/persons/BaseDataGrid";
 import fetcher from "../../../../utils/fetcher";
+import BaseDataGrid from "../../../components/DataGrid";
 
 dayjs.extend(utc);
 

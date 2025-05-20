@@ -35,9 +35,8 @@ const AssignmentFormFields = ({
     }));
   };
 
-  const handleClassChange = (event: SelectChangeEvent<number>) => {
-    const value = parseInt(event.target.value as string, 10);
-    handleInputChange("classId", value || 0);
+  const handleClassChange = (event: SelectChangeEvent<string>) => {
+    handleInputChange("classId", event.target.value || 0);
   };
 
   return (

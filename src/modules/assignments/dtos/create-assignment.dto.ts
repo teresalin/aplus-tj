@@ -1,6 +1,6 @@
 export interface CreateAssignmentDTO {
   name: string;
-  classId: number;
+  classId: string;
   description?: string;
   dueDate: Date;
 }
