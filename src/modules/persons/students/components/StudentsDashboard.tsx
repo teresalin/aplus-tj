@@ -39,7 +39,7 @@ export default function StudentsDashboard({
 
   const { data, isLoading, error } = useSWR<Student[]>(
     "/api/persons/students",
-    fetcher
+    fetcher,
   );
   const students = data || [];
 
@@ -53,7 +53,7 @@ export default function StudentsDashboard({
 
   const handleCreateStudent = async (
     data: { email: string },
-    resetForm: () => void
+    resetForm: () => void,
   ) => {
     try {
       const normalizedEmail = data.email.trim().toLowerCase();
@@ -128,7 +128,7 @@ export default function StudentsDashboard({
           column.field !== "id" &&
           column.field !== "action" &&
           column.field !== "detailPanel" &&
-          column.field !== "created"
+          column.field !== "created",
       )
       .map((column) => column.field);
 

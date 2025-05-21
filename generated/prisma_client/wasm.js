@@ -120,22 +120,22 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.PersonScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  preferred_name: 'preferred_name',
+  preferredName: 'preferredName',
   gender: 'gender',
   phone: 'phone',
   email: 'email',
-  date_of_birth: 'date_of_birth',
+  dateOfBirth: 'dateOfBirth',
   notes: 'notes',
   active: 'active',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.StaffRoleScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.StaffScalarFieldEnum = {
@@ -144,22 +144,22 @@ exports.Prisma.StaffScalarFieldEnum = {
   roleId: 'roleId',
   hireDate: 'hireDate',
   leaveDate: 'leaveDate',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ParentScalarFieldEnum = {
   id: 'id',
   parentId: 'parentId',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.GradeScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.StudentScalarFieldEnum = {
@@ -170,8 +170,8 @@ exports.Prisma.StudentScalarFieldEnum = {
   textbookPublisher: 'textbookPublisher',
   admissionDate: 'admissionDate',
   departureDate: 'departureDate',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.UserIdentifierScalarFieldEnum = {
@@ -180,8 +180,8 @@ exports.Prisma.UserIdentifierScalarFieldEnum = {
   name: 'name',
   value: 'value',
   isSocialMedia: 'isSocialMedia',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ClassScalarFieldEnum = {
@@ -191,8 +191,8 @@ exports.Prisma.ClassScalarFieldEnum = {
   gradeId: 'gradeId',
   capacity: 'capacity',
   active: 'active',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ClassCostScalarFieldEnum = {
@@ -202,8 +202,8 @@ exports.Prisma.ClassCostScalarFieldEnum = {
   currency: 'currency',
   effectiveDate: 'effectiveDate',
   notes: 'notes',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ClassStudentScalarFieldEnum = {
@@ -212,8 +212,8 @@ exports.Prisma.ClassStudentScalarFieldEnum = {
   studentId: 'studentId',
   startDate: 'startDate',
   endDate: 'endDate',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SessionScalarFieldEnum = {
@@ -222,8 +222,8 @@ exports.Prisma.SessionScalarFieldEnum = {
   startTime: 'startTime',
   endTime: 'endTime',
   status: 'status',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SessionDateHistoryScalarFieldEnum = {
@@ -234,16 +234,16 @@ exports.Prisma.SessionDateHistoryScalarFieldEnum = {
   status: 'status',
   modificationReason: 'modificationReason',
   modifiedAt: 'modifiedAt',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.AttendanceScalarFieldEnum = {
   id: 'id',
   sessionId: 'sessionId',
   studentId: 'studentId',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.AssignmentScalarFieldEnum = {
@@ -251,16 +251,16 @@ exports.Prisma.AssignmentScalarFieldEnum = {
   name: 'name',
   description: 'description',
   dueDate: 'dueDate',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ClassAssignmentScalarFieldEnum = {
   id: 'id',
   classId: 'classId',
   assignmentId: 'assignmentId',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ScheduleScalarFieldEnum = {
@@ -269,8 +269,8 @@ exports.Prisma.ScheduleScalarFieldEnum = {
   dayOfWeek: 'dayOfWeek',
   startTime: 'startTime',
   endTime: 'endTime',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.HolidayScalarFieldEnum = {
@@ -278,8 +278,8 @@ exports.Prisma.HolidayScalarFieldEnum = {
   name: 'name',
   startDate: 'startDate',
   endDate: 'endDate',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.StudentBillingRecordScalarFieldEnum = {
@@ -290,8 +290,8 @@ exports.Prisma.StudentBillingRecordScalarFieldEnum = {
   amount: 'amount',
   paymentMethod: 'paymentMethod',
   invoiceNumber: 'invoiceNumber',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.StudentBillingDetailScalarFieldEnum = {
@@ -299,8 +299,8 @@ exports.Prisma.StudentBillingDetailScalarFieldEnum = {
   billingRecordId: 'billingRecordId',
   categoryId: 'categoryId',
   amount: 'amount',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.StudentPaymentMethodScalarFieldEnum = {
@@ -310,16 +310,16 @@ exports.Prisma.StudentPaymentMethodScalarFieldEnum = {
   accountNumber: 'accountNumber',
   expirationDate: 'expirationDate',
   billingAddress: 'billingAddress',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.BillingCategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
   description: 'description',
-  created: 'created',
-  updated: 'updated'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
