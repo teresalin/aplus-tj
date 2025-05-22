@@ -1,8 +1,12 @@
 import { ApiResponse } from "../../../../../utils/apiResponse";
 import { CreateStudentDTO } from "../../../../modules/persons/students/dtos";
 import { handleError } from "../../../../../utils/errorHandler";
-import { MethodNotAllowedError } from "../../../../../utils/CustomError";
 import { NextApiRequest, NextApiResponse } from "next";
+import { Student } from "../../../../modules/persons/students/types";
+import {
+  MethodNotAllowedError,
+  UniqueConstraintError,
+} from "../../../../../utils/CustomError";
 import {
   createStudent,
   findAllStudents,
@@ -10,31 +14,42 @@ import {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   try {
     switch (req.method) {
-      case "GET":
+      case "GET": {
         const students = await findAllStudents();
-        res.status(200).json({
+        return res.status(200).json({
           status: "Success",
           result: students,
-          message: "All students retrieved successfully.",
+          message: "Students retrieved successfully.",
         } as ApiResponse);
-        break;
-      case "POST":
-        const studentData: CreateStudentDTO = req.body;
-        // Additional validation can be performed here
-        await createStudent(studentData);
-        res.status(201).json({
-          status: "Success",
-          message: "New student created successfully.",
-        } as ApiResponse);
-        break;
+      }
+
+      case "POST": {
+        const studentData = req.body as CreateStudentDTO;
+        try {
+          const newStudent: Student = await createStudent(studentData);
+          return res.status(201).json({
+            status: "Success",
+            result: newStudent,
+            message: "New student created successfully.",
+          } as ApiResponse);
+        } catch (error) {
+          if (error.code === "23505") {
+            throw new UniqueConstraintError(
+              "A student with that name and date of birth already exists.",
+            );
+          }
+          throw error;
+        }
+      }
+
       default:
         throw new MethodNotAllowedError(req.method!);
     }
   } catch (error) {
-    handleError(res, error);
+    handleError(res, error as Error);
   }
 }

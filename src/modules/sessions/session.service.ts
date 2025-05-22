@@ -2,47 +2,32 @@ import { CreateSessionDTO, UpdateSessionDTO } from "./dtos";
 import { getDBClient } from "../../../lib/db-connector";
 import { mapRowToSession } from "./session.mapper";
 import { Session } from "./types";
-import { UniqueConstraintError } from "../../../utils/CustomError";
 import dayjs from "dayjs";
 
-export async function findAllSessions(
-  range: string | string[] | undefined
-): Promise<Session[]> {
-  const client = await getDBClient();
+const BASE_SESSION_SELECT = `
+  SELECT
+    s.id               AS id,
+    s.class_id         AS class_id,
+    c.name             AS class_name,
+    (s.start_time AT TIME ZONE 'UTC') AS start_time,
+    (s.end_time   AT TIME ZONE 'UTC') AS end_time
+  FROM session s
+  JOIN class c ON s.class_id = c.id
+  WHERE c.active = TRUE
+`;
 
+export async function findAllSessions(): Promise<Session[]> {
+  const client = await getDBClient();
   try {
     const { rows } = await client.query(
-      `
-      SELECT
-        session.id,
-        c.id AS class_id,
-        c.name AS class_name,
-        session.start_time AT TIME ZONE 'UTC' AS start_time,
-        session.end_time AT TIME ZONE 'UTC' AS end_time
-      FROM
-        session
-        INNER JOIN class c ON session.class_id = c.id
-      WHERE
-        c.active = TRUE
-        AND (
-          ($1 = 'last7Days' 
-              AND session.start_time >= (CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - INTERVAL '7 days') 
-              AND session.start_time < CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
-          OR ($1 = 'thisMonth' 
-              AND session.start_time >= DATE_TRUNC('month', CURRENT_TIMESTAMP AT TIME ZONE 'UTC') 
-              AND session.start_time < (DATE_TRUNC('month', CURRENT_TIMESTAMP AT TIME ZONE 'UTC') + INTERVAL '1 month'))
-          OR ($1 = 'yearToDate' 
-              AND session.start_time >= DATE_TRUNC('year', CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
-          )
-        )
-      ORDER BY 
-        session.start_time DESC;
-      `,
-      [range]
+      BASE_SESSION_SELECT +
+        `
+      ORDER BY s.start_time DESC;
+    `,
     );
     return rows.map(mapRowToSession);
   } catch (error) {
-    console.error("Error fetching sessions from database:", error);
+    console.error("Error retrieving sessions:", error);
     throw error;
   } finally {
     client.release();
@@ -50,96 +35,91 @@ export async function findAllSessions(
 }
 
 export async function findSessionById(
-  sessionId: number
+  sessionId: number,
 ): Promise<Session | null> {
   const client = await getDBClient();
-
   try {
     const { rows } = await client.query(
-      `
-      SELECT id, class_id, start_time, end_time
-      FROM session
-      WHERE id = $1;
-      `,
-      [sessionId]
+      `${BASE_SESSION_SELECT}
+       AND s.id = $1;`,
+      [sessionId],
     );
     return rows.length ? mapRowToSession(rows[0]) : null;
   } catch (error) {
-    console.error("Error retrieving session from database:", error);
+    console.error("Error retrieving session:", error);
     throw error;
   } finally {
     client.release();
   }
 }
 
-export async function createSession(dto: CreateSessionDTO) {
+export async function createSession(dto: CreateSessionDTO): Promise<Session> {
   const client = await getDBClient();
-
-  console.log(dto);
-  ``;
   try {
     await client.query("BEGIN");
 
-    const insertSessionQuery = {
-      text: `
-        INSERT INTO session(class_id, start_time, end_time, status, created, updated)
-        VALUES($1, $2, $3, $4, NOW(), NOW());
-      `,
-      values: [
-        dto.classId,
-        dayjs(dto.startTime).utc(),
-        dayjs(dto.endTime).utc(),
-        "Scheduled",
-      ],
-    };
-    await client.query(insertSessionQuery);
+    const insertSQL = `
+      INSERT INTO session (class_id, start_time, end_time, status)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `;
+    const { rows: ins } = await client.query<{ id: string }>(insertSQL, [
+      dto.classId,
+      dayjs(dto.startTime).utc().toDate(),
+      dayjs(dto.endTime).utc().toDate(),
+      "Scheduled",
+    ]);
+    const sessionId = ins[0].id;
 
     await client.query("COMMIT");
+
+    const { rows } = await client.query(
+      `${BASE_SESSION_SELECT}
+       AND s.id = $1;`,
+      [sessionId],
+    );
+    return mapRowToSession(rows[0]);
   } catch (error) {
     await client.query("ROLLBACK");
-    if (error.code === "23505") {
-      // Unique violation error code in PostgreSQL
-      throw new UniqueConstraintError(
-        "A session with the same class and date times already exists."
-      );
-    } else {
-      console.error("Error creating session in the database:", error);
-      throw error;
-    }
+    console.error("Error creating session:", error);
+    throw error;
   } finally {
     client.release();
   }
 }
 
-export async function updateSession(dto: UpdateSessionDTO) {
+export async function updateSession(dto: UpdateSessionDTO): Promise<Session> {
   const client = await getDBClient();
-
   try {
     await client.query("BEGIN");
 
-    const updateSessionQuery = {
-      text: `
-        UPDATE session 
-        SET class_id = $2, start_time = $3, end_time = $4, created = NOW(), updated = NOW()
-        WHERE id = $1
-        RETURNING id;
-      `,
-      values: [dto.id, dto.classId, dto.startTime, dto.endTime],
-    };
-    await client.query(updateSessionQuery);
+    const updateSQL = `
+      UPDATE session
+        SET class_id   = $2,
+            start_time = $3,
+            end_time   = $4
+      WHERE id = $1
+      RETURNING id;
+    `;
+    const { rowCount } = await client.query(updateSQL, [
+      dto.id,
+      dto.classId,
+      dayjs(dto.startTime).utc().toDate(),
+      dayjs(dto.endTime).utc().toDate(),
+    ]);
 
     await client.query("COMMIT");
+
+    const { rows } = await client.query(
+      `${BASE_SESSION_SELECT}
+       AND s.id = $1;`,
+      [dto.id],
+    );
+    return mapRowToSession(rows[0]);
   } catch (error) {
     await client.query("ROLLBACK");
-    if (error.code === "23505") {
-      // Unique violation error code in PostgreSQL
-      throw new UniqueConstraintError(
-        "A session with the same class and date times already exists."
-      );
-    } else {
-      console.error("Error updating session in the database:", error);
-      throw error;
-    }
+    console.error("Error updating session:", error);
+    throw error;
   } finally {
     client.release();
   }

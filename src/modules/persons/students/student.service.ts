@@ -2,39 +2,37 @@ import { CreateStudentDTO, UpdateStudentDTO } from "./dtos";
 import { getDBClient } from "../../../../lib/db-connector";
 import { mapRowToStudent } from "./student.mapper";
 import { Student } from "./types";
-import { UniqueConstraintError } from "../../../../utils/CustomError";
+
+const STUDENT_SELECT_BASE = `
+  SELECT
+    p.id,
+    p.name,
+    p.preferred_name,
+    p.gender,
+    p.phone,
+    p.email,
+    (p.date_of_birth AT TIME ZONE 'UTC')   AS date_of_birth,
+    p.notes,
+    p.active,
+    s.student_id,
+    s.current_school,
+    s.textbook_publisher,
+    (s.admission_date AT TIME ZONE 'UTC')  AS admission_date, 
+    (s.departure_date AT TIME ZONE 'UTC')  AS departure_date, 
+    g.id                                   AS grade_id,
+    g.name                                 AS grade_name
+  FROM student s
+  INNER JOIN person  p ON s.id       = p.id
+  INNER JOIN grade   g ON s.grade_id = g.id
+`;
 
 export async function findAllStudents(): Promise<Student[]> {
   const client = await getDBClient();
-
   try {
-    const { rows } = await client.query(
-      `
-      SELECT
-        person.id,
-        person.name,
-        person.preferred_name,
-        person.gender,
-        person.phone,
-        person.email,
-        person.date_of_birth::timestamp at time zone 'UTC' as date_of_birth,
-        person.notes,
-        person.active,
-        student.student_id,
-        student.current_school,
-        student.textbook_publisher,
-        student.admission_date::timestamp at time zone 'UTC' as admission_date, 
-        student.departure_date::timestamp at time zone 'UTC' as departure_date, 
-        grade.id AS grade_id,
-        grade.name AS grade_name
-      FROM student
-      INNER JOIN person ON student.id = person.id
-      INNER JOIN grade ON student.grade_id = grade.id;
-      `
-    );
+    const { rows } = await client.query(`${STUDENT_SELECT_BASE};`);
     return rows.map(mapRowToStudent);
   } catch (error) {
-    console.error("Error fetching students from database:", error);
+    console.error("Error retrieving students:", error);
     throw error;
   } finally {
     client.release();
@@ -43,55 +41,37 @@ export async function findAllStudents(): Promise<Student[]> {
 
 export async function findStudentById(id: string): Promise<Student | null> {
   const client = await getDBClient();
-
   try {
     const { rows } = await client.query(
-      `
-      SELECT 
-        person.id,
-        person.name,
-        person.preferred_name,
-        person.gender,
-        person.phone,
-        person.email,
-        person.date_of_birth::timestamp at time zone 'UTC' as date_of_birth,
-        person.notes,
-        person.active,
-        student.student_id,
-        student.current_school,
-        student.textbook_publisher,
-        student.admission_date, 
-        student.departure_date, 
-        grade.id AS grade_id,
-        grade.name AS grade_name
-      FROM student
-      INNER JOIN person ON student.id = person.id
-      INNER JOIN grade ON student.grade_id = grade.id
-      WHERE student.id = $1;
-      `,
-      [id]
+      `${STUDENT_SELECT_BASE}
+       WHERE s.id = $1;`,
+      [id],
     );
     return rows.length ? mapRowToStudent(rows[0]) : null;
   } catch (error) {
-    console.error("Error retrieving student from database:", error);
+    console.error("Error retrieving student:", error);
     throw error;
   } finally {
     client.release();
   }
 }
 
-export async function createStudent(dto: CreateStudentDTO) {
+export async function createStudent(dto: CreateStudentDTO): Promise<Student> {
   const client = await getDBClient();
-
   try {
     await client.query("BEGIN");
 
-    const insertPersonQuery = {
-      text: `
-        INSERT INTO person(name, preferred_name, gender, phone, email, date_of_birth, notes, active, created, updated)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW(), NOW()) RETURNING id;
+    // 1) insert into person
+    const {
+      rows: [{ id: personId }],
+    } = await client.query<{ id: string }>(
+      `
+      INSERT INTO person
+        (name, preferred_name, gender, phone, email, date_of_birth, notes, active)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,true)
+      RETURNING id;
       `,
-      values: [
+      [
         dto.name,
         dto.preferredName,
         dto.gender,
@@ -100,16 +80,16 @@ export async function createStudent(dto: CreateStudentDTO) {
         dto.dateOfBirth,
         dto.notes,
       ],
-    };
-    const result = await client.query(insertPersonQuery);
-    const personId = result.rows[0].id;
+    );
 
-    const insertStudentQuery = {
-      text: `
-        INSERT INTO student(id, current_school, textbook_publisher, grade_id, admission_date, departure_date, created, updated)
-        VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW());
+    // 2) insert into student
+    await client.query(
+      `
+      INSERT INTO student
+        (id, current_school, textbook_publisher, grade_id, admission_date, departure_date)
+      VALUES ($1,$2,$3,$4,$5,$6);
       `,
-      values: [
+      [
         personId,
         dto.currentSchool,
         dto.textbookPublisher,
@@ -117,21 +97,20 @@ export async function createStudent(dto: CreateStudentDTO) {
         dto.admissionDate,
         dto.departureDate,
       ],
-    };
-    await client.query(insertStudentQuery);
+    );
+
+    // 3) fetch and return the freshly-created Student
+    const { rows } = await client.query(
+      `${STUDENT_SELECT_BASE} WHERE s.id = $1;`,
+      [personId],
+    );
 
     await client.query("COMMIT");
+    return mapRowToStudent(rows[0]);
   } catch (error) {
     await client.query("ROLLBACK");
-    if (error.code === "23505") {
-      // Unique violation error code in PostgreSQL
-      throw new UniqueConstraintError(
-        "A student with the same name, phone, and date of birth already exists."
-      );
-    } else {
-      console.error("Error creating student in the database:", error);
-      throw error;
-    }
+    console.error("Error creating student:", error);
+    throw error;
   } finally {
     client.release();
   }
@@ -139,14 +118,20 @@ export async function createStudent(dto: CreateStudentDTO) {
 
 export async function updateStudent(dto: UpdateStudentDTO) {
   const client = await getDBClient();
-
   try {
     await client.query("BEGIN");
 
     const updatePersonQuery = {
       text: `
         UPDATE person
-        SET name = $1, preferred_name = $2, gender = $3, phone = $4, email = $5, date_of_birth = $6, notes = $7, updated = NOW()
+        SET
+          name           = $1,
+          preferred_name = $2,
+          gender         = $3,
+          phone          = $4,
+          email          = $5,
+          date_of_birth  = $6,
+          notes          = $7
         WHERE id = $8
         RETURNING id;
       `,
@@ -167,7 +152,12 @@ export async function updateStudent(dto: UpdateStudentDTO) {
     const updateStudentQuery = {
       text: `
         UPDATE student
-        SET current_school = $1, textbook_publisher = $2, grade_id = $3, admission_date = $4, departure_date = $5, updated = NOW()
+        SET
+          current_school      = $1,
+          textbook_publisher  = $2,
+          grade_id            = $3,
+          admission_date      = $4,
+          departure_date      = $5
         WHERE id = $6;
       `,
       values: [
@@ -184,15 +174,8 @@ export async function updateStudent(dto: UpdateStudentDTO) {
     await client.query("COMMIT");
   } catch (error) {
     await client.query("ROLLBACK");
-    if (error.code === "23505") {
-      // Unique violation error code in PostgreSQL
-      throw new UniqueConstraintError(
-        "A student with the same name, phone, and date of birth already exists."
-      );
-    } else {
-      console.error("Error updating student in the database:", error);
-      throw error;
-    }
+    console.error("Error updating student:", error);
+    throw error;
   } finally {
     client.release();
   }

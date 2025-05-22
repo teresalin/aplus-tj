@@ -1,5 +1,6 @@
 export interface CreateStaffDTO {
   name: string;
+  preferredName?: string;
   gender: string;
   dateOfBirth: Date;
   notes?: string;

@@ -1,39 +1,47 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { ApiResponse } from "../../../../utils/apiResponse";
+import { AssignmentFilter } from "../../../modules/assignments/constants";
 import { CreateAssignmentDTO } from "../../../modules/assignments";
-import { MethodNotAllowedError } from "../../../../utils/CustomError";
 import { handleError } from "../../../../utils/errorHandler";
+import { MethodNotAllowedError } from "../../../../utils/CustomError";
+import { NextApiRequest, NextApiResponse } from "next";
+import { parseAssignmentFilter } from "../../../modules/assignments/assignment.filters";
 import {
   createAssignment,
   findAllAssignments,
 } from "../../../modules/assignments/assignment.service";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const { filter } = req.query;
-
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ApiResponse>,
+) {
   try {
     switch (req.method) {
-      case "GET":
+      case "GET": {
+        const filter: AssignmentFilter = parseAssignmentFilter(
+          req.query.filter,
+        );
+
         const assignments = await findAllAssignments(filter);
-        res.status(200).json({
+        return res.status(200).json({
           status: "Success",
           result: assignments,
-          message: "All assignments retrieved successfully.",
-        } as ApiResponse);
-        break;
-      case "POST":
-        const assignment: CreateAssignmentDTO = req.body;
-        // Additional validation can be performed here
-        await createAssignment(assignment);
-        res.status(201).json({
+          message: "Assignments retrieved successfully.",
+        });
+      }
+
+      case "POST": {
+        const dto: CreateAssignmentDTO = req.body;
+        await createAssignment(dto);
+        return res.status(201).json({
           status: "Success",
           message: "New assignment created successfully.",
-        } as ApiResponse);
-        break;
+        });
+      }
+
       default:
         throw new MethodNotAllowedError(req.method!);
     }
   } catch (error) {
-    handleError(res, error);
+    handleError(res, error as Error);
   }
-};
+}

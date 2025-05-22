@@ -2,6 +2,7 @@ export interface UpdateStaffDTO {
   id: string;
   staffId?: string;
   name?: string;
+  preferredName?: string;
   gender?: string;
   dateOfBirth?: Date;
   notes?: string;

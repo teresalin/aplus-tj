@@ -1,8 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiResponse } from "../../../../utils/apiResponse";
 import { handleError } from "../../../../utils/errorHandler";
 import type { CreateGradeDTO } from "../../../modules/grades/dtos/create-grade.dto";
 import type { Grade } from "../../../modules/grades/types";
+import type { NextApiRequest, NextApiResponse } from "next";
 import {
   createGrade,
   findAllGrades,
@@ -26,7 +26,6 @@ export default async function handler(
           message: "Grades retrieved successfully.",
         });
       }
-
       case "POST": {
         // 1. Validate
         const body = req.body as Partial<CreateGradeDTO>;
@@ -35,29 +34,26 @@ export default async function handler(
             .status(400)
             .json({ status: "Error", message: "'name' is required" });
         }
-
         try {
-          // 2. Try to create
+          // 2. Create
           const newGrade: Grade = await createGrade({ name: body.name });
           return res.status(201).json({
             status: "Success",
             result: newGrade,
             message: "Grade created successfully.",
           });
-        } catch (err: any) {
+        } catch (error) {
           // 3. Translate PG unique-violation → your custom error
-          if (err.code === "23505") {
+          if (error.code === "23505") {
             throw new UniqueConstraintError(
               "A grade with that name already exists.",
             );
           }
-          throw err; // let handleError deal with everything else
+          throw error; // let handleError deal with everything else
         }
       }
-
       default:
-        // Method not allowed
-        throw new MethodNotAllowedError(`Method ${req.method} Not Allowed`);
+        throw new MethodNotAllowedError(req.method!);
     }
   } catch (error) {
     return handleError(res, error as Error);

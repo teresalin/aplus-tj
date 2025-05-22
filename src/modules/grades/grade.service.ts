@@ -1,31 +1,27 @@
 import { getDBClient } from "../../../lib/db-connector";
 import { CreateGradeDTO } from "./dtos/create-grade.dto";
+import { mapRowToGrade } from "./grade.mapper";
 import { Grade } from "./types";
 
 export async function findAllGrades(): Promise<Grade[]> {
   const client = await getDBClient();
 
   try {
-    const result = await client.query<{
+    const { rows } = await client.query<{
       id: string;
       name: string;
       createdAt: Date;
       updatedAt: Date;
     }>(`
-      SELECT
-        id,
-        name,
-        created_at  AS "createdAt",
-        updated_at  AS "updatedAt"
-      FROM grade;
-    `);
+    SELECT
+      id,
+      name,
+      created_at,
+      updated_at
+    FROM grade;
+  `);
 
-    return result.rows.map((row) => ({
-      id: row.id,
-      name: row.name,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    }));
+    return rows.map(mapRowToGrade);
   } catch (error) {
     console.error("Error retrieving grades:", error);
     throw error;
@@ -36,7 +32,6 @@ export async function findAllGrades(): Promise<Grade[]> {
 
 export async function createGrade(dto: CreateGradeDTO): Promise<Grade> {
   const client = await getDBClient();
-
   try {
     await client.query("BEGIN");
 
@@ -47,13 +42,13 @@ export async function createGrade(dto: CreateGradeDTO): Promise<Grade> {
         RETURNING
           id,
           name,
-          created_at  AS "createdAt",
-          updated_at  AS "updatedAt"
+          created_at
+          updated_at;
       `,
       values: [dto.name],
     };
 
-    const result = await client.query<{
+    const { rows } = await client.query<{
       id: string;
       name: string;
       createdAt: Date;
@@ -62,12 +57,7 @@ export async function createGrade(dto: CreateGradeDTO): Promise<Grade> {
 
     await client.query("COMMIT");
 
-    return {
-      id: result.rows[0].id,
-      name: result.rows[0].name,
-      createdAt: result.rows[0].createdAt,
-      updatedAt: result.rows[0].updatedAt,
-    };
+    return mapRowToGrade(rows[0]);
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Error creating grade:", error);
