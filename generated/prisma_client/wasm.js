@@ -166,10 +166,10 @@ exports.Prisma.StudentScalarFieldEnum = {
   id: 'id',
   studentId: 'studentId',
   gradeId: 'gradeId',
-  currentSchool: 'currentSchool',
-  textbookPublisher: 'textbookPublisher',
   admissionDate: 'admissionDate',
   departureDate: 'departureDate',
+  currentSchool: 'currentSchool',
+  textbookPublisher: 'textbookPublisher',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

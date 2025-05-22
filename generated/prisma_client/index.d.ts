@@ -2992,13 +2992,13 @@ export namespace Prisma {
    */
 
   export type SessionCountOutputType = {
-    sessionDateHistory: number
     attendances: number
+    sessionDateHistory: number
   }
 
   export type SessionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    sessionDateHistory?: boolean | SessionCountOutputTypeCountSessionDateHistoryArgs
     attendances?: boolean | SessionCountOutputTypeCountAttendancesArgs
+    sessionDateHistory?: boolean | SessionCountOutputTypeCountSessionDateHistoryArgs
   }
 
   // Custom InputTypes
@@ -3015,15 +3015,15 @@ export namespace Prisma {
   /**
    * SessionCountOutputType without action
    */
-  export type SessionCountOutputTypeCountSessionDateHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: SessionDateHistoryWhereInput
+  export type SessionCountOutputTypeCountAttendancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AttendanceWhereInput
   }
 
   /**
    * SessionCountOutputType without action
    */
-  export type SessionCountOutputTypeCountAttendancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: AttendanceWhereInput
+  export type SessionCountOutputTypeCountSessionDateHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SessionDateHistoryWhereInput
   }
 
 
@@ -8664,10 +8664,10 @@ export namespace Prisma {
     id: string | null
     studentId: string | null
     gradeId: string | null
-    currentSchool: string | null
-    textbookPublisher: string | null
     admissionDate: Date | null
     departureDate: Date | null
+    currentSchool: string | null
+    textbookPublisher: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -8676,10 +8676,10 @@ export namespace Prisma {
     id: string | null
     studentId: string | null
     gradeId: string | null
-    currentSchool: string | null
-    textbookPublisher: string | null
     admissionDate: Date | null
     departureDate: Date | null
+    currentSchool: string | null
+    textbookPublisher: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -8688,10 +8688,10 @@ export namespace Prisma {
     id: number
     studentId: number
     gradeId: number
-    currentSchool: number
-    textbookPublisher: number
     admissionDate: number
     departureDate: number
+    currentSchool: number
+    textbookPublisher: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -8702,10 +8702,10 @@ export namespace Prisma {
     id?: true
     studentId?: true
     gradeId?: true
-    currentSchool?: true
-    textbookPublisher?: true
     admissionDate?: true
     departureDate?: true
+    currentSchool?: true
+    textbookPublisher?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -8714,10 +8714,10 @@ export namespace Prisma {
     id?: true
     studentId?: true
     gradeId?: true
-    currentSchool?: true
-    textbookPublisher?: true
     admissionDate?: true
     departureDate?: true
+    currentSchool?: true
+    textbookPublisher?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -8726,10 +8726,10 @@ export namespace Prisma {
     id?: true
     studentId?: true
     gradeId?: true
-    currentSchool?: true
-    textbookPublisher?: true
     admissionDate?: true
     departureDate?: true
+    currentSchool?: true
+    textbookPublisher?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -8811,10 +8811,10 @@ export namespace Prisma {
     id: string
     studentId: string | null
     gradeId: string
-    currentSchool: string | null
-    textbookPublisher: string | null
     admissionDate: Date
     departureDate: Date | null
+    currentSchool: string | null
+    textbookPublisher: string | null
     createdAt: Date
     updatedAt: Date
     _count: StudentCountAggregateOutputType | null
@@ -8840,14 +8840,14 @@ export namespace Prisma {
     id?: boolean
     studentId?: boolean
     gradeId?: boolean
-    currentSchool?: boolean
-    textbookPublisher?: boolean
     admissionDate?: boolean
     departureDate?: boolean
+    currentSchool?: boolean
+    textbookPublisher?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    grade?: boolean | GradeDefaultArgs<ExtArgs>
     person?: boolean | PersonDefaultArgs<ExtArgs>
+    grade?: boolean | GradeDefaultArgs<ExtArgs>
     attendances?: boolean | Student$attendancesArgs<ExtArgs>
     classStudents?: boolean | Student$classStudentsArgs<ExtArgs>
     billingRecords?: boolean | Student$billingRecordsArgs<ExtArgs>
@@ -8859,46 +8859,46 @@ export namespace Prisma {
     id?: boolean
     studentId?: boolean
     gradeId?: boolean
-    currentSchool?: boolean
-    textbookPublisher?: boolean
     admissionDate?: boolean
     departureDate?: boolean
+    currentSchool?: boolean
+    textbookPublisher?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    grade?: boolean | GradeDefaultArgs<ExtArgs>
     person?: boolean | PersonDefaultArgs<ExtArgs>
+    grade?: boolean | GradeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["student"]>
 
   export type StudentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     studentId?: boolean
     gradeId?: boolean
-    currentSchool?: boolean
-    textbookPublisher?: boolean
     admissionDate?: boolean
     departureDate?: boolean
+    currentSchool?: boolean
+    textbookPublisher?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    grade?: boolean | GradeDefaultArgs<ExtArgs>
     person?: boolean | PersonDefaultArgs<ExtArgs>
+    grade?: boolean | GradeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["student"]>
 
   export type StudentSelectScalar = {
     id?: boolean
     studentId?: boolean
     gradeId?: boolean
-    currentSchool?: boolean
-    textbookPublisher?: boolean
     admissionDate?: boolean
     departureDate?: boolean
+    currentSchool?: boolean
+    textbookPublisher?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type StudentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "studentId" | "gradeId" | "currentSchool" | "textbookPublisher" | "admissionDate" | "departureDate" | "createdAt" | "updatedAt", ExtArgs["result"]["student"]>
+  export type StudentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "studentId" | "gradeId" | "admissionDate" | "departureDate" | "currentSchool" | "textbookPublisher" | "createdAt" | "updatedAt", ExtArgs["result"]["student"]>
   export type StudentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    grade?: boolean | GradeDefaultArgs<ExtArgs>
     person?: boolean | PersonDefaultArgs<ExtArgs>
+    grade?: boolean | GradeDefaultArgs<ExtArgs>
     attendances?: boolean | Student$attendancesArgs<ExtArgs>
     classStudents?: boolean | Student$classStudentsArgs<ExtArgs>
     billingRecords?: boolean | Student$billingRecordsArgs<ExtArgs>
@@ -8906,19 +8906,19 @@ export namespace Prisma {
     _count?: boolean | StudentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type StudentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    grade?: boolean | GradeDefaultArgs<ExtArgs>
     person?: boolean | PersonDefaultArgs<ExtArgs>
+    grade?: boolean | GradeDefaultArgs<ExtArgs>
   }
   export type StudentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    grade?: boolean | GradeDefaultArgs<ExtArgs>
     person?: boolean | PersonDefaultArgs<ExtArgs>
+    grade?: boolean | GradeDefaultArgs<ExtArgs>
   }
 
   export type $StudentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Student"
     objects: {
-      grade: Prisma.$GradePayload<ExtArgs>
       person: Prisma.$PersonPayload<ExtArgs>
+      grade: Prisma.$GradePayload<ExtArgs>
       attendances: Prisma.$AttendancePayload<ExtArgs>[]
       classStudents: Prisma.$ClassStudentPayload<ExtArgs>[]
       billingRecords: Prisma.$StudentBillingRecordPayload<ExtArgs>[]
@@ -8928,10 +8928,10 @@ export namespace Prisma {
       id: string
       studentId: string | null
       gradeId: string
-      currentSchool: string | null
-      textbookPublisher: string | null
       admissionDate: Date
       departureDate: Date | null
+      currentSchool: string | null
+      textbookPublisher: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["student"]>
@@ -9328,8 +9328,8 @@ export namespace Prisma {
    */
   export interface Prisma__StudentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    grade<T extends GradeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GradeDefaultArgs<ExtArgs>>): Prisma__GradeClient<$Result.GetResult<Prisma.$GradePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     person<T extends PersonDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PersonDefaultArgs<ExtArgs>>): Prisma__PersonClient<$Result.GetResult<Prisma.$PersonPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
+    grade<T extends GradeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GradeDefaultArgs<ExtArgs>>): Prisma__GradeClient<$Result.GetResult<Prisma.$GradePayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
     attendances<T extends Student$attendancesArgs<ExtArgs> = {}>(args?: Subset<T, Student$attendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     classStudents<T extends Student$classStudentsArgs<ExtArgs> = {}>(args?: Subset<T, Student$classStudentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClassStudentPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     billingRecords<T extends Student$billingRecordsArgs<ExtArgs> = {}>(args?: Subset<T, Student$billingRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentBillingRecordPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
@@ -9366,10 +9366,10 @@ export namespace Prisma {
     readonly id: FieldRef<"Student", 'String'>
     readonly studentId: FieldRef<"Student", 'String'>
     readonly gradeId: FieldRef<"Student", 'String'>
-    readonly currentSchool: FieldRef<"Student", 'String'>
-    readonly textbookPublisher: FieldRef<"Student", 'String'>
     readonly admissionDate: FieldRef<"Student", 'DateTime'>
     readonly departureDate: FieldRef<"Student", 'DateTime'>
+    readonly currentSchool: FieldRef<"Student", 'String'>
+    readonly textbookPublisher: FieldRef<"Student", 'String'>
     readonly createdAt: FieldRef<"Student", 'DateTime'>
     readonly updatedAt: FieldRef<"Student", 'DateTime'>
   }
@@ -14651,8 +14651,8 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     class?: boolean | ClassDefaultArgs<ExtArgs>
-    sessionDateHistory?: boolean | Session$sessionDateHistoryArgs<ExtArgs>
     attendances?: boolean | Session$attendancesArgs<ExtArgs>
+    sessionDateHistory?: boolean | Session$sessionDateHistoryArgs<ExtArgs>
     _count?: boolean | SessionCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["session"]>
 
@@ -14691,8 +14691,8 @@ export namespace Prisma {
   export type SessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "classId" | "startTime" | "endTime" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["session"]>
   export type SessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     class?: boolean | ClassDefaultArgs<ExtArgs>
-    sessionDateHistory?: boolean | Session$sessionDateHistoryArgs<ExtArgs>
     attendances?: boolean | Session$attendancesArgs<ExtArgs>
+    sessionDateHistory?: boolean | Session$sessionDateHistoryArgs<ExtArgs>
     _count?: boolean | SessionCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SessionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14706,8 +14706,8 @@ export namespace Prisma {
     name: "Session"
     objects: {
       class: Prisma.$ClassPayload<ExtArgs>
-      sessionDateHistory: Prisma.$SessionDateHistoryPayload<ExtArgs>[]
       attendances: Prisma.$AttendancePayload<ExtArgs>[]
+      sessionDateHistory: Prisma.$SessionDateHistoryPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -15112,8 +15112,8 @@ export namespace Prisma {
   export interface Prisma__SessionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     class<T extends ClassDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClassDefaultArgs<ExtArgs>>): Prisma__ClassClient<$Result.GetResult<Prisma.$ClassPayload<ExtArgs>, T, "findUniqueOrThrow", ClientOptions> | Null, Null, ExtArgs, ClientOptions>
-    sessionDateHistory<T extends Session$sessionDateHistoryArgs<ExtArgs> = {}>(args?: Subset<T, Session$sessionDateHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionDateHistoryPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     attendances<T extends Session$attendancesArgs<ExtArgs> = {}>(args?: Subset<T, Session$attendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
+    sessionDateHistory<T extends Session$sessionDateHistoryArgs<ExtArgs> = {}>(args?: Subset<T, Session$sessionDateHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionDateHistoryPayload<ExtArgs>, T, "findMany", ClientOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -15546,30 +15546,6 @@ export namespace Prisma {
   }
 
   /**
-   * Session.sessionDateHistory
-   */
-  export type Session$sessionDateHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the SessionDateHistory
-     */
-    select?: SessionDateHistorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the SessionDateHistory
-     */
-    omit?: SessionDateHistoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: SessionDateHistoryInclude<ExtArgs> | null
-    where?: SessionDateHistoryWhereInput
-    orderBy?: SessionDateHistoryOrderByWithRelationInput | SessionDateHistoryOrderByWithRelationInput[]
-    cursor?: SessionDateHistoryWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: SessionDateHistoryScalarFieldEnum | SessionDateHistoryScalarFieldEnum[]
-  }
-
-  /**
    * Session.attendances
    */
   export type Session$attendancesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -15591,6 +15567,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AttendanceScalarFieldEnum | AttendanceScalarFieldEnum[]
+  }
+
+  /**
+   * Session.sessionDateHistory
+   */
+  export type Session$sessionDateHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SessionDateHistory
+     */
+    select?: SessionDateHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SessionDateHistory
+     */
+    omit?: SessionDateHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SessionDateHistoryInclude<ExtArgs> | null
+    where?: SessionDateHistoryWhereInput
+    orderBy?: SessionDateHistoryOrderByWithRelationInput | SessionDateHistoryOrderByWithRelationInput[]
+    cursor?: SessionDateHistoryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SessionDateHistoryScalarFieldEnum | SessionDateHistoryScalarFieldEnum[]
   }
 
   /**
@@ -26290,7 +26290,7 @@ export namespace Prisma {
     /**
      * The data needed to create a BillingCategory.
      */
-    data: XOR<BillingCategoryCreateInput, BillingCategoryUncheckedCreateInput>
+    data?: XOR<BillingCategoryCreateInput, BillingCategoryUncheckedCreateInput>
   }
 
   /**
@@ -26580,10 +26580,10 @@ export namespace Prisma {
     id: 'id',
     studentId: 'studentId',
     gradeId: 'gradeId',
-    currentSchool: 'currentSchool',
-    textbookPublisher: 'textbookPublisher',
     admissionDate: 'admissionDate',
     departureDate: 'departureDate',
+    currentSchool: 'currentSchool',
+    textbookPublisher: 'textbookPublisher',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -26939,7 +26939,7 @@ export namespace Prisma {
     AND?: PersonWhereInput | PersonWhereInput[]
     OR?: PersonWhereInput[]
     NOT?: PersonWhereInput | PersonWhereInput[]
-    id?: StringFilter<"Person"> | string
+    id?: UuidFilter<"Person"> | string
     name?: StringFilter<"Person"> | string
     preferredName?: StringNullableFilter<"Person"> | string | null
     gender?: EnumgenderNullableFilter<"Person"> | $Enums.gender | null
@@ -27017,7 +27017,7 @@ export namespace Prisma {
     AND?: PersonScalarWhereWithAggregatesInput | PersonScalarWhereWithAggregatesInput[]
     OR?: PersonScalarWhereWithAggregatesInput[]
     NOT?: PersonScalarWhereWithAggregatesInput | PersonScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Person"> | string
+    id?: UuidWithAggregatesFilter<"Person"> | string
     name?: StringWithAggregatesFilter<"Person"> | string
     preferredName?: StringNullableWithAggregatesFilter<"Person"> | string | null
     gender?: EnumgenderNullableWithAggregatesFilter<"Person"> | $Enums.gender | null
@@ -27034,7 +27034,7 @@ export namespace Prisma {
     AND?: StaffRoleWhereInput | StaffRoleWhereInput[]
     OR?: StaffRoleWhereInput[]
     NOT?: StaffRoleWhereInput | StaffRoleWhereInput[]
-    id?: StringFilter<"StaffRole"> | string
+    id?: UuidFilter<"StaffRole"> | string
     name?: StringFilter<"StaffRole"> | string
     createdAt?: DateTimeFilter<"StaffRole"> | Date | string
     updatedAt?: DateTimeFilter<"StaffRole"> | Date | string
@@ -27074,7 +27074,7 @@ export namespace Prisma {
     AND?: StaffRoleScalarWhereWithAggregatesInput | StaffRoleScalarWhereWithAggregatesInput[]
     OR?: StaffRoleScalarWhereWithAggregatesInput[]
     NOT?: StaffRoleScalarWhereWithAggregatesInput | StaffRoleScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"StaffRole"> | string
+    id?: UuidWithAggregatesFilter<"StaffRole"> | string
     name?: StringWithAggregatesFilter<"StaffRole"> | string
     createdAt?: DateTimeWithAggregatesFilter<"StaffRole"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"StaffRole"> | Date | string
@@ -27084,9 +27084,9 @@ export namespace Prisma {
     AND?: StaffWhereInput | StaffWhereInput[]
     OR?: StaffWhereInput[]
     NOT?: StaffWhereInput | StaffWhereInput[]
-    id?: StringFilter<"Staff"> | string
+    id?: UuidFilter<"Staff"> | string
     staffId?: StringNullableFilter<"Staff"> | string | null
-    roleId?: StringFilter<"Staff"> | string
+    roleId?: UuidFilter<"Staff"> | string
     hireDate?: DateTimeFilter<"Staff"> | Date | string
     leaveDate?: DateTimeNullableFilter<"Staff"> | Date | string | null
     createdAt?: DateTimeFilter<"Staff"> | Date | string
@@ -27115,7 +27115,7 @@ export namespace Prisma {
     AND?: StaffWhereInput | StaffWhereInput[]
     OR?: StaffWhereInput[]
     NOT?: StaffWhereInput | StaffWhereInput[]
-    roleId?: StringFilter<"Staff"> | string
+    roleId?: UuidFilter<"Staff"> | string
     hireDate?: DateTimeFilter<"Staff"> | Date | string
     leaveDate?: DateTimeNullableFilter<"Staff"> | Date | string | null
     createdAt?: DateTimeFilter<"Staff"> | Date | string
@@ -27142,9 +27142,9 @@ export namespace Prisma {
     AND?: StaffScalarWhereWithAggregatesInput | StaffScalarWhereWithAggregatesInput[]
     OR?: StaffScalarWhereWithAggregatesInput[]
     NOT?: StaffScalarWhereWithAggregatesInput | StaffScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Staff"> | string
+    id?: UuidWithAggregatesFilter<"Staff"> | string
     staffId?: StringNullableWithAggregatesFilter<"Staff"> | string | null
-    roleId?: StringWithAggregatesFilter<"Staff"> | string
+    roleId?: UuidWithAggregatesFilter<"Staff"> | string
     hireDate?: DateTimeWithAggregatesFilter<"Staff"> | Date | string
     leaveDate?: DateTimeNullableWithAggregatesFilter<"Staff"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Staff"> | Date | string
@@ -27155,7 +27155,7 @@ export namespace Prisma {
     AND?: ParentWhereInput | ParentWhereInput[]
     OR?: ParentWhereInput[]
     NOT?: ParentWhereInput | ParentWhereInput[]
-    id?: StringFilter<"Parent"> | string
+    id?: UuidFilter<"Parent"> | string
     parentId?: StringNullableFilter<"Parent"> | string | null
     createdAt?: DateTimeFilter<"Parent"> | Date | string
     updatedAt?: DateTimeFilter<"Parent"> | Date | string
@@ -27195,7 +27195,7 @@ export namespace Prisma {
     AND?: ParentScalarWhereWithAggregatesInput | ParentScalarWhereWithAggregatesInput[]
     OR?: ParentScalarWhereWithAggregatesInput[]
     NOT?: ParentScalarWhereWithAggregatesInput | ParentScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Parent"> | string
+    id?: UuidWithAggregatesFilter<"Parent"> | string
     parentId?: StringNullableWithAggregatesFilter<"Parent"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Parent"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Parent"> | Date | string
@@ -27205,7 +27205,7 @@ export namespace Prisma {
     AND?: GradeWhereInput | GradeWhereInput[]
     OR?: GradeWhereInput[]
     NOT?: GradeWhereInput | GradeWhereInput[]
-    id?: StringFilter<"Grade"> | string
+    id?: UuidFilter<"Grade"> | string
     name?: StringFilter<"Grade"> | string
     createdAt?: DateTimeFilter<"Grade"> | Date | string
     updatedAt?: DateTimeFilter<"Grade"> | Date | string
@@ -27248,7 +27248,7 @@ export namespace Prisma {
     AND?: GradeScalarWhereWithAggregatesInput | GradeScalarWhereWithAggregatesInput[]
     OR?: GradeScalarWhereWithAggregatesInput[]
     NOT?: GradeScalarWhereWithAggregatesInput | GradeScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Grade"> | string
+    id?: UuidWithAggregatesFilter<"Grade"> | string
     name?: StringWithAggregatesFilter<"Grade"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Grade"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Grade"> | Date | string
@@ -27258,17 +27258,17 @@ export namespace Prisma {
     AND?: StudentWhereInput | StudentWhereInput[]
     OR?: StudentWhereInput[]
     NOT?: StudentWhereInput | StudentWhereInput[]
-    id?: StringFilter<"Student"> | string
+    id?: UuidFilter<"Student"> | string
     studentId?: StringNullableFilter<"Student"> | string | null
-    gradeId?: StringFilter<"Student"> | string
-    currentSchool?: StringNullableFilter<"Student"> | string | null
-    textbookPublisher?: StringNullableFilter<"Student"> | string | null
+    gradeId?: UuidFilter<"Student"> | string
     admissionDate?: DateTimeFilter<"Student"> | Date | string
     departureDate?: DateTimeNullableFilter<"Student"> | Date | string | null
+    currentSchool?: StringNullableFilter<"Student"> | string | null
+    textbookPublisher?: StringNullableFilter<"Student"> | string | null
     createdAt?: DateTimeFilter<"Student"> | Date | string
     updatedAt?: DateTimeFilter<"Student"> | Date | string
-    grade?: XOR<GradeScalarRelationFilter, GradeWhereInput>
     person?: XOR<PersonScalarRelationFilter, PersonWhereInput>
+    grade?: XOR<GradeScalarRelationFilter, GradeWhereInput>
     attendances?: AttendanceListRelationFilter
     classStudents?: ClassStudentListRelationFilter
     billingRecords?: StudentBillingRecordListRelationFilter
@@ -27279,14 +27279,14 @@ export namespace Prisma {
     id?: SortOrder
     studentId?: SortOrderInput | SortOrder
     gradeId?: SortOrder
-    currentSchool?: SortOrderInput | SortOrder
-    textbookPublisher?: SortOrderInput | SortOrder
     admissionDate?: SortOrder
     departureDate?: SortOrderInput | SortOrder
+    currentSchool?: SortOrderInput | SortOrder
+    textbookPublisher?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    grade?: GradeOrderByWithRelationInput
     person?: PersonOrderByWithRelationInput
+    grade?: GradeOrderByWithRelationInput
     attendances?: AttendanceOrderByRelationAggregateInput
     classStudents?: ClassStudentOrderByRelationAggregateInput
     billingRecords?: StudentBillingRecordOrderByRelationAggregateInput
@@ -27299,15 +27299,15 @@ export namespace Prisma {
     AND?: StudentWhereInput | StudentWhereInput[]
     OR?: StudentWhereInput[]
     NOT?: StudentWhereInput | StudentWhereInput[]
-    gradeId?: StringFilter<"Student"> | string
-    currentSchool?: StringNullableFilter<"Student"> | string | null
-    textbookPublisher?: StringNullableFilter<"Student"> | string | null
+    gradeId?: UuidFilter<"Student"> | string
     admissionDate?: DateTimeFilter<"Student"> | Date | string
     departureDate?: DateTimeNullableFilter<"Student"> | Date | string | null
+    currentSchool?: StringNullableFilter<"Student"> | string | null
+    textbookPublisher?: StringNullableFilter<"Student"> | string | null
     createdAt?: DateTimeFilter<"Student"> | Date | string
     updatedAt?: DateTimeFilter<"Student"> | Date | string
-    grade?: XOR<GradeScalarRelationFilter, GradeWhereInput>
     person?: XOR<PersonScalarRelationFilter, PersonWhereInput>
+    grade?: XOR<GradeScalarRelationFilter, GradeWhereInput>
     attendances?: AttendanceListRelationFilter
     classStudents?: ClassStudentListRelationFilter
     billingRecords?: StudentBillingRecordListRelationFilter
@@ -27318,10 +27318,10 @@ export namespace Prisma {
     id?: SortOrder
     studentId?: SortOrderInput | SortOrder
     gradeId?: SortOrder
-    currentSchool?: SortOrderInput | SortOrder
-    textbookPublisher?: SortOrderInput | SortOrder
     admissionDate?: SortOrder
     departureDate?: SortOrderInput | SortOrder
+    currentSchool?: SortOrderInput | SortOrder
+    textbookPublisher?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: StudentCountOrderByAggregateInput
@@ -27333,13 +27333,13 @@ export namespace Prisma {
     AND?: StudentScalarWhereWithAggregatesInput | StudentScalarWhereWithAggregatesInput[]
     OR?: StudentScalarWhereWithAggregatesInput[]
     NOT?: StudentScalarWhereWithAggregatesInput | StudentScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Student"> | string
+    id?: UuidWithAggregatesFilter<"Student"> | string
     studentId?: StringNullableWithAggregatesFilter<"Student"> | string | null
-    gradeId?: StringWithAggregatesFilter<"Student"> | string
-    currentSchool?: StringNullableWithAggregatesFilter<"Student"> | string | null
-    textbookPublisher?: StringNullableWithAggregatesFilter<"Student"> | string | null
+    gradeId?: UuidWithAggregatesFilter<"Student"> | string
     admissionDate?: DateTimeWithAggregatesFilter<"Student"> | Date | string
     departureDate?: DateTimeNullableWithAggregatesFilter<"Student"> | Date | string | null
+    currentSchool?: StringNullableWithAggregatesFilter<"Student"> | string | null
+    textbookPublisher?: StringNullableWithAggregatesFilter<"Student"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Student"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Student"> | Date | string
   }
@@ -27348,8 +27348,8 @@ export namespace Prisma {
     AND?: UserIdentifierWhereInput | UserIdentifierWhereInput[]
     OR?: UserIdentifierWhereInput[]
     NOT?: UserIdentifierWhereInput | UserIdentifierWhereInput[]
-    id?: StringFilter<"UserIdentifier"> | string
-    personId?: StringFilter<"UserIdentifier"> | string
+    id?: UuidFilter<"UserIdentifier"> | string
+    personId?: UuidFilter<"UserIdentifier"> | string
     name?: StringFilter<"UserIdentifier"> | string
     value?: StringFilter<"UserIdentifier"> | string
     isSocialMedia?: BoolNullableFilter<"UserIdentifier"> | boolean | null
@@ -27374,7 +27374,7 @@ export namespace Prisma {
     AND?: UserIdentifierWhereInput | UserIdentifierWhereInput[]
     OR?: UserIdentifierWhereInput[]
     NOT?: UserIdentifierWhereInput | UserIdentifierWhereInput[]
-    personId?: StringFilter<"UserIdentifier"> | string
+    personId?: UuidFilter<"UserIdentifier"> | string
     name?: StringFilter<"UserIdentifier"> | string
     value?: StringFilter<"UserIdentifier"> | string
     isSocialMedia?: BoolNullableFilter<"UserIdentifier"> | boolean | null
@@ -27400,8 +27400,8 @@ export namespace Prisma {
     AND?: UserIdentifierScalarWhereWithAggregatesInput | UserIdentifierScalarWhereWithAggregatesInput[]
     OR?: UserIdentifierScalarWhereWithAggregatesInput[]
     NOT?: UserIdentifierScalarWhereWithAggregatesInput | UserIdentifierScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"UserIdentifier"> | string
-    personId?: StringWithAggregatesFilter<"UserIdentifier"> | string
+    id?: UuidWithAggregatesFilter<"UserIdentifier"> | string
+    personId?: UuidWithAggregatesFilter<"UserIdentifier"> | string
     name?: StringWithAggregatesFilter<"UserIdentifier"> | string
     value?: StringWithAggregatesFilter<"UserIdentifier"> | string
     isSocialMedia?: BoolNullableWithAggregatesFilter<"UserIdentifier"> | boolean | null
@@ -27413,10 +27413,10 @@ export namespace Prisma {
     AND?: ClassWhereInput | ClassWhereInput[]
     OR?: ClassWhereInput[]
     NOT?: ClassWhereInput | ClassWhereInput[]
-    id?: StringFilter<"Class"> | string
+    id?: UuidFilter<"Class"> | string
     name?: StringFilter<"Class"> | string
-    teacherId?: StringFilter<"Class"> | string
-    gradeId?: StringFilter<"Class"> | string
+    teacherId?: UuidFilter<"Class"> | string
+    gradeId?: UuidFilter<"Class"> | string
     capacity?: IntNullableFilter<"Class"> | number | null
     active?: BoolFilter<"Class"> | boolean
     createdAt?: DateTimeFilter<"Class"> | Date | string
@@ -27454,8 +27454,8 @@ export namespace Prisma {
     AND?: ClassWhereInput | ClassWhereInput[]
     OR?: ClassWhereInput[]
     NOT?: ClassWhereInput | ClassWhereInput[]
-    teacherId?: StringFilter<"Class"> | string
-    gradeId?: StringFilter<"Class"> | string
+    teacherId?: UuidFilter<"Class"> | string
+    gradeId?: UuidFilter<"Class"> | string
     capacity?: IntNullableFilter<"Class"> | number | null
     active?: BoolFilter<"Class"> | boolean
     createdAt?: DateTimeFilter<"Class"> | Date | string
@@ -27489,10 +27489,10 @@ export namespace Prisma {
     AND?: ClassScalarWhereWithAggregatesInput | ClassScalarWhereWithAggregatesInput[]
     OR?: ClassScalarWhereWithAggregatesInput[]
     NOT?: ClassScalarWhereWithAggregatesInput | ClassScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Class"> | string
+    id?: UuidWithAggregatesFilter<"Class"> | string
     name?: StringWithAggregatesFilter<"Class"> | string
-    teacherId?: StringWithAggregatesFilter<"Class"> | string
-    gradeId?: StringWithAggregatesFilter<"Class"> | string
+    teacherId?: UuidWithAggregatesFilter<"Class"> | string
+    gradeId?: UuidWithAggregatesFilter<"Class"> | string
     capacity?: IntNullableWithAggregatesFilter<"Class"> | number | null
     active?: BoolWithAggregatesFilter<"Class"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Class"> | Date | string
@@ -27503,8 +27503,8 @@ export namespace Prisma {
     AND?: ClassCostWhereInput | ClassCostWhereInput[]
     OR?: ClassCostWhereInput[]
     NOT?: ClassCostWhereInput | ClassCostWhereInput[]
-    id?: StringFilter<"ClassCost"> | string
-    classId?: StringFilter<"ClassCost"> | string
+    id?: UuidFilter<"ClassCost"> | string
+    classId?: UuidFilter<"ClassCost"> | string
     cost?: DecimalFilter<"ClassCost"> | Decimal | DecimalJsLike | number | string
     currency?: StringNullableFilter<"ClassCost"> | string | null
     effectiveDate?: DateTimeNullableFilter<"ClassCost"> | Date | string | null
@@ -27531,7 +27531,7 @@ export namespace Prisma {
     AND?: ClassCostWhereInput | ClassCostWhereInput[]
     OR?: ClassCostWhereInput[]
     NOT?: ClassCostWhereInput | ClassCostWhereInput[]
-    classId?: StringFilter<"ClassCost"> | string
+    classId?: UuidFilter<"ClassCost"> | string
     cost?: DecimalFilter<"ClassCost"> | Decimal | DecimalJsLike | number | string
     currency?: StringNullableFilter<"ClassCost"> | string | null
     effectiveDate?: DateTimeNullableFilter<"ClassCost"> | Date | string | null
@@ -27561,8 +27561,8 @@ export namespace Prisma {
     AND?: ClassCostScalarWhereWithAggregatesInput | ClassCostScalarWhereWithAggregatesInput[]
     OR?: ClassCostScalarWhereWithAggregatesInput[]
     NOT?: ClassCostScalarWhereWithAggregatesInput | ClassCostScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"ClassCost"> | string
-    classId?: StringWithAggregatesFilter<"ClassCost"> | string
+    id?: UuidWithAggregatesFilter<"ClassCost"> | string
+    classId?: UuidWithAggregatesFilter<"ClassCost"> | string
     cost?: DecimalWithAggregatesFilter<"ClassCost"> | Decimal | DecimalJsLike | number | string
     currency?: StringNullableWithAggregatesFilter<"ClassCost"> | string | null
     effectiveDate?: DateTimeNullableWithAggregatesFilter<"ClassCost"> | Date | string | null
@@ -27575,9 +27575,9 @@ export namespace Prisma {
     AND?: ClassStudentWhereInput | ClassStudentWhereInput[]
     OR?: ClassStudentWhereInput[]
     NOT?: ClassStudentWhereInput | ClassStudentWhereInput[]
-    id?: StringFilter<"ClassStudent"> | string
-    classId?: StringFilter<"ClassStudent"> | string
-    studentId?: StringFilter<"ClassStudent"> | string
+    id?: UuidFilter<"ClassStudent"> | string
+    classId?: UuidFilter<"ClassStudent"> | string
+    studentId?: UuidFilter<"ClassStudent"> | string
     startDate?: DateTimeFilter<"ClassStudent"> | Date | string
     endDate?: DateTimeNullableFilter<"ClassStudent"> | Date | string | null
     createdAt?: DateTimeFilter<"ClassStudent"> | Date | string
@@ -27603,8 +27603,8 @@ export namespace Prisma {
     AND?: ClassStudentWhereInput | ClassStudentWhereInput[]
     OR?: ClassStudentWhereInput[]
     NOT?: ClassStudentWhereInput | ClassStudentWhereInput[]
-    classId?: StringFilter<"ClassStudent"> | string
-    studentId?: StringFilter<"ClassStudent"> | string
+    classId?: UuidFilter<"ClassStudent"> | string
+    studentId?: UuidFilter<"ClassStudent"> | string
     startDate?: DateTimeFilter<"ClassStudent"> | Date | string
     endDate?: DateTimeNullableFilter<"ClassStudent"> | Date | string | null
     createdAt?: DateTimeFilter<"ClassStudent"> | Date | string
@@ -27630,9 +27630,9 @@ export namespace Prisma {
     AND?: ClassStudentScalarWhereWithAggregatesInput | ClassStudentScalarWhereWithAggregatesInput[]
     OR?: ClassStudentScalarWhereWithAggregatesInput[]
     NOT?: ClassStudentScalarWhereWithAggregatesInput | ClassStudentScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"ClassStudent"> | string
-    classId?: StringWithAggregatesFilter<"ClassStudent"> | string
-    studentId?: StringWithAggregatesFilter<"ClassStudent"> | string
+    id?: UuidWithAggregatesFilter<"ClassStudent"> | string
+    classId?: UuidWithAggregatesFilter<"ClassStudent"> | string
+    studentId?: UuidWithAggregatesFilter<"ClassStudent"> | string
     startDate?: DateTimeWithAggregatesFilter<"ClassStudent"> | Date | string
     endDate?: DateTimeNullableWithAggregatesFilter<"ClassStudent"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"ClassStudent"> | Date | string
@@ -27643,16 +27643,16 @@ export namespace Prisma {
     AND?: SessionWhereInput | SessionWhereInput[]
     OR?: SessionWhereInput[]
     NOT?: SessionWhereInput | SessionWhereInput[]
-    id?: StringFilter<"Session"> | string
-    classId?: StringFilter<"Session"> | string
+    id?: UuidFilter<"Session"> | string
+    classId?: UuidFilter<"Session"> | string
     startTime?: DateTimeFilter<"Session"> | Date | string
     endTime?: DateTimeFilter<"Session"> | Date | string
     status?: EnumstatusFilter<"Session"> | $Enums.status
     createdAt?: DateTimeFilter<"Session"> | Date | string
     updatedAt?: DateTimeFilter<"Session"> | Date | string
     class?: XOR<ClassScalarRelationFilter, ClassWhereInput>
-    sessionDateHistory?: SessionDateHistoryListRelationFilter
     attendances?: AttendanceListRelationFilter
+    sessionDateHistory?: SessionDateHistoryListRelationFilter
   }
 
   export type SessionOrderByWithRelationInput = {
@@ -27664,8 +27664,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     class?: ClassOrderByWithRelationInput
-    sessionDateHistory?: SessionDateHistoryOrderByRelationAggregateInput
     attendances?: AttendanceOrderByRelationAggregateInput
+    sessionDateHistory?: SessionDateHistoryOrderByRelationAggregateInput
   }
 
   export type SessionWhereUniqueInput = Prisma.AtLeast<{
@@ -27674,15 +27674,15 @@ export namespace Prisma {
     AND?: SessionWhereInput | SessionWhereInput[]
     OR?: SessionWhereInput[]
     NOT?: SessionWhereInput | SessionWhereInput[]
-    classId?: StringFilter<"Session"> | string
+    classId?: UuidFilter<"Session"> | string
     startTime?: DateTimeFilter<"Session"> | Date | string
     endTime?: DateTimeFilter<"Session"> | Date | string
     status?: EnumstatusFilter<"Session"> | $Enums.status
     createdAt?: DateTimeFilter<"Session"> | Date | string
     updatedAt?: DateTimeFilter<"Session"> | Date | string
     class?: XOR<ClassScalarRelationFilter, ClassWhereInput>
-    sessionDateHistory?: SessionDateHistoryListRelationFilter
     attendances?: AttendanceListRelationFilter
+    sessionDateHistory?: SessionDateHistoryListRelationFilter
   }, "id" | "unique_session_details">
 
   export type SessionOrderByWithAggregationInput = {
@@ -27702,8 +27702,8 @@ export namespace Prisma {
     AND?: SessionScalarWhereWithAggregatesInput | SessionScalarWhereWithAggregatesInput[]
     OR?: SessionScalarWhereWithAggregatesInput[]
     NOT?: SessionScalarWhereWithAggregatesInput | SessionScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Session"> | string
-    classId?: StringWithAggregatesFilter<"Session"> | string
+    id?: UuidWithAggregatesFilter<"Session"> | string
+    classId?: UuidWithAggregatesFilter<"Session"> | string
     startTime?: DateTimeWithAggregatesFilter<"Session"> | Date | string
     endTime?: DateTimeWithAggregatesFilter<"Session"> | Date | string
     status?: EnumstatusWithAggregatesFilter<"Session"> | $Enums.status
@@ -27715,8 +27715,8 @@ export namespace Prisma {
     AND?: SessionDateHistoryWhereInput | SessionDateHistoryWhereInput[]
     OR?: SessionDateHistoryWhereInput[]
     NOT?: SessionDateHistoryWhereInput | SessionDateHistoryWhereInput[]
-    id?: StringFilter<"SessionDateHistory"> | string
-    sessionId?: StringFilter<"SessionDateHistory"> | string
+    id?: UuidFilter<"SessionDateHistory"> | string
+    sessionId?: UuidFilter<"SessionDateHistory"> | string
     oldDate?: DateTimeFilter<"SessionDateHistory"> | Date | string
     newDate?: DateTimeFilter<"SessionDateHistory"> | Date | string
     status?: EnumstatusFilter<"SessionDateHistory"> | $Enums.status
@@ -27745,7 +27745,7 @@ export namespace Prisma {
     AND?: SessionDateHistoryWhereInput | SessionDateHistoryWhereInput[]
     OR?: SessionDateHistoryWhereInput[]
     NOT?: SessionDateHistoryWhereInput | SessionDateHistoryWhereInput[]
-    sessionId?: StringFilter<"SessionDateHistory"> | string
+    sessionId?: UuidFilter<"SessionDateHistory"> | string
     oldDate?: DateTimeFilter<"SessionDateHistory"> | Date | string
     newDate?: DateTimeFilter<"SessionDateHistory"> | Date | string
     status?: EnumstatusFilter<"SessionDateHistory"> | $Enums.status
@@ -27775,8 +27775,8 @@ export namespace Prisma {
     AND?: SessionDateHistoryScalarWhereWithAggregatesInput | SessionDateHistoryScalarWhereWithAggregatesInput[]
     OR?: SessionDateHistoryScalarWhereWithAggregatesInput[]
     NOT?: SessionDateHistoryScalarWhereWithAggregatesInput | SessionDateHistoryScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"SessionDateHistory"> | string
-    sessionId?: StringWithAggregatesFilter<"SessionDateHistory"> | string
+    id?: UuidWithAggregatesFilter<"SessionDateHistory"> | string
+    sessionId?: UuidWithAggregatesFilter<"SessionDateHistory"> | string
     oldDate?: DateTimeWithAggregatesFilter<"SessionDateHistory"> | Date | string
     newDate?: DateTimeWithAggregatesFilter<"SessionDateHistory"> | Date | string
     status?: EnumstatusWithAggregatesFilter<"SessionDateHistory"> | $Enums.status
@@ -27790,9 +27790,9 @@ export namespace Prisma {
     AND?: AttendanceWhereInput | AttendanceWhereInput[]
     OR?: AttendanceWhereInput[]
     NOT?: AttendanceWhereInput | AttendanceWhereInput[]
-    id?: StringFilter<"Attendance"> | string
-    sessionId?: StringFilter<"Attendance"> | string
-    studentId?: StringFilter<"Attendance"> | string
+    id?: UuidFilter<"Attendance"> | string
+    sessionId?: UuidFilter<"Attendance"> | string
+    studentId?: UuidFilter<"Attendance"> | string
     createdAt?: DateTimeFilter<"Attendance"> | Date | string
     updatedAt?: DateTimeFilter<"Attendance"> | Date | string
     session?: XOR<SessionScalarRelationFilter, SessionWhereInput>
@@ -27814,8 +27814,8 @@ export namespace Prisma {
     AND?: AttendanceWhereInput | AttendanceWhereInput[]
     OR?: AttendanceWhereInput[]
     NOT?: AttendanceWhereInput | AttendanceWhereInput[]
-    sessionId?: StringFilter<"Attendance"> | string
-    studentId?: StringFilter<"Attendance"> | string
+    sessionId?: UuidFilter<"Attendance"> | string
+    studentId?: UuidFilter<"Attendance"> | string
     createdAt?: DateTimeFilter<"Attendance"> | Date | string
     updatedAt?: DateTimeFilter<"Attendance"> | Date | string
     session?: XOR<SessionScalarRelationFilter, SessionWhereInput>
@@ -27837,9 +27837,9 @@ export namespace Prisma {
     AND?: AttendanceScalarWhereWithAggregatesInput | AttendanceScalarWhereWithAggregatesInput[]
     OR?: AttendanceScalarWhereWithAggregatesInput[]
     NOT?: AttendanceScalarWhereWithAggregatesInput | AttendanceScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Attendance"> | string
-    sessionId?: StringWithAggregatesFilter<"Attendance"> | string
-    studentId?: StringWithAggregatesFilter<"Attendance"> | string
+    id?: UuidWithAggregatesFilter<"Attendance"> | string
+    sessionId?: UuidWithAggregatesFilter<"Attendance"> | string
+    studentId?: UuidWithAggregatesFilter<"Attendance"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Attendance"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Attendance"> | Date | string
   }
@@ -27848,7 +27848,7 @@ export namespace Prisma {
     AND?: AssignmentWhereInput | AssignmentWhereInput[]
     OR?: AssignmentWhereInput[]
     NOT?: AssignmentWhereInput | AssignmentWhereInput[]
-    id?: StringFilter<"Assignment"> | string
+    id?: UuidFilter<"Assignment"> | string
     name?: StringFilter<"Assignment"> | string
     description?: StringNullableFilter<"Assignment"> | string | null
     dueDate?: DateTimeNullableFilter<"Assignment"> | Date | string | null
@@ -27896,7 +27896,7 @@ export namespace Prisma {
     AND?: AssignmentScalarWhereWithAggregatesInput | AssignmentScalarWhereWithAggregatesInput[]
     OR?: AssignmentScalarWhereWithAggregatesInput[]
     NOT?: AssignmentScalarWhereWithAggregatesInput | AssignmentScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Assignment"> | string
+    id?: UuidWithAggregatesFilter<"Assignment"> | string
     name?: StringWithAggregatesFilter<"Assignment"> | string
     description?: StringNullableWithAggregatesFilter<"Assignment"> | string | null
     dueDate?: DateTimeNullableWithAggregatesFilter<"Assignment"> | Date | string | null
@@ -27908,9 +27908,9 @@ export namespace Prisma {
     AND?: ClassAssignmentWhereInput | ClassAssignmentWhereInput[]
     OR?: ClassAssignmentWhereInput[]
     NOT?: ClassAssignmentWhereInput | ClassAssignmentWhereInput[]
-    id?: StringFilter<"ClassAssignment"> | string
-    classId?: StringFilter<"ClassAssignment"> | string
-    assignmentId?: StringFilter<"ClassAssignment"> | string
+    id?: UuidFilter<"ClassAssignment"> | string
+    classId?: UuidFilter<"ClassAssignment"> | string
+    assignmentId?: UuidFilter<"ClassAssignment"> | string
     createdAt?: DateTimeFilter<"ClassAssignment"> | Date | string
     updatedAt?: DateTimeFilter<"ClassAssignment"> | Date | string
     class?: XOR<ClassScalarRelationFilter, ClassWhereInput>
@@ -27932,8 +27932,8 @@ export namespace Prisma {
     AND?: ClassAssignmentWhereInput | ClassAssignmentWhereInput[]
     OR?: ClassAssignmentWhereInput[]
     NOT?: ClassAssignmentWhereInput | ClassAssignmentWhereInput[]
-    classId?: StringFilter<"ClassAssignment"> | string
-    assignmentId?: StringFilter<"ClassAssignment"> | string
+    classId?: UuidFilter<"ClassAssignment"> | string
+    assignmentId?: UuidFilter<"ClassAssignment"> | string
     createdAt?: DateTimeFilter<"ClassAssignment"> | Date | string
     updatedAt?: DateTimeFilter<"ClassAssignment"> | Date | string
     class?: XOR<ClassScalarRelationFilter, ClassWhereInput>
@@ -27955,9 +27955,9 @@ export namespace Prisma {
     AND?: ClassAssignmentScalarWhereWithAggregatesInput | ClassAssignmentScalarWhereWithAggregatesInput[]
     OR?: ClassAssignmentScalarWhereWithAggregatesInput[]
     NOT?: ClassAssignmentScalarWhereWithAggregatesInput | ClassAssignmentScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"ClassAssignment"> | string
-    classId?: StringWithAggregatesFilter<"ClassAssignment"> | string
-    assignmentId?: StringWithAggregatesFilter<"ClassAssignment"> | string
+    id?: UuidWithAggregatesFilter<"ClassAssignment"> | string
+    classId?: UuidWithAggregatesFilter<"ClassAssignment"> | string
+    assignmentId?: UuidWithAggregatesFilter<"ClassAssignment"> | string
     createdAt?: DateTimeWithAggregatesFilter<"ClassAssignment"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ClassAssignment"> | Date | string
   }
@@ -27966,8 +27966,8 @@ export namespace Prisma {
     AND?: ScheduleWhereInput | ScheduleWhereInput[]
     OR?: ScheduleWhereInput[]
     NOT?: ScheduleWhereInput | ScheduleWhereInput[]
-    id?: StringFilter<"Schedule"> | string
-    classId?: StringFilter<"Schedule"> | string
+    id?: UuidFilter<"Schedule"> | string
+    classId?: UuidFilter<"Schedule"> | string
     dayOfWeek?: Enumday_of_weekFilter<"Schedule"> | $Enums.day_of_week
     startTime?: DateTimeFilter<"Schedule"> | Date | string
     endTime?: DateTimeFilter<"Schedule"> | Date | string
@@ -27992,7 +27992,7 @@ export namespace Prisma {
     AND?: ScheduleWhereInput | ScheduleWhereInput[]
     OR?: ScheduleWhereInput[]
     NOT?: ScheduleWhereInput | ScheduleWhereInput[]
-    classId?: StringFilter<"Schedule"> | string
+    classId?: UuidFilter<"Schedule"> | string
     dayOfWeek?: Enumday_of_weekFilter<"Schedule"> | $Enums.day_of_week
     startTime?: DateTimeFilter<"Schedule"> | Date | string
     endTime?: DateTimeFilter<"Schedule"> | Date | string
@@ -28018,8 +28018,8 @@ export namespace Prisma {
     AND?: ScheduleScalarWhereWithAggregatesInput | ScheduleScalarWhereWithAggregatesInput[]
     OR?: ScheduleScalarWhereWithAggregatesInput[]
     NOT?: ScheduleScalarWhereWithAggregatesInput | ScheduleScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Schedule"> | string
-    classId?: StringWithAggregatesFilter<"Schedule"> | string
+    id?: UuidWithAggregatesFilter<"Schedule"> | string
+    classId?: UuidWithAggregatesFilter<"Schedule"> | string
     dayOfWeek?: Enumday_of_weekWithAggregatesFilter<"Schedule"> | $Enums.day_of_week
     startTime?: DateTimeWithAggregatesFilter<"Schedule"> | Date | string
     endTime?: DateTimeWithAggregatesFilter<"Schedule"> | Date | string
@@ -28031,7 +28031,7 @@ export namespace Prisma {
     AND?: HolidayWhereInput | HolidayWhereInput[]
     OR?: HolidayWhereInput[]
     NOT?: HolidayWhereInput | HolidayWhereInput[]
-    id?: StringFilter<"Holiday"> | string
+    id?: UuidFilter<"Holiday"> | string
     name?: StringFilter<"Holiday"> | string
     startDate?: DateTimeFilter<"Holiday"> | Date | string
     endDate?: DateTimeFilter<"Holiday"> | Date | string
@@ -28076,7 +28076,7 @@ export namespace Prisma {
     AND?: HolidayScalarWhereWithAggregatesInput | HolidayScalarWhereWithAggregatesInput[]
     OR?: HolidayScalarWhereWithAggregatesInput[]
     NOT?: HolidayScalarWhereWithAggregatesInput | HolidayScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Holiday"> | string
+    id?: UuidWithAggregatesFilter<"Holiday"> | string
     name?: StringWithAggregatesFilter<"Holiday"> | string
     startDate?: DateTimeWithAggregatesFilter<"Holiday"> | Date | string
     endDate?: DateTimeWithAggregatesFilter<"Holiday"> | Date | string
@@ -28088,8 +28088,8 @@ export namespace Prisma {
     AND?: StudentBillingRecordWhereInput | StudentBillingRecordWhereInput[]
     OR?: StudentBillingRecordWhereInput[]
     NOT?: StudentBillingRecordWhereInput | StudentBillingRecordWhereInput[]
-    id?: StringFilter<"StudentBillingRecord"> | string
-    studentId?: StringFilter<"StudentBillingRecord"> | string
+    id?: UuidFilter<"StudentBillingRecord"> | string
+    studentId?: UuidFilter<"StudentBillingRecord"> | string
     billingDate?: DateTimeNullableFilter<"StudentBillingRecord"> | Date | string | null
     description?: StringNullableFilter<"StudentBillingRecord"> | string | null
     amount?: IntNullableFilter<"StudentBillingRecord"> | number | null
@@ -28120,7 +28120,7 @@ export namespace Prisma {
     AND?: StudentBillingRecordWhereInput | StudentBillingRecordWhereInput[]
     OR?: StudentBillingRecordWhereInput[]
     NOT?: StudentBillingRecordWhereInput | StudentBillingRecordWhereInput[]
-    studentId?: StringFilter<"StudentBillingRecord"> | string
+    studentId?: UuidFilter<"StudentBillingRecord"> | string
     billingDate?: DateTimeNullableFilter<"StudentBillingRecord"> | Date | string | null
     description?: StringNullableFilter<"StudentBillingRecord"> | string | null
     amount?: IntNullableFilter<"StudentBillingRecord"> | number | null
@@ -28153,8 +28153,8 @@ export namespace Prisma {
     AND?: StudentBillingRecordScalarWhereWithAggregatesInput | StudentBillingRecordScalarWhereWithAggregatesInput[]
     OR?: StudentBillingRecordScalarWhereWithAggregatesInput[]
     NOT?: StudentBillingRecordScalarWhereWithAggregatesInput | StudentBillingRecordScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"StudentBillingRecord"> | string
-    studentId?: StringWithAggregatesFilter<"StudentBillingRecord"> | string
+    id?: UuidWithAggregatesFilter<"StudentBillingRecord"> | string
+    studentId?: UuidWithAggregatesFilter<"StudentBillingRecord"> | string
     billingDate?: DateTimeNullableWithAggregatesFilter<"StudentBillingRecord"> | Date | string | null
     description?: StringNullableWithAggregatesFilter<"StudentBillingRecord"> | string | null
     amount?: IntNullableWithAggregatesFilter<"StudentBillingRecord"> | number | null
@@ -28168,9 +28168,9 @@ export namespace Prisma {
     AND?: StudentBillingDetailWhereInput | StudentBillingDetailWhereInput[]
     OR?: StudentBillingDetailWhereInput[]
     NOT?: StudentBillingDetailWhereInput | StudentBillingDetailWhereInput[]
-    id?: StringFilter<"StudentBillingDetail"> | string
-    billingRecordId?: StringFilter<"StudentBillingDetail"> | string
-    categoryId?: StringNullableFilter<"StudentBillingDetail"> | string | null
+    id?: UuidFilter<"StudentBillingDetail"> | string
+    billingRecordId?: UuidFilter<"StudentBillingDetail"> | string
+    categoryId?: UuidNullableFilter<"StudentBillingDetail"> | string | null
     amount?: DecimalNullableFilter<"StudentBillingDetail"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFilter<"StudentBillingDetail"> | Date | string
     updatedAt?: DateTimeFilter<"StudentBillingDetail"> | Date | string
@@ -28194,8 +28194,8 @@ export namespace Prisma {
     AND?: StudentBillingDetailWhereInput | StudentBillingDetailWhereInput[]
     OR?: StudentBillingDetailWhereInput[]
     NOT?: StudentBillingDetailWhereInput | StudentBillingDetailWhereInput[]
-    billingRecordId?: StringFilter<"StudentBillingDetail"> | string
-    categoryId?: StringNullableFilter<"StudentBillingDetail"> | string | null
+    billingRecordId?: UuidFilter<"StudentBillingDetail"> | string
+    categoryId?: UuidNullableFilter<"StudentBillingDetail"> | string | null
     amount?: DecimalNullableFilter<"StudentBillingDetail"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFilter<"StudentBillingDetail"> | Date | string
     updatedAt?: DateTimeFilter<"StudentBillingDetail"> | Date | string
@@ -28221,9 +28221,9 @@ export namespace Prisma {
     AND?: StudentBillingDetailScalarWhereWithAggregatesInput | StudentBillingDetailScalarWhereWithAggregatesInput[]
     OR?: StudentBillingDetailScalarWhereWithAggregatesInput[]
     NOT?: StudentBillingDetailScalarWhereWithAggregatesInput | StudentBillingDetailScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"StudentBillingDetail"> | string
-    billingRecordId?: StringWithAggregatesFilter<"StudentBillingDetail"> | string
-    categoryId?: StringNullableWithAggregatesFilter<"StudentBillingDetail"> | string | null
+    id?: UuidWithAggregatesFilter<"StudentBillingDetail"> | string
+    billingRecordId?: UuidWithAggregatesFilter<"StudentBillingDetail"> | string
+    categoryId?: UuidNullableWithAggregatesFilter<"StudentBillingDetail"> | string | null
     amount?: DecimalNullableWithAggregatesFilter<"StudentBillingDetail"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeWithAggregatesFilter<"StudentBillingDetail"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"StudentBillingDetail"> | Date | string
@@ -28233,8 +28233,8 @@ export namespace Prisma {
     AND?: StudentPaymentMethodWhereInput | StudentPaymentMethodWhereInput[]
     OR?: StudentPaymentMethodWhereInput[]
     NOT?: StudentPaymentMethodWhereInput | StudentPaymentMethodWhereInput[]
-    id?: StringFilter<"StudentPaymentMethod"> | string
-    studentId?: StringFilter<"StudentPaymentMethod"> | string
+    id?: UuidFilter<"StudentPaymentMethod"> | string
+    studentId?: UuidFilter<"StudentPaymentMethod"> | string
     paymentMethod?: StringNullableFilter<"StudentPaymentMethod"> | string | null
     accountNumber?: StringNullableFilter<"StudentPaymentMethod"> | string | null
     expirationDate?: DateTimeNullableFilter<"StudentPaymentMethod"> | Date | string | null
@@ -28261,7 +28261,7 @@ export namespace Prisma {
     AND?: StudentPaymentMethodWhereInput | StudentPaymentMethodWhereInput[]
     OR?: StudentPaymentMethodWhereInput[]
     NOT?: StudentPaymentMethodWhereInput | StudentPaymentMethodWhereInput[]
-    studentId?: StringFilter<"StudentPaymentMethod"> | string
+    studentId?: UuidFilter<"StudentPaymentMethod"> | string
     paymentMethod?: StringNullableFilter<"StudentPaymentMethod"> | string | null
     accountNumber?: StringNullableFilter<"StudentPaymentMethod"> | string | null
     expirationDate?: DateTimeNullableFilter<"StudentPaymentMethod"> | Date | string | null
@@ -28289,8 +28289,8 @@ export namespace Prisma {
     AND?: StudentPaymentMethodScalarWhereWithAggregatesInput | StudentPaymentMethodScalarWhereWithAggregatesInput[]
     OR?: StudentPaymentMethodScalarWhereWithAggregatesInput[]
     NOT?: StudentPaymentMethodScalarWhereWithAggregatesInput | StudentPaymentMethodScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"StudentPaymentMethod"> | string
-    studentId?: StringWithAggregatesFilter<"StudentPaymentMethod"> | string
+    id?: UuidWithAggregatesFilter<"StudentPaymentMethod"> | string
+    studentId?: UuidWithAggregatesFilter<"StudentPaymentMethod"> | string
     paymentMethod?: StringNullableWithAggregatesFilter<"StudentPaymentMethod"> | string | null
     accountNumber?: StringNullableWithAggregatesFilter<"StudentPaymentMethod"> | string | null
     expirationDate?: DateTimeNullableWithAggregatesFilter<"StudentPaymentMethod"> | Date | string | null
@@ -28303,7 +28303,7 @@ export namespace Prisma {
     AND?: BillingCategoryWhereInput | BillingCategoryWhereInput[]
     OR?: BillingCategoryWhereInput[]
     NOT?: BillingCategoryWhereInput | BillingCategoryWhereInput[]
-    id?: StringFilter<"BillingCategory"> | string
+    id?: UuidFilter<"BillingCategory"> | string
     name?: StringNullableFilter<"BillingCategory"> | string | null
     description?: StringNullableFilter<"BillingCategory"> | string | null
     createdAt?: DateTimeFilter<"BillingCategory"> | Date | string
@@ -28347,7 +28347,7 @@ export namespace Prisma {
     AND?: BillingCategoryScalarWhereWithAggregatesInput | BillingCategoryScalarWhereWithAggregatesInput[]
     OR?: BillingCategoryScalarWhereWithAggregatesInput[]
     NOT?: BillingCategoryScalarWhereWithAggregatesInput | BillingCategoryScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"BillingCategory"> | string
+    id?: UuidWithAggregatesFilter<"BillingCategory"> | string
     name?: StringNullableWithAggregatesFilter<"BillingCategory"> | string | null
     description?: StringNullableWithAggregatesFilter<"BillingCategory"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"BillingCategory"> | Date | string
@@ -28528,12 +28528,12 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     role: StaffRoleCreateNestedOneWithoutStaffInput
-    person: PersonCreateNestedOneWithoutStaffInput
+    person?: PersonCreateNestedOneWithoutStaffInput
     classes?: ClassCreateNestedManyWithoutTeacherInput
   }
 
   export type StaffUncheckedCreateInput = {
-    id: string
+    id?: string
     staffId?: string | null
     roleId: string
     hireDate: Date | string
@@ -28566,7 +28566,7 @@ export namespace Prisma {
   }
 
   export type StaffCreateManyInput = {
-    id: string
+    id?: string
     staffId?: string | null
     roleId: string
     hireDate: Date | string
@@ -28597,11 +28597,11 @@ export namespace Prisma {
     parentId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    person: PersonCreateNestedOneWithoutParentInput
+    person?: PersonCreateNestedOneWithoutParentInput
   }
 
   export type ParentUncheckedCreateInput = {
-    id: string
+    id?: string
     parentId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -28622,7 +28622,7 @@ export namespace Prisma {
   }
 
   export type ParentCreateManyInput = {
-    id: string
+    id?: string
     parentId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -28700,14 +28700,14 @@ export namespace Prisma {
 
   export type StudentCreateInput = {
     studentId?: string | null
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    person?: PersonCreateNestedOneWithoutStudentInput
     grade: GradeCreateNestedOneWithoutStudentsInput
-    person: PersonCreateNestedOneWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     classStudents?: ClassStudentCreateNestedManyWithoutStudentInput
     billingRecords?: StudentBillingRecordCreateNestedManyWithoutStudentInput
@@ -28715,13 +28715,13 @@ export namespace Prisma {
   }
 
   export type StudentUncheckedCreateInput = {
-    id: string
+    id?: string
     studentId?: string | null
     gradeId: string
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -28732,14 +28732,14 @@ export namespace Prisma {
 
   export type StudentUpdateInput = {
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    grade?: GradeUpdateOneRequiredWithoutStudentsNestedInput
     person?: PersonUpdateOneRequiredWithoutStudentNestedInput
+    grade?: GradeUpdateOneRequiredWithoutStudentsNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     classStudents?: ClassStudentUpdateManyWithoutStudentNestedInput
     billingRecords?: StudentBillingRecordUpdateManyWithoutStudentNestedInput
@@ -28750,10 +28750,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
     gradeId?: StringFieldUpdateOperationsInput | string
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -28763,23 +28763,23 @@ export namespace Prisma {
   }
 
   export type StudentCreateManyInput = {
-    id: string
+    id?: string
     studentId?: string | null
     gradeId: string
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type StudentUpdateManyMutationInput = {
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -28788,10 +28788,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
     gradeId?: StringFieldUpdateOperationsInput | string
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29112,8 +29112,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     class: ClassCreateNestedOneWithoutSessionsInput
-    sessionDateHistory?: SessionDateHistoryCreateNestedManyWithoutSessionInput
     attendances?: AttendanceCreateNestedManyWithoutSessionInput
+    sessionDateHistory?: SessionDateHistoryCreateNestedManyWithoutSessionInput
   }
 
   export type SessionUncheckedCreateInput = {
@@ -29124,8 +29124,8 @@ export namespace Prisma {
     status?: $Enums.status
     createdAt?: Date | string
     updatedAt?: Date | string
-    sessionDateHistory?: SessionDateHistoryUncheckedCreateNestedManyWithoutSessionInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutSessionInput
+    sessionDateHistory?: SessionDateHistoryUncheckedCreateNestedManyWithoutSessionInput
   }
 
   export type SessionUpdateInput = {
@@ -29136,8 +29136,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     class?: ClassUpdateOneRequiredWithoutSessionsNestedInput
-    sessionDateHistory?: SessionDateHistoryUpdateManyWithoutSessionNestedInput
     attendances?: AttendanceUpdateManyWithoutSessionNestedInput
+    sessionDateHistory?: SessionDateHistoryUpdateManyWithoutSessionNestedInput
   }
 
   export type SessionUncheckedUpdateInput = {
@@ -29148,8 +29148,8 @@ export namespace Prisma {
     status?: EnumstatusFieldUpdateOperationsInput | $Enums.status
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    sessionDateHistory?: SessionDateHistoryUncheckedUpdateManyWithoutSessionNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutSessionNestedInput
+    sessionDateHistory?: SessionDateHistoryUncheckedUpdateManyWithoutSessionNestedInput
   }
 
   export type SessionCreateManyInput = {
@@ -29855,6 +29855,18 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type UuidFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidFilter<$PrismaModel> | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -29983,6 +29995,21 @@ export namespace Prisma {
     active?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type UuidWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -30260,10 +30287,10 @@ export namespace Prisma {
     id?: SortOrder
     studentId?: SortOrder
     gradeId?: SortOrder
-    currentSchool?: SortOrder
-    textbookPublisher?: SortOrder
     admissionDate?: SortOrder
     departureDate?: SortOrder
+    currentSchool?: SortOrder
+    textbookPublisher?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30272,10 +30299,10 @@ export namespace Prisma {
     id?: SortOrder
     studentId?: SortOrder
     gradeId?: SortOrder
-    currentSchool?: SortOrder
-    textbookPublisher?: SortOrder
     admissionDate?: SortOrder
     departureDate?: SortOrder
+    currentSchool?: SortOrder
+    textbookPublisher?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30284,10 +30311,10 @@ export namespace Prisma {
     id?: SortOrder
     studentId?: SortOrder
     gradeId?: SortOrder
-    currentSchool?: SortOrder
-    textbookPublisher?: SortOrder
     admissionDate?: SortOrder
     departureDate?: SortOrder
+    currentSchool?: SortOrder
+    textbookPublisher?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30868,6 +30895,18 @@ export namespace Prisma {
     amount?: SortOrder
   }
 
+  export type UuidNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidNullableFilter<$PrismaModel> | string | null
+  }
+
   export type DecimalNullableFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
@@ -30922,6 +30961,21 @@ export namespace Prisma {
 
   export type StudentBillingDetailSumOrderByAggregateInput = {
     amount?: SortOrder
+  }
+
+  export type UuidNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -31369,16 +31423,16 @@ export namespace Prisma {
     deleteMany?: ClassScalarWhereInput | ClassScalarWhereInput[]
   }
 
-  export type GradeCreateNestedOneWithoutStudentsInput = {
-    create?: XOR<GradeCreateWithoutStudentsInput, GradeUncheckedCreateWithoutStudentsInput>
-    connectOrCreate?: GradeCreateOrConnectWithoutStudentsInput
-    connect?: GradeWhereUniqueInput
-  }
-
   export type PersonCreateNestedOneWithoutStudentInput = {
     create?: XOR<PersonCreateWithoutStudentInput, PersonUncheckedCreateWithoutStudentInput>
     connectOrCreate?: PersonCreateOrConnectWithoutStudentInput
     connect?: PersonWhereUniqueInput
+  }
+
+  export type GradeCreateNestedOneWithoutStudentsInput = {
+    create?: XOR<GradeCreateWithoutStudentsInput, GradeUncheckedCreateWithoutStudentsInput>
+    connectOrCreate?: GradeCreateOrConnectWithoutStudentsInput
+    connect?: GradeWhereUniqueInput
   }
 
   export type AttendanceCreateNestedManyWithoutStudentInput = {
@@ -31437,20 +31491,20 @@ export namespace Prisma {
     connect?: StudentPaymentMethodWhereUniqueInput | StudentPaymentMethodWhereUniqueInput[]
   }
 
-  export type GradeUpdateOneRequiredWithoutStudentsNestedInput = {
-    create?: XOR<GradeCreateWithoutStudentsInput, GradeUncheckedCreateWithoutStudentsInput>
-    connectOrCreate?: GradeCreateOrConnectWithoutStudentsInput
-    upsert?: GradeUpsertWithoutStudentsInput
-    connect?: GradeWhereUniqueInput
-    update?: XOR<XOR<GradeUpdateToOneWithWhereWithoutStudentsInput, GradeUpdateWithoutStudentsInput>, GradeUncheckedUpdateWithoutStudentsInput>
-  }
-
   export type PersonUpdateOneRequiredWithoutStudentNestedInput = {
     create?: XOR<PersonCreateWithoutStudentInput, PersonUncheckedCreateWithoutStudentInput>
     connectOrCreate?: PersonCreateOrConnectWithoutStudentInput
     upsert?: PersonUpsertWithoutStudentInput
     connect?: PersonWhereUniqueInput
     update?: XOR<XOR<PersonUpdateToOneWithWhereWithoutStudentInput, PersonUpdateWithoutStudentInput>, PersonUncheckedUpdateWithoutStudentInput>
+  }
+
+  export type GradeUpdateOneRequiredWithoutStudentsNestedInput = {
+    create?: XOR<GradeCreateWithoutStudentsInput, GradeUncheckedCreateWithoutStudentsInput>
+    connectOrCreate?: GradeCreateOrConnectWithoutStudentsInput
+    upsert?: GradeUpsertWithoutStudentsInput
+    connect?: GradeWhereUniqueInput
+    update?: XOR<XOR<GradeUpdateToOneWithWhereWithoutStudentsInput, GradeUpdateWithoutStudentsInput>, GradeUncheckedUpdateWithoutStudentsInput>
   }
 
   export type AttendanceUpdateManyWithoutStudentNestedInput = {
@@ -31885,13 +31939,6 @@ export namespace Prisma {
     connect?: ClassWhereUniqueInput
   }
 
-  export type SessionDateHistoryCreateNestedManyWithoutSessionInput = {
-    create?: XOR<SessionDateHistoryCreateWithoutSessionInput, SessionDateHistoryUncheckedCreateWithoutSessionInput> | SessionDateHistoryCreateWithoutSessionInput[] | SessionDateHistoryUncheckedCreateWithoutSessionInput[]
-    connectOrCreate?: SessionDateHistoryCreateOrConnectWithoutSessionInput | SessionDateHistoryCreateOrConnectWithoutSessionInput[]
-    createMany?: SessionDateHistoryCreateManySessionInputEnvelope
-    connect?: SessionDateHistoryWhereUniqueInput | SessionDateHistoryWhereUniqueInput[]
-  }
-
   export type AttendanceCreateNestedManyWithoutSessionInput = {
     create?: XOR<AttendanceCreateWithoutSessionInput, AttendanceUncheckedCreateWithoutSessionInput> | AttendanceCreateWithoutSessionInput[] | AttendanceUncheckedCreateWithoutSessionInput[]
     connectOrCreate?: AttendanceCreateOrConnectWithoutSessionInput | AttendanceCreateOrConnectWithoutSessionInput[]
@@ -31899,7 +31946,7 @@ export namespace Prisma {
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
   }
 
-  export type SessionDateHistoryUncheckedCreateNestedManyWithoutSessionInput = {
+  export type SessionDateHistoryCreateNestedManyWithoutSessionInput = {
     create?: XOR<SessionDateHistoryCreateWithoutSessionInput, SessionDateHistoryUncheckedCreateWithoutSessionInput> | SessionDateHistoryCreateWithoutSessionInput[] | SessionDateHistoryUncheckedCreateWithoutSessionInput[]
     connectOrCreate?: SessionDateHistoryCreateOrConnectWithoutSessionInput | SessionDateHistoryCreateOrConnectWithoutSessionInput[]
     createMany?: SessionDateHistoryCreateManySessionInputEnvelope
@@ -31913,6 +31960,13 @@ export namespace Prisma {
     connect?: AttendanceWhereUniqueInput | AttendanceWhereUniqueInput[]
   }
 
+  export type SessionDateHistoryUncheckedCreateNestedManyWithoutSessionInput = {
+    create?: XOR<SessionDateHistoryCreateWithoutSessionInput, SessionDateHistoryUncheckedCreateWithoutSessionInput> | SessionDateHistoryCreateWithoutSessionInput[] | SessionDateHistoryUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: SessionDateHistoryCreateOrConnectWithoutSessionInput | SessionDateHistoryCreateOrConnectWithoutSessionInput[]
+    createMany?: SessionDateHistoryCreateManySessionInputEnvelope
+    connect?: SessionDateHistoryWhereUniqueInput | SessionDateHistoryWhereUniqueInput[]
+  }
+
   export type EnumstatusFieldUpdateOperationsInput = {
     set?: $Enums.status
   }
@@ -31923,20 +31977,6 @@ export namespace Prisma {
     upsert?: ClassUpsertWithoutSessionsInput
     connect?: ClassWhereUniqueInput
     update?: XOR<XOR<ClassUpdateToOneWithWhereWithoutSessionsInput, ClassUpdateWithoutSessionsInput>, ClassUncheckedUpdateWithoutSessionsInput>
-  }
-
-  export type SessionDateHistoryUpdateManyWithoutSessionNestedInput = {
-    create?: XOR<SessionDateHistoryCreateWithoutSessionInput, SessionDateHistoryUncheckedCreateWithoutSessionInput> | SessionDateHistoryCreateWithoutSessionInput[] | SessionDateHistoryUncheckedCreateWithoutSessionInput[]
-    connectOrCreate?: SessionDateHistoryCreateOrConnectWithoutSessionInput | SessionDateHistoryCreateOrConnectWithoutSessionInput[]
-    upsert?: SessionDateHistoryUpsertWithWhereUniqueWithoutSessionInput | SessionDateHistoryUpsertWithWhereUniqueWithoutSessionInput[]
-    createMany?: SessionDateHistoryCreateManySessionInputEnvelope
-    set?: SessionDateHistoryWhereUniqueInput | SessionDateHistoryWhereUniqueInput[]
-    disconnect?: SessionDateHistoryWhereUniqueInput | SessionDateHistoryWhereUniqueInput[]
-    delete?: SessionDateHistoryWhereUniqueInput | SessionDateHistoryWhereUniqueInput[]
-    connect?: SessionDateHistoryWhereUniqueInput | SessionDateHistoryWhereUniqueInput[]
-    update?: SessionDateHistoryUpdateWithWhereUniqueWithoutSessionInput | SessionDateHistoryUpdateWithWhereUniqueWithoutSessionInput[]
-    updateMany?: SessionDateHistoryUpdateManyWithWhereWithoutSessionInput | SessionDateHistoryUpdateManyWithWhereWithoutSessionInput[]
-    deleteMany?: SessionDateHistoryScalarWhereInput | SessionDateHistoryScalarWhereInput[]
   }
 
   export type AttendanceUpdateManyWithoutSessionNestedInput = {
@@ -31953,7 +31993,7 @@ export namespace Prisma {
     deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
   }
 
-  export type SessionDateHistoryUncheckedUpdateManyWithoutSessionNestedInput = {
+  export type SessionDateHistoryUpdateManyWithoutSessionNestedInput = {
     create?: XOR<SessionDateHistoryCreateWithoutSessionInput, SessionDateHistoryUncheckedCreateWithoutSessionInput> | SessionDateHistoryCreateWithoutSessionInput[] | SessionDateHistoryUncheckedCreateWithoutSessionInput[]
     connectOrCreate?: SessionDateHistoryCreateOrConnectWithoutSessionInput | SessionDateHistoryCreateOrConnectWithoutSessionInput[]
     upsert?: SessionDateHistoryUpsertWithWhereUniqueWithoutSessionInput | SessionDateHistoryUpsertWithWhereUniqueWithoutSessionInput[]
@@ -31979,6 +32019,20 @@ export namespace Prisma {
     update?: AttendanceUpdateWithWhereUniqueWithoutSessionInput | AttendanceUpdateWithWhereUniqueWithoutSessionInput[]
     updateMany?: AttendanceUpdateManyWithWhereWithoutSessionInput | AttendanceUpdateManyWithWhereWithoutSessionInput[]
     deleteMany?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
+  }
+
+  export type SessionDateHistoryUncheckedUpdateManyWithoutSessionNestedInput = {
+    create?: XOR<SessionDateHistoryCreateWithoutSessionInput, SessionDateHistoryUncheckedCreateWithoutSessionInput> | SessionDateHistoryCreateWithoutSessionInput[] | SessionDateHistoryUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: SessionDateHistoryCreateOrConnectWithoutSessionInput | SessionDateHistoryCreateOrConnectWithoutSessionInput[]
+    upsert?: SessionDateHistoryUpsertWithWhereUniqueWithoutSessionInput | SessionDateHistoryUpsertWithWhereUniqueWithoutSessionInput[]
+    createMany?: SessionDateHistoryCreateManySessionInputEnvelope
+    set?: SessionDateHistoryWhereUniqueInput | SessionDateHistoryWhereUniqueInput[]
+    disconnect?: SessionDateHistoryWhereUniqueInput | SessionDateHistoryWhereUniqueInput[]
+    delete?: SessionDateHistoryWhereUniqueInput | SessionDateHistoryWhereUniqueInput[]
+    connect?: SessionDateHistoryWhereUniqueInput | SessionDateHistoryWhereUniqueInput[]
+    update?: SessionDateHistoryUpdateWithWhereUniqueWithoutSessionInput | SessionDateHistoryUpdateWithWhereUniqueWithoutSessionInput[]
+    updateMany?: SessionDateHistoryUpdateManyWithWhereWithoutSessionInput | SessionDateHistoryUpdateManyWithWhereWithoutSessionInput[]
+    deleteMany?: SessionDateHistoryScalarWhereInput | SessionDateHistoryScalarWhereInput[]
   }
 
   export type SessionCreateNestedOneWithoutSessionDateHistoryInput = {
@@ -32261,6 +32315,17 @@ export namespace Prisma {
     deleteMany?: StudentBillingDetailScalarWhereInput | StudentBillingDetailScalarWhereInput[]
   }
 
+  export type NestedUuidFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidFilter<$PrismaModel> | string
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -32312,6 +32377,31 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type NestedUuidWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -32327,17 +32417,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -32526,6 +32605,17 @@ export namespace Prisma {
     _max?: NestedEnumday_of_weekFilter<$PrismaModel>
   }
 
+  export type NestedUuidNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedDecimalNullableFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
@@ -32535,6 +32625,20 @@ export namespace Prisma {
     gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type NestedUuidNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -32597,10 +32701,10 @@ export namespace Prisma {
 
   export type StudentCreateWithoutPersonInput = {
     studentId?: string | null
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     grade: GradeCreateNestedOneWithoutStudentsInput
@@ -32613,10 +32717,10 @@ export namespace Prisma {
   export type StudentUncheckedCreateWithoutPersonInput = {
     studentId?: string | null
     gradeId: string
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -32725,10 +32829,10 @@ export namespace Prisma {
 
   export type StudentUpdateWithoutPersonInput = {
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     grade?: GradeUpdateOneRequiredWithoutStudentsNestedInput
@@ -32741,10 +32845,10 @@ export namespace Prisma {
   export type StudentUncheckedUpdateWithoutPersonInput = {
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
     gradeId?: StringFieldUpdateOperationsInput | string
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -32773,8 +32877,8 @@ export namespace Prisma {
     AND?: UserIdentifierScalarWhereInput | UserIdentifierScalarWhereInput[]
     OR?: UserIdentifierScalarWhereInput[]
     NOT?: UserIdentifierScalarWhereInput | UserIdentifierScalarWhereInput[]
-    id?: StringFilter<"UserIdentifier"> | string
-    personId?: StringFilter<"UserIdentifier"> | string
+    id?: UuidFilter<"UserIdentifier"> | string
+    personId?: UuidFilter<"UserIdentifier"> | string
     name?: StringFilter<"UserIdentifier"> | string
     value?: StringFilter<"UserIdentifier"> | string
     isSocialMedia?: BoolNullableFilter<"UserIdentifier"> | boolean | null
@@ -32788,12 +32892,12 @@ export namespace Prisma {
     leaveDate?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    person: PersonCreateNestedOneWithoutStaffInput
+    person?: PersonCreateNestedOneWithoutStaffInput
     classes?: ClassCreateNestedManyWithoutTeacherInput
   }
 
   export type StaffUncheckedCreateWithoutRoleInput = {
-    id: string
+    id?: string
     staffId?: string | null
     hireDate: Date | string
     leaveDate?: Date | string | null
@@ -32832,9 +32936,9 @@ export namespace Prisma {
     AND?: StaffScalarWhereInput | StaffScalarWhereInput[]
     OR?: StaffScalarWhereInput[]
     NOT?: StaffScalarWhereInput | StaffScalarWhereInput[]
-    id?: StringFilter<"Staff"> | string
+    id?: UuidFilter<"Staff"> | string
     staffId?: StringNullableFilter<"Staff"> | string | null
-    roleId?: StringFilter<"Staff"> | string
+    roleId?: UuidFilter<"Staff"> | string
     hireDate?: DateTimeFilter<"Staff"> | Date | string
     leaveDate?: DateTimeNullableFilter<"Staff"> | Date | string | null
     createdAt?: DateTimeFilter<"Staff"> | Date | string
@@ -33029,10 +33133,10 @@ export namespace Prisma {
     AND?: ClassScalarWhereInput | ClassScalarWhereInput[]
     OR?: ClassScalarWhereInput[]
     NOT?: ClassScalarWhereInput | ClassScalarWhereInput[]
-    id?: StringFilter<"Class"> | string
+    id?: UuidFilter<"Class"> | string
     name?: StringFilter<"Class"> | string
-    teacherId?: StringFilter<"Class"> | string
-    gradeId?: StringFilter<"Class"> | string
+    teacherId?: UuidFilter<"Class"> | string
+    gradeId?: UuidFilter<"Class"> | string
     capacity?: IntNullableFilter<"Class"> | number | null
     active?: BoolFilter<"Class"> | boolean
     createdAt?: DateTimeFilter<"Class"> | Date | string
@@ -33125,13 +33229,13 @@ export namespace Prisma {
 
   export type StudentCreateWithoutGradeInput = {
     studentId?: string | null
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    person: PersonCreateNestedOneWithoutStudentInput
+    person?: PersonCreateNestedOneWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     classStudents?: ClassStudentCreateNestedManyWithoutStudentInput
     billingRecords?: StudentBillingRecordCreateNestedManyWithoutStudentInput
@@ -33139,12 +33243,12 @@ export namespace Prisma {
   }
 
   export type StudentUncheckedCreateWithoutGradeInput = {
-    id: string
+    id?: string
     studentId?: string | null
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -33223,13 +33327,13 @@ export namespace Prisma {
     AND?: StudentScalarWhereInput | StudentScalarWhereInput[]
     OR?: StudentScalarWhereInput[]
     NOT?: StudentScalarWhereInput | StudentScalarWhereInput[]
-    id?: StringFilter<"Student"> | string
+    id?: UuidFilter<"Student"> | string
     studentId?: StringNullableFilter<"Student"> | string | null
-    gradeId?: StringFilter<"Student"> | string
-    currentSchool?: StringNullableFilter<"Student"> | string | null
-    textbookPublisher?: StringNullableFilter<"Student"> | string | null
+    gradeId?: UuidFilter<"Student"> | string
     admissionDate?: DateTimeFilter<"Student"> | Date | string
     departureDate?: DateTimeNullableFilter<"Student"> | Date | string | null
+    currentSchool?: StringNullableFilter<"Student"> | string | null
+    textbookPublisher?: StringNullableFilter<"Student"> | string | null
     createdAt?: DateTimeFilter<"Student"> | Date | string
     updatedAt?: DateTimeFilter<"Student"> | Date | string
   }
@@ -33248,27 +33352,6 @@ export namespace Prisma {
   export type ClassUpdateManyWithWhereWithoutGradeInput = {
     where: ClassScalarWhereInput
     data: XOR<ClassUpdateManyMutationInput, ClassUncheckedUpdateManyWithoutGradeInput>
-  }
-
-  export type GradeCreateWithoutStudentsInput = {
-    id?: string
-    name: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    classes?: ClassCreateNestedManyWithoutGradeInput
-  }
-
-  export type GradeUncheckedCreateWithoutStudentsInput = {
-    id?: string
-    name: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    classes?: ClassUncheckedCreateNestedManyWithoutGradeInput
-  }
-
-  export type GradeCreateOrConnectWithoutStudentsInput = {
-    where: GradeWhereUniqueInput
-    create: XOR<GradeCreateWithoutStudentsInput, GradeUncheckedCreateWithoutStudentsInput>
   }
 
   export type PersonCreateWithoutStudentInput = {
@@ -33308,6 +33391,27 @@ export namespace Prisma {
   export type PersonCreateOrConnectWithoutStudentInput = {
     where: PersonWhereUniqueInput
     create: XOR<PersonCreateWithoutStudentInput, PersonUncheckedCreateWithoutStudentInput>
+  }
+
+  export type GradeCreateWithoutStudentsInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    classes?: ClassCreateNestedManyWithoutGradeInput
+  }
+
+  export type GradeUncheckedCreateWithoutStudentsInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    classes?: ClassUncheckedCreateNestedManyWithoutGradeInput
+  }
+
+  export type GradeCreateOrConnectWithoutStudentsInput = {
+    where: GradeWhereUniqueInput
+    create: XOR<GradeCreateWithoutStudentsInput, GradeUncheckedCreateWithoutStudentsInput>
   }
 
   export type AttendanceCreateWithoutStudentInput = {
@@ -33426,33 +33530,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type GradeUpsertWithoutStudentsInput = {
-    update: XOR<GradeUpdateWithoutStudentsInput, GradeUncheckedUpdateWithoutStudentsInput>
-    create: XOR<GradeCreateWithoutStudentsInput, GradeUncheckedCreateWithoutStudentsInput>
-    where?: GradeWhereInput
-  }
-
-  export type GradeUpdateToOneWithWhereWithoutStudentsInput = {
-    where?: GradeWhereInput
-    data: XOR<GradeUpdateWithoutStudentsInput, GradeUncheckedUpdateWithoutStudentsInput>
-  }
-
-  export type GradeUpdateWithoutStudentsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    classes?: ClassUpdateManyWithoutGradeNestedInput
-  }
-
-  export type GradeUncheckedUpdateWithoutStudentsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    classes?: ClassUncheckedUpdateManyWithoutGradeNestedInput
-  }
-
   export type PersonUpsertWithoutStudentInput = {
     update: XOR<PersonUpdateWithoutStudentInput, PersonUncheckedUpdateWithoutStudentInput>
     create: XOR<PersonCreateWithoutStudentInput, PersonUncheckedCreateWithoutStudentInput>
@@ -33498,6 +33575,33 @@ export namespace Prisma {
     userIdentifiers?: UserIdentifierUncheckedUpdateManyWithoutPersonNestedInput
   }
 
+  export type GradeUpsertWithoutStudentsInput = {
+    update: XOR<GradeUpdateWithoutStudentsInput, GradeUncheckedUpdateWithoutStudentsInput>
+    create: XOR<GradeCreateWithoutStudentsInput, GradeUncheckedCreateWithoutStudentsInput>
+    where?: GradeWhereInput
+  }
+
+  export type GradeUpdateToOneWithWhereWithoutStudentsInput = {
+    where?: GradeWhereInput
+    data: XOR<GradeUpdateWithoutStudentsInput, GradeUncheckedUpdateWithoutStudentsInput>
+  }
+
+  export type GradeUpdateWithoutStudentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    classes?: ClassUpdateManyWithoutGradeNestedInput
+  }
+
+  export type GradeUncheckedUpdateWithoutStudentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    classes?: ClassUncheckedUpdateManyWithoutGradeNestedInput
+  }
+
   export type AttendanceUpsertWithWhereUniqueWithoutStudentInput = {
     where: AttendanceWhereUniqueInput
     update: XOR<AttendanceUpdateWithoutStudentInput, AttendanceUncheckedUpdateWithoutStudentInput>
@@ -33518,9 +33622,9 @@ export namespace Prisma {
     AND?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
     OR?: AttendanceScalarWhereInput[]
     NOT?: AttendanceScalarWhereInput | AttendanceScalarWhereInput[]
-    id?: StringFilter<"Attendance"> | string
-    sessionId?: StringFilter<"Attendance"> | string
-    studentId?: StringFilter<"Attendance"> | string
+    id?: UuidFilter<"Attendance"> | string
+    sessionId?: UuidFilter<"Attendance"> | string
+    studentId?: UuidFilter<"Attendance"> | string
     createdAt?: DateTimeFilter<"Attendance"> | Date | string
     updatedAt?: DateTimeFilter<"Attendance"> | Date | string
   }
@@ -33545,9 +33649,9 @@ export namespace Prisma {
     AND?: ClassStudentScalarWhereInput | ClassStudentScalarWhereInput[]
     OR?: ClassStudentScalarWhereInput[]
     NOT?: ClassStudentScalarWhereInput | ClassStudentScalarWhereInput[]
-    id?: StringFilter<"ClassStudent"> | string
-    classId?: StringFilter<"ClassStudent"> | string
-    studentId?: StringFilter<"ClassStudent"> | string
+    id?: UuidFilter<"ClassStudent"> | string
+    classId?: UuidFilter<"ClassStudent"> | string
+    studentId?: UuidFilter<"ClassStudent"> | string
     startDate?: DateTimeFilter<"ClassStudent"> | Date | string
     endDate?: DateTimeNullableFilter<"ClassStudent"> | Date | string | null
     createdAt?: DateTimeFilter<"ClassStudent"> | Date | string
@@ -33574,8 +33678,8 @@ export namespace Prisma {
     AND?: StudentBillingRecordScalarWhereInput | StudentBillingRecordScalarWhereInput[]
     OR?: StudentBillingRecordScalarWhereInput[]
     NOT?: StudentBillingRecordScalarWhereInput | StudentBillingRecordScalarWhereInput[]
-    id?: StringFilter<"StudentBillingRecord"> | string
-    studentId?: StringFilter<"StudentBillingRecord"> | string
+    id?: UuidFilter<"StudentBillingRecord"> | string
+    studentId?: UuidFilter<"StudentBillingRecord"> | string
     billingDate?: DateTimeNullableFilter<"StudentBillingRecord"> | Date | string | null
     description?: StringNullableFilter<"StudentBillingRecord"> | string | null
     amount?: IntNullableFilter<"StudentBillingRecord"> | number | null
@@ -33605,8 +33709,8 @@ export namespace Prisma {
     AND?: StudentPaymentMethodScalarWhereInput | StudentPaymentMethodScalarWhereInput[]
     OR?: StudentPaymentMethodScalarWhereInput[]
     NOT?: StudentPaymentMethodScalarWhereInput | StudentPaymentMethodScalarWhereInput[]
-    id?: StringFilter<"StudentPaymentMethod"> | string
-    studentId?: StringFilter<"StudentPaymentMethod"> | string
+    id?: UuidFilter<"StudentPaymentMethod"> | string
+    studentId?: UuidFilter<"StudentPaymentMethod"> | string
     paymentMethod?: StringNullableFilter<"StudentPaymentMethod"> | string | null
     accountNumber?: StringNullableFilter<"StudentPaymentMethod"> | string | null
     expirationDate?: DateTimeNullableFilter<"StudentPaymentMethod"> | Date | string | null
@@ -33706,11 +33810,11 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     role: StaffRoleCreateNestedOneWithoutStaffInput
-    person: PersonCreateNestedOneWithoutStaffInput
+    person?: PersonCreateNestedOneWithoutStaffInput
   }
 
   export type StaffUncheckedCreateWithoutClassesInput = {
-    id: string
+    id?: string
     staffId?: string | null
     roleId: string
     hireDate: Date | string
@@ -33810,8 +33914,8 @@ export namespace Prisma {
     status?: $Enums.status
     createdAt?: Date | string
     updatedAt?: Date | string
-    sessionDateHistory?: SessionDateHistoryCreateNestedManyWithoutSessionInput
     attendances?: AttendanceCreateNestedManyWithoutSessionInput
+    sessionDateHistory?: SessionDateHistoryCreateNestedManyWithoutSessionInput
   }
 
   export type SessionUncheckedCreateWithoutClassInput = {
@@ -33821,8 +33925,8 @@ export namespace Prisma {
     status?: $Enums.status
     createdAt?: Date | string
     updatedAt?: Date | string
-    sessionDateHistory?: SessionDateHistoryUncheckedCreateNestedManyWithoutSessionInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutSessionInput
+    sessionDateHistory?: SessionDateHistoryUncheckedCreateNestedManyWithoutSessionInput
   }
 
   export type SessionCreateOrConnectWithoutClassInput = {
@@ -33981,8 +34085,8 @@ export namespace Prisma {
     AND?: ClassCostScalarWhereInput | ClassCostScalarWhereInput[]
     OR?: ClassCostScalarWhereInput[]
     NOT?: ClassCostScalarWhereInput | ClassCostScalarWhereInput[]
-    id?: StringFilter<"ClassCost"> | string
-    classId?: StringFilter<"ClassCost"> | string
+    id?: UuidFilter<"ClassCost"> | string
+    classId?: UuidFilter<"ClassCost"> | string
     cost?: DecimalFilter<"ClassCost"> | Decimal | DecimalJsLike | number | string
     currency?: StringNullableFilter<"ClassCost"> | string | null
     effectiveDate?: DateTimeNullableFilter<"ClassCost"> | Date | string | null
@@ -34011,8 +34115,8 @@ export namespace Prisma {
     AND?: SessionScalarWhereInput | SessionScalarWhereInput[]
     OR?: SessionScalarWhereInput[]
     NOT?: SessionScalarWhereInput | SessionScalarWhereInput[]
-    id?: StringFilter<"Session"> | string
-    classId?: StringFilter<"Session"> | string
+    id?: UuidFilter<"Session"> | string
+    classId?: UuidFilter<"Session"> | string
     startTime?: DateTimeFilter<"Session"> | Date | string
     endTime?: DateTimeFilter<"Session"> | Date | string
     status?: EnumstatusFilter<"Session"> | $Enums.status
@@ -34040,8 +34144,8 @@ export namespace Prisma {
     AND?: ScheduleScalarWhereInput | ScheduleScalarWhereInput[]
     OR?: ScheduleScalarWhereInput[]
     NOT?: ScheduleScalarWhereInput | ScheduleScalarWhereInput[]
-    id?: StringFilter<"Schedule"> | string
-    classId?: StringFilter<"Schedule"> | string
+    id?: UuidFilter<"Schedule"> | string
+    classId?: UuidFilter<"Schedule"> | string
     dayOfWeek?: Enumday_of_weekFilter<"Schedule"> | $Enums.day_of_week
     startTime?: DateTimeFilter<"Schedule"> | Date | string
     endTime?: DateTimeFilter<"Schedule"> | Date | string
@@ -34069,9 +34173,9 @@ export namespace Prisma {
     AND?: ClassAssignmentScalarWhereInput | ClassAssignmentScalarWhereInput[]
     OR?: ClassAssignmentScalarWhereInput[]
     NOT?: ClassAssignmentScalarWhereInput | ClassAssignmentScalarWhereInput[]
-    id?: StringFilter<"ClassAssignment"> | string
-    classId?: StringFilter<"ClassAssignment"> | string
-    assignmentId?: StringFilter<"ClassAssignment"> | string
+    id?: UuidFilter<"ClassAssignment"> | string
+    classId?: UuidFilter<"ClassAssignment"> | string
+    assignmentId?: UuidFilter<"ClassAssignment"> | string
     createdAt?: DateTimeFilter<"ClassAssignment"> | Date | string
     updatedAt?: DateTimeFilter<"ClassAssignment"> | Date | string
   }
@@ -34189,27 +34293,27 @@ export namespace Prisma {
 
   export type StudentCreateWithoutClassStudentsInput = {
     studentId?: string | null
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    person?: PersonCreateNestedOneWithoutStudentInput
     grade: GradeCreateNestedOneWithoutStudentsInput
-    person: PersonCreateNestedOneWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     billingRecords?: StudentBillingRecordCreateNestedManyWithoutStudentInput
     paymentMethods?: StudentPaymentMethodCreateNestedManyWithoutStudentInput
   }
 
   export type StudentUncheckedCreateWithoutClassStudentsInput = {
-    id: string
+    id?: string
     studentId?: string | null
     gradeId: string
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -34276,14 +34380,14 @@ export namespace Prisma {
 
   export type StudentUpdateWithoutClassStudentsInput = {
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    grade?: GradeUpdateOneRequiredWithoutStudentsNestedInput
     person?: PersonUpdateOneRequiredWithoutStudentNestedInput
+    grade?: GradeUpdateOneRequiredWithoutStudentsNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     billingRecords?: StudentBillingRecordUpdateManyWithoutStudentNestedInput
     paymentMethods?: StudentPaymentMethodUpdateManyWithoutStudentNestedInput
@@ -34293,10 +34397,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
     gradeId?: StringFieldUpdateOperationsInput | string
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -34339,6 +34443,30 @@ export namespace Prisma {
     create: XOR<ClassCreateWithoutSessionsInput, ClassUncheckedCreateWithoutSessionsInput>
   }
 
+  export type AttendanceCreateWithoutSessionInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    student: StudentCreateNestedOneWithoutAttendancesInput
+  }
+
+  export type AttendanceUncheckedCreateWithoutSessionInput = {
+    id?: string
+    studentId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceCreateOrConnectWithoutSessionInput = {
+    where: AttendanceWhereUniqueInput
+    create: XOR<AttendanceCreateWithoutSessionInput, AttendanceUncheckedCreateWithoutSessionInput>
+  }
+
+  export type AttendanceCreateManySessionInputEnvelope = {
+    data: AttendanceCreateManySessionInput | AttendanceCreateManySessionInput[]
+    skipDuplicates?: boolean
+  }
+
   export type SessionDateHistoryCreateWithoutSessionInput = {
     id?: string
     oldDate: Date | string
@@ -34368,30 +34496,6 @@ export namespace Prisma {
 
   export type SessionDateHistoryCreateManySessionInputEnvelope = {
     data: SessionDateHistoryCreateManySessionInput | SessionDateHistoryCreateManySessionInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type AttendanceCreateWithoutSessionInput = {
-    id?: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    student: StudentCreateNestedOneWithoutAttendancesInput
-  }
-
-  export type AttendanceUncheckedCreateWithoutSessionInput = {
-    id?: string
-    studentId: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type AttendanceCreateOrConnectWithoutSessionInput = {
-    where: AttendanceWhereUniqueInput
-    create: XOR<AttendanceCreateWithoutSessionInput, AttendanceUncheckedCreateWithoutSessionInput>
-  }
-
-  export type AttendanceCreateManySessionInputEnvelope = {
-    data: AttendanceCreateManySessionInput | AttendanceCreateManySessionInput[]
     skipDuplicates?: boolean
   }
 
@@ -34436,6 +34540,22 @@ export namespace Prisma {
     classAssignments?: ClassAssignmentUncheckedUpdateManyWithoutClassNestedInput
   }
 
+  export type AttendanceUpsertWithWhereUniqueWithoutSessionInput = {
+    where: AttendanceWhereUniqueInput
+    update: XOR<AttendanceUpdateWithoutSessionInput, AttendanceUncheckedUpdateWithoutSessionInput>
+    create: XOR<AttendanceCreateWithoutSessionInput, AttendanceUncheckedCreateWithoutSessionInput>
+  }
+
+  export type AttendanceUpdateWithWhereUniqueWithoutSessionInput = {
+    where: AttendanceWhereUniqueInput
+    data: XOR<AttendanceUpdateWithoutSessionInput, AttendanceUncheckedUpdateWithoutSessionInput>
+  }
+
+  export type AttendanceUpdateManyWithWhereWithoutSessionInput = {
+    where: AttendanceScalarWhereInput
+    data: XOR<AttendanceUpdateManyMutationInput, AttendanceUncheckedUpdateManyWithoutSessionInput>
+  }
+
   export type SessionDateHistoryUpsertWithWhereUniqueWithoutSessionInput = {
     where: SessionDateHistoryWhereUniqueInput
     update: XOR<SessionDateHistoryUpdateWithoutSessionInput, SessionDateHistoryUncheckedUpdateWithoutSessionInput>
@@ -34456,8 +34576,8 @@ export namespace Prisma {
     AND?: SessionDateHistoryScalarWhereInput | SessionDateHistoryScalarWhereInput[]
     OR?: SessionDateHistoryScalarWhereInput[]
     NOT?: SessionDateHistoryScalarWhereInput | SessionDateHistoryScalarWhereInput[]
-    id?: StringFilter<"SessionDateHistory"> | string
-    sessionId?: StringFilter<"SessionDateHistory"> | string
+    id?: UuidFilter<"SessionDateHistory"> | string
+    sessionId?: UuidFilter<"SessionDateHistory"> | string
     oldDate?: DateTimeFilter<"SessionDateHistory"> | Date | string
     newDate?: DateTimeFilter<"SessionDateHistory"> | Date | string
     status?: EnumstatusFilter<"SessionDateHistory"> | $Enums.status
@@ -34465,22 +34585,6 @@ export namespace Prisma {
     modifiedAt?: DateTimeFilter<"SessionDateHistory"> | Date | string
     createdAt?: DateTimeFilter<"SessionDateHistory"> | Date | string
     updatedAt?: DateTimeFilter<"SessionDateHistory"> | Date | string
-  }
-
-  export type AttendanceUpsertWithWhereUniqueWithoutSessionInput = {
-    where: AttendanceWhereUniqueInput
-    update: XOR<AttendanceUpdateWithoutSessionInput, AttendanceUncheckedUpdateWithoutSessionInput>
-    create: XOR<AttendanceCreateWithoutSessionInput, AttendanceUncheckedCreateWithoutSessionInput>
-  }
-
-  export type AttendanceUpdateWithWhereUniqueWithoutSessionInput = {
-    where: AttendanceWhereUniqueInput
-    data: XOR<AttendanceUpdateWithoutSessionInput, AttendanceUncheckedUpdateWithoutSessionInput>
-  }
-
-  export type AttendanceUpdateManyWithWhereWithoutSessionInput = {
-    where: AttendanceScalarWhereInput
-    data: XOR<AttendanceUpdateManyMutationInput, AttendanceUncheckedUpdateManyWithoutSessionInput>
   }
 
   export type SessionCreateWithoutSessionDateHistoryInput = {
@@ -34572,27 +34676,27 @@ export namespace Prisma {
 
   export type StudentCreateWithoutAttendancesInput = {
     studentId?: string | null
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    person?: PersonCreateNestedOneWithoutStudentInput
     grade: GradeCreateNestedOneWithoutStudentsInput
-    person: PersonCreateNestedOneWithoutStudentInput
     classStudents?: ClassStudentCreateNestedManyWithoutStudentInput
     billingRecords?: StudentBillingRecordCreateNestedManyWithoutStudentInput
     paymentMethods?: StudentPaymentMethodCreateNestedManyWithoutStudentInput
   }
 
   export type StudentUncheckedCreateWithoutAttendancesInput = {
-    id: string
+    id?: string
     studentId?: string | null
     gradeId: string
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     classStudents?: ClassStudentUncheckedCreateNestedManyWithoutStudentInput
@@ -34651,14 +34755,14 @@ export namespace Prisma {
 
   export type StudentUpdateWithoutAttendancesInput = {
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    grade?: GradeUpdateOneRequiredWithoutStudentsNestedInput
     person?: PersonUpdateOneRequiredWithoutStudentNestedInput
+    grade?: GradeUpdateOneRequiredWithoutStudentsNestedInput
     classStudents?: ClassStudentUpdateManyWithoutStudentNestedInput
     billingRecords?: StudentBillingRecordUpdateManyWithoutStudentNestedInput
     paymentMethods?: StudentPaymentMethodUpdateManyWithoutStudentNestedInput
@@ -34668,10 +34772,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
     gradeId?: StringFieldUpdateOperationsInput | string
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     classStudents?: ClassStudentUncheckedUpdateManyWithoutStudentNestedInput
@@ -34925,27 +35029,27 @@ export namespace Prisma {
 
   export type StudentCreateWithoutBillingRecordsInput = {
     studentId?: string | null
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    person?: PersonCreateNestedOneWithoutStudentInput
     grade: GradeCreateNestedOneWithoutStudentsInput
-    person: PersonCreateNestedOneWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     classStudents?: ClassStudentCreateNestedManyWithoutStudentInput
     paymentMethods?: StudentPaymentMethodCreateNestedManyWithoutStudentInput
   }
 
   export type StudentUncheckedCreateWithoutBillingRecordsInput = {
-    id: string
+    id?: string
     studentId?: string | null
     gradeId: string
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -34997,14 +35101,14 @@ export namespace Prisma {
 
   export type StudentUpdateWithoutBillingRecordsInput = {
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    grade?: GradeUpdateOneRequiredWithoutStudentsNestedInput
     person?: PersonUpdateOneRequiredWithoutStudentNestedInput
+    grade?: GradeUpdateOneRequiredWithoutStudentsNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     classStudents?: ClassStudentUpdateManyWithoutStudentNestedInput
     paymentMethods?: StudentPaymentMethodUpdateManyWithoutStudentNestedInput
@@ -35014,10 +35118,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
     gradeId?: StringFieldUpdateOperationsInput | string
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -35045,9 +35149,9 @@ export namespace Prisma {
     AND?: StudentBillingDetailScalarWhereInput | StudentBillingDetailScalarWhereInput[]
     OR?: StudentBillingDetailScalarWhereInput[]
     NOT?: StudentBillingDetailScalarWhereInput | StudentBillingDetailScalarWhereInput[]
-    id?: StringFilter<"StudentBillingDetail"> | string
-    billingRecordId?: StringFilter<"StudentBillingDetail"> | string
-    categoryId?: StringNullableFilter<"StudentBillingDetail"> | string | null
+    id?: UuidFilter<"StudentBillingDetail"> | string
+    billingRecordId?: UuidFilter<"StudentBillingDetail"> | string
+    categoryId?: UuidNullableFilter<"StudentBillingDetail"> | string | null
     amount?: DecimalNullableFilter<"StudentBillingDetail"> | Decimal | DecimalJsLike | number | string | null
     createdAt?: DateTimeFilter<"StudentBillingDetail"> | Date | string
     updatedAt?: DateTimeFilter<"StudentBillingDetail"> | Date | string
@@ -35167,27 +35271,27 @@ export namespace Prisma {
 
   export type StudentCreateWithoutPaymentMethodsInput = {
     studentId?: string | null
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    person?: PersonCreateNestedOneWithoutStudentInput
     grade: GradeCreateNestedOneWithoutStudentsInput
-    person: PersonCreateNestedOneWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     classStudents?: ClassStudentCreateNestedManyWithoutStudentInput
     billingRecords?: StudentBillingRecordCreateNestedManyWithoutStudentInput
   }
 
   export type StudentUncheckedCreateWithoutPaymentMethodsInput = {
-    id: string
+    id?: string
     studentId?: string | null
     gradeId: string
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -35213,14 +35317,14 @@ export namespace Prisma {
 
   export type StudentUpdateWithoutPaymentMethodsInput = {
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    grade?: GradeUpdateOneRequiredWithoutStudentsNestedInput
     person?: PersonUpdateOneRequiredWithoutStudentNestedInput
+    grade?: GradeUpdateOneRequiredWithoutStudentsNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     classStudents?: ClassStudentUpdateManyWithoutStudentNestedInput
     billingRecords?: StudentBillingRecordUpdateManyWithoutStudentNestedInput
@@ -35230,10 +35334,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
     gradeId?: StringFieldUpdateOperationsInput | string
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -35320,7 +35424,7 @@ export namespace Prisma {
   }
 
   export type StaffCreateManyRoleInput = {
-    id: string
+    id?: string
     staffId?: string | null
     hireDate: Date | string
     leaveDate?: Date | string | null
@@ -35408,12 +35512,12 @@ export namespace Prisma {
   }
 
   export type StudentCreateManyGradeInput = {
-    id: string
+    id?: string
     studentId?: string | null
-    currentSchool?: string | null
-    textbookPublisher?: string | null
     admissionDate: Date | string
     departureDate?: Date | string | null
+    currentSchool?: string | null
+    textbookPublisher?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -35430,10 +35534,10 @@ export namespace Prisma {
 
   export type StudentUpdateWithoutGradeInput = {
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     person?: PersonUpdateOneRequiredWithoutStudentNestedInput
@@ -35446,10 +35550,10 @@ export namespace Prisma {
   export type StudentUncheckedUpdateWithoutGradeInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -35461,10 +35565,10 @@ export namespace Prisma {
   export type StudentUncheckedUpdateManyWithoutGradeInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentId?: NullableStringFieldUpdateOperationsInput | string | null
-    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
-    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     admissionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     departureDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSchool?: NullableStringFieldUpdateOperationsInput | string | null
+    textbookPublisher?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -35767,8 +35871,8 @@ export namespace Prisma {
     status?: EnumstatusFieldUpdateOperationsInput | $Enums.status
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    sessionDateHistory?: SessionDateHistoryUpdateManyWithoutSessionNestedInput
     attendances?: AttendanceUpdateManyWithoutSessionNestedInput
+    sessionDateHistory?: SessionDateHistoryUpdateManyWithoutSessionNestedInput
   }
 
   export type SessionUncheckedUpdateWithoutClassInput = {
@@ -35778,8 +35882,8 @@ export namespace Prisma {
     status?: EnumstatusFieldUpdateOperationsInput | $Enums.status
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    sessionDateHistory?: SessionDateHistoryUncheckedUpdateManyWithoutSessionNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutSessionNestedInput
+    sessionDateHistory?: SessionDateHistoryUncheckedUpdateManyWithoutSessionNestedInput
   }
 
   export type SessionUncheckedUpdateManyWithoutClassInput = {
@@ -35839,6 +35943,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AttendanceCreateManySessionInput = {
+    id?: string
+    studentId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type SessionDateHistoryCreateManySessionInput = {
     id?: string
     oldDate: Date | string
@@ -35850,11 +35961,25 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type AttendanceCreateManySessionInput = {
-    id?: string
-    studentId: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
+  export type AttendanceUpdateWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    student?: StudentUpdateOneRequiredWithoutAttendancesNestedInput
+  }
+
+  export type AttendanceUncheckedUpdateWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceUncheckedUpdateManyWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SessionDateHistoryUpdateWithoutSessionInput = {
@@ -35886,27 +36011,6 @@ export namespace Prisma {
     status?: EnumstatusFieldUpdateOperationsInput | $Enums.status
     modificationReason?: NullableStringFieldUpdateOperationsInput | string | null
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type AttendanceUpdateWithoutSessionInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    student?: StudentUpdateOneRequiredWithoutAttendancesNestedInput
-  }
-
-  export type AttendanceUncheckedUpdateWithoutSessionInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    studentId?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type AttendanceUncheckedUpdateManyWithoutSessionInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    studentId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
