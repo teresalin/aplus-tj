@@ -43,7 +43,7 @@ export async function findAllStaffs(): Promise<Staff[]> {
   }
 }
 
-export async function findStaffById(staffId: number): Promise<Staff | null> {
+export async function findStaffById(staffId: string): Promise<Staff | null> {
   const client = await getDBClient();
   try {
     const { rows } = await client.query(

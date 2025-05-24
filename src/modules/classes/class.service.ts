@@ -79,7 +79,7 @@ export async function findAllClasses(): Promise<Class[]> {
   }
 }
 
-export async function findClassById(classId: number): Promise<Class | null> {
+export async function findClassById(classId: string): Promise<Class | null> {
   const client = await getDBClient();
   try {
     const { rows } = await client.query(

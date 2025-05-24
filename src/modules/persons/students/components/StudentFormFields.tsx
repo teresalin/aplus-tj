@@ -54,6 +54,7 @@ const StudentFormFields = ({
   //   const value = parseInt(event.target.value as string, 10);
   //   handleInputChange("gradeId", value || 0);
   // };
+  console.log(gradeId);
 
   return (
     <>
@@ -103,7 +104,7 @@ const StudentFormFields = ({
           onChange={(date) =>
             handleInputChange(
               "dateOfBirth",
-              date ? dayjs(date).utc().format("YYYY-MM-DD") : null
+              date ? dayjs(date).utc().format("YYYY-MM-DD") : null,
             )
           }
           sx={{ marginTop: "16px", marginBottom: "8px", width: "100%" }}

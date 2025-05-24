@@ -2,7 +2,7 @@ import { getDBClient, releaseDBClient } from "../../../../../lib/db-connector";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const classID = req.query.class_id;
+  const classID = String(req.query.classId);
   const startDate = req.query.start_date;
   const client = await getDBClient();
 

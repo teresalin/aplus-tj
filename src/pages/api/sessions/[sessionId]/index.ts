@@ -13,9 +13,9 @@ import {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
-  const sessionId = parseInt(req.query.session_id as string);
+  const sessionId = String(req.query.sessionId);
 
   try {
     switch (req.method) {

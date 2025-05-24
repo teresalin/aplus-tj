@@ -5,7 +5,7 @@ import {
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const studentID = req.query.student_id;
+  const studentId = String(req.query.studentId);
   const client = await getDBClient();
 
   try {
@@ -27,7 +27,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           class_student.end_date,
           class_student.active;
       `,
-      values: [studentID],
+      values: [studentId],
     };
     const result = await client.query(query);
     res.status(200).json({

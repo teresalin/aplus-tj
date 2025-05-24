@@ -31,6 +31,7 @@ export default function UpdateStudentDialog({
   const initialStudentState = {} as UpdateStudentDTO;
   const [formData, setFormData] =
     React.useState<UpdateStudentDTO>(initialStudentState);
+  console.log(formData);
 
   const { data, error, isLoading } = useSWR<Grade[]>("/api/grades", fetcher);
   const grades = data || [];
@@ -45,11 +46,11 @@ export default function UpdateStudentDialog({
   }, [open, existingStudent]);
 
   const handleSubmit: React.FormEventHandler = async (
-    event: React.FormEvent
+    event: React.FormEvent,
   ) => {
     event.preventDefault();
     await onSubmit(formData as UpdateStudentDTO, () =>
-      setFormData(initialStudentState)
+      setFormData(initialStudentState),
     );
   };
 

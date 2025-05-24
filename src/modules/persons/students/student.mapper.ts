@@ -4,17 +4,17 @@ import { Student } from "./types";
 export function mapRowToStudent(row: any): Student {
   return {
     id: row.id,
-    studentId: row.student_id,
+    studentId: row.student_id ?? undefined,
     name: row.name,
-    preferredName: row.preferred_name,
+    preferredName: row.preferred_name ?? undefined,
     gender: row.gender,
     email: row.email,
     phone: row.phone,
     dateOfBirth: new Date(row.date_of_birth),
-    currentSchool: row.current_school,
-    textbookPublisher: row.textbook_publisher,
+    currentSchool: row.current_school ?? undefined,
+    textbookPublisher: row.textbook_publisher ?? undefined,
     grade: { id: row.grade_id, name: row.grade_name } as Grade,
-    notes: row.notes,
+    notes: row.notes ?? undefined,
     active: row.active,
     admissionDate: new Date(row.admission_date),
     // In TypeScript, optional properties are typically represented by `undefined`

@@ -12,9 +12,9 @@ import {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
-  const classId = parseInt(req.query.class_id as string);
+  const classId = String(req.query.classId);
 
   try {
     switch (req.method) {

@@ -14,9 +14,9 @@ import {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
-  const assignmentId = parseInt(req.query.assignment_id as string);
+  const assignmentId = String(req.query.assignmentId);
 
   try {
     switch (req.method) {

@@ -35,7 +35,7 @@ export async function findAllSessions(): Promise<Session[]> {
 }
 
 export async function findSessionById(
-  sessionId: number,
+  sessionId: string,
 ): Promise<Session | null> {
   const client = await getDBClient();
   try {
