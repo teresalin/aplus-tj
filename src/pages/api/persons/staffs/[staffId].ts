@@ -1,15 +1,15 @@
-import { ApiResponse } from "../../../../../../utils/apiResponse";
-import { handleError } from "../../../../../../utils/errorHandler";
+import { ApiResponse } from "../../../../../utils/apiResponse";
+import { handleError } from "../../../../../utils/errorHandler";
 import { NextApiRequest, NextApiResponse } from "next";
-import { UpdateStaffDTO } from "../../../../../modules/persons/staffs";
+import { UpdateStaffDTO } from "../../../../modules/persons/staffs";
 import {
   MethodNotAllowedError,
   NotFoundError,
-} from "../../../../../../utils/CustomError";
+} from "../../../../../utils/CustomError";
 import {
   findStaffById,
   updateStaff,
-} from "../../../../../modules/persons/staffs/staff.service";
+} from "../../../../modules/persons/staffs/staff.service";
 
 export default async function handler(
   req: NextApiRequest,

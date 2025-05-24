@@ -28,9 +28,9 @@ export default async function handler(
       }
 
       case "POST": {
-        const studentData = req.body as CreateStudentDTO;
+        const body: CreateStudentDTO = req.body;
         try {
-          const newStudent: Student = await createStudent(studentData);
+          const newStudent: Student = await createStudent(body);
           return res.status(201).json({
             status: "Success",
             result: newStudent,

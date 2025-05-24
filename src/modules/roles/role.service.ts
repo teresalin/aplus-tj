@@ -1,4 +1,4 @@
-import { getDBClient } from "../../../../lib/db-connector";
+import { getDBClient } from "../../../lib/db-connector";
 import { CreateRoleDTO } from "./dtos/create-role.dto";
 import { mapRowToRole } from "./role.mapper";
 import { Role } from "./types";
@@ -42,7 +42,7 @@ export async function createRole(dto: CreateRoleDTO): Promise<Role> {
         RETURNING
           id,
           name,
-          created_at
+          created_at,
           updated_at;
       `,
       values: [dto.name],

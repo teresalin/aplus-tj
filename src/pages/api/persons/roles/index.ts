@@ -1,16 +1,16 @@
-import { ApiResponse } from "../../../../../../utils/apiResponse";
-import { CreateRoleDTO } from "../../../../../modules/persons/roles/dtos/create-role.dto";
-import { handleError } from "../../../../../../utils/errorHandler";
+import { ApiResponse } from "../../../../../utils/apiResponse";
+import { CreateRoleDTO } from "../../../../modules/roles/dtos/create-role.dto";
+import { handleError } from "../../../../../utils/errorHandler";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Role } from "../../../../../modules/persons/roles/types";
+import { Role } from "../../../../modules/roles/types";
 import {
   MethodNotAllowedError,
   UniqueConstraintError,
-} from "../../../../../../utils/CustomError";
+} from "../../../../../utils/CustomError";
 import {
   createRole,
   findAllRoles,
-} from "../../../../../modules/persons/roles/role.service";
+} from "../../../../modules/roles/role.service";
 
 export default async (
   req: NextApiRequest,
@@ -45,7 +45,7 @@ export default async (
           // 3. Translate PG unique-violation → your custom error
           if (error.code === "23505") {
             throw new UniqueConstraintError(
-              "A grade with that name already exists.",
+              "A role with that name already exists.",
             );
           }
           throw error; // let handleError deal with everything else

@@ -38,7 +38,7 @@ export default function StaffsDashboard({ onSnackbar }: StaffsDashboardProps) {
 
   const { data, isLoading, error } = useSWR<Staff[]>(
     "/api/persons/staffs",
-    fetcher
+    fetcher,
   );
   const staffs = data || [];
 
@@ -52,7 +52,7 @@ export default function StaffsDashboard({ onSnackbar }: StaffsDashboardProps) {
 
   const handleCreateStaff = async (
     data: { email: string },
-    resetForm: () => void
+    resetForm: () => void,
   ) => {
     try {
       const normalizedEmail = data.email.trim().toLowerCase();
@@ -86,11 +86,8 @@ export default function StaffsDashboard({ onSnackbar }: StaffsDashboardProps) {
     }
   };
 
-  const onRowClick = (data: { staffId: string }) => {
-    router.push(
-      `/persons/staffs/[staff_id]/details`,
-      `/persons/staffs/${data.staffId}/details`
-    );
+  const onRowClick = (data: { id: string }) => {
+    router.push(`/persons/staffs/${data.id}/details`);
   };
 
   const columns: GridColDef[] = [
@@ -170,7 +167,7 @@ export default function StaffsDashboard({ onSnackbar }: StaffsDashboardProps) {
           column.field !== "personId" &&
           column.field !== "action" &&
           column.field !== "detailPanel" &&
-          column.field !== "created"
+          column.field !== "created",
       )
       .map((column) => column.field);
   };

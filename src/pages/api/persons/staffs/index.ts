@@ -22,7 +22,7 @@ export default async (
         return res.status(200).json({
           status: "Success",
           result: staffs,
-          message: "All staffs retrieved successfully.",
+          message: "Staffs retrieved successfully.",
         } as ApiResponse);
       case "POST":
         const body: CreateStaffDTO = req.body;

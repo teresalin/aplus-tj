@@ -30,7 +30,7 @@ dayjs.extend(utc);
 
 export default function DetailsTab() {
   const theme = useTheme();
-  const staffID = useRouter().query.staff_id;
+  const staffId = useRouter().query.staffId;
 
   const [isUpdateStaffDialogOpen, setIsUpdateStaffDialogOpen] =
     React.useState(false);
@@ -40,8 +40,8 @@ export default function DetailsTab() {
     React.useState<AlertColor>("error");
 
   const { data, isLoading, error } = useSWR<Staff>(
-    staffID ? `/api/persons/staffs/${staffID}` : null,
-    fetcher
+    staffId ? `/api/persons/staffs/${staffId}` : null,
+    fetcher,
   );
   const staff = data || null;
 
@@ -72,7 +72,7 @@ export default function DetailsTab() {
     const responseData = await response.json();
     if (response.ok) {
       handleCloseUpdateStaffDialog();
-      mutate(`/api/persons/staffs/${staffID}`);
+      mutate(`/api/persons/staffs/${staffId}`);
       setSnackbarMessage("Staff updated successfully");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
@@ -123,8 +123,8 @@ export default function DetailsTab() {
                       staff.gender === "Male"
                         ? "/student-boy.png"
                         : staff.gender === "Female"
-                        ? "/student-girl.png"
-                        : "/student-other.png"
+                          ? "/student-girl.png"
+                          : "/student-other.png"
                     }`}
                   />
                 </Grid>

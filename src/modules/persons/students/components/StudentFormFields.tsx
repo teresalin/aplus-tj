@@ -54,7 +54,6 @@ const StudentFormFields = ({
   //   const value = parseInt(event.target.value as string, 10);
   //   handleInputChange("gradeId", value || 0);
   // };
-  console.log(gradeId);
 
   return (
     <>

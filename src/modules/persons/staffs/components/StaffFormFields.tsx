@@ -10,7 +10,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import utc from "dayjs/plugin/utc";
 
-import { Role } from "../../roles";
+import { Role } from "../../../roles";
 import { CreateStaffDTO, UpdateStaffDTO } from "../dtos";
 
 dayjs.extend(utc);
@@ -166,7 +166,7 @@ const StaffFormFields = ({
               label={"Select a role"}
               labelId="role-select-label"
               value={roleId || ""}
-              onChange={handleRoleChange}
+              onChange={(e) => handleInputChange("roleId", e.target.value)}
             >
               {roles &&
                 roles.map((role: Role) => (
@@ -186,10 +186,10 @@ const StaffFormFields = ({
           <Grid container direction="row" spacing={1}>
             <Grid item xs={6}>
               <DatePicker
-                label="Join Date"
+                label="Hire Date"
                 format="YYYY-MM-DD"
                 value={hireDate ? dayjs(hireDate).utc() : null}
-                onChange={(date) => handleInputChange("joinDate", date)}
+                onChange={(date) => handleInputChange("hireDate", date)}
                 slotProps={{
                   textField: {
                     required: true,

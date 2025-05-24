@@ -29,7 +29,7 @@ const BASE_CLASS_SELECT = `
         JSON_BUILD_OBJECT(
           'studentId',     p2.id,
           'name',          p2.name,
-          'englishName',   st.english_name,
+          'preferredName', p2.preferred_name,
           'dateOfBirth',   p2.date_of_birth,
           'currentSchool', st.current_school,
           'notes',         p2.notes
@@ -37,9 +37,12 @@ const BASE_CLASS_SELECT = `
       )
       FROM class_student cs
       JOIN student st ON cs.student_id = st.id
-      JOIN person p2   ON st.person_id  = p2.id
+      JOIN person p2   ON st.id  = p2.id
       WHERE cs.class_id = c.id
-        AND cs.active = TRUE
+      AND (
+        cs.end_date IS NULL
+        OR cs.end_date >= CURRENT_DATE
+      )
     ) AS students,
     (
       SELECT JSON_AGG(
@@ -48,7 +51,7 @@ const BASE_CLASS_SELECT = `
           'name',        a.name,
           'description', a.description,
           'dueDate',     a.due_date,
-          'created',     a.created
+          'createdAt',   a.created_at
         ) ORDER BY a.due_date
       )
       FROM class_assignment ca
@@ -59,7 +62,7 @@ const BASE_CLASS_SELECT = `
     ) AS assignments
   FROM class c
   JOIN staff s   ON c.teacher_id = s.id
-  JOIN person p  ON s.person_id  = p.id
+  JOIN person p  ON s.id  = p.id
   JOIN grade g   ON c.grade_id   = g.id
   WHERE c.active = TRUE
 `;

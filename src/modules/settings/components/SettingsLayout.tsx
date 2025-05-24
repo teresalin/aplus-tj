@@ -10,7 +10,7 @@ interface TabItem {
 
 const tabList: TabItem[] = [
   { label: "General", href: "/settings/general" },
-  { label: "Grades", href: "/settings/grades" },
+  { label: "Staff", href: "/settings/staffs" },
   { label: "Profile", href: "/settings/profile" },
   // add more tabs here as you spin them up
 ];

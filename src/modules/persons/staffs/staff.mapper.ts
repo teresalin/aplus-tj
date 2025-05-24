@@ -1,4 +1,4 @@
-import { Role } from "../roles";
+import { Role } from "../../roles";
 import { Staff } from "./types";
 
 export function mapRowToStaff(row: any): Staff {

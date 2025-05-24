@@ -31,7 +31,6 @@ export default function UpdateStudentDialog({
   const initialStudentState = {} as UpdateStudentDTO;
   const [formData, setFormData] =
     React.useState<UpdateStudentDTO>(initialStudentState);
-  console.log(formData);
 
   const { data, error, isLoading } = useSWR<Grade[]>("/api/grades", fetcher);
   const grades = data || [];

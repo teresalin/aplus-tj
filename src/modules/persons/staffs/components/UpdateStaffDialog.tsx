@@ -8,7 +8,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import React from "react";
 import useSWR, { mutate } from "swr";
 
-import { Role } from "../../roles";
+import { Role } from "../../../roles";
 import { Staff } from "../types";
 import { staffToUpdateStaffDTO } from "../staff.transformers";
 import { UpdateStaffDTO } from "../dtos";
@@ -33,26 +33,26 @@ export default function UpdateStaffDialog({
     React.useState<UpdateStaffDTO>(initialStaffState);
 
   const { data, error, isLoading } = useSWR<Role[]>(
-    "/api/persons/staffs/roles",
-    fetcher
+    "/api/persons//roles",
+    fetcher,
   );
   const roles = data || [];
 
   // Initialize form data when the dialog opens with the latest staff data
   React.useEffect(() => {
     if (open && existingStaff) {
-      mutate(`/api/persons/staffs/${existingStaff.id}`).then(() => {
+      mutate(`/api/persons//${existingStaff.id}`).then(() => {
         setFormData(staffToUpdateStaffDTO(existingStaff));
       });
     }
   }, [open, existingStaff]);
 
   const handleSubmit: React.FormEventHandler = async (
-    event: React.FormEvent
+    event: React.FormEvent,
   ) => {
     event.preventDefault();
     await onSubmit(formData as UpdateStaffDTO, () =>
-      setFormData(initialStaffState)
+      setFormData(initialStaffState),
     );
   };
 

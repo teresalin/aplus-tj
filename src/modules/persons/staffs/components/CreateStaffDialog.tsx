@@ -9,7 +9,7 @@ import React from "react";
 import useSWR from "swr";
 
 import { CreateStaffDTO } from "../dtos";
-import { Role } from "../../roles";
+import { Role } from "../../../roles";
 import fetcher from "../../../../../utils/fetcher";
 import StaffFormFields from "./StaffFormFields";
 
@@ -28,17 +28,17 @@ export default function CreateStaffDialog({
   const [newStaff, setNewStaff] = React.useState(initialStaffState);
 
   const { data, error, isLoading } = useSWR<Role[]>(
-    "/api/persons/staffs/roles",
-    fetcher
+    "/api/persons/roles",
+    fetcher,
   );
   const roles = data || [];
 
   const handleSubmit: React.FormEventHandler = async (
-    event: React.FormEvent
+    event: React.FormEvent,
   ) => {
     event.preventDefault();
     await onSubmit(newStaff as CreateStaffDTO, () =>
-      setNewStaff(initialStaffState)
+      setNewStaff(initialStaffState),
     );
   };
 

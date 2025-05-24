@@ -68,7 +68,7 @@ const ClassFormFields = ({
         !schedule.startTime ||
         !schedule.endTime ||
         schedule.startTime === "Invalid Date" ||
-        schedule.endTime === "Invalid Date"
+        schedule.endTime === "Invalid Date",
     );
   }
 
@@ -87,12 +87,12 @@ const ClassFormFields = ({
 
   const handleSwitchChange = (day: string) => {
     const existingSchedule = schedules?.find(
-      (schedule) => schedule.dayOfWeek === day
+      (schedule) => schedule.dayOfWeek === day,
     );
     if (existingSchedule) {
       handleInputChange(
         "schedules",
-        schedules?.filter((schedule) => schedule.dayOfWeek !== day)
+        schedules?.filter((schedule) => schedule.dayOfWeek !== day),
       );
     } else {
       handleInputChange("schedules", [
@@ -105,7 +105,7 @@ const ClassFormFields = ({
   const handleTimeChange = (
     field: string,
     day: string,
-    newValue: Dayjs | null
+    newValue: Dayjs | null,
   ) => {
     handleInputChange(
       "schedules",
@@ -117,7 +117,7 @@ const ClassFormFields = ({
           };
         }
         return schedule;
-      })
+      }),
     );
   };
 
@@ -152,7 +152,7 @@ const ClassFormFields = ({
               labelId="grade-select-label"
               margin="dense"
               value={gradeId || ""}
-              onChange={handleSelectChange("gradeId")}
+              onChange={(e) => handleInputChange("gradeId", e.target.value)}
             >
               {grades &&
                 grades.map((grade: Grade) => (
@@ -223,7 +223,7 @@ const ClassFormFields = ({
                         required={schedules?.length === 0}
                         checked={
                           !!schedules?.find(
-                            (schedule) => schedule.dayOfWeek === day
+                            (schedule) => schedule.dayOfWeek === day,
                           )
                         }
                         onChange={() => handleSwitchChange(day)}
@@ -239,19 +239,19 @@ const ClassFormFields = ({
                       textField: {
                         size: "small",
                         required: !!schedules?.find(
-                          (schedule) => schedule.dayOfWeek === day
+                          (schedule) => schedule.dayOfWeek === day,
                         ),
                       },
                     }}
                     value={
                       !!schedules?.find(
-                        (schedule) => schedule.dayOfWeek === day
+                        (schedule) => schedule.dayOfWeek === day,
                       )
                         ? dayjs(
                             schedules.find(
-                              (schedule) => schedule.dayOfWeek === day
+                              (schedule) => schedule.dayOfWeek === day,
                             )?.startTime,
-                            "HH:mm:ss"
+                            "HH:mm:ss",
                           ).local()
                         : null
                     }
@@ -271,13 +271,13 @@ const ClassFormFields = ({
                     }}
                     value={
                       !!schedules?.find(
-                        (schedule) => schedule.dayOfWeek === day
+                        (schedule) => schedule.dayOfWeek === day,
                       )
                         ? dayjs(
                             schedules.find(
-                              (schedule) => schedule.dayOfWeek === day
+                              (schedule) => schedule.dayOfWeek === day,
                             )?.endTime,
-                            "HH:mm:ss"
+                            "HH:mm:ss",
                           ).local()
                         : null
                     }

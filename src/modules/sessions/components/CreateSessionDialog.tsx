@@ -33,15 +33,13 @@ export default function CreateSessionDialog({
   const classes = data || [];
 
   const handleSubmit: React.FormEventHandler = async (
-    event: React.FormEvent
+    event: React.FormEvent,
   ) => {
     event.preventDefault();
     if (!hasError) {
       await onSubmit(newSession, () => setNewSession(initialSessionState));
     }
   };
-
-  // console.log(newSession);
 
   return (
     <Dialog open={open} onClose={onClose}>
