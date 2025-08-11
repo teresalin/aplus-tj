@@ -1,7 +1,0 @@
-id,name,gender,phone,email,date_of_birth,notes,active,created,updated
-1,Michael Scott,Male,0928777362,michaelscott@test.com,1989-12-24,Hates Toby,t,2023-08-28 06:15:27.687219,2023-08-28 06:15:27.687219
-2,Holy Flax,Female,0928777363,hollyflax@test.com,1990-11-09,Hates Toby,t,2023-08-28 06:15:27.729297,2023-08-28 06:15:27.729297
-3,John Doe,Male,0932097363,johndoe@test.com,2010-11-09,Plays the violin and guitar,t,2023-08-28 06:15:27.730926,2023-08-28 06:15:27.730926
-4,Jane Doe,Female,0918477260,janedoe@test.com,2013-07-16,,t,2023-08-28 06:15:28.225578,2023-08-28 06:15:28.225578
-5,Haley Dunphy,Female,0910471243,haleydunphy@test.com,2000-11-07,,t,2023-09-04 07:04:10.737869,2023-09-04 07:04:10.737869
-6,Luke Dunphy,Male,0916548978,lukedunphy@test.com,1999-01-30,,t,2023-09-04 07:04:11.503323,2023-09-04 07:04:11.503323

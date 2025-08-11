@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma_client"
 }
 
 datasource db {
@@ -8,13 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum gender {
+enum Gender {
   Male
   Female
   Other
 }
 
-enum status {
+enum Status {
   Scheduled
   Rescheduled
   Cancelled
@@ -34,7 +33,7 @@ model Person {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String
   preferredName String?  @map("preferred_name")
-  gender        gender?
+  gender        Gender?
   phone         String?
   email         String   @unique
   dateOfBirth   DateTime @map("date_of_birth")
@@ -195,7 +194,7 @@ model Session {
   classId   String   @map("class_id") @db.Uuid // ← FK to Class.id
   startTime DateTime @map("start_time")
   endTime   DateTime @map("end_time")
-  status    status   @default(Scheduled)
+  status    Status   @default(Scheduled)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
@@ -212,7 +211,7 @@ model SessionDateHistory {
   sessionId          String   @map("session_id") @db.Uuid // ← FK to Session.id
   oldDate            DateTime @map("old_date")
   newDate            DateTime @map("new_date")
-  status             status   @default(Scheduled)
+  status             Status   @default(Scheduled)
   modificationReason String?  @map("modification_reason")
   modifiedAt         DateTime @default(now()) @map("modified_at")
   createdAt          DateTime @default(now()) @map("created_at")
@@ -265,8 +264,8 @@ model Schedule {
   id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   classId   String      @map("class_id") @db.Uuid // ← FK to Class.id
   dayOfWeek day_of_week @map("day_of_week")
-  startTime DateTime    @map("start_time")
-  endTime   DateTime    @map("end_time")
+  startTime DateTime    @map("start_time") @db.Time
+  endTime   DateTime    @map("end_time") @db.Time
   createdAt DateTime    @default(now()) @map("created_at")
   updatedAt DateTime    @default(now()) @updatedAt @map("updated_at")
 

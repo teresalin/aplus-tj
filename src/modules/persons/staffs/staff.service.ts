@@ -1,5 +1,5 @@
 import { CreateStaffDTO, UpdateStaffDTO } from "./dtos";
-import { getDBClient } from "../../../../lib/db-connector";
+import { getDBClient } from "../../../lib/db-connector";
 import { mapRowToStaff } from "./staff.mapper";
 import { Staff } from "./types";
 

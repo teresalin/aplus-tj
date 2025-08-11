@@ -79,12 +79,6 @@ const ClassFormFields = ({
     }));
   };
 
-  const handleSelectChange =
-    (field: FieldName) => (event: SelectChangeEvent<string>) => {
-      const value = parseInt(event.target.value as string, 10);
-      handleInputChange(field, value || 0);
-    };
-
   const handleSwitchChange = (day: string) => {
     const existingSchedule = schedules?.find(
       (schedule) => schedule.dayOfWeek === day,
@@ -176,7 +170,7 @@ const ClassFormFields = ({
               labelId="teacher-select-label"
               margin="dense"
               value={teacherId || ""}
-              onChange={handleSelectChange("teacherId")}
+              onChange={(e) => handleInputChange("teacherId", e.target.value)}
             >
               {teachers &&
                 teachers.map((teacher: Staff) => (

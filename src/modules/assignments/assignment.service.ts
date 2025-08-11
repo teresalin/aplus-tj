@@ -1,7 +1,7 @@
 import { Assignment } from "./types";
 import { AssignmentFilter } from "./constants";
 import { CreateAssignmentDTO, UpdateAssignmentDTO } from "./dtos";
-import { getDBClient } from "../../../lib/db-connector";
+import { getDBClient } from "../../lib/db-connector";
 import { mapRowToAssignment } from "./assignment.mapper";
 
 const BASE_ASSIGNMENT_SELECT = `

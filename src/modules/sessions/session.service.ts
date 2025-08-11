@@ -1,5 +1,5 @@
 import { CreateSessionDTO, UpdateSessionDTO } from "./dtos";
-import { getDBClient } from "../../../lib/db-connector";
+import { getDBClient } from "../../lib/db-connector";
 import { mapRowToSession } from "./session.mapper";
 import { Session } from "./types";
 import dayjs from "dayjs";

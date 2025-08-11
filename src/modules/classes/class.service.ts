@@ -1,6 +1,6 @@
 import { Class } from "./types";
 import { CreateClassDTO, UpdateClassDTO } from "./dtos";
-import { getDBClient } from "../../../lib/db-connector";
+import { getDBClient } from "../../lib/db-connector";
 import { mapRowToClass } from "./class.mapper";
 
 const BASE_CLASS_SELECT = `
@@ -110,7 +110,7 @@ export async function createClass(dto: CreateClassDTO): Promise<Class> {
       `
       INSERT INTO class
         (name, teacher_id, grade_id, capacity, active)
-      VALUES ($1, $2, $3, $4,true)
+      VALUES ($1, $2, $3, $4, true)
       RETURNING id;
       `,
       [dto.name, dto.teacherId, dto.gradeId, dto.capacity],

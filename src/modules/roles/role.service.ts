@@ -1,4 +1,4 @@
-import { getDBClient } from "../../../lib/db-connector";
+import { getDBClient } from "../../lib/db-connector";
 import { CreateRoleDTO } from "./dtos/create-role.dto";
 import { mapRowToRole } from "./role.mapper";
 import { Role } from "./types";

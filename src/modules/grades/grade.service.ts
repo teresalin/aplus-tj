@@ -1,4 +1,4 @@
-import { getDBClient } from "../../../lib/db-connector";
+import { getDBClient } from "../../lib/db-connector";
 import { CreateGradeDTO } from "./dtos/create-grade.dto";
 import { mapRowToGrade } from "./grade.mapper";
 import { Grade } from "./types";
