@@ -1,7 +1,7 @@
 import { ApiResponse } from "../../../../utils/apiResponse";
 import { handleError } from "../../../../utils/errorHandler";
 import type { CreateGradeDTO } from "../../../modules/grades/dtos/create-grade.dto";
-import type { Grade } from "../../../modules/grades/types";
+import type { Grade } from "../../../modules/grades/schema";
 import type { NextApiRequest, NextApiResponse } from "next";
 import {
   createGrade,

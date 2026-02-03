@@ -34,7 +34,8 @@
     "react-big-calendar": "^1.8.4",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.15.0",
-    "swr": "^2.2.1"
+    "swr": "^2.2.1",
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@types/node": "^20.5.1",

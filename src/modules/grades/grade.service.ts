@@ -1,7 +1,7 @@
 import { getDBClient } from "../../lib/db-connector";
 import { CreateGradeDTO } from "./dtos/create-grade.dto";
 import { mapRowToGrade } from "./grade.mapper";
-import { Grade } from "./types";
+import { Grade } from "./schema";
 
 export async function findAllGrades(): Promise<Grade[]> {
   const client = await getDBClient();

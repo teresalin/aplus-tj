@@ -1,4 +1,4 @@
-import { Grade } from "./types";
+import { Grade } from "./schema";
 
 export function mapRowToGrade(row: any): Grade {
   return {
