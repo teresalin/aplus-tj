@@ -20,7 +20,7 @@ import DoDisturbOnIcon from "@mui/icons-material/DoDisturbOn";
 
 import StudentLayout from "@/modules/persons/students/components/StudentLayout";
 import ClassEnrollmentDialog from "@/modules/persons/students/components/ClassEnrollmentDialog";
-import fetcher from "@/lib/fetcher";
+import fetcher from "@/lib/api/fetcher";
 
 interface Props {
   studentID: string;

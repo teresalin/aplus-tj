@@ -17,14 +17,14 @@ import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
 import utc from "dayjs/plugin/utc";
 
-import fetcher from "@/lib/fetcher";
+import fetcher from "@/lib/api/fetcher";
 import {
   Student,
   StudentLayout,
   UpdateStudentDialog,
   UpdateStudentDTO,
 } from "../../../../../modules/persons/students";
-import { formatDate } from "@/lib/formatDate";
+import { formatDate } from "@/lib/format-date";
 
 dayjs.extend(utc);
 

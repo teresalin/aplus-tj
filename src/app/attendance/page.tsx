@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
 import { Class } from "../../modules/classes";
-import fetcher from "@/lib/fetcher";
+import fetcher from "@/lib/api/fetcher";
 
 export default function Attendance() {
   const { data, isLoading, error } = useSWR("api/classes", fetcher);

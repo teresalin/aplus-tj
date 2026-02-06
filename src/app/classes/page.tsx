@@ -17,7 +17,7 @@ import useSWR, { mutate } from "swr";
 import { Class, CreateClassDialog } from "../../modules/classes";
 import { Schedule } from "../../modules/schedules";
 import { daysOfWeek } from "../../constants";
-import fetcher from "@/lib/fetcher";
+import fetcher from "@/lib/api/fetcher";
 
 // TODO allow user to select a color for each class in admin settings
 

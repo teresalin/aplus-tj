@@ -19,7 +19,7 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 import WorkIcon from "@mui/icons-material/Work";
 
-import fetcher from "@/lib/fetcher";
+import fetcher from "@/lib/api/fetcher";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",

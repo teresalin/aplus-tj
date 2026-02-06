@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { MethodNotAllowedError, NotFoundError } from "@/lib/CustomError";
-import { handleError } from "@/lib/errorHandler";
+import {
+  MethodNotAllowedError,
+  NotFoundError,
+} from "@/lib/errors/custom-errors";
+import { handleError } from "@/lib/api/error-handler";
 import {
   findSessionById,
   updateSession,

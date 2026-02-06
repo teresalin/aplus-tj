@@ -15,7 +15,7 @@ import useSWR from "swr";
 
 import ClassEnrollmentDialog from "../../../../../modules/persons/students/components/ClassEnrollmentDialog";
 import StudentLayout from "../../../../../modules/persons/students/components/StudentLayout";
-import fetcher from "@/lib/fetcher";
+import fetcher from "@/lib/api/fetcher";
 
 export default function ClassesTab() {
   const theme = useTheme();

@@ -1,49 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MethodNotAllowedError } from "@/lib/CustomError";
-import {
-  createStudent,
-  findAllStudents,
-} from "@/modules/persons/students/student.service";
-import type { CreateStudentDTO } from "@/modules/persons/students/dtos";
 import { authorize } from "@/lib/authz";
 import { CreateStudentSchema } from "@/modules/persons/students/schema";
+import { handleApiError } from "@/lib/api/error-handler";
+import { studentService } from "@/modules/persons/students/student.service";
 
-// GET /api/persons/students
+/**
+ * GET /api/persons/students
+ * Returns all students (summary view)
+ */
 export async function GET(req: NextRequest) {
   try {
     await authorize(["admin", "teacher"]);
-    const students = await findAllStudents();
-    return NextResponse.json(
-      { status: "Success", result: students },
-      { status: 200 },
-    );
+    const students = await studentService.getAll();
+    return NextResponse.json(students, { status: 200 });
   } catch (error) {
-    return NextResponse.json(
-      { status: "Error", message: error.message },
-      { status: 500 },
-    );
+    return handleApiError(error);
   }
 }
 
-// POST /api/persons/students
+/**
+ * POST /api/persons/students
+ * Creates a new student
+ */
 export async function POST(req: NextRequest) {
   try {
-    await authorize("admin");
-    const dto = CreateStudentSchema.parse(await req.json());
-    const newStudent = await createStudent(dto);
-    return NextResponse.json(
-      { status: "Success", result: newStudent, message: "Created" },
-      { status: 201 },
-    );
+    await authorize(["admin"]);
+
+    const body = await req.json();
+    const validatedData = CreateStudentSchema.parse(body);
+    const newStudent = await studentService.create(validatedData);
+
+    return NextResponse.json(newStudent, { status: 201 });
   } catch (error) {
-    return NextResponse.json(
-      { status: "Error", message: error.message },
-      { status: 500 },
-    );
+    return handleApiError(error);
   }
 }
-
-// Fallback for other methods
-export const ALL = () => {
-  throw new MethodNotAllowedError("ALL");
-};

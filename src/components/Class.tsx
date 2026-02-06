@@ -19,7 +19,7 @@ import Typography from "@mui/material/Typography";
 import useSWR, { mutate } from "swr";
 import { Schedule, PrismaClient } from "@prisma/client";
 
-import fetcher from "@/lib/fetcher";
+import fetcher from "@/lib/api/fetcher";
 
 const columns: GridColDef[] = [
   {

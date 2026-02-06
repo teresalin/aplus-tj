@@ -1,10 +1,9 @@
 import prisma from "@/lib/prisma";
 import { studentIncludes } from "./types";
-import type { StudentWithEnrollment } from "./types";
 import type { CreateStudentDTO, UpdateStudentDTO } from "./schema";
+import type { StudentWithEnrollment } from "./types";
 
 export class StudentService {
-  // Use Prisma types inline when needed
   async getById(id: string) {
     return await prisma.student.findUnique({
       where: { id },

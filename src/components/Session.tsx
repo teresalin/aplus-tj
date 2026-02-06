@@ -16,7 +16,7 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 
 import { SessionDetail } from "@/modules/sessions";
-import fetcher from "@/lib/fetcher";
+import fetcher from "@/lib/api/fetcher";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   boxShadow: "none",
