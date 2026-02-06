@@ -1,3 +1,2 @@
-export * from "./types";
-export * from "./dtos";
-export * from "./components";
+export * from "./schema";
+export * from "./student.service";

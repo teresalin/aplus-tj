@@ -39,7 +39,7 @@ export type Person = z.infer<typeof PersonSchema>;
 // PERSON DTOs (for API inputs)
 // ========================================
 // Shared fields for creating ANY person (student, staff, parent)
-export const PersonCreateSchema = z.object({
+export const CreatePersonSchema = z.object({
   name: z.string().trim().min(1),
   preferredName: z
     .string()
@@ -53,7 +53,7 @@ export const PersonCreateSchema = z.object({
   notes: z.string().optional(),
 });
 
-export const PersonUpdateSchema = PersonCreateSchema.partial();
+export const UpdatePersonSchema = CreatePersonSchema.partial();
 
-export type PersonCreateDTO = z.infer<typeof PersonCreateSchema>;
-export type PersonUpdateDTO = z.infer<typeof PersonUpdateSchema>;
+export type CreatePersonDTO = z.infer<typeof CreatePersonSchema>;
+export type UpdatePersonDTO = z.infer<typeof UpdatePersonSchema>;

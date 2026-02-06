@@ -1,14 +1,14 @@
 import { z } from "zod";
 import {
-  PersonCreateSchema,
-  PersonUpdateSchema,
+  CreatePersonSchema,
+  UpdatePersonSchema,
   validators,
 } from "@/modules/persons/schema";
 
 // ========================================
 // INPUT VALIDATION (DTOs)
 // ========================================
-export const CreateStudentSchema = PersonCreateSchema.extend({
+export const CreateStudentSchema = CreatePersonSchema.extend({
   currentSchool: z
     .string()
     .trim()
@@ -25,13 +25,14 @@ export const CreateStudentSchema = PersonCreateSchema.extend({
     message: "Departure date must be on or after admission date",
   },
 );
-export type CreateStudentDTO = z.infer<typeof CreateStudentSchema>;
 
-export const UpdateStudentSchema = PersonUpdateSchema.extend({
+export const UpdateStudentSchema = UpdatePersonSchema.extend({
   currentSchool: z.string().trim().optional(),
   gradeId: validators.uuid.optional(),
   textbookPublisher: z.string().trim().optional(),
   admissionDate: z.coerce.date().optional(),
   departureDate: z.coerce.date().optional(),
 }).partial();
+
+export type CreateStudentDTO = z.infer<typeof CreateStudentSchema>;
 export type UpdateStudentDTO = z.infer<typeof UpdateStudentSchema>;

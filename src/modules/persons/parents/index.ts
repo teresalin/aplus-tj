@@ -1,2 +1,2 @@
-export * from "./types";
-export { default as CreateParentDialog } from "./components/CreateParentDialog";
+export * from "./schema";
+export * from "./parent.service";
