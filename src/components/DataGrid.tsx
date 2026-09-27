@@ -41,7 +41,6 @@ export default function BaseDataGrid<R extends GridValidRowModel>({
 
   return (
     <DataGrid
-      getRowId={(row) => row.id}
       rows={data}
       loading={isLoading}
       columns={columns}

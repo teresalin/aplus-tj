@@ -1,16 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import Button from "@mui/material/Button";
 import EditIcon from "@mui/icons-material/Edit";
 import React from "react";
 
-import { apiRequest, getErrorMessage } from "@/lib/api/client";
-import { useSnackbar } from "@/components/feedback/SnackbarProvider";
+import FormDialog from "@/components/FormDialog";
+import { useApiMutation } from "@/hooks/use-api-mutation";
 import type { Grade } from "@/modules/grades";
 import type { Student } from "@/modules/persons/students";
-import UpdateStudentDialog from "./UpdateStudentDialog";
-import { toStudentPayload, type StudentFormValues } from "./StudentFormFields";
+import StudentFormFields, {
+  toStudentFormValues,
+  toStudentPayload,
+  type StudentFormValues,
+} from "./StudentFormFields";
 
 export default function EditStudentButton({
   student,
@@ -19,23 +21,17 @@ export default function EditStudentButton({
   student: Student;
   grades: Grade[];
 }) {
-  const router = useRouter();
-  const notify = useSnackbar();
+  const mutate = useApiMutation();
   const [open, setOpen] = React.useState(false);
 
-  const handleUpdateStudent = async (data: StudentFormValues) => {
-    try {
-      await apiRequest(
-        `/api/persons/students/${student.id}`,
-        "PATCH",
-        toStudentPayload(data),
-      );
-      setOpen(false);
-      notify("Student updated successfully");
-      router.refresh();
-    } catch (error) {
-      notify(getErrorMessage(error), "error");
-    }
+  const handleUpdateStudent = async (values: StudentFormValues) => {
+    const updated = await mutate({
+      method: "PATCH",
+      url: `/api/persons/students/${student.id}`,
+      body: toStudentPayload(values),
+      successMessage: "Student updated successfully",
+    });
+    if (updated) setOpen(false);
   };
 
   return (
@@ -48,13 +44,21 @@ export default function EditStudentButton({
       >
         Edit
       </Button>
-      <UpdateStudentDialog
-        existingStudent={student}
+      <FormDialog
         open={open}
+        title="Update Student"
+        initialValues={toStudentFormValues(student)}
         onClose={() => setOpen(false)}
         onSubmit={handleUpdateStudent}
-        grades={grades}
-      />
+      >
+        {(values, setValues) => (
+          <StudentFormFields
+            student={values}
+            setFormData={setValues}
+            grades={grades}
+          />
+        )}
+      </FormDialog>
     </>
   );
 }

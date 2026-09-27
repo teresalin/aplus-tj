@@ -14,6 +14,9 @@ interface RenderMenuProps {
 
 function RenderMenu({ onEditClick, onDeleteClick }: RenderMenuProps) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  // Rendered once per grid row, so ids must be unique.
+  const buttonId = React.useId();
+  const menuId = React.useId();
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
@@ -38,10 +41,11 @@ function RenderMenu({ onEditClick, onDeleteClick }: RenderMenuProps) {
     <>
       <Tooltip title="Actions">
         <IconButton
+          id={buttonId}
           onClick={handleOpen}
-          aria-label="action"
+          aria-label="Actions"
           size="small"
-          aria-controls={anchorEl ? "assignment-menu" : undefined}
+          aria-controls={anchorEl ? menuId : undefined}
           aria-haspopup="true"
           aria-expanded={anchorEl ? "true" : undefined}
         >
@@ -49,12 +53,12 @@ function RenderMenu({ onEditClick, onDeleteClick }: RenderMenuProps) {
         </IconButton>
       </Tooltip>
       <Menu
-        id="assignment-menu"
+        id={menuId}
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
         MenuListProps={{
-          "aria-labelledby": "basic-button",
+          "aria-labelledby": buttonId,
         }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}

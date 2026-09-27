@@ -1,16 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import Button from "@mui/material/Button";
 import EditIcon from "@mui/icons-material/Edit";
 import React from "react";
 
-import { apiRequest, getErrorMessage } from "@/lib/api/client";
-import { useSnackbar } from "@/components/feedback/SnackbarProvider";
+import FormDialog from "@/components/FormDialog";
+import { useApiMutation } from "@/hooks/use-api-mutation";
 import type { Role } from "@/modules/roles";
 import type { Staff } from "@/modules/persons/staffs";
-import UpdateStaffDialog from "./UpdateStaffDialog";
-import { toStaffPayload, type StaffFormValues } from "./StaffFormFields";
+import StaffFormFields, {
+  toStaffFormValues,
+  toStaffPayload,
+  type StaffFormValues,
+} from "./StaffFormFields";
 
 export default function EditStaffButton({
   staff,
@@ -19,23 +21,17 @@ export default function EditStaffButton({
   staff: Staff;
   roles: Role[];
 }) {
-  const router = useRouter();
-  const notify = useSnackbar();
+  const mutate = useApiMutation();
   const [open, setOpen] = React.useState(false);
 
-  const handleUpdateStaff = async (data: StaffFormValues) => {
-    try {
-      await apiRequest(
-        `/api/persons/staffs/${staff.id}`,
-        "PATCH",
-        toStaffPayload(data),
-      );
-      setOpen(false);
-      notify("Staff updated successfully");
-      router.refresh();
-    } catch (error) {
-      notify(getErrorMessage(error), "error");
-    }
+  const handleUpdateStaff = async (values: StaffFormValues) => {
+    const updated = await mutate({
+      method: "PATCH",
+      url: `/api/persons/staffs/${staff.id}`,
+      body: toStaffPayload(values),
+      successMessage: "Staff updated successfully",
+    });
+    if (updated) setOpen(false);
   };
 
   return (
@@ -48,13 +44,21 @@ export default function EditStaffButton({
       >
         Edit
       </Button>
-      <UpdateStaffDialog
-        existingStaff={staff}
+      <FormDialog
         open={open}
+        title="Update Staff"
+        initialValues={toStaffFormValues(staff)}
         onClose={() => setOpen(false)}
         onSubmit={handleUpdateStaff}
-        roles={roles}
-      />
+      >
+        {(values, setValues) => (
+          <StaffFormFields
+            staff={values}
+            setFormData={setValues}
+            roles={roles}
+          />
+        )}
+      </FormDialog>
     </>
   );
 }

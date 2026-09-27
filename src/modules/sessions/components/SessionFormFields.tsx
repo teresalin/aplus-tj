@@ -43,26 +43,23 @@ export function toSessionPayload(values: SessionFormValues) {
   };
 }
 
+/** Pickers can hold partial input, so completeness is checked explicitly. */
+export function hasSessionTimes(values: SessionFormValues): boolean {
+  return Boolean(values.startTime?.isValid() && values.endTime?.isValid());
+}
+
 export interface ISessionFormFieldsProps {
   session: SessionFormValues;
   setFormData: React.Dispatch<React.SetStateAction<SessionFormValues>>;
   classes: ClassOption[];
-  setHasError: (hasError: boolean) => void;
 }
 
 const SessionFormFields = ({
   session,
   setFormData,
   classes,
-  setHasError,
 }: ISessionFormFieldsProps) => {
   const { classId, startTime, endTime } = session;
-
-  const hasEmptyOrInvalidTimes = !startTime?.isValid() || !endTime?.isValid();
-
-  React.useEffect(() => {
-    setHasError(hasEmptyOrInvalidTimes);
-  }, [hasEmptyOrInvalidTimes, setHasError]);
 
   const handleInputChange = <K extends keyof SessionFormValues>(
     field: K,
@@ -122,7 +119,7 @@ const SessionFormFields = ({
             onChange={(dateTime) => handleInputChange("endTime", dateTime)}
           />
         </Stack>
-        {hasEmptyOrInvalidTimes && (
+        {!hasSessionTimes(session) && (
           <Typography
             color="error"
             // Note: probably want to remove this in the future since it is not good practice

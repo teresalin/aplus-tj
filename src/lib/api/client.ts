@@ -3,7 +3,7 @@
  * return the resource on success and `{ error, details? }` on failure.
  */
 
-type HttpMethod = "POST" | "PUT" | "PATCH" | "DELETE";
+export type HttpMethod = "POST" | "PUT" | "PATCH" | "DELETE";
 
 interface ErrorBody {
   error?: string;

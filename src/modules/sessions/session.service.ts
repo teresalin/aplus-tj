@@ -1,53 +1,24 @@
 import "server-only";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import type { Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
-import { startOfUtcDay } from "@/lib/dates";
 import { rethrowUniqueViolation } from "@/lib/errors/prisma-errors";
-import { DEFAULT_SESSION_RANGE, type SessionRange } from "./constants";
 import {
-  sessionInclude,
-  type SessionDetail,
-  type SessionStudent,
-} from "./types";
+  DEFAULT_SESSION_RANGE,
+  sessionStartTimeFilter,
+  type SessionRange,
+} from "./constants";
+import { splitRosterByAttendance } from "./roster";
+import { sessionInclude, type SessionDetail } from "./types";
 import type { CreateSessionDTO, UpdateSessionDTO } from "./schema";
 
-dayjs.extend(utc);
-
 const DUPLICATE_SESSION = "This class already has a session at that time.";
-
-function startTimeFilter(
-  range: SessionRange,
-  now = new Date(),
-): Prisma.DateTimeFilter | undefined {
-  const today = dayjs.utc(now);
-  switch (range) {
-    case "last7Days":
-      return { gte: today.subtract(7, "day").toDate(), lt: now };
-    case "thisMonth":
-      return {
-        gte: today.startOf("month").toDate(),
-        lt: today.startOf("month").add(1, "month").toDate(),
-      };
-    case "yearToDate":
-      return { gte: today.startOf("year").toDate() };
-    case "all":
-      return undefined;
-  }
-}
-
-function toSessionStudent(student: {
-  id: string;
-  person: { name: string };
-}): SessionStudent {
-  return { id: student.id, name: student.person.name };
-}
 
 export class SessionService {
   async getAll(range: SessionRange = DEFAULT_SESSION_RANGE) {
     return await prisma.session.findMany({
-      where: { class: { active: true }, startTime: startTimeFilter(range) },
+      where: {
+        class: { active: true },
+        startTime: sessionStartTimeFilter(range),
+      },
       include: sessionInclude,
       orderBy: { startTime: "desc" },
     });
@@ -81,17 +52,11 @@ export class SessionService {
     });
     if (!session) return null;
 
-    const present = session.attendances.map((a) => toSessionStudent(a.student));
-    const presentIds = new Set(present.map((student) => student.id));
-    const sessionDay = startOfUtcDay(session.startTime);
-    const absent = session.class.classStudents
-      .filter(
-        (enrollment) =>
-          enrollment.startDate <= session.startTime &&
-          (!enrollment.endDate || enrollment.endDate >= sessionDay) &&
-          !presentIds.has(enrollment.student.id),
-      )
-      .map((enrollment) => toSessionStudent(enrollment.student));
+    const { present, absent } = splitRosterByAttendance(
+      session.startTime,
+      session.class.classStudents,
+      session.attendances.map((attendance) => attendance.student),
+    );
 
     return {
       id: session.id,

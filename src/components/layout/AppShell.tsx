@@ -2,9 +2,8 @@ import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import type { ReactNode } from "react";
 
+import { DRAWER_WIDTH } from "./constants";
 import SideNav, { type SideNavUser } from "./SideNav";
-
-const DRAWER_WIDTH = 250;
 
 /** Permanent side navigation plus the main content area. */
 export default function AppShell({

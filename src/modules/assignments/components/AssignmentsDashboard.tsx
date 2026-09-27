@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -8,10 +7,11 @@ import React from "react";
 import { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 
 import BaseDataGrid from "@/components/DataGrid";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import FormDialog from "@/components/FormDialog";
 import LinkTabs from "@/components/navigation/LinkTabs";
 import RenderMenu from "@/components/grid/RenderMenu";
-import { useSnackbar } from "@/components/feedback/SnackbarProvider";
-import { apiRequest, getErrorMessage } from "@/lib/api/client";
+import { useApiMutation } from "@/hooks/use-api-mutation";
 import { formatDate } from "@/lib/dates";
 import {
   ASSIGNMENT_FILTERS,
@@ -19,10 +19,9 @@ import {
   type AssignmentFilter,
 } from "@/modules/assignments";
 import type { ClassOption } from "@/modules/classes";
-import CreateAssignmentDialog from "./CreateAssignmentDialog";
-import DeleteAssignmentDialog from "./DeleteAssignmentDialog";
-import UpdateAssignmentDialog from "./UpdateAssignmentDialog";
-import {
+import AssignmentFormFields, {
+  emptyAssignmentFormValues,
+  toAssignmentFormValues,
   toAssignmentPayload,
   type AssignmentFormValues,
 } from "./AssignmentFormFields";
@@ -50,6 +49,12 @@ const initialColumnVisibilityModel: GridColumnVisibilityModel = {
   createdAt: false,
 };
 
+/** The dialog being shown; edit and delete always carry the assignment they act on. */
+type DialogState =
+  | { type: "create" }
+  | { type: "edit"; assignment: Assignment }
+  | { type: "delete"; assignment: Assignment };
+
 interface AssignmentsDashboardProps {
   assignments: Assignment[];
   classes: ClassOption[];
@@ -61,77 +66,46 @@ export default function AssignmentsDashboard({
   classes,
   filter,
 }: AssignmentsDashboardProps) {
-  const router = useRouter();
-  const notify = useSnackbar();
+  const mutate = useApiMutation();
+  // `dialog` outlives `open` so a closing dialog keeps its content while it animates out.
+  const [dialog, setDialog] = React.useState<DialogState | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const showDialog = (next: DialogState) => {
+    setDialog(next);
+    setOpen(true);
+  };
+  const closeDialog = () => setOpen(false);
 
-  const [isUpdateAssignmentDialogOpen, setIsUpdateAssignmentDialogOpen] =
-    React.useState(false);
-  const [isCreateAssignmentDialogOpen, setIsCreateAssignmentDialogOpen] =
-    React.useState(false);
-  const [isDeleteAssignmentDialogOpen, setIsDeleteAssignmentDialogOpen] =
-    React.useState(false);
-  const [selectedRow, setSelectedRow] = React.useState<Assignment | null>(null);
-
-  const handleEditClick = (row: Assignment) => {
-    setSelectedRow(row);
-    setIsUpdateAssignmentDialogOpen(true);
+  const handleCreateAssignment = async (values: AssignmentFormValues) => {
+    const created = await mutate({
+      method: "POST",
+      url: "/api/assignments",
+      body: toAssignmentPayload(values),
+      successMessage: "Assignment created successfully",
+    });
+    if (created) closeDialog();
   };
 
-  const handleDeleteClick = (row: Assignment) => {
-    setSelectedRow(row);
-    setIsDeleteAssignmentDialogOpen(true);
-  };
-
-  const handleCloseUpdateAssignmentDialog = () => {
-    setIsUpdateAssignmentDialogOpen(false);
-    setSelectedRow(null);
-  };
-
-  const handleCloseDeleteAssignmentDialog = () => {
-    setIsDeleteAssignmentDialogOpen(false);
-    setSelectedRow(null);
-  };
-
-  const handleCreateAssignment = async (
-    data: AssignmentFormValues,
-    resetForm: () => void,
+  const handleUpdateAssignment = async (
+    assignment: Assignment,
+    values: AssignmentFormValues,
   ) => {
-    try {
-      await apiRequest("/api/assignments", "POST", toAssignmentPayload(data));
-      setIsCreateAssignmentDialogOpen(false);
-      notify("Assignment created successfully");
-      resetForm();
-      router.refresh();
-    } catch (error) {
-      notify(getErrorMessage(error), "error");
-    }
+    const updated = await mutate({
+      method: "PUT",
+      url: `/api/assignments/${assignment.id}`,
+      body: toAssignmentPayload(values),
+      successMessage: "Assignment updated successfully",
+    });
+    if (updated) closeDialog();
   };
 
-  const handleUpdateAssignment = async (data: AssignmentFormValues) => {
-    if (!selectedRow) return;
-    try {
-      await apiRequest(
-        `/api/assignments/${selectedRow.id}`,
-        "PUT",
-        toAssignmentPayload(data),
-      );
-      handleCloseUpdateAssignmentDialog();
-      notify("Assignment updated successfully");
-      router.refresh();
-    } catch (error) {
-      notify(getErrorMessage(error), "error");
-    }
-  };
-
-  const handleDeleteAssignment = async (data: Assignment) => {
-    try {
-      await apiRequest(`/api/assignments/${data.id}`, "DELETE");
-      handleCloseDeleteAssignmentDialog();
-      notify("Assignment deleted successfully");
-      router.refresh();
-    } catch (error) {
-      notify(getErrorMessage(error), "error");
-    }
+  const handleDeleteAssignment = async (assignment: Assignment) => {
+    const deleted = await mutate({
+      method: "DELETE",
+      url: `/api/assignments/${assignment.id}`,
+      successMessage: "Assignment deleted successfully",
+    });
+    if (deleted) closeDialog();
   };
 
   const columns: GridColDef<Assignment>[] = [
@@ -183,8 +157,8 @@ export default function AssignmentsDashboard({
       sortable: false,
       renderCell: ({ row }) => (
         <RenderMenu
-          onEditClick={() => handleEditClick(row)}
-          onDeleteClick={() => handleDeleteClick(row)}
+          onEditClick={() => showDialog({ type: "edit", assignment: row })}
+          onDeleteClick={() => showDialog({ type: "delete", assignment: row })}
         />
       ),
     },
@@ -192,11 +166,23 @@ export default function AssignmentsDashboard({
 
   const toolbarButtons = (
     <IconButton
-      onClick={() => setIsCreateAssignmentDialogOpen(true)}
+      aria-label="Add assignment"
+      onClick={() => showDialog({ type: "create" })}
       color="primary"
     >
       <AddBoxIcon />
     </IconButton>
+  );
+
+  const renderFields = (
+    values: AssignmentFormValues,
+    setValues: React.Dispatch<React.SetStateAction<AssignmentFormValues>>,
+  ) => (
+    <AssignmentFormFields
+      assignment={values}
+      setFormData={setValues}
+      classes={classes}
+    />
   );
 
   return (
@@ -216,27 +202,42 @@ export default function AssignmentsDashboard({
           initialColumnVisibilityModel={initialColumnVisibilityModel}
           additionalToolbarButtons={toolbarButtons}
         />
-        {/* TODO fix overlapping input fields */}
       </Box>
-      <UpdateAssignmentDialog
-        existingAssignment={selectedRow}
-        open={isUpdateAssignmentDialogOpen}
-        onClose={handleCloseUpdateAssignmentDialog}
-        onSubmit={handleUpdateAssignment}
-        classes={classes}
-      />
-      <CreateAssignmentDialog
-        open={isCreateAssignmentDialogOpen}
-        onClose={() => setIsCreateAssignmentDialogOpen(false)}
-        onSubmit={handleCreateAssignment}
-        classes={classes}
-      />
-      <DeleteAssignmentDialog
-        assignment={selectedRow}
-        open={isDeleteAssignmentDialogOpen}
-        onClose={handleCloseDeleteAssignmentDialog}
-        onSubmit={handleDeleteAssignment}
-      />
+      {dialog?.type === "create" && (
+        <FormDialog
+          open={open}
+          title="New assignment"
+          initialValues={emptyAssignmentFormValues}
+          onClose={closeDialog}
+          onSubmit={handleCreateAssignment}
+        >
+          {renderFields}
+        </FormDialog>
+      )}
+      {dialog?.type === "edit" && (
+        <FormDialog
+          key={dialog.assignment.id}
+          open={open}
+          title="Update Assignment"
+          initialValues={toAssignmentFormValues(dialog.assignment)}
+          onClose={closeDialog}
+          onSubmit={(values) =>
+            handleUpdateAssignment(dialog.assignment, values)
+          }
+        >
+          {renderFields}
+        </FormDialog>
+      )}
+      {dialog?.type === "delete" && (
+        <ConfirmDialog
+          open={open}
+          title="Delete Assignment"
+          message="Permanently delete this assignment and remove it from its corresponding class? You cannot undo this action."
+          confirmLabel="Delete"
+          onClose={closeDialog}
+          onConfirm={() => handleDeleteAssignment(dialog.assignment)}
+        />
+      )}
     </>
   );
 }

@@ -7,7 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -39,6 +40,7 @@
     "prettier": "^3.5.3",
     "prettier-plugin-prisma": "^5.0.0",
     "prisma": "^6.13.0",
-    "typescript": "5.1.6"
+    "typescript": "5.1.6",
+    "vitest": "^3.2.7"
   }
 }

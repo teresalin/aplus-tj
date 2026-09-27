@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateField } from "@/lib/validation";
 import {
   CreatePersonSchema,
   UpdatePersonSchema,
@@ -16,7 +17,7 @@ export const CreateStudentSchema = CreatePersonSchema.extend({
     .transform((v) => (v === "" ? undefined : v)),
   gradeId: validators.uuid,
   textbookPublisher: z.string().trim().optional(),
-  admissionDate: z.coerce.date(),
+  admissionDate: dateField,
   departureDate: validators.optionalDate,
 }).refine(
   (data) => !data.departureDate || data.departureDate >= data.admissionDate,
@@ -30,7 +31,7 @@ export const UpdateStudentSchema = UpdatePersonSchema.extend({
   currentSchool: z.string().trim().optional(),
   gradeId: validators.uuid.optional(),
   textbookPublisher: z.string().trim().optional(),
-  admissionDate: z.coerce.date().optional(),
+  admissionDate: dateField.optional(),
   departureDate: validators.optionalDate,
 }).partial();
 

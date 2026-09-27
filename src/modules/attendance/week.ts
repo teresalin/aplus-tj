@@ -22,3 +22,10 @@ export function parseWeekParam(raw?: string | string[]): Date {
 export function addWeeks(weekStart: string, weeks: number): string {
   return dayjs.utc(weekStart).add(weeks, "week").format("YYYY-MM-DD");
 }
+
+/** The seven days of the week starting at `weekStart`, as "YYYY-MM-DD". */
+export function weekDates(weekStart: Date): string[] {
+  return Array.from({ length: 7 }, (_, i) =>
+    dayjs.utc(weekStart).add(i, "day").format("YYYY-MM-DD"),
+  );
+}

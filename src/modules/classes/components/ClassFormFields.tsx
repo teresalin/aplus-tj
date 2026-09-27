@@ -54,7 +54,7 @@ export function toClassFormValues(cls: ClassDetail): ClassFormValues {
   };
 }
 
-function validate(values: ClassFormValues): Record<string, string> {
+function validateClassForm(values: ClassFormValues): Record<string, string> {
   const errors: Record<string, string> = {};
 
   if (values.capacity && isNaN(Number(values.capacity))) {
@@ -77,12 +77,15 @@ function validate(values: ClassFormValues): Record<string, string> {
   return errors;
 }
 
+export function isClassFormValid(values: ClassFormValues): boolean {
+  return Object.keys(validateClassForm(values)).length === 0;
+}
+
 export interface IClassFormFieldsProps {
   classData: ClassFormValues;
   setFormData: React.Dispatch<React.SetStateAction<ClassFormValues>>;
   grades: Grade[];
   teachers: StaffOption[];
-  setHasError: (hasError: boolean) => void;
 }
 
 const ClassFormFields = ({
@@ -90,15 +93,10 @@ const ClassFormFields = ({
   setFormData,
   grades,
   teachers,
-  setHasError,
 }: IClassFormFieldsProps) => {
   const { name, gradeId, teacherId, capacity, schedules } = classData;
 
-  const errors = React.useMemo(() => validate(classData), [classData]);
-
-  React.useEffect(() => {
-    setHasError(Object.keys(errors).length > 0);
-  }, [errors, setHasError]);
+  const errors = validateClassForm(classData);
 
   const handleInputChange = <K extends keyof ClassFormValues>(
     field: K,

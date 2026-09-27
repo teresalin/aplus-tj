@@ -2,9 +2,10 @@ import "server-only";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import prisma from "@/lib/prisma";
-import { formatDate } from "@/lib/dates";
 import { activeEnrollmentWhere } from "@/modules/classes";
-import type { AttendanceRow, WeeklyAttendance } from "./types";
+import { buildAttendanceRows } from "./rows";
+import type { WeeklyAttendance } from "./types";
+import { weekDates } from "./week";
 
 dayjs.extend(utc);
 
@@ -48,31 +49,13 @@ export class AttendanceService {
     });
     if (!cls) return null;
 
-    const rows = new Map<string, AttendanceRow>();
-    for (const { student } of cls.classStudents) {
-      if (rows.has(student.id)) continue;
-      const attendance: AttendanceRow["attendance"] = {};
-      for (const session of cls.sessions) {
-        const attended = session.attendances.some(
-          (a) => a.studentId === student.id,
-        );
-        attendance[formatDate(session.startTime)] = attended
-          ? "Present"
-          : "Absent";
-      }
-      rows.set(student.id, {
-        id: student.id,
-        name: student.person.name,
-        attendance,
-      });
-    }
-
     return {
       class: { id: cls.id, name: cls.name },
-      dates: Array.from({ length: 7 }, (_, i) =>
-        dayjs.utc(weekStart).add(i, "day").format("YYYY-MM-DD"),
+      dates: weekDates(weekStart),
+      rows: buildAttendanceRows(
+        cls.classStudents.map(({ student }) => student),
+        cls.sessions,
       ),
-      rows: Array.from(rows.values()),
     };
   }
 }

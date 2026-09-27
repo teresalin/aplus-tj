@@ -6,21 +6,27 @@ import Box from "@mui/material/Box";
 import dayjs from "dayjs";
 import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
+import Link from "@mui/material/Link";
+import NextLink from "next/link";
 import MenuItem from "@mui/material/MenuItem";
 import React from "react";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 
 import BaseDataGrid from "@/components/DataGrid";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import FormDialog from "@/components/FormDialog";
 import RenderMenu from "@/components/grid/RenderMenu";
-import { useSnackbar } from "@/components/feedback/SnackbarProvider";
-import { apiRequest, getErrorMessage } from "@/lib/api/client";
+import { useApiMutation } from "@/hooks/use-api-mutation";
 import type { ClassOption } from "@/modules/classes";
 import type { Session, SessionRange } from "@/modules/sessions";
-import CreateSessionDialog from "./CreateSessionDialog";
-import DeleteSessionDialog from "./DeleteSessionDialog";
-import UpdateSessionDialog from "./UpdateSessionDialog";
-import { toSessionPayload, type SessionFormValues } from "./SessionFormFields";
+import SessionFormFields, {
+  emptySessionFormValues,
+  hasSessionTimes,
+  toSessionFormValues,
+  toSessionPayload,
+  type SessionFormValues,
+} from "./SessionFormFields";
 
 const formatLocalTime = (value: Date) =>
   dayjs(value).format("YYYY-MM-DD HH:mm A");
@@ -32,6 +38,12 @@ const initialColumnVisibilityModel: GridColumnVisibilityModel = {
 // Hide the `id` column from the list of togglable columns.
 const getTogglableColumns = (columns: GridColDef[]) =>
   columns.filter((column) => column.field !== "id").map((c) => c.field);
+
+/** The dialog being shown; edit and delete always carry the session they act on. */
+type DialogState =
+  | { type: "create" }
+  | { type: "edit"; session: Session }
+  | { type: "delete"; session: Session };
 
 interface SessionsDashboardProps {
   sessions: Session[];
@@ -46,72 +58,50 @@ export default function SessionsDashboard({
 }: SessionsDashboardProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const notify = useSnackbar();
-
-  const [selectedRow, setSelectedRow] = React.useState<Session | null>(null);
-  const [isCreateSessionDialogOpen, setIsCreateSessionDialogOpen] =
-    React.useState(false);
-  const [isUpdateSessionDialogOpen, setIsUpdateSessionDialogOpen] =
-    React.useState(false);
-  const [isDeleteSessionDialogOpen, setIsDeleteSessionDialogOpen] =
-    React.useState(false);
+  const mutate = useApiMutation();
+  // `dialog` outlives `open` so a closing dialog keeps its content while it animates out.
+  const [dialog, setDialog] = React.useState<DialogState | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const showDialog = (next: DialogState) => {
+    setDialog(next);
+    setOpen(true);
+  };
+  const closeDialog = () => setOpen(false);
 
   const handleRangeChange = (event: SelectChangeEvent<SessionRange>) => {
     router.push(`${pathname}?range=${event.target.value}`);
   };
 
-  const handleEditClick = (row: Session) => {
-    setSelectedRow(row);
-    setIsUpdateSessionDialogOpen(true);
+  const handleCreateSession = async (values: SessionFormValues) => {
+    const created = await mutate({
+      method: "POST",
+      url: "/api/sessions",
+      body: toSessionPayload(values),
+      successMessage: "Session created successfully",
+    });
+    if (created) closeDialog();
   };
 
-  const handleDeleteClick = (row: Session) => {
-    setSelectedRow(row);
-    setIsDeleteSessionDialogOpen(true);
-  };
-
-  const handleCreateSession = async (
-    data: SessionFormValues,
-    resetForm: () => void,
+  const handleUpdateSession = async (
+    session: Session,
+    values: SessionFormValues,
   ) => {
-    try {
-      await apiRequest("/api/sessions", "POST", toSessionPayload(data));
-      setIsCreateSessionDialogOpen(false);
-      notify("Session created successfully");
-      resetForm();
-      router.refresh();
-    } catch (error) {
-      notify(getErrorMessage(error), "error");
-    }
+    const updated = await mutate({
+      method: "PUT",
+      url: `/api/sessions/${session.id}`,
+      body: toSessionPayload(values),
+      successMessage: "Session updated successfully",
+    });
+    if (updated) closeDialog();
   };
 
-  const handleUpdateSession = async (data: SessionFormValues) => {
-    if (!selectedRow) return;
-    try {
-      await apiRequest(
-        `/api/sessions/${selectedRow.id}`,
-        "PUT",
-        toSessionPayload(data),
-      );
-      setIsUpdateSessionDialogOpen(false);
-      notify("Session updated successfully");
-      router.refresh();
-    } catch (error) {
-      notify(getErrorMessage(error), "error");
-    }
-  };
-
-  const handleDeleteSession = async () => {
-    if (!selectedRow) return;
-    try {
-      await apiRequest(`/api/sessions/${selectedRow.id}`, "DELETE");
-      setIsDeleteSessionDialogOpen(false);
-      setSelectedRow(null);
-      notify("Session deleted successfully");
-      router.refresh();
-    } catch (error) {
-      notify(getErrorMessage(error), "error");
-    }
+  const handleDeleteSession = async (session: Session) => {
+    const deleted = await mutate({
+      method: "DELETE",
+      url: `/api/sessions/${session.id}`,
+      successMessage: "Session deleted successfully",
+    });
+    if (deleted) closeDialog();
   };
 
   const columns: GridColDef<Session>[] = [
@@ -127,6 +117,11 @@ export default function SessionsDashboard({
       minWidth: 200,
       flex: 1,
       valueGetter: ({ row }) => row.class.name,
+      renderCell: ({ row, value }) => (
+        <Link component={NextLink} href={`/sessions/${row.id}`}>
+          {value}
+        </Link>
+      ),
     },
     {
       field: "startTime",
@@ -151,8 +146,8 @@ export default function SessionsDashboard({
       sortable: false,
       renderCell: ({ row }) => (
         <RenderMenu
-          onEditClick={() => handleEditClick(row)}
-          onDeleteClick={() => handleDeleteClick(row)}
+          onEditClick={() => showDialog({ type: "edit", session: row })}
+          onDeleteClick={() => showDialog({ type: "delete", session: row })}
         />
       ),
     },
@@ -160,11 +155,23 @@ export default function SessionsDashboard({
 
   const toolbarButtons = (
     <IconButton
-      onClick={() => setIsCreateSessionDialogOpen(true)}
+      aria-label="Add session"
+      onClick={() => showDialog({ type: "create" })}
       color="primary"
     >
       <AddBoxIcon />
     </IconButton>
+  );
+
+  const renderFields = (
+    values: SessionFormValues,
+    setValues: React.Dispatch<React.SetStateAction<SessionFormValues>>,
+  ) => (
+    <SessionFormFields
+      session={values}
+      setFormData={setValues}
+      classes={classes}
+    />
   );
 
   return (
@@ -196,24 +203,41 @@ export default function SessionsDashboard({
           additionalToolbarButtons={toolbarButtons}
         />
       </Box>
-      <CreateSessionDialog
-        open={isCreateSessionDialogOpen}
-        onClose={() => setIsCreateSessionDialogOpen(false)}
-        onSubmit={handleCreateSession}
-        classes={classes}
-      />
-      <UpdateSessionDialog
-        existingSession={selectedRow}
-        open={isUpdateSessionDialogOpen}
-        onClose={() => setIsUpdateSessionDialogOpen(false)}
-        onSubmit={handleUpdateSession}
-        classes={classes}
-      />
-      <DeleteSessionDialog
-        open={isDeleteSessionDialogOpen}
-        onClose={() => setIsDeleteSessionDialogOpen(false)}
-        onSubmit={handleDeleteSession}
-      />
+      {dialog?.type === "create" && (
+        <FormDialog
+          open={open}
+          title="New session"
+          initialValues={emptySessionFormValues}
+          canSubmit={hasSessionTimes}
+          onClose={closeDialog}
+          onSubmit={handleCreateSession}
+        >
+          {renderFields}
+        </FormDialog>
+      )}
+      {dialog?.type === "edit" && (
+        <FormDialog
+          key={dialog.session.id}
+          open={open}
+          title="Update session"
+          initialValues={toSessionFormValues(dialog.session)}
+          canSubmit={hasSessionTimes}
+          onClose={closeDialog}
+          onSubmit={(values) => handleUpdateSession(dialog.session, values)}
+        >
+          {renderFields}
+        </FormDialog>
+      )}
+      {dialog?.type === "delete" && (
+        <ConfirmDialog
+          open={open}
+          title="Delete session"
+          message="Permanently delete this session and remove it from its corresponding class? You cannot undo this action."
+          confirmLabel="Delete"
+          onClose={closeDialog}
+          onConfirm={() => handleDeleteSession(dialog.session)}
+        />
+      )}
     </>
   );
 }
