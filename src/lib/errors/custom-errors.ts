@@ -1,7 +1,11 @@
-export class ValidationError extends Error {
-  constructor(message: string) {
+/** An error that maps directly to an HTTP status (e.g. 401, 403). */
+export class HttpError extends Error {
+  readonly status: number;
+
+  constructor(status: number, message: string) {
     super(message);
-    this.name = "ValidationError";
+    this.name = "HttpError";
+    this.status = status;
   }
 }
 
@@ -16,12 +20,5 @@ export class NotFoundError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "NotFoundError";
-  }
-}
-
-export class MethodNotAllowedError extends Error {
-  constructor(method: string) {
-    super(`Method ${method} is not allowed`);
-    this.name = "MethodNotAllowedError";
   }
 }

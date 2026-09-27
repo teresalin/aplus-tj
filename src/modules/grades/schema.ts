@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-export const GradeSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string().trim().min(1),
+export const CreateGradeSchema = z.object({
+  name: z.string().trim().min(1, "Name is required"),
 });
-export type Grade = z.infer<typeof GradeSchema>;
+export type CreateGradeDTO = z.infer<typeof CreateGradeSchema>;

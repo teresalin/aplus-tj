@@ -9,15 +9,26 @@ export const parentIncludes = {
     person: true,
   },
 
-  /** Lightweight summary for lists/dropdowns */
+  /** Fields shown in the parents list */
   summary: {
     person: {
       select: {
         id: true,
         name: true,
+        gender: true,
         email: true,
         phone: true,
+        dateOfBirth: true,
+        active: true,
+        createdAt: true,
       },
     },
   },
 } as const satisfies Record<string, Prisma.ParentInclude>;
+
+// ========================================
+// DOMAIN TYPES
+// ========================================
+export type ParentSummary = Prisma.ParentGetPayload<{
+  include: typeof parentIncludes.summary;
+}>;

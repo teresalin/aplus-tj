@@ -10,12 +10,18 @@ export const staffIncludes = {
     role: true,
   },
 
-  /** Lightweight summary for lists/dropdowns */
+  /** Fields shown in the staff list */
   summary: {
     person: {
       select: {
         id: true,
         name: true,
+        gender: true,
+        phone: true,
+        email: true,
+        dateOfBirth: true,
+        active: true,
+        createdAt: true,
       },
     },
   },
@@ -37,6 +43,20 @@ export const staffIncludes = {
 // ========================================
 // DOMAIN TYPES (Only export if used in multiple places)
 // ========================================
+export type Staff = Prisma.StaffGetPayload<{
+  include: typeof staffIncludes.full;
+}>;
+
+export type StaffSummary = Prisma.StaffGetPayload<{
+  include: typeof staffIncludes.summary;
+}>;
+
 export type StaffWithClasses = Prisma.StaffGetPayload<{
   include: typeof staffIncludes.withClasses;
 }>;
+
+/** Id/name pair for staff dropdowns (e.g. choosing a class teacher). */
+export interface StaffOption {
+  id: string;
+  name: string;
+}

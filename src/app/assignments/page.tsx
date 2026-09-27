@@ -1,43 +1,30 @@
-import Alert, { AlertColor } from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import React from "react";
-import Snackbar from "@mui/material/Snackbar";
-import AssignmentsDashboard from "../../modules/assignments/components/AssignmentsDashboard";
+import type { Metadata } from "next";
 
-export default function StudentsPage() {
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarMessage, setSnackbarMessage] = React.useState("");
-  const [snackbarSeverity, setSnackbarSeverity] =
-    React.useState<AlertColor>("error");
+import { requirePageAccess } from "@/lib/authz";
+import { parseAssignmentFilter } from "@/modules/assignments";
+import { assignmentService } from "@/modules/assignments/assignment.service";
+import { AssignmentsDashboard } from "@/modules/assignments/components";
+import { classService } from "@/modules/classes/class.service";
 
-  const handleSnackbar = (
-    message: string,
-    severity: AlertColor = "success"
-  ) => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
-  };
+export const metadata: Metadata = { title: "Assignments" };
+
+export default async function AssignmentsPage({
+  searchParams,
+}: {
+  searchParams: { filter?: string | string[] };
+}) {
+  await requirePageAccess();
+  const filter = parseAssignmentFilter(searchParams.filter);
+  const [assignments, classes] = await Promise.all([
+    assignmentService.getAll(filter),
+    classService.getOptions(),
+  ]);
 
   return (
-    <>
-      <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
-        <AssignmentsDashboard onSnackbar={handleSnackbar} />
-      </Box>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
-      >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </>
+    <AssignmentsDashboard
+      assignments={assignments}
+      classes={classes}
+      filter={filter}
+    />
   );
 }

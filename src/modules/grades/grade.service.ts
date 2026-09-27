@@ -1,68 +1,24 @@
-import { getDBClient } from "../../lib/db-connector";
-import { CreateGradeDTO } from "./dtos/create-grade.dto";
-import { mapRowToGrade } from "./grade.mapper";
-import { Grade } from "./schema";
+import "server-only";
+import prisma from "@/lib/prisma";
+import { rethrowUniqueViolation } from "@/lib/errors/prisma-errors";
+import { gradeSelect } from "./types";
+import type { CreateGradeDTO } from "./schema";
 
-export async function findAllGrades(): Promise<Grade[]> {
-  const client = await getDBClient();
+export class GradeService {
+  async getAll() {
+    return await prisma.grade.findMany({
+      select: gradeSelect,
+      orderBy: { createdAt: "asc" },
+    });
+  }
 
-  try {
-    const { rows } = await client.query<{
-      id: string;
-      name: string;
-      createdAt: Date;
-      updatedAt: Date;
-    }>(`
-    SELECT
-      id,
-      name,
-      created_at,
-      updated_at
-    FROM grade;
-  `);
-
-    return rows.map(mapRowToGrade);
-  } catch (error) {
-    console.error("Error retrieving grades:", error);
-    throw error;
-  } finally {
-    client.release();
+  async create(data: CreateGradeDTO) {
+    try {
+      return await prisma.grade.create({ data, select: gradeSelect });
+    } catch (error) {
+      rethrowUniqueViolation(error, "A grade with that name already exists.");
+    }
   }
 }
 
-export async function createGrade(dto: CreateGradeDTO): Promise<Grade> {
-  const client = await getDBClient();
-  try {
-    await client.query("BEGIN");
-
-    const insertQuery = {
-      text: `
-        INSERT INTO grade (name)
-        VALUES ($1)
-        RETURNING
-          id,
-          name,
-          created_at
-          updated_at;
-      `,
-      values: [dto.name],
-    };
-
-    const { rows } = await client.query<{
-      id: string;
-      name: string;
-      createdAt: Date;
-      updatedAt: Date;
-    }>(insertQuery);
-
-    await client.query("COMMIT");
-
-    return mapRowToGrade(rows[0]);
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Error creating grade:", error);
-    throw error;
-  } finally {
-    client.release();
-  }
-}
+export const gradeService = new GradeService();

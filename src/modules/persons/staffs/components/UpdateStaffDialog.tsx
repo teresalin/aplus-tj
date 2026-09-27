@@ -1,25 +1,26 @@
-import Alert from "@mui/material/Alert";
+"use client";
+
 import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import React from "react";
-import useSWR, { mutate } from "swr";
 
-import { Role } from "../../../roles";
-import { Staff } from "../types";
-import { staffToUpdateStaffDTO } from "../staff.transformers";
-import { UpdateStaffDTO } from "../dtos";
-import fetcher from "../../../../../utils/fetcher";
-import StaffFormFields from "./StaffFormFields";
+import type { Role } from "@/modules/roles";
+import type { Staff } from "@/modules/persons/staffs";
+import StaffFormFields, {
+  emptyStaffFormValues,
+  toStaffFormValues,
+  type StaffFormValues,
+} from "./StaffFormFields";
 
 export interface IUpdateStaffDialogProps {
-  existingStaff: Staff | null;
+  existingStaff: Staff;
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: UpdateStaffDTO, resetForm: () => void) => Promise<void>;
+  onSubmit: (data: StaffFormValues) => Promise<void>;
+  roles: Role[];
 }
 
 export default function UpdateStaffDialog({
@@ -27,68 +28,40 @@ export default function UpdateStaffDialog({
   open,
   onClose,
   onSubmit,
+  roles,
 }: IUpdateStaffDialogProps) {
-  const initialStaffState = {} as UpdateStaffDTO;
-  const [formData, setFormData] =
-    React.useState<UpdateStaffDTO>(initialStaffState);
+  const [formData, setFormData] = React.useState(emptyStaffFormValues);
 
-  const { data, error, isLoading } = useSWR<Role[]>(
-    "/api/persons//roles",
-    fetcher,
-  );
-  const roles = data || [];
-
-  // Initialize form data when the dialog opens with the latest staff data
+  // Start from the latest staff data each time the dialog opens.
   React.useEffect(() => {
-    if (open && existingStaff) {
-      mutate(`/api/persons//${existingStaff.id}`).then(() => {
-        setFormData(staffToUpdateStaffDTO(existingStaff));
-      });
+    if (open) {
+      setFormData(toStaffFormValues(existingStaff));
     }
   }, [open, existingStaff]);
 
-  const handleSubmit: React.FormEventHandler = async (
-    event: React.FormEvent,
-  ) => {
+  const handleSubmit: React.FormEventHandler = async (event) => {
     event.preventDefault();
-    await onSubmit(formData as UpdateStaffDTO, () =>
-      setFormData(initialStaffState),
-    );
+    await onSubmit(formData);
   };
 
   return (
-    formData && (
-      <Dialog disablePortal open={open} onClose={onClose}>
-        <form onSubmit={handleSubmit}>
-          <DialogTitle>New Staff</DialogTitle>
-          <DialogContent>
-            {isLoading ? (
-              <CircularProgress />
-            ) : (
-              <>
-                {error && (
-                  <Alert severity="error">
-                    Failed to load role data: {error.message}
-                  </Alert>
-                )}
-                {!error && (
-                  <StaffFormFields
-                    staff={formData}
-                    setFormData={setFormData}
-                    roles={roles}
-                  />
-                )}
-              </>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button autoFocus type="submit" onClick={handleSubmit}>
-              Submit
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    )
+    <Dialog disablePortal open={open} onClose={onClose}>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>Update Staff</DialogTitle>
+        <DialogContent>
+          <StaffFormFields
+            staff={formData}
+            setFormData={setFormData}
+            roles={roles}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button autoFocus type="submit">
+            Submit
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
   );
 }

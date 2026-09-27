@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+"use client";
+
+import React from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import type { Dayjs } from "dayjs";
 import {
   Dialog,
   DialogTitle,
@@ -12,39 +15,36 @@ import {
   MenuItem,
   Box,
 } from "@mui/material";
-import useSWR from "swr";
 
-import { Class, ClassStudent } from "../../../classes/types";
-import fetcher from "../../../../../utils/fetcher";
+import type { ClassOption } from "@/modules/classes";
+
+export interface ClassEnrollmentValues {
+  classId: string;
+  startDate: Dayjs | null;
+}
+
+const emptyEnrollment: ClassEnrollmentValues = { classId: "", startDate: null };
 
 export interface IClassEnrollmentDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit;
-  studentClasses;
+  onSubmit: (data: ClassEnrollmentValues) => void;
+  classes: ClassOption[];
 }
 
-export default function ManageEnrollmentDialog({
+export default function ClassEnrollmentDialog({
   open,
   onClose,
   onSubmit,
-  studentClasses,
+  classes,
 }: IClassEnrollmentDialogProps) {
-  const [newClassStudent, setNewClassStudent] = useState({} as ClassStudent);
+  const [newEnrollment, setNewEnrollment] = React.useState(emptyEnrollment);
 
-  const { data } = useSWR("/api/classes", fetcher);
   // TODO take current classes out of the dropdown
-  const classes = (data as Class[]) || [];
-
-  const handleInputChange = (field, value) => {
-    setNewClassStudent((prevData) => ({
-      ...prevData,
-      [field]: field === "classId" ? Number(value) : value,
-    }));
-  };
-
-  const handleSubmit = () => {
-    onSubmit();
+  const handleSubmit: React.FormEventHandler = (event) => {
+    event.preventDefault();
+    onSubmit(newEnrollment);
+    setNewEnrollment(emptyEnrollment);
     onClose();
   };
 
@@ -63,12 +63,13 @@ export default function ManageEnrollmentDialog({
               labelId="class-select-label"
               label="Select Class"
               margin="dense"
-              value={
-                newClassStudent.classId
-                  ? newClassStudent.classId.toString()
-                  : ""
+              value={newEnrollment.classId}
+              onChange={(e) =>
+                setNewEnrollment((prev) => ({
+                  ...prev,
+                  classId: e.target.value,
+                }))
               }
-              onChange={(e) => handleInputChange("classId", e.target.value)}
             >
               {classes.map((cls) => (
                 <MenuItem key={cls.id} value={cls.id}>
@@ -81,8 +82,10 @@ export default function ManageEnrollmentDialog({
             <DatePicker
               label="Start Date"
               format="YYYY-MM-DD"
-              value={newClassStudent.startDate || null}
-              onChange={(date) => handleInputChange("startDate", date)}
+              value={newEnrollment.startDate}
+              onChange={(date) =>
+                setNewEnrollment((prev) => ({ ...prev, startDate: date }))
+              }
               sx={{ marginTop: "8px", marginBottom: "4px", width: "100%" }}
               slotProps={{
                 textField: {

@@ -10,12 +10,15 @@ export const validators = {
     .email()
     .transform((s) => s.toLowerCase()),
   phone: z.string().trim().optional(),
+  // Compared at validation time (not module load) so long-running servers stay correct.
   pastDate: z.coerce
     .date()
-    .max(new Date(), { message: "Date cannot be in the future" }),
+    .refine((date) => date <= new Date(), "Date cannot be in the future"),
   futureDate: z.coerce
     .date()
-    .min(new Date(), { message: "Date cannot be in the past" }),
+    .refine((date) => date >= new Date(), "Date cannot be in the past"),
+  /** Optional date that may be cleared by sending `null`. */
+  optionalDate: z.coerce.date().nullish(),
   uuid: z.string().uuid(),
 } as const;
 

@@ -1,6 +1,8 @@
+"use client";
+
 import { TimePicker } from "@mui/x-date-pickers";
-import { Grade } from "../../grades";
 import Box from "@mui/material/Box";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs, { Dayjs } from "dayjs";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -8,27 +10,80 @@ import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import React from "react";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
-import { CreateClassDTO, UpdateClassDTO } from "../dtos";
-import { daysOfWeek } from "../../../constants";
-import { Schedule } from "../../schedules";
-import { Staff } from "../../persons/staffs";
+import { daysOfWeek, type DayOfWeek } from "@/constants";
+import type { Grade } from "@/modules/grades";
+import type { StaffOption } from "@/modules/persons/staffs";
+import type { ClassDetail, ScheduleInput } from "@/modules/classes";
 
-export interface IClassFormFieldsProps {
-  classData: CreateClassDTO | UpdateClassDTO;
-  setFormData: React.Dispatch<
-    React.SetStateAction<CreateClassDTO | UpdateClassDTO>
-  >;
-  grades: Grade[];
-  teachers: Staff[];
-  setHasError: (hasError: boolean) => void;
+dayjs.extend(customParseFormat);
+
+const TIME_FORMAT = "HH:mm:ss";
+
+export interface ClassFormValues {
+  name: string;
+  gradeId: string;
+  teacherId: string;
+  capacity: string;
+  schedules: ScheduleInput[];
 }
 
-type FieldName = "gradeId" | "teacherId";
+export const emptyClassFormValues: ClassFormValues = {
+  name: "",
+  gradeId: "",
+  teacherId: "",
+  capacity: "",
+  schedules: [],
+};
+
+export function toClassFormValues(cls: ClassDetail): ClassFormValues {
+  return {
+    name: cls.name,
+    gradeId: cls.grade.id,
+    teacherId: cls.teacher.id,
+    capacity: cls.capacity == null ? "" : String(cls.capacity),
+    schedules: cls.schedules.map(({ dayOfWeek, startTime, endTime }) => ({
+      dayOfWeek,
+      startTime,
+      endTime,
+    })),
+  };
+}
+
+function validate(values: ClassFormValues): Record<string, string> {
+  const errors: Record<string, string> = {};
+
+  if (values.capacity && isNaN(Number(values.capacity))) {
+    errors.capacity = "Capacity must be a number";
+  }
+
+  // Custom validation since forms can't detect the built-in required field in TimePicker
+  // https://github.com/mui/mui-x/issues/7633
+  const hasEmptyTimes = values.schedules.some(
+    (schedule) =>
+      !schedule.startTime ||
+      !schedule.endTime ||
+      schedule.startTime === "Invalid Date" ||
+      schedule.endTime === "Invalid Date",
+  );
+  if (hasEmptyTimes) {
+    errors.schedules = "All schedule times must be filled";
+  }
+
+  return errors;
+}
+
+export interface IClassFormFieldsProps {
+  classData: ClassFormValues;
+  setFormData: React.Dispatch<React.SetStateAction<ClassFormValues>>;
+  grades: Grade[];
+  teachers: StaffOption[];
+  setHasError: (hasError: boolean) => void;
+}
 
 const ClassFormFields = ({
   classData,
@@ -39,81 +94,59 @@ const ClassFormFields = ({
 }: IClassFormFieldsProps) => {
   const { name, gradeId, teacherId, capacity, schedules } = classData;
 
-  const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const errors = React.useMemo(() => validate(classData), [classData]);
 
   React.useEffect(() => {
-    validateForm();
-  }, [classData]);
+    setHasError(Object.keys(errors).length > 0);
+  }, [errors, setHasError]);
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (capacity && isNaN(Number(capacity))) {
-      newErrors.capacity = "Capacity must be a number";
-    }
-
-    if (hasEmptyOrInvalidTimeValues()) {
-      newErrors.schedules = "All schedule times must be filled";
-    }
-
-    setErrors(newErrors);
-    setHasError(Object.keys(newErrors).length > 0);
-  };
-
-  // Implemented custom validation since frm is unable to detect the built-in required field in TimePicker
-  // https://github.com/mui/mui-x/issues/7633
-  function hasEmptyOrInvalidTimeValues() {
-    return classData.schedules?.some(
-      (schedule) =>
-        !schedule.startTime ||
-        !schedule.endTime ||
-        schedule.startTime === "Invalid Date" ||
-        schedule.endTime === "Invalid Date",
-    );
-  }
-
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = <K extends keyof ClassFormValues>(
+    field: K,
+    value: ClassFormValues[K],
+  ) => {
     setFormData((prevData) => ({
       ...prevData,
       [field]: value,
     }));
   };
 
-  const handleSwitchChange = (day: string) => {
-    const existingSchedule = schedules?.find(
-      (schedule) => schedule.dayOfWeek === day,
-    );
-    if (existingSchedule) {
+  const findSchedule = (day: DayOfWeek) =>
+    schedules.find((schedule) => schedule.dayOfWeek === day);
+
+  const handleSwitchChange = (day: DayOfWeek) => {
+    if (findSchedule(day)) {
       handleInputChange(
         "schedules",
-        schedules?.filter((schedule) => schedule.dayOfWeek !== day),
+        schedules.filter((schedule) => schedule.dayOfWeek !== day),
       );
     } else {
       handleInputChange("schedules", [
-        ...(schedules || []),
+        ...schedules,
         { dayOfWeek: day, startTime: "", endTime: "" },
-      ] as Schedule[]);
+      ]);
     }
   };
 
   const handleTimeChange = (
-    field: string,
-    day: string,
+    field: "startTime" | "endTime",
+    day: DayOfWeek,
     newValue: Dayjs | null,
   ) => {
     handleInputChange(
       "schedules",
-      schedules?.map((schedule) => {
-        if (schedule.dayOfWeek === day) {
-          return {
-            ...schedule,
-            [field]: newValue ? newValue.format("HH:mm:ss") : "00:00:00",
-          };
-        }
-        return schedule;
-      }),
+      schedules.map((schedule) =>
+        schedule.dayOfWeek === day
+          ? {
+              ...schedule,
+              [field]: newValue ? newValue.format(TIME_FORMAT) : "00:00:00",
+            }
+          : schedule,
+      ),
     );
   };
+
+  const toPickerTime = (time: string | undefined) =>
+    time ? dayjs(time, TIME_FORMAT) : null;
 
   return (
     <>
@@ -128,7 +161,7 @@ const ClassFormFields = ({
           name="name"
           label="Name"
           type="text"
-          value={name || ""}
+          value={name}
           fullWidth
           variant="outlined"
           onChange={(e) => handleInputChange("name", e.target.value)}
@@ -145,15 +178,14 @@ const ClassFormFields = ({
               label={"Select a grade"}
               labelId="grade-select-label"
               margin="dense"
-              value={gradeId || ""}
+              value={gradeId}
               onChange={(e) => handleInputChange("gradeId", e.target.value)}
             >
-              {grades &&
-                grades.map((grade: Grade) => (
-                  <MenuItem key={grade.id} value={grade.id}>
-                    {grade.name}
-                  </MenuItem>
-                ))}
+              {grades.map((grade) => (
+                <MenuItem key={grade.id} value={grade.id}>
+                  {grade.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>
@@ -169,15 +201,14 @@ const ClassFormFields = ({
               label={"Select a teacher"}
               labelId="teacher-select-label"
               margin="dense"
-              value={teacherId || ""}
+              value={teacherId}
               onChange={(e) => handleInputChange("teacherId", e.target.value)}
             >
-              {teachers &&
-                teachers.map((teacher: Staff) => (
-                  <MenuItem key={teacher.id} value={teacher.id}>
-                    {teacher.name}
-                  </MenuItem>
-                ))}
+              {teachers.map((teacher) => (
+                <MenuItem key={teacher.id} value={teacher.id}>
+                  {teacher.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>
@@ -195,7 +226,7 @@ const ClassFormFields = ({
             placeholder="Enter a number"
             fullWidth
             variant="outlined"
-            value={capacity || ""}
+            value={capacity}
             onChange={(e) => handleInputChange("capacity", e.target.value)}
             error={!!errors.capacity}
             helperText={errors.capacity}
@@ -206,20 +237,17 @@ const ClassFormFields = ({
         <Typography variant="body2" display="block" gutterBottom>
           Class Schedule
         </Typography>
-        {classData &&
-          daysOfWeek.map((day) => (
+        {daysOfWeek.map((day) => {
+          const schedule = findSchedule(day);
+          return (
             <Box key={day} my={1}>
-              <Grid container item key={day} spacing={1} alignItems="center">
+              <Grid container item spacing={1} alignItems="center">
                 <Grid item xs={12} md={4}>
                   <FormControlLabel
                     control={
                       <Switch
-                        required={schedules?.length === 0}
-                        checked={
-                          !!schedules?.find(
-                            (schedule) => schedule.dayOfWeek === day,
-                          )
-                        }
+                        required={schedules.length === 0}
+                        checked={!!schedule}
                         onChange={() => handleSwitchChange(day)}
                       />
                     }
@@ -232,24 +260,11 @@ const ClassFormFields = ({
                     slotProps={{
                       textField: {
                         size: "small",
-                        required: !!schedules?.find(
-                          (schedule) => schedule.dayOfWeek === day,
-                        ),
+                        required: !!schedule,
                       },
                     }}
-                    value={
-                      !!schedules?.find(
-                        (schedule) => schedule.dayOfWeek === day,
-                      )
-                        ? dayjs(
-                            schedules.find(
-                              (schedule) => schedule.dayOfWeek === day,
-                            )?.startTime,
-                            "HH:mm:ss",
-                          ).local()
-                        : null
-                    }
-                    onChange={(newValue: Dayjs | null) =>
+                    value={toPickerTime(schedule?.startTime)}
+                    onChange={(newValue) =>
                       handleTimeChange("startTime", day, newValue)
                     }
                   />
@@ -263,26 +278,16 @@ const ClassFormFields = ({
                         size: "small",
                       },
                     }}
-                    value={
-                      !!schedules?.find(
-                        (schedule) => schedule.dayOfWeek === day,
-                      )
-                        ? dayjs(
-                            schedules.find(
-                              (schedule) => schedule.dayOfWeek === day,
-                            )?.endTime,
-                            "HH:mm:ss",
-                          ).local()
-                        : null
-                    }
-                    onChange={(newValue: Dayjs | null) =>
+                    value={toPickerTime(schedule?.endTime)}
+                    onChange={(newValue) =>
                       handleTimeChange("endTime", day, newValue)
                     }
                   />
                 </Grid>
               </Grid>
             </Box>
-          ))}
+          );
+        })}
         {errors.schedules && (
           <Typography
             color="error"

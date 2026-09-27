@@ -1,68 +1,24 @@
-import { getDBClient } from "../../lib/db-connector";
-import { CreateRoleDTO } from "./dtos/create-role.dto";
-import { mapRowToRole } from "./role.mapper";
-import { Role } from "./types";
+import "server-only";
+import prisma from "@/lib/prisma";
+import { rethrowUniqueViolation } from "@/lib/errors/prisma-errors";
+import { roleSelect } from "./types";
+import type { CreateRoleDTO } from "./schema";
 
-export const findAllRoles = async (): Promise<Role[]> => {
-  const client = await getDBClient();
-
-  try {
-    const { rows } = await client.query<{
-      id: string;
-      name: string;
-      createdAt: Date;
-      updatedAt: Date;
-    }>(`
-    SELECT
-      id,
-      name,
-      created_at,
-      updated_at
-    FROM staff_role;
-  `);
-
-    return rows.map(mapRowToRole);
-  } catch (error) {
-    console.error("Error retrieving staff roles", error);
-    throw error;
-  } finally {
-    client.release();
+export class RoleService {
+  async getAll() {
+    return await prisma.staffRole.findMany({
+      select: roleSelect,
+      orderBy: { createdAt: "asc" },
+    });
   }
-};
 
-export async function createRole(dto: CreateRoleDTO): Promise<Role> {
-  const client = await getDBClient();
-  try {
-    await client.query("BEGIN");
-
-    const insertQuery = {
-      text: `
-        INSERT INTO staff_role (name)
-        VALUES ($1)
-        RETURNING
-          id,
-          name,
-          created_at,
-          updated_at;
-      `,
-      values: [dto.name],
-    };
-
-    const { rows } = await client.query<{
-      id: string;
-      name: string;
-      createdAt: Date;
-      updatedAt: Date;
-    }>(insertQuery);
-
-    await client.query("COMMIT");
-
-    return mapRowToRole(rows[0]);
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Error creating role:", error);
-    throw error;
-  } finally {
-    client.release();
+  async create(data: CreateRoleDTO) {
+    try {
+      return await prisma.staffRole.create({ data, select: roleSelect });
+    } catch (error) {
+      rethrowUniqueViolation(error, "A role with that name already exists.");
+    }
   }
 }
+
+export const roleService = new RoleService();

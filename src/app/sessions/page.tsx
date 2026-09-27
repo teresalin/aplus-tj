@@ -1,43 +1,26 @@
-import Alert, { AlertColor } from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import React from "react";
-import Snackbar from "@mui/material/Snackbar";
-import SessionsDashboard from "../../modules/sessions/components/SessionsDashboard";
+import type { Metadata } from "next";
 
-export default function SessionsPage() {
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarMessage, setSnackbarMessage] = React.useState("");
-  const [snackbarSeverity, setSnackbarSeverity] =
-    React.useState<AlertColor>("error");
+import { requirePageAccess } from "@/lib/authz";
+import { classService } from "@/modules/classes/class.service";
+import { parseSessionRange } from "@/modules/sessions";
+import { SessionsDashboard } from "@/modules/sessions/components";
+import { sessionService } from "@/modules/sessions/session.service";
 
-  const handleSnackbar = (
-    message: string,
-    severity: AlertColor = "success"
-  ) => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
-  };
+export const metadata: Metadata = { title: "Sessions" };
+
+export default async function SessionsPage({
+  searchParams,
+}: {
+  searchParams: { range?: string | string[] };
+}) {
+  await requirePageAccess();
+  const range = parseSessionRange(searchParams.range);
+  const [sessions, classes] = await Promise.all([
+    sessionService.getAll(range),
+    classService.getOptions(),
+  ]);
 
   return (
-    <>
-      <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
-        <SessionsDashboard onSnackbar={handleSnackbar} />
-      </Box>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
-      >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </>
+    <SessionsDashboard sessions={sessions} classes={classes} range={range} />
   );
 }

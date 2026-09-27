@@ -1,54 +1,43 @@
+"use client";
+
 import React from "react";
 import {
   DataGrid,
   GridColDef,
-  GridRowSelectionModel,
   GridColumnVisibilityModel,
+  GridEventListener,
+  GridRowSelectionModel,
+  GridValidRowModel,
 } from "@mui/x-data-grid";
 import CustomToolBar from "./grid/CustomToolBar";
 
-interface BaseDataGridProps {
-  data: any[];
-  columns: GridColDef[];
-  isLoading: boolean;
-  onRowClick?: (row: any) => void;
+interface BaseDataGridProps<R extends GridValidRowModel> {
+  data: R[];
+  columns: GridColDef<R>[];
+  isLoading?: boolean;
+  onRowClick?: GridEventListener<"rowClick">;
   getTogglableColumns?: (columns: GridColDef[]) => string[];
   initialColumnVisibilityModel: GridColumnVisibilityModel;
-  additionalToolbarButtons?: React.ReactNode[];
+  additionalToolbarButtons?: React.ReactNode;
 }
 
-const BaseDataGrid: React.FC<BaseDataGridProps> = ({
+// Rows are never selectable; clicks are used for navigation instead.
+const NO_SELECTION: GridRowSelectionModel = [];
+
+export default function BaseDataGrid<R extends GridValidRowModel>({
   data,
   columns,
-  isLoading,
+  isLoading = false,
   onRowClick,
+  getTogglableColumns,
   initialColumnVisibilityModel,
-  additionalToolbarButtons = [],
-}) => {
+  additionalToolbarButtons,
+}: BaseDataGridProps<R>) {
   const [columnVisibilityModel, setColumnVisibilityModel] =
     React.useState<GridColumnVisibilityModel>(initialColumnVisibilityModel);
-  const [rowSelectionModel, setRowSelectionModel] =
-    React.useState<GridRowSelectionModel>([]);
   const [buttonEl, setButtonEl] = React.useState<HTMLButtonElement | null>(
-    null
+    null,
   );
-
-  const onColumnVisibilityChange = (
-    model: React.SetStateAction<GridColumnVisibilityModel>
-  ) => {
-    if (typeof model === "function") {
-      return;
-    }
-
-    let count = 0;
-    Object.keys(model).forEach((key) => {
-      if (model[key as keyof GridColumnVisibilityModel]) {
-        count++;
-      }
-    });
-
-    setColumnVisibilityModel(model);
-  };
 
   return (
     <DataGrid
@@ -56,17 +45,12 @@ const BaseDataGrid: React.FC<BaseDataGridProps> = ({
       rows={data}
       loading={isLoading}
       columns={columns}
-      rowSelectionModel={rowSelectionModel}
+      rowSelectionModel={NO_SELECTION}
       columnVisibilityModel={columnVisibilityModel}
-      onColumnVisibilityModelChange={(newModel) => {
-        onColumnVisibilityChange(newModel);
-      }}
+      onColumnVisibilityModelChange={setColumnVisibilityModel}
       onRowClick={onRowClick}
       initialState={{
         pagination: { paginationModel: { pageSize: 10 } },
-        columns: {
-          columnVisibilityModel: columnVisibilityModel,
-        },
       }}
       slots={{
         toolbar: CustomToolBar,
@@ -80,11 +64,12 @@ const BaseDataGrid: React.FC<BaseDataGridProps> = ({
           children: additionalToolbarButtons,
           setButtonEl,
         },
+        columnsPanel: {
+          getTogglableColumns,
+        },
       }}
       pageSizeOptions={[5, 10, 25]}
       hideFooterSelectedRowCount
     />
   );
-};
-
-export default BaseDataGrid;
+}

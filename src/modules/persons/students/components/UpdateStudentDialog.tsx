@@ -1,25 +1,26 @@
-import Alert from "@mui/material/Alert";
+"use client";
+
 import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import React from "react";
-import useSWR, { mutate } from "swr";
 
-import { Grade } from "../../../grades";
-import { Student } from "../types";
-import { studentToUpdateStudentDTO } from "../student.transformers";
-import { UpdateStudentDTO } from "../dtos";
-import fetcher from "../../../../../utils/fetcher";
-import StudentFormFields from "./StudentFormFields";
+import type { Grade } from "@/modules/grades";
+import type { Student } from "@/modules/persons/students";
+import StudentFormFields, {
+  emptyStudentFormValues,
+  toStudentFormValues,
+  type StudentFormValues,
+} from "./StudentFormFields";
 
 export interface IUpdateStudentDialogProps {
-  existingStudent: Student | null;
+  existingStudent: Student;
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: UpdateStudentDTO, resetForm: () => void) => Promise<void>;
+  onSubmit: (data: StudentFormValues) => Promise<void>;
+  grades: Grade[];
 }
 
 export default function UpdateStudentDialog({
@@ -27,70 +28,40 @@ export default function UpdateStudentDialog({
   open,
   onClose,
   onSubmit,
+  grades,
 }: IUpdateStudentDialogProps) {
-  const initialStudentState = {} as UpdateStudentDTO;
-  const [formData, setFormData] =
-    React.useState<UpdateStudentDTO>(initialStudentState);
+  const [formData, setFormData] = React.useState(emptyStudentFormValues);
 
-  const { data, error, isLoading } = useSWR<Grade[]>("/api/grades", fetcher);
-  const grades = data || [];
-
-  // Initialize form data when the dialog opens with the latest student data
+  // Start from the latest student data each time the dialog opens.
   React.useEffect(() => {
-    if (open && existingStudent) {
-      mutate(`/api/persons/students/${existingStudent.id}`).then(() => {
-        setFormData(studentToUpdateStudentDTO(existingStudent));
-      });
+    if (open) {
+      setFormData(toStudentFormValues(existingStudent));
     }
   }, [open, existingStudent]);
 
-  const handleSubmit: React.FormEventHandler = async (
-    event: React.FormEvent,
-  ) => {
+  const handleSubmit: React.FormEventHandler = async (event) => {
     event.preventDefault();
-    await onSubmit(formData as UpdateStudentDTO, () =>
-      setFormData(initialStudentState),
-    );
-  };
-
-  const handleClose = () => {
-    onClose();
-    setFormData(initialStudentState);
+    await onSubmit(formData);
   };
 
   return (
-    formData && (
-      <Dialog disablePortal open={open} onClose={handleClose}>
-        <form onSubmit={handleSubmit}>
-          <DialogTitle>Update Student</DialogTitle>
-          <DialogContent>
-            {isLoading ? (
-              <CircularProgress />
-            ) : (
-              <>
-                {error && (
-                  <Alert severity="error">
-                    Failed to load role data: {error.message}
-                  </Alert>
-                )}
-                {!error && (
-                  <StudentFormFields
-                    student={formData}
-                    setFormData={setFormData}
-                    grades={grades}
-                  />
-                )}
-              </>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button autoFocus type="submit">
-              Submit
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    )
+    <Dialog disablePortal open={open} onClose={onClose}>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>Update Student</DialogTitle>
+        <DialogContent>
+          <StudentFormFields
+            student={formData}
+            setFormData={setFormData}
+            grades={grades}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button autoFocus type="submit">
+            Submit
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
   );
 }

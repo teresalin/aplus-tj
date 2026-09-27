@@ -1,25 +1,72 @@
+"use client";
+
+import type { Gender } from "@prisma/client";
 import { DatePicker } from "@mui/x-date-pickers";
 import Box from "@mui/material/Box";
-import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
 import FormControl from "@mui/material/FormControl";
 import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import utc from "dayjs/plugin/utc";
 
-import { Role } from "../../../roles";
-import { CreateStaffDTO, UpdateStaffDTO } from "../dtos";
+import { fromPickerDate, toPickerDate } from "@/lib/dates";
+import type { Staff } from "@/modules/persons/staffs";
+import type { Role } from "@/modules/roles";
 
-dayjs.extend(utc);
+export interface StaffFormValues {
+  name: string;
+  gender: Gender | "";
+  dateOfBirth: Dayjs | null;
+  notes: string;
+  email: string;
+  phone: string;
+  roleId: string;
+  hireDate: Dayjs | null;
+  leaveDate: Dayjs | null;
+}
+
+export const emptyStaffFormValues: StaffFormValues = {
+  name: "",
+  gender: "",
+  dateOfBirth: null,
+  notes: "",
+  email: "",
+  phone: "",
+  roleId: "",
+  hireDate: null,
+  leaveDate: null,
+};
+
+export function toStaffFormValues(staff: Staff): StaffFormValues {
+  return {
+    name: staff.person.name,
+    gender: staff.person.gender ?? "",
+    dateOfBirth: toPickerDate(staff.person.dateOfBirth),
+    notes: staff.person.notes ?? "",
+    email: staff.person.email,
+    phone: staff.person.phone ?? "",
+    roleId: staff.roleId,
+    hireDate: toPickerDate(staff.hireDate),
+    leaveDate: toPickerDate(staff.leaveDate),
+  };
+}
+
+/** Request body for creating or updating a staff member. */
+export function toStaffPayload(values: StaffFormValues) {
+  return {
+    ...values,
+    dateOfBirth: fromPickerDate(values.dateOfBirth),
+    hireDate: fromPickerDate(values.hireDate),
+    leaveDate: fromPickerDate(values.leaveDate),
+  };
+}
 
 export interface IStaffFormFieldsProps {
-  staff: CreateStaffDTO | UpdateStaffDTO;
-  setFormData: React.Dispatch<
-    React.SetStateAction<CreateStaffDTO | UpdateStaffDTO>
-  >;
+  staff: StaffFormValues;
+  setFormData: React.Dispatch<React.SetStateAction<StaffFormValues>>;
   roles: Role[];
 }
 
@@ -40,16 +87,14 @@ const StaffFormFields = ({
     leaveDate,
   } = staff;
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = <K extends keyof StaffFormValues>(
+    field: K,
+    value: StaffFormValues[K],
+  ) => {
     setFormData((prevData) => ({
       ...prevData,
       [field]: value,
     }));
-  };
-
-  const handleRoleChange = (event: SelectChangeEvent<number>) => {
-    const value = parseInt(event.target.value as string, 10);
-    handleInputChange("roleId", value || 0);
   };
 
   return (
@@ -67,13 +112,13 @@ const StaffFormFields = ({
           type="text"
           fullWidth
           variant="outlined"
-          value={name || ""}
+          value={name}
           onChange={(e) => handleInputChange("name", e.target.value)}
         />
         <DatePicker
           label="Date of Birth"
           format="YYYY-MM-DD"
-          value={dateOfBirth ? dayjs(dateOfBirth).utc() : null}
+          value={dateOfBirth}
           onChange={(date) => handleInputChange("dateOfBirth", date)}
           sx={{ marginTop: "16px", width: "100%" }}
           slotProps={{
@@ -92,8 +137,10 @@ const StaffFormFields = ({
             label="Select a gender"
             margin="normal"
             select
-            value={gender || ""}
-            onChange={(e) => handleInputChange("gender", e.target.value)}
+            value={gender}
+            onChange={(e) =>
+              handleInputChange("gender", e.target.value as Gender)
+            }
           >
             <MenuItem value="Male">Male</MenuItem>
             <MenuItem value="Female">Female</MenuItem>
@@ -113,13 +160,12 @@ const StaffFormFields = ({
             variant="outlined"
             placeholder="Hobbies, nicknames, etc."
             InputLabelProps={{ shrink: true }}
-            value={notes || ""}
+            value={notes}
             onChange={(e) => handleInputChange("notes", e.target.value)}
           />
         </Box>
       </Box>
       <Box mt="16px">
-        {/* TODO lowercase before storing into db */}
         <Typography variant="body2" display="block" gutterBottom>
           Contact Information
         </Typography>
@@ -132,7 +178,7 @@ const StaffFormFields = ({
           type="email"
           fullWidth
           variant="outlined"
-          value={email || ""}
+          value={email}
           onChange={(e) => handleInputChange("email", e.target.value)}
         />
         <Box mt="8px">
@@ -145,7 +191,7 @@ const StaffFormFields = ({
             type="tel"
             fullWidth
             variant="outlined"
-            value={phone || ""}
+            value={phone}
             onChange={(e) => handleInputChange("phone", e.target.value)}
           />
         </Box>
@@ -165,15 +211,14 @@ const StaffFormFields = ({
               name="role"
               label={"Select a role"}
               labelId="role-select-label"
-              value={roleId || ""}
+              value={roleId}
               onChange={(e) => handleInputChange("roleId", e.target.value)}
             >
-              {roles &&
-                roles.map((role: Role) => (
-                  <MenuItem key={role.id} value={role.id}>
-                    {role.name}
-                  </MenuItem>
-                ))}
+              {roles.map((role) => (
+                <MenuItem key={role.id} value={role.id}>
+                  {role.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>
@@ -188,7 +233,7 @@ const StaffFormFields = ({
               <DatePicker
                 label="Hire Date"
                 format="YYYY-MM-DD"
-                value={hireDate ? dayjs(hireDate).utc() : null}
+                value={hireDate}
                 onChange={(date) => handleInputChange("hireDate", date)}
                 slotProps={{
                   textField: {
@@ -201,7 +246,7 @@ const StaffFormFields = ({
               <DatePicker
                 label="Leave Date"
                 format="YYYY-MM-DD"
-                value={leaveDate ? dayjs(leaveDate).utc() : null}
+                value={leaveDate}
                 onChange={(date) => handleInputChange("leaveDate", date)}
               />
             </Grid>

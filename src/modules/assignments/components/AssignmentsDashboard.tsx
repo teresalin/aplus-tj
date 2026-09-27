@@ -1,75 +1,76 @@
-import Alert, { AlertColor } from "@mui/material/Alert";
+"use client";
+
+import { useRouter } from "next/navigation";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
-import dayjs from "dayjs";
 import IconButton from "@mui/material/IconButton";
 import React from "react";
-import Snackbar from "@mui/material/Snackbar";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
-import timezone from "dayjs/plugin/timezone";
-import useSWR, { mutate } from "swr";
-import utc from "dayjs/plugin/utc";
-import {
-  GridColDef,
-  GridValueFormatterParams,
-  GridColumnVisibilityModel,
-} from "@mui/x-data-grid";
+import { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 
-import { Assignment } from "../types";
-import BaseDataGrid from "../../../components/DataGrid";
+import BaseDataGrid from "@/components/DataGrid";
+import LinkTabs from "@/components/navigation/LinkTabs";
+import RenderMenu from "@/components/grid/RenderMenu";
+import { useSnackbar } from "@/components/feedback/SnackbarProvider";
+import { apiRequest, getErrorMessage } from "@/lib/api/client";
+import { formatDate } from "@/lib/dates";
+import {
+  ASSIGNMENT_FILTERS,
+  type Assignment,
+  type AssignmentFilter,
+} from "@/modules/assignments";
+import type { ClassOption } from "@/modules/classes";
 import CreateAssignmentDialog from "./CreateAssignmentDialog";
 import DeleteAssignmentDialog from "./DeleteAssignmentDialog";
-import fetcher from "../../../../utils/fetcher";
-import RenderMenu from "../../../components/grid/RenderMenu";
 import UpdateAssignmentDialog from "./UpdateAssignmentDialog";
-import { CreateAssignmentDTO, UpdateAssignmentDTO } from "../dtos";
+import {
+  toAssignmentPayload,
+  type AssignmentFormValues,
+} from "./AssignmentFormFields";
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
+const filterHref = (filter: AssignmentFilter) =>
+  `/assignments?filter=${encodeURIComponent(filter)}`;
 
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
+const filterTabs = ASSIGNMENT_FILTERS.map((filter) => ({
+  label: filter,
+  href: filterHref(filter),
+}));
 
-const assignmentTypes = ["all", "upcoming", "past due"];
+const getTogglableColumns = (columns: GridColDef[]) =>
+  columns
+    .filter(
+      (column) =>
+        column.field !== "id" &&
+        column.field !== "action" &&
+        column.field !== "createdAt",
+    )
+    .map((column) => column.field);
+
+const initialColumnVisibilityModel: GridColumnVisibilityModel = {
+  id: false,
+  createdAt: false,
+};
 
 interface AssignmentsDashboardProps {
-  onSnackbar?: (message: string, severity?: AlertColor) => void;
+  assignments: Assignment[];
+  classes: ClassOption[];
+  filter: AssignmentFilter;
 }
 
 export default function AssignmentsDashboard({
-  onSnackbar,
+  assignments,
+  classes,
+  filter,
 }: AssignmentsDashboardProps) {
-  const [tab, setTab] = React.useState("all");
+  const router = useRouter();
+  const notify = useSnackbar();
+
   const [isUpdateAssignmentDialogOpen, setIsUpdateAssignmentDialogOpen] =
     React.useState(false);
   const [isCreateAssignmentDialogOpen, setIsCreateAssignmentDialogOpen] =
     React.useState(false);
   const [isDeleteAssignmentDialogOpen, setIsDeleteAssignmentDialogOpen] =
     React.useState(false);
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarMessage, setSnackbarMessage] = React.useState("");
-  const [snackbarSeverity, setSnackbarSeverity] =
-    React.useState<AlertColor>("error");
   const [selectedRow, setSelectedRow] = React.useState<Assignment | null>(null);
-
-  const { data, isLoading, error } = useSWR<Assignment[]>(
-    `/api/assignments?filter=${tab}`,
-    fetcher
-  );
-  const assignments = data || [];
-
-  const handleTabChange = (event: React.SyntheticEvent, newTab: string) => {
-    setTab(newTab);
-  };
-
-  const handleAddButtonClick = () => {
-    setIsCreateAssignmentDialogOpen(true);
-  };
 
   const handleEditClick = (row: Assignment) => {
     setSelectedRow(row);
@@ -79,10 +80,6 @@ export default function AssignmentsDashboard({
   const handleDeleteClick = (row: Assignment) => {
     setSelectedRow(row);
     setIsDeleteAssignmentDialogOpen(true);
-  };
-
-  const handleCloseCreateAssignmentDialog = () => {
-    setIsCreateAssignmentDialogOpen(false);
   };
 
   const handleCloseUpdateAssignmentDialog = () => {
@@ -96,94 +93,48 @@ export default function AssignmentsDashboard({
   };
 
   const handleCreateAssignment = async (
-    data: CreateAssignmentDTO,
-    resetForm: () => void
+    data: AssignmentFormValues,
+    resetForm: () => void,
   ) => {
-    const response = await fetch("/api/assignments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    const responseData = await response.json();
     try {
-      if (response.ok) {
-        handleCloseCreateAssignmentDialog();
-        mutate(`/api/assignments?filter=${tab}`);
-        onSnackbar?.("Assignment created successfully", "success");
-        resetForm();
-      } else {
-        console.error("Error creating assignment:", responseData);
-        onSnackbar?.(responseData.error.message, "error");
-      }
+      await apiRequest("/api/assignments", "POST", toAssignmentPayload(data));
+      setIsCreateAssignmentDialogOpen(false);
+      notify("Assignment created successfully");
+      resetForm();
+      router.refresh();
     } catch (error) {
-      console.error("Unexpected error:", error);
-      onSnackbar?.("An unexpected error occurred", "error");
+      notify(getErrorMessage(error), "error");
     }
   };
 
-  const handleUpdateAssignment = async (
-    data: UpdateAssignmentDTO,
-    resetForm: () => void
-  ) => {
-    const response = await fetch(`/api/assignments/${data.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    const responseData = await response.json();
+  const handleUpdateAssignment = async (data: AssignmentFormValues) => {
+    if (!selectedRow) return;
     try {
-      if (response.ok) {
-        handleCloseUpdateAssignmentDialog();
-        mutate(`/api/assignments?filter=${tab}`);
-        onSnackbar?.("Assignment updated successfully", "success");
-        resetForm();
-      } else {
-        console.error("Error updating assignment:", responseData);
-        onSnackbar?.(responseData.error.message, "error");
-      }
+      await apiRequest(
+        `/api/assignments/${selectedRow.id}`,
+        "PUT",
+        toAssignmentPayload(data),
+      );
+      handleCloseUpdateAssignmentDialog();
+      notify("Assignment updated successfully");
+      router.refresh();
     } catch (error) {
-      console.error("Unexpected error:", error);
-      onSnackbar?.("An unexpected error occurred", "error");
+      notify(getErrorMessage(error), "error");
     }
   };
 
   const handleDeleteAssignment = async (data: Assignment) => {
-    const response = await fetch(`/api/assignments/${data.id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const responseData = await response.json();
     try {
-      if (response.ok) {
-        handleCloseDeleteAssignmentDialog();
-        mutate(`/api/assignments?filter=${tab}`);
-        setSnackbarMessage("Assignment deleted successfully");
-        setSnackbarSeverity("success");
-        setSnackbarOpen(true);
-      } else {
-        console.error("Error deleting assignment:", responseData);
-        setSnackbarMessage(responseData.error.message);
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
-      }
+      await apiRequest(`/api/assignments/${data.id}`, "DELETE");
+      handleCloseDeleteAssignmentDialog();
+      notify("Assignment deleted successfully");
+      router.refresh();
     } catch (error) {
-      console.error("Unexpected error:", error);
-      setSnackbarMessage("An unexpected error occurred");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      notify(getErrorMessage(error), "error");
     }
   };
 
-  const columns: GridColDef[] = [
+  const columns: GridColDef<Assignment>[] = [
     {
       field: "id",
       headerName: "id",
@@ -201,7 +152,7 @@ export default function AssignmentsDashboard({
       headerName: "Class",
       minWidth: 150,
       flex: 1,
-      valueGetter: (params) => params.row?.class?.name,
+      valueGetter: ({ row }) => row.class?.name,
     },
     {
       field: "description",
@@ -214,24 +165,14 @@ export default function AssignmentsDashboard({
       headerName: "Due Date",
       minWidth: 120,
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<Date>) => {
-        if (params.value == null) {
-          return "";
-        }
-        return dayjs(params.value).utc().format("YYYY-MM-DD");
-      },
+      valueFormatter: ({ value }) => formatDate(value),
     },
     {
-      field: "created",
+      field: "createdAt",
       headerName: "Created On",
       minWidth: 120,
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<Date>) => {
-        if (params.value == null) {
-          return "";
-        }
-        return dayjs(params.value).utc().format("YYYY-MM-DD");
-      },
+      valueFormatter: ({ value }) => formatDate(value),
     },
     {
       field: "action",
@@ -239,63 +180,38 @@ export default function AssignmentsDashboard({
       minWidth: 70,
       maxWidth: 70,
       flex: 1,
-      renderCell: (params) => (
+      sortable: false,
+      renderCell: ({ row }) => (
         <RenderMenu
-          onEditClick={() => handleEditClick(params.row)}
-          onDeleteClick={() => handleDeleteClick(params.row)}
+          onEditClick={() => handleEditClick(row)}
+          onDeleteClick={() => handleDeleteClick(row)}
         />
       ),
     },
   ];
 
-  const getTogglableColumns = (columns: GridColDef[]) => {
-    return columns
-      .filter(
-        (column) =>
-          column.field !== "id" &&
-          column.field !== "action" &&
-          column.field !== "created"
-      )
-      .map((column) => column.field);
-  };
-
-  // TODO update columns
-  const initialColumnVisibilityModel: GridColumnVisibilityModel = {
-    id: false,
-    name: true,
-    active: true,
-    created: false,
-    action: true,
-  };
-
-  if (error) {
-    return <div>Error fetching data</div>;
-  }
-
-  const toolbarButtons = [
-    <IconButton key="add" onClick={handleAddButtonClick} color="primary">
+  const toolbarButtons = (
+    <IconButton
+      onClick={() => setIsCreateAssignmentDialogOpen(true)}
+      color="primary"
+    >
       <AddBoxIcon />
-    </IconButton>,
-  ];
+    </IconButton>
+  );
 
   return (
     <>
       <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={tab}
-            onChange={handleTabChange}
-            aria-label="assignment tabs"
-          >
-            {assignmentTypes.map((key) => (
-              <Tab key={key} value={key} label={key} {...a11yProps(key)} />
-            ))}
-          </Tabs>
+          <LinkTabs
+            tabs={filterTabs}
+            value={filterHref(filter)}
+            ariaLabel="assignment tabs"
+          />
         </Box>
         <BaseDataGrid
           data={assignments}
           columns={columns}
-          isLoading={isLoading}
           getTogglableColumns={getTogglableColumns}
           initialColumnVisibilityModel={initialColumnVisibilityModel}
           additionalToolbarButtons={toolbarButtons}
@@ -307,34 +223,20 @@ export default function AssignmentsDashboard({
         open={isUpdateAssignmentDialogOpen}
         onClose={handleCloseUpdateAssignmentDialog}
         onSubmit={handleUpdateAssignment}
+        classes={classes}
       />
       <CreateAssignmentDialog
         open={isCreateAssignmentDialogOpen}
-        onClose={handleCloseCreateAssignmentDialog}
+        onClose={() => setIsCreateAssignmentDialogOpen(false)}
         onSubmit={handleCreateAssignment}
+        classes={classes}
       />
-      {selectedRow && (
-        <DeleteAssignmentDialog
-          assignment={selectedRow}
-          open={isDeleteAssignmentDialogOpen}
-          onClose={handleCloseDeleteAssignmentDialog}
-          onSubmit={handleDeleteAssignment}
-        />
-      )}
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
-      >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <DeleteAssignmentDialog
+        assignment={selectedRow}
+        open={isDeleteAssignmentDialogOpen}
+        onClose={handleCloseDeleteAssignmentDialog}
+        onSubmit={handleDeleteAssignment}
+      />
     </>
   );
 }

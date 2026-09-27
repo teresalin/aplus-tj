@@ -10,14 +10,20 @@ export const studentIncludes = {
     grade: { select: { id: true, name: true } },
   },
 
-  /** Lightweight summary for lists/dropdowns */
+  /** Fields shown in the students list */
   summary: {
     person: {
       select: {
         id: true,
         name: true,
         preferredName: true,
+        gender: true,
+        phone: true,
+        email: true,
+        dateOfBirth: true,
+        active: true,
         notes: true,
+        createdAt: true,
       },
     },
   },
@@ -62,6 +68,10 @@ export const studentIncludes = {
   },
 } as const satisfies Record<string, Prisma.StudentInclude>;
 
+export const enrollmentInclude = {
+  class: { select: { id: true, name: true } },
+} as const satisfies Prisma.ClassStudentInclude;
+
 // ========================================
 // DOMAIN TYPES (Generated from Prisma)
 // ========================================
@@ -75,4 +85,9 @@ export type StudentSummary = Prisma.StudentGetPayload<{
 
 export type StudentWithEnrollment = Prisma.StudentGetPayload<{
   include: typeof studentIncludes.withEnrollment;
+}>;
+
+/** A student's enrollment in a class, past or current. */
+export type StudentEnrollment = Prisma.ClassStudentGetPayload<{
+  include: typeof enrollmentInclude;
 }>;

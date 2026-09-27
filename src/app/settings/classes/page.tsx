@@ -1,12 +1,15 @@
-import React from "react";
-import ClassesTab from "../../../modules/settings/components/ClassesTab";
+import type { Metadata } from "next";
 
-const ClassesPage = () => {
+import { requirePageAccess } from "@/lib/authz";
+
+export const metadata: Metadata = { title: "Class settings" };
+
+export default async function ClassesSettingsPage() {
+  await requirePageAccess();
   return (
     <div>
-      <ClassesTab />
+      <h1>Classes Tab Content</h1>
+      {/* Add more content and functionality as needed */}
     </div>
   );
-};
-
-export default ClassesPage;
+}

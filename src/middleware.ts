@@ -1,47 +1,42 @@
 import { getToken } from "next-auth/jwt";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { STAFF_ROLES } from "@/lib/auth/roles";
 
-export async function middleware(req: Request) {
-  const url = new URL(req.url);
-  const pathname = url.pathname;
-  const isApi = pathname.startsWith("/api");
+/**
+ * Coarse gate for the whole app: every matched route requires a signed-in
+ * staff member. Route handlers and pages still check roles themselves.
+ */
+export async function middleware(request: NextRequest) {
+  const { pathname, search } = request.nextUrl;
+  const isApi = pathname.startsWith("/api/");
 
   const token = await getToken({
-    req: req as any,
+    req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  // 1) Must be logged in
   if (!token) {
-    return isApi
-      ? NextResponse.json({ message: "Unauthorized" }, { status: 401 })
-      : NextResponse.redirect(new URL("/login", req.url));
+    if (isApi) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const signInUrl = new URL("/api/auth/signin", request.url);
+    signInUrl.searchParams.set("callbackUrl", `${pathname}${search}`);
+    return NextResponse.redirect(signInUrl);
   }
 
-  // 2) Coarse RBAC by path (example)
-  // Align these with your real roles & paths
-  if (pathname.startsWith("/api/admin") && token.role !== "admin") {
+  if (!STAFF_ROLES.includes(token.role ?? "user")) {
     return isApi
-      ? NextResponse.json({ message: "Forbidden" }, { status: 403 })
-      : NextResponse.redirect(new URL("/no-access", req.url));
-  }
-
-  if (
-    pathname.startsWith("/api/teacher") &&
-    !["admin", "teacher"].includes(String(token.role))
-  ) {
-    return isApi
-      ? NextResponse.json({ message: "Forbidden" }, { status: 403 })
-      : NextResponse.redirect(new URL("/no-access", req.url));
+      ? NextResponse.json({ error: "Forbidden" }, { status: 403 })
+      : NextResponse.redirect(new URL("/no-access", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
+  // Everything except the public landing page ("/"), NextAuth's own endpoints,
+  // the no-access page, and static assets.
   matcher: [
-    "/api/:path*", // protect all API routes
-    "/admin/:path*", // protect admin pages
-    "/edit/:path*", // protect editor pages (if you keep this)
+    "/((?!api/auth|no-access|_next/static|_next/image|favicon\\.ico|.*\\.(?:png|jpg|jpeg|svg|ico)$).+)",
   ],
 };

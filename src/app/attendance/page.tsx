@@ -1,22 +1,18 @@
-import React from "react";
+import type { Metadata } from "next";
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
-import LinearProgress from "@mui/material/LinearProgress";
 import Link from "next/link";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import useSWR from "swr";
 
-import { Class } from "../../modules/classes";
-import fetcher from "@/lib/api/fetcher";
+import { requirePageAccess } from "@/lib/authz";
+import { classService } from "@/modules/classes/class.service";
 
-export default function Attendance() {
-  const { data, isLoading, error } = useSWR("api/classes", fetcher);
-  const classes = data || [];
+export const metadata: Metadata = { title: "Attendance" };
 
-  if (error) {
-    return <div>Error fetching data</div>;
-  }
+export default async function AttendancePage() {
+  await requirePageAccess();
+  const classes = await classService.getOptions();
 
   return (
     <>
@@ -27,27 +23,15 @@ export default function Attendance() {
         </Typography>
       </Grid>
 
-      {isLoading && <LinearProgress />}
-
-      {data && classes.length === 0 ? (
+      {classes.length === 0 ? (
         <Card variant="outlined" sx={{ mt: 2, p: 2 }}>
           No student attendance records.
         </Card>
       ) : (
-        classes.map((row: Class) => (
-          <Link href={`attendance/${row.id}`} key={row.id}>
-            <Paper key={row.id} sx={{ my: 2, p: 2 }}>
-              <Grid
-                container
-                spacing={2}
-                direction="row"
-                alignContent="center"
-                justifyContent="space-between"
-              >
-                <Grid container item alignContent="center" xs={12} md="auto">
-                  <Typography>{row.name}</Typography>
-                </Grid>
-              </Grid>
+        classes.map((row) => (
+          <Link href={`/attendance/${row.id}`} key={row.id}>
+            <Paper sx={{ my: 2, p: 2 }}>
+              <Typography>{row.name}</Typography>
             </Paper>
           </Link>
         ))

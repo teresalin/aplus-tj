@@ -1,5 +1,6 @@
+import "server-only";
 import prisma from "@/lib/prisma";
-import { studentIncludes } from "./types";
+import { enrollmentInclude, studentIncludes } from "./types";
 import type { CreateStudentDTO, UpdateStudentDTO } from "./schema";
 import type { StudentWithEnrollment } from "./types";
 
@@ -14,6 +15,7 @@ export class StudentService {
   async getAll() {
     return await prisma.student.findMany({
       include: studentIncludes.summary,
+      orderBy: { person: { name: "asc" } },
     });
   }
 
@@ -25,8 +27,17 @@ export class StudentService {
     });
   }
 
+  /** All of a student's class enrollments, most recent first. */
+  async getEnrollments(id: string) {
+    return await prisma.classStudent.findMany({
+      where: { studentId: id },
+      include: enrollmentInclude,
+      orderBy: { startDate: "desc" },
+    });
+  }
+
   async create(data: CreateStudentDTO) {
-    const student = await prisma.student.create({
+    return await prisma.student.create({
       data: {
         person: {
           create: {
@@ -40,7 +51,7 @@ export class StudentService {
             active: true,
           },
         },
-        gradeId: data.gradeId,
+        grade: { connect: { id: data.gradeId } },
         currentSchool: data.currentSchool,
         textbookPublisher: data.textbookPublisher,
         admissionDate: data.admissionDate,
@@ -48,8 +59,6 @@ export class StudentService {
       },
       include: studentIncludes.full,
     });
-
-    return student;
   }
 
   async update(id: string, data: UpdateStudentDTO) {
@@ -59,10 +68,10 @@ export class StudentService {
 
     if (!existing) return null;
 
-    const student = await prisma.student.update({
+    return await prisma.student.update({
       where: { id },
       data: {
-        ...(data.gradeId && { gradeId: data.gradeId }),
+        ...(data.gradeId && { grade: { connect: { id: data.gradeId } } }),
         ...(data.currentSchool !== undefined && {
           currentSchool: data.currentSchool,
         }),
@@ -89,8 +98,6 @@ export class StudentService {
       },
       include: studentIncludes.full,
     });
-
-    return student;
   }
 }
 

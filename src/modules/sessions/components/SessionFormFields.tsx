@@ -1,26 +1,52 @@
+"use client";
+
 import { DateTimePicker } from "@mui/x-date-pickers";
 import React from "react";
 import Box from "@mui/material/Box";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
-import utc from "dayjs/plugin/utc";
-
-import { Class } from "../../classes";
-import { CreateSessionDTO, UpdateSessionDTO } from "../dtos";
 import Typography from "@mui/material/Typography";
 
-dayjs.extend(utc);
+import type { ClassOption } from "@/modules/classes";
+import type { Session } from "@/modules/sessions";
+
+export interface SessionFormValues {
+  classId: string;
+  startTime: Dayjs | null;
+  endTime: Dayjs | null;
+}
+
+export const emptySessionFormValues: SessionFormValues = {
+  classId: "",
+  startTime: null,
+  endTime: null,
+};
+
+export function toSessionFormValues(session: Session): SessionFormValues {
+  return {
+    classId: session.class.id,
+    startTime: dayjs(session.startTime),
+    endTime: dayjs(session.endTime),
+  };
+}
+
+/** Request body for creating or updating a session. */
+export function toSessionPayload(values: SessionFormValues) {
+  return {
+    classId: values.classId,
+    startTime: values.startTime?.toISOString(),
+    endTime: values.endTime?.toISOString(),
+  };
+}
 
 export interface ISessionFormFieldsProps {
-  session: CreateSessionDTO | UpdateSessionDTO;
-  setFormData: React.Dispatch<
-    React.SetStateAction<CreateSessionDTO | UpdateSessionDTO>
-  >;
-  classes: Class[];
+  session: SessionFormValues;
+  setFormData: React.Dispatch<React.SetStateAction<SessionFormValues>>;
+  classes: ClassOption[];
   setHasError: (hasError: boolean) => void;
 }
 
@@ -30,51 +56,29 @@ const SessionFormFields = ({
   classes,
   setHasError,
 }: ISessionFormFieldsProps) => {
-  const { classId, startTime, endTime, studentIds } = session;
+  const { classId, startTime, endTime } = session;
 
-  const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const hasEmptyOrInvalidTimes = !startTime?.isValid() || !endTime?.isValid();
 
   React.useEffect(() => {
-    validateForm();
-  }, [session]);
+    setHasError(hasEmptyOrInvalidTimes);
+  }, [hasEmptyOrInvalidTimes, setHasError]);
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (hasEmptyOrInvalidTimeValues()) {
-      newErrors.startTimeEndTime = "Start Time and End Time must be filled";
-    }
-
-    setErrors(newErrors);
-    setHasError(Object.keys(newErrors).length > 0);
-  };
-
-  function hasEmptyOrInvalidTimeValues() {
-    return (
-      !startTime ||
-      !endTime ||
-      startTime === "Invalid Date" ||
-      endTime === "Invalid Date"
-    );
-  }
-
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = <K extends keyof SessionFormValues>(
+    field: K,
+    value: SessionFormValues[K],
+  ) => {
     setFormData((prevData) => ({
       ...prevData,
       [field]: value,
     }));
   };
 
-  const handleClassChange = (event: SelectChangeEvent<number>) => {
-    const value = parseInt(event.target.value as string, 10);
-    handleInputChange("classId", value || 0);
-  };
-
   return (
     <>
       <Box mt="6px">
         <FormControl fullWidth>
-          <InputLabel id="select-label">Assign to a class</InputLabel>
+          <InputLabel id="class-select-label">Assign to a class</InputLabel>
           <Select
             fullWidth
             required
@@ -84,15 +88,14 @@ const SessionFormFields = ({
             label={"Assign to a class"}
             labelId="class-select-label"
             margin="dense"
-            value={classId || ""}
-            onChange={handleClassChange}
+            value={classId}
+            onChange={(e) => handleInputChange("classId", e.target.value)}
           >
-            {classes &&
-              classes.map((item: Class) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.name}
-                </MenuItem>
-              ))}
+            {classes.map((item) => (
+              <MenuItem key={item.id} value={item.id}>
+                {item.name}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Box>
@@ -105,7 +108,7 @@ const SessionFormFields = ({
                 required: true,
               },
             }}
-            value={startTime ? dayjs(startTime).local() : null}
+            value={startTime}
             onChange={(dateTime) => handleInputChange("startTime", dateTime)}
           />
           <DateTimePicker
@@ -115,11 +118,11 @@ const SessionFormFields = ({
                 required: true,
               },
             }}
-            value={endTime ? dayjs(endTime).local() : null}
+            value={endTime}
             onChange={(dateTime) => handleInputChange("endTime", dateTime)}
           />
         </Stack>
-        {errors.startTimeEndTime && (
+        {hasEmptyOrInvalidTimes && (
           <Typography
             color="error"
             // Note: probably want to remove this in the future since it is not good practice
@@ -130,7 +133,7 @@ const SessionFormFields = ({
               marginTop: 1,
             }}
           >
-            {errors.startTimeEndTime}
+            Start Time and End Time must be filled
           </Typography>
         )}
       </Box>
