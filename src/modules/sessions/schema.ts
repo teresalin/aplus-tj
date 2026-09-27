@@ -1,9 +1,10 @@
 import { z } from "zod";
+import { dateField } from "@/lib/validation";
 
 export const CreateSessionSchema = z.object({
   classId: z.uuid(),
-  startTime: z.coerce.date(),
-  endTime: z.coerce.date(),
+  startTime: dateField,
+  endTime: dateField,
 });
 
 /** Updates replace the session's class and times (PUT). */

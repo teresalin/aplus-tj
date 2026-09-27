@@ -2,7 +2,6 @@ import "server-only";
 import prisma from "@/lib/prisma";
 import { enrollmentInclude, studentIncludes } from "./types";
 import type { CreateStudentDTO, UpdateStudentDTO } from "./schema";
-import type { StudentWithEnrollment } from "./types";
 
 export class StudentService {
   async getById(id: string) {
@@ -16,14 +15,6 @@ export class StudentService {
     return await prisma.student.findMany({
       include: studentIncludes.summary,
       orderBy: { person: { name: "asc" } },
-    });
-  }
-
-  async getWithEnrollment(id: string): Promise<StudentWithEnrollment | null> {
-    // Only this one has an explicit type since we use it across the app
-    return await prisma.student.findUnique({
-      where: { id },
-      include: studentIncludes.withEnrollment,
     });
   }
 

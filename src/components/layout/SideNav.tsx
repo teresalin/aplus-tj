@@ -24,6 +24,7 @@ import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
 
 import { useColorMode } from "@/components/providers/AppProviders";
+import { DRAWER_WIDTH } from "./constants";
 
 export interface SideNavUser {
   name?: string | null;
@@ -88,7 +89,7 @@ export default function SideNav({ user }: { user: SideNavUser | null }) {
               <Box
                 component="img"
                 src="/owl.png"
-                alt="A Plus"
+                alt=""
                 sx={{ maxWidth: 30, mr: 1 }}
               />
             </ListItemIcon>
@@ -113,7 +114,7 @@ export default function SideNav({ user }: { user: SideNavUser | null }) {
       <Stack
         direction="column"
         spacing={1}
-        sx={{ position: "fixed", bottom: 0, p: "10px", width: 250 }}
+        sx={{ position: "fixed", bottom: 0, p: "10px", width: DRAWER_WIDTH }}
       >
         {user && (
           <Typography variant="caption" color="text.secondary" noWrap>

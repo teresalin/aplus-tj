@@ -1,7 +1,6 @@
 import "server-only";
-import type { Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
-import type { AssignmentFilter } from "./constants";
+import { dueDateFilter, type AssignmentFilter } from "./constants";
 import {
   assignmentInclude,
   type Assignment,
@@ -14,20 +13,6 @@ function toAssignment({
   ...assignment
 }: AssignmentRecord): Assignment {
   return { ...assignment, class: classAssignments[0]?.class ?? null };
-}
-
-function dueDateFilter(
-  filter: AssignmentFilter,
-  now = new Date(),
-): Prisma.DateTimeNullableFilter | undefined {
-  switch (filter) {
-    case "upcoming":
-      return { gt: now };
-    case "past due":
-      return { lte: now };
-    case "all":
-      return undefined;
-  }
 }
 
 export class AssignmentService {

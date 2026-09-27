@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
@@ -115,9 +114,21 @@ export default async function ClassPage({
                 padding: "0.8em",
               }}
             >
-              <Button sx={{ backgroundColor: "#59addd", color: "#fff", mr: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  px: 1,
+                  mr: 2,
+                  borderRadius: 1,
+                  bgcolor: "#59addd",
+                  color: "#fff",
+                  typography: "button",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {formatDate(assignment.dueDate, "MMM DD")}
-              </Button>
+              </Box>
               <Stack direction="column" justifyContent="center">
                 <Typography>{assignment.name}</Typography>
                 {assignment.description && (

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { dateField } from "@/lib/validation";
 import {
   CreatePersonSchema,
   UpdatePersonSchema,
@@ -10,7 +11,7 @@ import {
 // ========================================
 export const CreateStaffSchema = CreatePersonSchema.extend({
   roleId: validators.uuid,
-  hireDate: z.coerce.date(),
+  hireDate: dateField,
   leaveDate: validators.optionalDate,
 }).refine((data) => !data.leaveDate || data.leaveDate >= data.hireDate, {
   path: ["leaveDate"],
@@ -19,7 +20,7 @@ export const CreateStaffSchema = CreatePersonSchema.extend({
 
 export const UpdateStaffSchema = UpdatePersonSchema.extend({
   roleId: validators.uuid.optional(),
-  hireDate: z.coerce.date().optional(),
+  hireDate: dateField.optional(),
   leaveDate: validators.optionalDate,
 }).partial();
 

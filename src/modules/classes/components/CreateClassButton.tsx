@@ -1,16 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Button from "@mui/material/Button";
 import React from "react";
 
-import { apiRequest, getErrorMessage } from "@/lib/api/client";
-import { useSnackbar } from "@/components/feedback/SnackbarProvider";
+import FormDialog from "@/components/FormDialog";
+import { useApiMutation } from "@/hooks/use-api-mutation";
 import type { Grade } from "@/modules/grades";
 import type { StaffOption } from "@/modules/persons/staffs";
-import CreateClassDialog from "./CreateClassDialog";
-import type { ClassFormValues } from "./ClassFormFields";
+import ClassFormFields, {
+  emptyClassFormValues,
+  isClassFormValid,
+  type ClassFormValues,
+} from "./ClassFormFields";
 
 // TODO allow user to select a color for each class in admin settings
 
@@ -21,23 +23,17 @@ export default function CreateClassButton({
   grades: Grade[];
   teachers: StaffOption[];
 }) {
-  const router = useRouter();
-  const notify = useSnackbar();
+  const mutate = useApiMutation();
   const [open, setOpen] = React.useState(false);
 
-  const handleCreateClass = async (
-    data: ClassFormValues,
-    resetForm: () => void,
-  ) => {
-    try {
-      await apiRequest("/api/classes", "POST", data);
-      setOpen(false);
-      notify("Class created successfully");
-      resetForm();
-      router.refresh();
-    } catch (error) {
-      notify(getErrorMessage(error), "error");
-    }
+  const handleCreateClass = async (values: ClassFormValues) => {
+    const created = await mutate({
+      method: "POST",
+      url: "/api/classes",
+      body: values,
+      successMessage: "Class created successfully",
+    });
+    if (created) setOpen(false);
   };
 
   return (
@@ -50,13 +46,23 @@ export default function CreateClassButton({
       >
         Add Class
       </Button>
-      <CreateClassDialog
+      <FormDialog
         open={open}
+        title="New Class"
+        initialValues={emptyClassFormValues}
+        canSubmit={isClassFormValid}
         onClose={() => setOpen(false)}
         onSubmit={handleCreateClass}
-        grades={grades}
-        teachers={teachers}
-      />
+      >
+        {(values, setValues) => (
+          <ClassFormFields
+            classData={values}
+            setFormData={setValues}
+            grades={grades}
+            teachers={teachers}
+          />
+        )}
+      </FormDialog>
     </>
   );
 }

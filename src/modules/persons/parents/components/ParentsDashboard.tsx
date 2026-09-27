@@ -1,23 +1,26 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
 import React from "react";
-import { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 
 import BaseDataGrid from "@/components/DataGrid";
-import { useSnackbar } from "@/components/feedback/SnackbarProvider";
-import { apiRequest, getErrorMessage } from "@/lib/api/client";
-import { formatDate } from "@/lib/dates";
+import FormDialog from "@/components/FormDialog";
+import { useApiMutation } from "@/hooks/use-api-mutation";
 import type { ParentSummary } from "@/modules/persons/parents";
 import PersonsTabs from "../../PersonsTabs";
-import CreateParentDialog, {
+import {
+  getTogglablePersonColumns,
+  personColumnVisibility,
+  personColumns,
+} from "../../components/personColumns";
+import ParentFormFields, {
+  emptyParentFormValues,
   toParentPayload,
   type ParentFormValues,
-} from "./CreateParentDialog";
+} from "./ParentFormFields";
 
 const renderActiveChip = (active: boolean) =>
   active ? (
@@ -36,115 +39,30 @@ const renderActiveChip = (active: boolean) =>
     />
   );
 
-const columns: GridColDef<ParentSummary>[] = [
-  {
-    field: "id",
-    headerName: "id",
-    minWidth: 50,
-    flex: 1,
-  },
-  {
-    field: "name",
-    headerName: "Name",
-    minWidth: 150,
-    flex: 1,
-    valueGetter: ({ row }) => row.person.name,
-  },
-  {
-    field: "gender",
-    headerName: "Gender",
-    minWidth: 100,
-    flex: 1,
-    valueGetter: ({ row }) => row.person.gender,
-  },
-  {
-    field: "phone",
-    headerName: "Phone",
-    minWidth: 120,
-    flex: 1,
-    valueGetter: ({ row }) => row.person.phone,
-  },
-  {
-    field: "email",
-    headerName: "Email",
-    minWidth: 200,
-    flex: 1,
-    valueGetter: ({ row }) => row.person.email,
-  },
-  {
-    field: "dateOfBirth",
-    headerName: "Date of Birth",
-    minWidth: 120,
-    flex: 1,
-    valueGetter: ({ row }) => row.person.dateOfBirth,
-    valueFormatter: ({ value }) => formatDate(value),
-  },
-  {
-    field: "active",
-    headerName: "Active",
-    minWidth: 100,
-    flex: 1,
-    valueGetter: ({ row }) => row.person.active,
-    renderCell: ({ value }) => renderActiveChip(value),
-  },
-  {
-    field: "createdAt",
-    headerName: "Created On",
-    minWidth: 120,
-    flex: 1,
-    valueFormatter: ({ value }) => formatDate(value),
-  },
-];
-
-const getTogglableColumns = (columns: GridColDef[]) =>
-  columns
-    .filter(
-      (column) =>
-        column.field !== "id" &&
-        column.field !== "action" &&
-        column.field !== "createdAt",
-    )
-    .map((column) => column.field);
-
-const initialColumnVisibilityModel: GridColumnVisibilityModel = {
-  id: false,
-  name: true,
-  gender: false,
-  phone: true,
-  email: true,
-  dateOfBirth: true,
-  active: true,
-  createdAt: false,
-};
+const columns = personColumns<ParentSummary>(renderActiveChip);
 
 export default function ParentsDashboard({
   parents,
 }: {
   parents: ParentSummary[];
 }) {
-  const router = useRouter();
-  const notify = useSnackbar();
-  const [isCreateParentDialogOpen, setIsCreateParentDialogOpen] =
-    React.useState(false);
+  const mutate = useApiMutation();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
 
-  const handleCreateParent = async (
-    data: ParentFormValues,
-    resetForm: () => void,
-  ) => {
-    try {
-      await apiRequest("/api/persons/parents", "POST", toParentPayload(data));
-      setIsCreateParentDialogOpen(false);
-      notify("Parent created successfully");
-      resetForm();
-      router.refresh();
-    } catch (error) {
-      notify(getErrorMessage(error), "error");
-    }
+  const handleCreateParent = async (values: ParentFormValues) => {
+    const created = await mutate({
+      method: "POST",
+      url: "/api/persons/parents",
+      body: toParentPayload(values),
+      successMessage: "Parent created successfully",
+    });
+    if (created) setIsCreateDialogOpen(false);
   };
 
   const toolbarButtons = (
     <IconButton
-      onClick={() => setIsCreateParentDialogOpen(true)}
+      aria-label="Add parent"
+      onClick={() => setIsCreateDialogOpen(true)}
       color="primary"
     >
       <AddBoxIcon />
@@ -158,16 +76,22 @@ export default function ParentsDashboard({
         <BaseDataGrid
           data={parents}
           columns={columns}
-          getTogglableColumns={getTogglableColumns}
-          initialColumnVisibilityModel={initialColumnVisibilityModel}
+          getTogglableColumns={getTogglablePersonColumns}
+          initialColumnVisibilityModel={personColumnVisibility}
           additionalToolbarButtons={toolbarButtons}
         />
       </Box>
-      <CreateParentDialog
-        open={isCreateParentDialogOpen}
-        onClose={() => setIsCreateParentDialogOpen(false)}
+      <FormDialog
+        open={isCreateDialogOpen}
+        title="New Parent"
+        initialValues={emptyParentFormValues}
+        onClose={() => setIsCreateDialogOpen(false)}
         onSubmit={handleCreateParent}
-      />
+      >
+        {(values, setValues) => (
+          <ParentFormFields parent={values} setFormData={setValues} />
+        )}
+      </FormDialog>
     </>
   );
 }

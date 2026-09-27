@@ -128,7 +128,6 @@ const StaffFormFields = ({
           }}
         />
         <Box mt="4px">
-          {/* TODO update to Select */}
           <TextField
             fullWidth
             required

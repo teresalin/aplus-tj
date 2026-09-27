@@ -27,45 +27,6 @@ export const studentIncludes = {
       },
     },
   },
-
-  /** Student with enrollment and attendance data */
-  withEnrollment: {
-    person: true,
-    grade: { select: { id: true, name: true } },
-    attendances: {
-      include: {
-        session: {
-          include: {
-            class: {
-              select: { id: true, name: true },
-            },
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc" as const,
-      },
-      take: 50, // Limit for performance
-    },
-    classStudents: {
-      include: {
-        class: {
-          select: {
-            id: true,
-            name: true,
-            teacher: {
-              include: {
-                person: { select: { name: true } },
-              },
-            },
-          },
-        },
-      },
-      where: {
-        endDate: null, // Only active enrollments
-      },
-    },
-  },
 } as const satisfies Record<string, Prisma.StudentInclude>;
 
 export const enrollmentInclude = {
@@ -81,10 +42,6 @@ export type Student = Prisma.StudentGetPayload<{
 
 export type StudentSummary = Prisma.StudentGetPayload<{
   include: typeof studentIncludes.summary;
-}>;
-
-export type StudentWithEnrollment = Prisma.StudentGetPayload<{
-  include: typeof studentIncludes.withEnrollment;
 }>;
 
 /** A student's enrollment in a class, past or current. */

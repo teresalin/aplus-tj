@@ -158,7 +158,6 @@ const StudentFormFields = ({
             },
           }}
         />
-        {/* TODO update to Select */}
         <TextField
           fullWidth
           required

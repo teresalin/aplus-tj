@@ -1,7 +1,6 @@
 import type { Person } from "@prisma/client";
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import CakeIcon from "@mui/icons-material/Cake";
 import EmailIcon from "@mui/icons-material/Email";
 import Grid from "@mui/material/Grid";
@@ -9,6 +8,7 @@ import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
+import IconLabel from "@/components/IconLabel";
 import { formatDate } from "@/lib/dates";
 
 const avatarByGender = {
@@ -16,16 +16,6 @@ const avatarByGender = {
   Female: "/student-girl.png",
   Other: "/student-other.png",
 } as const;
-
-const contactButtonSx = {
-  "&:hover": {
-    backgroundColor: "transparent",
-  },
-  "& .MuiButton-startIcon": {
-    "& > *:first-of-type": { fontSize: 15 },
-  },
-  fontSize: 12,
-};
 
 /** Avatar, name, and contact details at the top of a person's page. */
 export function PersonHeader({
@@ -42,28 +32,40 @@ export function PersonHeader({
           <Box
             component="img"
             sx={{ height: 80, width: 80 }}
-            alt="User profile picture"
+            alt=""
             src={avatarByGender[person.gender ?? "Other"]}
           />
         </Grid>
         <Grid item>
           <Typography variant="h6">{person.name}</Typography>
           <Typography variant="subtitle2">{subtitle}</Typography>
-          <Grid container>
+          <Grid container columnSpacing={2}>
             <Grid item>
-              <Button startIcon={<EmailIcon />} sx={contactButtonSx}>
+              <IconLabel
+                icon={EmailIcon}
+                label="Email"
+                href={`mailto:${person.email}`}
+                size="small"
+              >
                 {person.email}
-              </Button>
+              </IconLabel>
             </Grid>
+            {person.phone && (
+              <Grid item>
+                <IconLabel
+                  icon={LocalPhoneIcon}
+                  label="Phone"
+                  href={`tel:${person.phone}`}
+                  size="small"
+                >
+                  {person.phone}
+                </IconLabel>
+              </Grid>
+            )}
             <Grid item>
-              <Button startIcon={<LocalPhoneIcon />} sx={contactButtonSx}>
-                {person.phone}
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button startIcon={<CakeIcon />} sx={contactButtonSx}>
+              <IconLabel icon={CakeIcon} label="Date of birth" size="small">
                 {formatDate(person.dateOfBirth)}
-              </Button>
+              </IconLabel>
             </Grid>
           </Grid>
         </Grid>

@@ -76,7 +76,10 @@ export default function StudentClassesView({ enrollments, classes }: Props) {
       <ClassEnrollmentDialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        onSubmit={notImplemented}
+        onSubmit={async () => {
+          notImplemented();
+          setIsDialogOpen(false);
+        }}
         classes={classes}
       />
     </>

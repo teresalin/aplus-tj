@@ -20,6 +20,11 @@ export default async function BillingPage() {
           Billing
         </Typography>
       </Grid>
+      {classes.length === 0 && (
+        <Paper variant="outlined" sx={{ my: 2, p: 2 }}>
+          No classes yet.
+        </Paper>
+      )}
       {classes.map((row) => (
         <Link href={`/billing/${row.id}`} key={row.id}>
           <Paper sx={{ my: 2, p: 2 }}>
