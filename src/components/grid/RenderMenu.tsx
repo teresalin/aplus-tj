@@ -1,3 +1,5 @@
+"use client";
+
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -5,10 +7,15 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import React from "react";
 import Tooltip from "@mui/material/Tooltip";
 
-function RenderMenu({ onEditClick, onDeleteClick }) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+interface RenderMenuProps {
+  onEditClick: () => void;
+  onDeleteClick: () => void;
+}
 
-  const handleOpen = (event) => {
+function RenderMenu({ onEditClick, onDeleteClick }: RenderMenuProps) {
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+
+  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
   };

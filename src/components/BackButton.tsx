@@ -1,18 +1,14 @@
-import { useRouter } from "next/router";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Link from "next/link";
-import React from "react";
 
-const BackButton = ({ backRoute }) => {
-  const router = useRouter();
-
+export default function BackButton({ href }: { href: string }) {
   return (
     <Box mt={-1} mb={2}>
       <Button
         component={Link}
-        href={backRoute}
+        href={href}
         startIcon={<ArrowBackIosIcon />}
         sx={{
           "&:hover": {
@@ -24,6 +20,4 @@ const BackButton = ({ backRoute }) => {
       </Button>
     </Box>
   );
-};
-
-export default BackButton;
+}

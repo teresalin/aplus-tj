@@ -1,45 +1,36 @@
-import Alert from "@mui/material/Alert";
+"use client";
+
 import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import React from "react";
-import useSWR from "swr";
 
-import { CreateStaffDTO } from "../dtos";
-import { Role } from "../../../roles";
-import fetcher from "../../../../../utils/fetcher";
-import StaffFormFields from "./StaffFormFields";
+import type { Role } from "@/modules/roles";
+import StaffFormFields, {
+  emptyStaffFormValues,
+  type StaffFormValues,
+} from "./StaffFormFields";
 
 export interface ICreateStaffDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateStaffDTO, resetForm: () => void) => Promise<void>;
+  onSubmit: (data: StaffFormValues, resetForm: () => void) => Promise<void>;
+  roles: Role[];
 }
 
 export default function CreateStaffDialog({
   open,
   onClose,
   onSubmit,
+  roles,
 }: ICreateStaffDialogProps) {
-  const initialStaffState = {} as CreateStaffDTO;
-  const [newStaff, setNewStaff] = React.useState(initialStaffState);
+  const [newStaff, setNewStaff] = React.useState(emptyStaffFormValues);
 
-  const { data, error, isLoading } = useSWR<Role[]>(
-    "/api/persons/roles",
-    fetcher,
-  );
-  const roles = data || [];
-
-  const handleSubmit: React.FormEventHandler = async (
-    event: React.FormEvent,
-  ) => {
+  const handleSubmit: React.FormEventHandler = async (event) => {
     event.preventDefault();
-    await onSubmit(newStaff as CreateStaffDTO, () =>
-      setNewStaff(initialStaffState),
-    );
+    await onSubmit(newStaff, () => setNewStaff(emptyStaffFormValues));
   };
 
   return (
@@ -47,24 +38,11 @@ export default function CreateStaffDialog({
       <form onSubmit={handleSubmit}>
         <DialogTitle>New Staff</DialogTitle>
         <DialogContent>
-          {isLoading ? (
-            <CircularProgress />
-          ) : (
-            <>
-              {error && (
-                <Alert severity="error">
-                  Failed to load role data: {error.message}
-                </Alert>
-              )}
-              {!error && (
-                <StaffFormFields
-                  staff={newStaff}
-                  setFormData={setNewStaff}
-                  roles={roles}
-                />
-              )}
-            </>
-          )}
+          <StaffFormFields
+            staff={newStaff}
+            setFormData={setNewStaff}
+            roles={roles}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

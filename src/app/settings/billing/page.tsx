@@ -1,12 +1,15 @@
-import React from "react";
-import BillingTab from "../../../modules/settings/components/BillingTab";
+import type { Metadata } from "next";
 
-const BillingPage = () => {
+import { requirePageAccess } from "@/lib/authz";
+
+export const metadata: Metadata = { title: "Billing settings" };
+
+export default async function BillingSettingsPage() {
+  await requirePageAccess();
   return (
     <div>
-      <BillingTab />
+      <h1>Billing Tab Content</h1>
+      {/* Add more content and functionality as needed */}
     </div>
   );
-};
-
-export default BillingPage;
+}

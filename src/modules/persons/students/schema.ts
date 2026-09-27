@@ -17,7 +17,7 @@ export const CreateStudentSchema = CreatePersonSchema.extend({
   gradeId: validators.uuid,
   textbookPublisher: z.string().trim().optional(),
   admissionDate: z.coerce.date(),
-  departureDate: z.coerce.date().optional(),
+  departureDate: validators.optionalDate,
 }).refine(
   (data) => !data.departureDate || data.departureDate >= data.admissionDate,
   {
@@ -31,7 +31,7 @@ export const UpdateStudentSchema = UpdatePersonSchema.extend({
   gradeId: validators.uuid.optional(),
   textbookPublisher: z.string().trim().optional(),
   admissionDate: z.coerce.date().optional(),
-  departureDate: z.coerce.date().optional(),
+  departureDate: validators.optionalDate,
 }).partial();
 
 export type CreateStudentDTO = z.infer<typeof CreateStudentSchema>;

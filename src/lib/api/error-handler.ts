@@ -1,90 +1,74 @@
+import "server-only";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { Prisma } from "@prisma/client";
 import {
-  MethodNotAllowedError,
+  HttpError,
   NotFoundError,
   UniqueConstraintError,
-  ValidationError,
 } from "../errors/custom-errors";
 
-export function handleApiError(error: unknown): NextResponse {
-  console.error("API error:", error);
+/** Error body returned by every route handler: `{ error, details? }`. */
+export interface ApiErrorBody {
+  error: string;
+  details?: { path: string; message: string }[];
+}
 
-  // Zod validation errors
+function errorResponse(status: number, body: ApiErrorBody) {
+  return NextResponse.json(body, { status });
+}
+
+export function handleApiError(error: unknown): NextResponse<ApiErrorBody> {
   if (error instanceof ZodError) {
-    return NextResponse.json(
-      {
-        error: "Validation failed",
-        details: error.issues.map((e) => ({
-          path: e.path.join("."),
-          message: e.message,
-        })),
-      },
-      { status: 400 },
-    );
+    return errorResponse(400, {
+      error: "Validation failed",
+      details: error.issues.map((issue) => ({
+        path: issue.path.join("."),
+        message: issue.message,
+      })),
+    });
   }
 
-  // Custom errors
+  if (error instanceof HttpError) {
+    return errorResponse(error.status, { error: error.message });
+  }
+
   if (error instanceof UniqueConstraintError) {
-    return NextResponse.json({ error: error.message }, { status: 409 });
-  }
-
-  if (error instanceof ValidationError) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return errorResponse(409, { error: error.message });
   }
 
   if (error instanceof NotFoundError) {
-    return NextResponse.json({ error: error.message }, { status: 404 });
+    return errorResponse(404, { error: error.message });
   }
 
-  if (error instanceof MethodNotAllowedError) {
-    return NextResponse.json({ error: error.message }, { status: 405 });
-  }
-
-  // Prisma errors
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    if (error.code === "P2002") {
-      const fields = (error.meta?.target as string[]) || [];
-      return NextResponse.json(
-        { error: `A record with this ${fields.join(", ")} already exists` },
-        { status: 409 },
-      );
-    }
-
-    if (error.code === "P2025") {
-      return NextResponse.json({ error: "Record not found" }, { status: 404 });
-    }
-
-    if (error.code === "P2003") {
-      return NextResponse.json(
-        { error: "Invalid reference to related record" },
-        { status: 400 },
-      );
-    }
-  }
-
-  // Authorization errors
-  if (error instanceof Error) {
-    if (error.message.includes("Unauthorized")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    if (error.message.includes("Forbidden")) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    switch (error.code) {
+      case "P2002": {
+        const target = error.meta?.target;
+        const fields = Array.isArray(target) ? target.join(", ") : target;
+        return errorResponse(409, {
+          error: fields
+            ? `A record with this ${fields} already exists`
+            : "A record with these values already exists",
+        });
+      }
+      case "P2025":
+        return errorResponse(404, { error: "Record not found" });
+      case "P2003":
+        return errorResponse(400, {
+          error: "Invalid reference to related record",
+        });
     }
   }
 
-  // Generic server error
-  const errorMessage =
-    error instanceof Error ? error.message : "Internal server error";
+  console.error("Unhandled API error:", error);
   return NextResponse.json(
     {
       error: "Internal server error",
-      ...(process.env.NODE_ENV === "development" && {
-        details: errorMessage,
-        stack: error instanceof Error ? error.stack : undefined,
-      }),
+      ...(process.env.NODE_ENV === "development" &&
+        error instanceof Error && {
+          details: [{ path: "", message: error.message }],
+        }),
     },
     { status: 500 },
   );

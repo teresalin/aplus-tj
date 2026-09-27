@@ -11,12 +11,16 @@ enum Gender {
   Male
   Female
   Other
+
+  @@map("gender")
 }
 
 enum Status {
   Scheduled
   Rescheduled
   Cancelled
+
+  @@map("status")
 }
 
 enum day_of_week {

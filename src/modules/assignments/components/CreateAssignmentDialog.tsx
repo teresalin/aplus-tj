@@ -1,42 +1,42 @@
+"use client";
+
 import React from "react";
-import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import useSWR from "swr";
 
-import { Class } from "../../classes";
-import { CreateAssignmentDTO } from "../dtos";
-import AssignmentFormFields from "./AssignmentFormFields";
-import fetcher from "../../../../utils/fetcher";
+import type { ClassOption } from "@/modules/classes";
+import AssignmentFormFields, {
+  emptyAssignmentFormValues,
+  type AssignmentFormValues,
+} from "./AssignmentFormFields";
 
 export interface ICreateAssignmentDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateAssignmentDTO, resetForm: () => void) => Promise<void>;
+  onSubmit: (
+    data: AssignmentFormValues,
+    resetForm: () => void,
+  ) => Promise<void>;
+  classes: ClassOption[];
 }
 
 export default function CreateAssignmentDialog({
   open,
   onClose,
   onSubmit,
+  classes,
 }: ICreateAssignmentDialogProps) {
-  const initialAssignmentState = {} as CreateAssignmentDTO;
   const [newAssignment, setNewAssignment] = React.useState(
-    {} as CreateAssignmentDTO
+    emptyAssignmentFormValues,
   );
-  const { data, error, isLoading } = useSWR<Class[]>("/api/classes", fetcher);
-  const classes = data || [];
 
-  const handleSubmit: React.FormEventHandler = async (
-    event: React.FormEvent
-  ) => {
+  const handleSubmit: React.FormEventHandler = async (event) => {
     event.preventDefault();
     await onSubmit(newAssignment, () =>
-      setNewAssignment(initialAssignmentState)
+      setNewAssignment(emptyAssignmentFormValues),
     );
   };
 
@@ -45,24 +45,11 @@ export default function CreateAssignmentDialog({
       <form onSubmit={handleSubmit}>
         <DialogTitle>New assignment</DialogTitle>
         <DialogContent>
-          {isLoading ? (
-            <CircularProgress />
-          ) : (
-            <>
-              {error && (
-                <Alert severity="error">
-                  Failed to load class data: {error.message}
-                </Alert>
-              )}
-              {!error && (
-                <AssignmentFormFields
-                  assignment={newAssignment}
-                  setFormData={setNewAssignment}
-                  classes={classes}
-                />
-              )}
-            </>
-          )}
+          <AssignmentFormFields
+            assignment={newAssignment}
+            setFormData={setNewAssignment}
+            classes={classes}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

@@ -31,11 +31,23 @@ Picture by [Kelly Sikkema](https://unsplash.com/@kellysikkema)
 
 I used `React`, `Typescript`, `NextJS`, `PostgreSQL`, `HTML`, and `CSS`.
 
+The app uses the Next.js App Router with Prisma, NextAuth (Google sign-in), and MUI.
+
 ## Setup
 
 - Download or clone the repository
 - Run `npm install`
-- ...
+- Copy `.env.example` to `.env.local` and fill in the database URL, NextAuth secret, Google OAuth credentials, and the admin/teacher email allowlists
+- Apply the database migrations: `npx prisma migrate deploy`
+- Start the dev server: `npm run dev`
+
+Other scripts: `npm run build`, `npm run lint`, and `npm run typecheck`.
+
+### Project layout
+
+- `src/app` – routes. Pages are Server Components that check access and load data; `src/app/api/**/route.ts` holds the mutation endpoints used by the UI.
+- `src/modules/<domain>` – domain code: `*.service.ts` (server-only Prisma access), `schema.ts` (zod input validation), `types.ts`, and `components/` (client UI).
+- `src/lib` – shared helpers (auth, API error handling, dates, Prisma client).
 
 ## Approach
 

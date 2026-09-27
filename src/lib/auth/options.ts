@@ -1,6 +1,7 @@
 import "server-only";
 import type { NextAuthOptions } from "next-auth";
 import Google from "next-auth/providers/google";
+import { resolveRole } from "./roles";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -11,15 +12,13 @@ export const authOptions: NextAuthOptions = {
   ],
   session: { strategy: "jwt" },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user?.email) {
-        const isTeacher = user.email.endsWith("@your-school.org");
-        token.role = token.role ?? (isTeacher ? "teacher" : "user");
-      }
+    async jwt({ token }) {
+      // Re-resolved on every refresh so allowlist changes apply without a re-login.
+      token.role = resolveRole(token.email);
       return token;
     },
     async session({ session, token }) {
-      (session.user as any).role = (token as any).role ?? "user";
+      session.user.role = token.role ?? "user";
       return session;
     },
   },

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -6,7 +8,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-import { Assignment } from "../types";
+import type { Assignment } from "@/modules/assignments";
 
 export interface IDeleteAssignmentDialogProps {
   assignment: Assignment | null;
@@ -21,9 +23,7 @@ export default function DeleteAssignmentDialog({
   onClose,
   onSubmit,
 }: IDeleteAssignmentDialogProps) {
-  const handleSubmit: React.FormEventHandler = async (
-    event: React.FormEvent
-  ) => {
+  const handleSubmit: React.FormEventHandler = async (event) => {
     event.preventDefault();
     if (assignment) {
       await onSubmit(assignment);

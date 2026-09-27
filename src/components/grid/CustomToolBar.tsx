@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 import FilterListIcon from "@mui/icons-material/FilterList";
@@ -14,7 +16,7 @@ import {
 } from "@mui/x-data-grid";
 
 export interface CustomToolbarProps {
-  children: React.JSX.Element;
+  children?: React.ReactNode;
   setButtonEl: React.Dispatch<React.SetStateAction<HTMLButtonElement | null>>;
 }
 

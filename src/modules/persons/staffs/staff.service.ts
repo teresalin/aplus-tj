@@ -1,7 +1,8 @@
+import "server-only";
 import prisma from "@/lib/prisma";
 import { staffIncludes } from "./types";
 import type { CreateStaffDTO, UpdateStaffDTO } from "./schema";
-import type { StaffWithClasses } from "./types";
+import type { StaffOption, StaffWithClasses } from "./types";
 
 export class StaffService {
   async getById(id: string) {
@@ -14,7 +15,17 @@ export class StaffService {
   async getAll() {
     return await prisma.staff.findMany({
       include: staffIncludes.summary,
+      orderBy: { person: { name: "asc" } },
     });
+  }
+
+  /** Id/name list for dropdowns such as choosing a class teacher. */
+  async getOptions(): Promise<StaffOption[]> {
+    const staffs = await prisma.staff.findMany({
+      select: { id: true, person: { select: { name: true } } },
+      orderBy: { person: { name: "asc" } },
+    });
+    return staffs.map((staff) => ({ id: staff.id, name: staff.person.name }));
   }
 
   async getWithClasses(id: string): Promise<StaffWithClasses | null> {
@@ -39,7 +50,7 @@ export class StaffService {
             active: true,
           },
         },
-        roleId: data.roleId,
+        role: { connect: { id: data.roleId } },
         hireDate: data.hireDate,
         leaveDate: data.leaveDate,
       },
@@ -59,7 +70,7 @@ export class StaffService {
     const staff = await prisma.staff.update({
       where: { id },
       data: {
-        ...(data.roleId && { roleId: data.roleId }),
+        ...(data.roleId && { role: { connect: { id: data.roleId } } }),
         ...(data.hireDate && { hireDate: data.hireDate }),
         ...(data.leaveDate !== undefined && { leaveDate: data.leaveDate }),
         person: {

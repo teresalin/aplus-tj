@@ -1,3 +1,4 @@
+import "server-only";
 import prisma from "@/lib/prisma";
 import { parentIncludes } from "./types";
 import type { CreateParentDTO, UpdateParentDTO } from "./schema";
@@ -13,6 +14,7 @@ export class ParentService {
   async getAll() {
     return await prisma.parent.findMany({
       include: parentIncludes.summary,
+      orderBy: { person: { name: "asc" } },
     });
   }
 

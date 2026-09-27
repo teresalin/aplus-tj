@@ -3,7 +3,7 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "noEmit": true,
     "incremental": true,
     "esModuleInterop": true,
@@ -19,7 +19,6 @@
       "@/*": ["./src/*"]
     },
 
-    "strictNullChecks": true,
     "plugins": [{ "name": "next" }]
   },
   "include": [

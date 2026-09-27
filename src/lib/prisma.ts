@@ -1,4 +1,14 @@
-import { PrismaClient } from "generated/prisma_client";
+import "server-only";
+import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+// Reuse one client across hot reloads in development so each reload doesn't
+// open a new connection pool.
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+
+const prisma = globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}
+
 export default prisma;

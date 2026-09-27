@@ -1,49 +1,53 @@
-import { AlertColor } from "@mui/material/Alert";
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
-import CustomParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
 import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import React from "react";
-
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import timezone from "dayjs/plugin/timezone";
-import useSWR, { mutate } from "swr";
-import utc from "dayjs/plugin/utc";
-import {
-  GridColDef,
-  GridValueFormatterParams,
-  GridColumnVisibilityModel,
-} from "@mui/x-data-grid";
+import { GridColDef, GridColumnVisibilityModel } from "@mui/x-data-grid";
 
-import { ClassSummary } from "../../classes";
-import { CreateSessionDTO, UpdateSessionDTO } from "../dtos";
-import { Session } from "../types";
-import BaseDataGrid from "../../../components/DataGrid";
+import BaseDataGrid from "@/components/DataGrid";
+import RenderMenu from "@/components/grid/RenderMenu";
+import { useSnackbar } from "@/components/feedback/SnackbarProvider";
+import { apiRequest, getErrorMessage } from "@/lib/api/client";
+import type { ClassOption } from "@/modules/classes";
+import type { Session, SessionRange } from "@/modules/sessions";
 import CreateSessionDialog from "./CreateSessionDialog";
-import fetcher from "../../../../utils/fetcher";
-import RenderMenu from "../../../components/grid/RenderMenu";
+import DeleteSessionDialog from "./DeleteSessionDialog";
 import UpdateSessionDialog from "./UpdateSessionDialog";
+import { toSessionPayload, type SessionFormValues } from "./SessionFormFields";
 
-dayjs.extend(CustomParseFormat);
-dayjs.extend(utc);
-dayjs.extend(timezone);
+const formatLocalTime = (value: Date) =>
+  dayjs(value).format("YYYY-MM-DD HH:mm A");
 
-const convertToLocalTime = (utcTime) => {
-  return dayjs.utc(utcTime).local().format("YYYY-MM-DD HH:mm A");
+const initialColumnVisibilityModel: GridColumnVisibilityModel = {
+  id: false,
 };
 
+// Hide the `id` column from the list of togglable columns.
+const getTogglableColumns = (columns: GridColDef[]) =>
+  columns.filter((column) => column.field !== "id").map((c) => c.field);
+
 interface SessionsDashboardProps {
-  onSnackbar?: (message: string, severity?: AlertColor) => void;
+  sessions: Session[];
+  classes: ClassOption[];
+  range: SessionRange;
 }
 
 export default function SessionsDashboard({
-  onSnackbar,
+  sessions,
+  classes,
+  range,
 }: SessionsDashboardProps) {
-  const [timeRange, setTimeRange] = React.useState("thisMonth");
+  const router = useRouter();
+  const pathname = usePathname();
+  const notify = useSnackbar();
+
   const [selectedRow, setSelectedRow] = React.useState<Session | null>(null);
   const [isCreateSessionDialogOpen, setIsCreateSessionDialogOpen] =
     React.useState(false);
@@ -52,18 +56,8 @@ export default function SessionsDashboard({
   const [isDeleteSessionDialogOpen, setIsDeleteSessionDialogOpen] =
     React.useState(false);
 
-  const { data, isLoading, error } = useSWR<Session[]>(
-    `api/sessions?range=${timeRange}`,
-    fetcher
-  );
-  const sessions = data || [];
-
-  const handleSelectChange = (event: SelectChangeEvent) => {
-    setTimeRange(event.target.value);
-  };
-
-  const handleAddButtonClick = () => {
-    setIsCreateSessionDialogOpen(true);
+  const handleRangeChange = (event: SelectChangeEvent<SessionRange>) => {
+    router.push(`${pathname}?range=${event.target.value}`);
   };
 
   const handleEditClick = (row: Session) => {
@@ -76,102 +70,51 @@ export default function SessionsDashboard({
     setIsDeleteSessionDialogOpen(true);
   };
 
-  const handleCloseCreateSessionDialog = () => {
-    setIsCreateSessionDialogOpen(false);
-  };
-
-  const handleCloseUpdateSessionDialog = () => {
-    setIsUpdateSessionDialogOpen(false);
-    setIsUpdateSessionDialogOpen(false);
-  };
-
-  const handleCloseDeleteSessionDialog = () => {
-    setIsDeleteSessionDialogOpen(false);
-  };
-
   const handleCreateSession = async (
-    data: CreateSessionDTO,
-    resetForm: () => void
+    data: SessionFormValues,
+    resetForm: () => void,
   ) => {
-    const response = await fetch("/api/sessions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    const responseData = await response.json();
     try {
-      if (response.ok) {
-        handleCloseCreateSessionDialog();
-        mutate(`/api/sessions`);
-        onSnackbar?.("Session created successfully", "success");
-        resetForm();
-      } else {
-        console.error("Error creating session:", responseData);
-        onSnackbar?.(responseData.error.message, "error");
-      }
+      await apiRequest("/api/sessions", "POST", toSessionPayload(data));
+      setIsCreateSessionDialogOpen(false);
+      notify("Session created successfully");
+      resetForm();
+      router.refresh();
     } catch (error) {
-      console.error("Unexpected error:", error);
-      onSnackbar?.("An unexpected error occurred", "error");
+      notify(getErrorMessage(error), "error");
     }
   };
 
-  const handleUpdateSession = async (
-    data: UpdateSessionDTO,
-    resetForm: () => void
-  ) => {
-    const response = await fetch(`/api/sessions/${data.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    const responseData = await response.json();
+  const handleUpdateSession = async (data: SessionFormValues) => {
+    if (!selectedRow) return;
     try {
-      if (response.ok) {
-        handleCloseUpdateSessionDialog();
-        mutate(`api/sessions?range=${timeRange}`);
-        onSnackbar?.("Session updated successfully", "success");
-        resetForm();
-      } else {
-        console.error("Error updating session:", responseData);
-        onSnackbar?.(responseData.error.message, "error");
-      }
+      await apiRequest(
+        `/api/sessions/${selectedRow.id}`,
+        "PUT",
+        toSessionPayload(data),
+      );
+      setIsUpdateSessionDialogOpen(false);
+      notify("Session updated successfully");
+      router.refresh();
     } catch (error) {
-      console.error("Unexpected error:", error);
-      onSnackbar?.("An unexpected error occurred", "error");
+      notify(getErrorMessage(error), "error");
     }
   };
 
-  const handleDeleteSession = async (data: Session) => {
-    const response = await fetch(`/api/sessions/${data.id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const responseData = await response.json();
+  const handleDeleteSession = async () => {
+    if (!selectedRow) return;
     try {
-      if (response.ok) {
-        handleCloseDeleteSessionDialog();
-        mutate(`/api/sessions?filter=${timeRange}`);
-        onSnackbar?.("Session deleted successfully", "success");
-      } else {
-        console.error("Error deleting session:", responseData);
-        onSnackbar?.(responseData.error.message, "error");
-      }
+      await apiRequest(`/api/sessions/${selectedRow.id}`, "DELETE");
+      setIsDeleteSessionDialogOpen(false);
+      setSelectedRow(null);
+      notify("Session deleted successfully");
+      router.refresh();
     } catch (error) {
-      console.error("Unexpected error:", error);
-      onSnackbar?.("An unexpected error occurred", "error");
+      notify(getErrorMessage(error), "error");
     }
   };
 
-  const columns: GridColDef[] = [
+  const columns: GridColDef<Session>[] = [
     {
       field: "id",
       headerName: "id",
@@ -183,36 +126,21 @@ export default function SessionsDashboard({
       headerName: "Class Name",
       minWidth: 200,
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<ClassSummary>) => {
-        if (params.value == null) {
-          return "";
-        }
-        return params.value.name;
-      },
+      valueGetter: ({ row }) => row.class.name,
     },
     {
       field: "startTime",
       headerName: "Start Time",
       minWidth: 120,
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<Date>) => {
-        if (params.value == null) {
-          return "";
-        }
-        return convertToLocalTime(params.value);
-      },
+      valueFormatter: ({ value }) => (value ? formatLocalTime(value) : ""),
     },
     {
       field: "endTime",
       headerName: "End Time",
       minWidth: 120,
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<Date>) => {
-        if (params.value == null) {
-          return "";
-        }
-        return convertToLocalTime(params.value);
-      },
+      valueFormatter: ({ value }) => (value ? formatLocalTime(value) : ""),
     },
     {
       field: "action",
@@ -220,56 +148,38 @@ export default function SessionsDashboard({
       minWidth: 70,
       maxWidth: 70,
       flex: 1,
-      renderCell: (params) => (
+      sortable: false,
+      renderCell: ({ row }) => (
         <RenderMenu
-          onEditClick={() => handleEditClick(params.row)}
-          onDeleteClick={() => handleDeleteClick(params.row)}
+          onEditClick={() => handleEditClick(row)}
+          onDeleteClick={() => handleDeleteClick(row)}
         />
       ),
     },
   ];
 
-  const getTogglableColumns = (columns: GridColDef[]) => {
-    // hide the column with field `id` from list of togglable columns
-    return columns
-      .filter((column) => column.field !== "id")
-      .map((column) => column.field);
-  };
-
-  // TODO update columns
-  const initialColumnVisibilityModel: GridColumnVisibilityModel = {
-    id: false,
-    name: true,
-    active: true,
-    created: false,
-    action: true,
-  };
-
-  if (error) {
-    return <div>Error fetching data</div>;
-  }
-
-  const toolbarButtons = [
-    <IconButton key="add" onClick={handleAddButtonClick} color="primary">
+  const toolbarButtons = (
+    <IconButton
+      onClick={() => setIsCreateSessionDialogOpen(true)}
+      color="primary"
+    >
       <AddBoxIcon />
-    </IconButton>,
-  ];
+    </IconButton>
+  );
 
   return (
     <>
       <Box sx={{ width: "100%", height: "auto", overflow: "auto" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <FormControl sx={{ my: 1, minWidth: 150 }}>
-            <InputLabel id="demo-select-small-label"></InputLabel>
-            <Select
-              id="demo-select-small"
-              value={timeRange}
-              displayEmpty
-              label=""
-              onChange={handleSelectChange}
+            <Select<SessionRange>
+              id="session-range-select"
+              value={range}
+              onChange={handleRangeChange}
+              inputProps={{ "aria-label": "Session date range" }}
               style={{ height: "30px" }}
             >
-              <MenuItem value="">
+              <MenuItem value="all">
                 <em>None</em>
               </MenuItem>
               <MenuItem value="last7Days">Last 7 days</MenuItem>
@@ -281,7 +191,6 @@ export default function SessionsDashboard({
         <BaseDataGrid
           data={sessions}
           columns={columns}
-          isLoading={isLoading}
           getTogglableColumns={getTogglableColumns}
           initialColumnVisibilityModel={initialColumnVisibilityModel}
           additionalToolbarButtons={toolbarButtons}
@@ -289,20 +198,22 @@ export default function SessionsDashboard({
       </Box>
       <CreateSessionDialog
         open={isCreateSessionDialogOpen}
-        onClose={handleCloseCreateSessionDialog}
+        onClose={() => setIsCreateSessionDialogOpen(false)}
         onSubmit={handleCreateSession}
+        classes={classes}
       />
       <UpdateSessionDialog
         existingSession={selectedRow}
         open={isUpdateSessionDialogOpen}
-        onClose={handleCloseUpdateSessionDialog}
+        onClose={() => setIsUpdateSessionDialogOpen(false)}
         onSubmit={handleUpdateSession}
+        classes={classes}
       />
-      {/* <DeleteSessionDialog
-        open={isDeleteDialogOpen}
-        onClose={handleCloseDeleteDialog}
-        onSubmit={handleDeleteRowData}
-      /> */}
+      <DeleteSessionDialog
+        open={isDeleteSessionDialogOpen}
+        onClose={() => setIsDeleteSessionDialogOpen(false)}
+        onSubmit={handleDeleteSession}
+      />
     </>
   );
 }

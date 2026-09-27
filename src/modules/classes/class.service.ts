@@ -1,194 +1,109 @@
-import { Class } from "./types";
-import { CreateClassDTO, UpdateClassDTO } from "./dtos";
-import { getDBClient } from "../../lib/db-connector";
-import { mapRowToClass } from "./class.mapper";
+import "server-only";
+import type { Schedule as ScheduleRecord } from "@prisma/client";
+import prisma from "@/lib/prisma";
+import { dateToTimeOfDay, startOfUtcDay, timeOfDayToDate } from "@/lib/dates";
+import { rethrowUniqueViolation } from "@/lib/errors/prisma-errors";
+import type { Schedule } from "@/modules/schedules";
+import {
+  classDetailInclude,
+  classListInclude,
+  classOptionSelect,
+  type ClassDetail,
+  type ClassListItem,
+} from "./types";
+import type { CreateClassDTO, ScheduleInput, UpdateClassDTO } from "./schema";
 
-const BASE_CLASS_SELECT = `
-  SELECT
-    c.id                AS class_id,
-    c.name              AS class_name,
-    c.capacity,
-    s.id                AS staff_id,
-    p.name              AS staff_name,
-    g.id                AS grade_id,
-    g.name              AS grade_name,
-    (
-      SELECT JSON_AGG(
-        JSON_BUILD_OBJECT(
-          'id',        sch.id,
-          'dayOfWeek', sch.day_of_week,
-          'startTime', sch.start_time,
-          'endTime',   sch.end_time
-        ) ORDER BY sch.day_of_week
-      )
-      FROM schedule sch
-      WHERE sch.class_id = c.id
-    ) AS schedules,
-    (
-      SELECT JSON_AGG(
-        JSON_BUILD_OBJECT(
-          'studentId',     p2.id,
-          'name',          p2.name,
-          'preferredName', p2.preferred_name,
-          'dateOfBirth',   p2.date_of_birth,
-          'currentSchool', st.current_school,
-          'notes',         p2.notes
-        )
-      )
-      FROM class_student cs
-      JOIN student st ON cs.student_id = st.id
-      JOIN person p2   ON st.id  = p2.id
-      WHERE cs.class_id = c.id
-      AND (
-        cs.end_date IS NULL
-        OR cs.end_date >= CURRENT_DATE
-      )
-    ) AS students,
-    (
-      SELECT JSON_AGG(
-        JSON_BUILD_OBJECT(
-          'id',          a.id,
-          'name',        a.name,
-          'description', a.description,
-          'dueDate',     a.due_date,
-          'createdAt',   a.created_at
-        ) ORDER BY a.due_date
-      )
-      FROM class_assignment ca
-      JOIN assignment a ON ca.assignment_id = a.id
-      WHERE ca.class_id = c.id
-        AND a.due_date >= CURRENT_DATE
-      LIMIT 5
-    ) AS assignments
-  FROM class c
-  JOIN staff s   ON c.teacher_id = s.id
-  JOIN person p  ON s.id  = p.id
-  JOIN grade g   ON c.grade_id   = g.id
-  WHERE c.active = TRUE
-`;
+const DUPLICATE_NAME = "A class with that name already exists.";
 
-export async function findAllClasses(): Promise<Class[]> {
-  const client = await getDBClient();
-  try {
-    const { rows } = await client.query(
-      BASE_CLASS_SELECT +
-        `
-      ORDER BY c.id;
-    `,
-    );
-    return rows.map(mapRowToClass);
-  } finally {
-    client.release();
-  }
+function withScheduleTimes<T extends { schedules: ScheduleRecord[] }>(
+  record: T,
+): Omit<T, "schedules"> & { schedules: Schedule[] } {
+  return {
+    ...record,
+    schedules: record.schedules.map((schedule) => ({
+      id: schedule.id,
+      dayOfWeek: schedule.dayOfWeek,
+      startTime: dateToTimeOfDay(schedule.startTime),
+      endTime: dateToTimeOfDay(schedule.endTime),
+    })),
+  };
 }
 
-export async function findClassById(classId: string): Promise<Class | null> {
-  const client = await getDBClient();
-  try {
-    const { rows } = await client.query(
-      BASE_CLASS_SELECT +
-        `
-      AND c.id = $1;
-    `,
-      [classId],
-    );
-    return rows.length ? mapRowToClass(rows[0]) : null;
-  } finally {
-    client.release();
-  }
+function toScheduleRows(schedules: ScheduleInput[]) {
+  return schedules.map((schedule) => ({
+    dayOfWeek: schedule.dayOfWeek,
+    startTime: timeOfDayToDate(schedule.startTime),
+    endTime: timeOfDayToDate(schedule.endTime),
+  }));
 }
 
-export async function createClass(dto: CreateClassDTO): Promise<Class> {
-  const client = await getDBClient();
-  try {
-    await client.query("BEGIN");
+export class ClassService {
+  async getAll(): Promise<ClassListItem[]> {
+    const classes = await prisma.class.findMany({
+      where: { active: true },
+      include: classListInclude(startOfUtcDay()),
+      orderBy: { name: "asc" },
+    });
+    return classes.map(withScheduleTimes);
+  }
 
-    // 2) insert into class
-    const {
-      rows: [{ id: classId }],
-    } = await client.query<{ id: number }>(
-      `
-      INSERT INTO class
-        (name, teacher_id, grade_id, capacity, active)
-      VALUES ($1, $2, $3, $4, true)
-      RETURNING id;
-      `,
-      [dto.name, dto.teacherId, dto.gradeId, dto.capacity],
-    );
+  /** Lightweight id/name list for dropdowns and link lists. */
+  async getOptions() {
+    return await prisma.class.findMany({
+      where: { active: true },
+      select: classOptionSelect,
+      orderBy: { name: "asc" },
+    });
+  }
 
-    // insert into schedule (or none, if dto.schedules is undefined)
-    for (const sch of dto.schedules ?? []) {
-      await client.query(
-        `
-        INSERT INTO schedule
-          (class_id, day_of_week, start_time, end_time)
-        VALUES ($1, $2, $3, $4);
-        `,
-        [classId, sch.dayOfWeek, sch.startTime, sch.endTime],
-      );
+  async getById(id: string): Promise<ClassDetail | null> {
+    const record = await prisma.class.findFirst({
+      where: { id, active: true },
+      include: classDetailInclude(startOfUtcDay()),
+    });
+    return record ? withScheduleTimes(record) : null;
+  }
+
+  async create(data: CreateClassDTO): Promise<ClassListItem> {
+    try {
+      const record = await prisma.class.create({
+        data: {
+          name: data.name,
+          gradeId: data.gradeId,
+          teacherId: data.teacherId,
+          capacity: data.capacity,
+          schedules: { create: toScheduleRows(data.schedules) },
+        },
+        include: classListInclude(startOfUtcDay()),
+      });
+      return withScheduleTimes(record);
+    } catch (error) {
+      rethrowUniqueViolation(error, DUPLICATE_NAME);
     }
-
-    await client.query("COMMIT");
-
-    // 3) fetch and return the freshly-created Class
-    const { rows } = await client.query(
-      BASE_CLASS_SELECT +
-        `
-      AND c.id = $1;
-      `,
-      [classId],
-    );
-    return mapRowToClass(rows[0]);
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Error creating class:", error);
-    throw error;
-  } finally {
-    client.release();
   }
-}
 
-/**
- * Update class metadata and schedules (wipe + re-insert).
- */
-export async function updateClass(dto: UpdateClassDTO) {
-  const client = await getDBClient();
-  try {
-    await client.query("BEGIN");
-
-    // 1) update class
-    await client.query(
-      `
-      UPDATE class
-         SET name       = $2,
-             teacher_id = $3,
-             grade_id   = $4,
-             capacity   = $5
-       WHERE id = $1
-      RETURNING id;
-      `,
-      [dto.id, dto.name, dto.teacherId, dto.gradeId, dto.capacity],
-    );
-
-    // 2) reset schedules
-    await client.query(`DELETE FROM schedule WHERE class_id = $1;`, [dto.id]);
-    for (const sch of dto.schedules ?? []) {
-      await client.query(
-        `
-        INSERT INTO schedule
-          (class_id, day_of_week, start_time, end_time)
-        VALUES ($1, $2, $3, $4);
-        `,
-        [dto.id, sch.dayOfWeek, sch.startTime, sch.endTime],
-      );
+  /** Replaces the class details and its weekly schedule in one atomic write. */
+  async update(id: string, data: UpdateClassDTO): Promise<ClassListItem> {
+    try {
+      const record = await prisma.class.update({
+        where: { id },
+        data: {
+          name: data.name,
+          gradeId: data.gradeId,
+          teacherId: data.teacherId,
+          capacity: data.capacity,
+          schedules: {
+            deleteMany: {},
+            create: toScheduleRows(data.schedules),
+          },
+        },
+        include: classListInclude(startOfUtcDay()),
+      });
+      return withScheduleTimes(record);
+    } catch (error) {
+      rethrowUniqueViolation(error, DUPLICATE_NAME);
     }
-
-    await client.query("COMMIT");
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Error updating class:", error);
-    throw error;
-  } finally {
-    client.release();
   }
 }
+
+export const classService = new ClassService();
