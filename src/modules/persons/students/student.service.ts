@@ -81,7 +81,7 @@ export class StudentService {
             }),
             ...(data.gender && { gender: data.gender }),
             ...(data.phone !== undefined && { phone: data.phone }),
-            ...(data.email && { email: data.email }),
+            ...(data.email !== undefined && { email: data.email }),
             ...(data.dateOfBirth && { dateOfBirth: data.dateOfBirth }),
             ...(data.notes !== undefined && { notes: data.notes }),
           },

@@ -53,7 +53,7 @@ export function toStudentFormValues(student: Student): StudentFormValues {
     gender: student.person.gender ?? "",
     dateOfBirth: toPickerDate(student.person.dateOfBirth),
     notes: student.person.notes ?? "",
-    email: student.person.email,
+    email: student.person.email ?? "",
     phone: student.person.phone ?? "",
     currentSchool: student.currentSchool ?? "",
     gradeId: student.grade.id,
@@ -197,7 +197,6 @@ const StudentFormFields = ({
         </Typography>
         <TextField
           fullWidth
-          required
           id="email"
           name="email"
           label="Email Address"

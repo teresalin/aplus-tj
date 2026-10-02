@@ -10,6 +10,7 @@ import {
 // INPUT VALIDATION (DTOs)
 // ========================================
 export const CreateStudentSchema = CreatePersonSchema.extend({
+  email: validators.optionalEmail,
   currentSchool: z
     .string()
     .trim()
@@ -28,6 +29,7 @@ export const CreateStudentSchema = CreatePersonSchema.extend({
 );
 
 export const UpdateStudentSchema = UpdatePersonSchema.extend({
+  email: validators.optionalEmail,
   currentSchool: z.string().trim().optional(),
   gradeId: validators.uuid.optional(),
   textbookPublisher: z.string().trim().optional(),

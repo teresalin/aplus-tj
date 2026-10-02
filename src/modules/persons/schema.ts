@@ -4,12 +4,20 @@ import { dateField, optionalDateField } from "@/lib/validation";
 // ========================================
 // SHARED VALIDATORS (used across modules)
 // ========================================
+const email = z
+  .string()
+  .trim()
+  .email()
+  .transform((s) => s.toLowerCase());
+
 export const validators = {
-  email: z
-    .string()
-    .trim()
-    .email()
-    .transform((s) => s.toLowerCase()),
+  email,
+  /** Email for people who may not have one (students); blank input becomes `null`, which clears it. */
+  optionalEmail: z.preprocess(
+    (value) =>
+      typeof value === "string" && value.trim() === "" ? null : value,
+    email.nullish(),
+  ),
   phone: z.string().trim().optional(),
   // Compared at validation time (not module load) so long-running servers stay correct.
   pastDate: dateField.refine(
@@ -24,7 +32,8 @@ export const validators = {
 // ========================================
 // PERSON DTOs (for API inputs)
 // ========================================
-// Shared fields for creating ANY person (student, staff, parent)
+// Shared fields for creating ANY person (student, staff, parent). Email is
+// required here; the student schemas override it with `validators.optionalEmail`.
 export const CreatePersonSchema = z.object({
   name: z.string().trim().min(1),
   preferredName: z

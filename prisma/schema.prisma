@@ -39,7 +39,9 @@ model Person {
   preferredName String?  @map("preferred_name")
   gender        Gender?
   phone         String?
-  email         String   @unique
+  // Optional because young students often have no email of their own; the app
+  // still requires one for parents and staff. Unique among non-null values.
+  email         String?  @unique
   dateOfBirth   DateTime @map("date_of_birth")
   notes         String?
   active        Boolean  @default(true)

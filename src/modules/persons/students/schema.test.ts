@@ -58,6 +58,20 @@ describe("CreateStudentSchema", () => {
     ]);
   });
 
+  it("accepts a student without an email", () => {
+    const { email: _email, ...withoutEmail } = validStudent;
+    expect(CreateStudentSchema.parse(withoutEmail).email).toBeUndefined();
+    expect(
+      CreateStudentSchema.parse({ ...validStudent, email: " " }).email,
+    ).toBeNull();
+  });
+
+  it("rejects a malformed email", () => {
+    expect(issuesOf({ ...validStudent, email: "alice" })).toEqual([
+      expect.objectContaining({ path: "email" }),
+    ]);
+  });
+
   it("rejects an invalid grade id", () => {
     expect(issuesOf({ ...validStudent, gradeId: "grade-3" })).toEqual([
       expect.objectContaining({ path: "gradeId" }),
@@ -70,6 +84,10 @@ describe("UpdateStudentSchema", () => {
     expect(UpdateStudentSchema.parse({ preferredName: "Ally" })).toEqual({
       preferredName: "Ally",
     });
+  });
+
+  it("clears the email when it is sent blank", () => {
+    expect(UpdateStudentSchema.parse({ email: "" })).toEqual({ email: null });
   });
 
   it("allows clearing the departure date with null", () => {
