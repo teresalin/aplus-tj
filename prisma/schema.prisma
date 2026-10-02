@@ -15,12 +15,13 @@ enum Gender {
   @@map("gender")
 }
 
-enum Status {
+// A moved session stays Scheduled at its new time; the move itself is
+// recorded in SessionDateHistory.
+enum SessionStatus {
   Scheduled
-  Rescheduled
   Cancelled
 
-  @@map("status")
+  @@map("session_status")
 }
 
 enum day_of_week {
@@ -80,7 +81,8 @@ model Staff {
   role   StaffRole @relation(fields: [roleId], references: [id])
   person Person    @relation(fields: [id], references: [id])
 
-  classes Class[]
+  classes  Class[]
+  sessions Session[]
 
   @@map("staff")
 }
@@ -196,15 +198,19 @@ model ClassStudent {
 }
 
 model Session {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  classId   String   @map("class_id") @db.Uuid // ← FK to Class.id
-  startTime DateTime @map("start_time")
-  endTime   DateTime @map("end_time")
-  status    Status   @default(Scheduled)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  id                 String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  classId            String        @map("class_id") @db.Uuid // ← FK to Class.id; never changes, since attendance belongs to the class
+  // Who taught this session: the class's teacher when it was created, or a substitute.
+  teacherId          String        @map("teacher_id") @db.Uuid // ← FK to Staff.id
+  startTime          DateTime      @map("start_time")
+  endTime            DateTime      @map("end_time")
+  status             SessionStatus @default(Scheduled)
+  cancellationReason String?       @map("cancellation_reason")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @default(now()) @updatedAt @map("updated_at")
 
   class              Class                @relation(fields: [classId], references: [id])
+  teacher            Staff                @relation(fields: [teacherId], references: [id])
   attendances        Attendance[]
   sessionDateHistory SessionDateHistory[]
 
@@ -212,19 +218,22 @@ model Session {
   @@map("session")
 }
 
+// Append-only log of changes to a session's time, written in the same
+// transaction as the change.
 model SessionDateHistory {
-  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  sessionId          String   @map("session_id") @db.Uuid // ← FK to Session.id
-  oldDate            DateTime @map("old_date")
-  newDate            DateTime @map("new_date")
-  status             Status   @default(Scheduled)
-  modificationReason String?  @map("modification_reason")
-  modifiedAt         DateTime @default(now()) @map("modified_at")
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sessionId         String   @map("session_id") @db.Uuid // ← FK to Session.id
+  previousStartTime DateTime @map("previous_start_time")
+  previousEndTime   DateTime @map("previous_end_time")
+  newStartTime      DateTime @map("new_start_time")
+  newEndTime        DateTime @map("new_end_time")
+  reason            String?
+  changedBy         String?  @map("changed_by") // email of the staff member who made the change
+  changedAt         DateTime @default(now()) @map("changed_at")
 
   session Session @relation(fields: [sessionId], references: [id])
 
+  @@index([sessionId])
   @@map("session_date_history")
 }
 

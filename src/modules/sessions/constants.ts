@@ -1,8 +1,13 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import type { Prisma } from "@prisma/client";
+import type { Prisma, SessionStatus } from "@prisma/client";
 
 dayjs.extend(utc);
+
+export const SESSION_STATUSES = [
+  "Scheduled",
+  "Cancelled",
+] as const satisfies readonly SessionStatus[];
 
 export const SESSION_RANGES = [
   "last7Days",

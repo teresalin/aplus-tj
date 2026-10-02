@@ -2,6 +2,7 @@ import "server-only";
 import type { Schedule as ScheduleRecord } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { dateToTimeOfDay, startOfUtcDay, timeOfDayToDate } from "@/lib/dates";
+import { NotFoundError } from "@/lib/errors/custom-errors";
 import { rethrowUniqueViolation } from "@/lib/errors/prisma-errors";
 import type { Schedule } from "@/modules/schedules";
 import {
@@ -82,22 +83,45 @@ export class ClassService {
     }
   }
 
-  /** Replaces the class details and its weekly schedule in one atomic write. */
+  /**
+   * Replaces the class details and its weekly schedule in one atomic write.
+   * When the teacher changes, upcoming sessions taught by the previous teacher
+   * move to the new one; past sessions and substitutes keep their teacher.
+   */
   async update(id: string, data: UpdateClassDTO): Promise<ClassListItem> {
     try {
-      const record = await prisma.class.update({
-        where: { id },
-        data: {
-          name: data.name,
-          gradeId: data.gradeId,
-          teacherId: data.teacherId,
-          capacity: data.capacity,
-          schedules: {
-            deleteMany: {},
-            create: toScheduleRows(data.schedules),
+      const record = await prisma.$transaction(async (tx) => {
+        const current = await tx.class.findUnique({
+          where: { id },
+          select: { teacherId: true },
+        });
+        if (!current) throw new NotFoundError("Class not found");
+
+        if (current.teacherId !== data.teacherId) {
+          await tx.session.updateMany({
+            where: {
+              classId: id,
+              teacherId: current.teacherId,
+              startTime: { gte: new Date() },
+            },
+            data: { teacherId: data.teacherId },
+          });
+        }
+
+        return await tx.class.update({
+          where: { id },
+          data: {
+            name: data.name,
+            gradeId: data.gradeId,
+            teacherId: data.teacherId,
+            capacity: data.capacity,
+            schedules: {
+              deleteMany: {},
+              create: toScheduleRows(data.schedules),
+            },
           },
-        },
-        include: classListInclude(startOfUtcDay()),
+          include: classListInclude(startOfUtcDay()),
+        });
       });
       return withScheduleTimes(record);
     } catch (error) {
