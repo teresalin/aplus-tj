@@ -40,16 +40,18 @@ export function PersonHeader({
           <Typography variant="h6">{person.name}</Typography>
           <Typography variant="subtitle2">{subtitle}</Typography>
           <Grid container columnSpacing={2}>
-            <Grid item>
-              <IconLabel
-                icon={EmailIcon}
-                label="Email"
-                href={`mailto:${person.email}`}
-                size="small"
-              >
-                {person.email}
-              </IconLabel>
-            </Grid>
+            {person.email && (
+              <Grid item>
+                <IconLabel
+                  icon={EmailIcon}
+                  label="Email"
+                  href={`mailto:${person.email}`}
+                  size="small"
+                >
+                  {person.email}
+                </IconLabel>
+              </Grid>
+            )}
             {person.phone && (
               <Grid item>
                 <IconLabel

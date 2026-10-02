@@ -46,7 +46,7 @@ export function toStaffFormValues(staff: Staff): StaffFormValues {
     gender: staff.person.gender ?? "",
     dateOfBirth: toPickerDate(staff.person.dateOfBirth),
     notes: staff.person.notes ?? "",
-    email: staff.person.email,
+    email: staff.person.email ?? "",
     phone: staff.person.phone ?? "",
     roleId: staff.roleId,
     hireDate: toPickerDate(staff.hireDate),
