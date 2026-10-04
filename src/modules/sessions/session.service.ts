@@ -7,9 +7,9 @@ import {
   sessionStartTimeFilter,
   type SessionRange,
 } from "./constants";
-import { sessionTimeChange } from "./history";
+import { sessionTimeChange } from "./time-change";
 import { splitRosterByAttendance } from "./roster";
-import { sessionInclude, type SessionDetail } from "./types";
+import { sessionInclude, timeChangeSelect, type SessionDetail } from "./types";
 import type { CreateSessionDTO, UpdateSessionDTO } from "./schema";
 
 const DUPLICATE_SESSION = "This class already has a session at that time.";
@@ -53,16 +53,8 @@ export class SessionService {
         },
         teacher: { select: { id: true, person: { select: { name: true } } } },
         attendances: { select: { student: studentSelect } },
-        sessionDateHistory: {
-          select: {
-            previousStartTime: true,
-            previousEndTime: true,
-            newStartTime: true,
-            newEndTime: true,
-            reason: true,
-            changedBy: true,
-            changedAt: true,
-          },
+        timeChanges: {
+          select: timeChangeSelect,
           orderBy: { changedAt: "desc" },
         },
       },
@@ -85,7 +77,7 @@ export class SessionService {
       teacher: { id: session.teacher.id, name: session.teacher.person.name },
       present,
       absent: session.status === "Cancelled" ? [] : absent,
-      timeChanges: session.sessionDateHistory,
+      timeChanges: session.timeChanges,
     };
   }
 
@@ -142,7 +134,7 @@ export class SessionService {
                 ? (data.cancellationReason ?? null)
                 : null,
             ...(timeChange && {
-              sessionDateHistory: {
+              timeChanges: {
                 create: { ...timeChange, reason: data.changeReason, changedBy },
               },
             }),
@@ -171,7 +163,7 @@ export class SessionService {
     }
 
     await prisma.$transaction([
-      prisma.sessionDateHistory.deleteMany({ where: { sessionId: id } }),
+      prisma.sessionTimeChange.deleteMany({ where: { sessionId: id } }),
       prisma.session.delete({ where: { id } }),
     ]);
   }

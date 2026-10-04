@@ -8,6 +8,17 @@ export const sessionInclude = {
   teacher: { select: { id: true, person: { select: { name: true } } } },
 } as const satisfies Prisma.SessionInclude;
 
+/** The fields of a time change shown on the session page. */
+export const timeChangeSelect = {
+  previousStartTime: true,
+  previousEndTime: true,
+  newStartTime: true,
+  newEndTime: true,
+  reason: true,
+  changedBy: true,
+  changedAt: true,
+} as const satisfies Prisma.SessionTimeChangeSelect;
+
 // ========================================
 // DOMAIN TYPES
 // ========================================
@@ -21,15 +32,9 @@ export interface SessionStudent {
 }
 
 /** One recorded change to a session's time. */
-export interface SessionTimeChange {
-  previousStartTime: Date;
-  previousEndTime: Date;
-  newStartTime: Date;
-  newEndTime: Date;
-  reason: string | null;
-  changedBy: string | null;
-  changedAt: Date;
-}
+export type SessionTimeChangeItem = Prisma.SessionTimeChangeGetPayload<{
+  select: typeof timeChangeSelect;
+}>;
 
 /** A session with the class roster split by attendance, and its time changes (newest first). */
 export interface SessionDetail {
@@ -42,5 +47,5 @@ export interface SessionDetail {
   teacher: { id: string; name: string };
   present: SessionStudent[];
   absent: SessionStudent[];
-  timeChanges: SessionTimeChange[];
+  timeChanges: SessionTimeChangeItem[];
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { sessionTimeChange } from "./history";
+import { sessionTimeChange } from "./time-change";
 
 const previous = {
   startTime: new Date("2026-10-10T09:00:00.000Z"),
