@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
 import dayjs from "dayjs";
 import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
@@ -19,12 +20,14 @@ import FormDialog from "@/components/FormDialog";
 import RenderMenu from "@/components/grid/RenderMenu";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 import type { ClassOption } from "@/modules/classes";
+import type { StaffOption } from "@/modules/persons/staffs";
 import type { Session, SessionRange } from "@/modules/sessions";
 import SessionFormFields, {
   emptySessionFormValues,
   hasSessionTimes,
+  toCreateSessionPayload,
   toSessionFormValues,
-  toSessionPayload,
+  toUpdateSessionPayload,
   type SessionFormValues,
 } from "./SessionFormFields";
 
@@ -48,12 +51,14 @@ type DialogState =
 interface SessionsDashboardProps {
   sessions: Session[];
   classes: ClassOption[];
+  teachers: StaffOption[];
   range: SessionRange;
 }
 
 export default function SessionsDashboard({
   sessions,
   classes,
+  teachers,
   range,
 }: SessionsDashboardProps) {
   const router = useRouter();
@@ -76,7 +81,7 @@ export default function SessionsDashboard({
     const created = await mutate({
       method: "POST",
       url: "/api/sessions",
-      body: toSessionPayload(values),
+      body: toCreateSessionPayload(values),
       successMessage: "Session created successfully",
     });
     if (created) closeDialog();
@@ -89,7 +94,7 @@ export default function SessionsDashboard({
     const updated = await mutate({
       method: "PUT",
       url: `/api/sessions/${session.id}`,
-      body: toSessionPayload(values),
+      body: toUpdateSessionPayload(values),
       successMessage: "Session updated successfully",
     });
     if (updated) closeDialog();
@@ -124,6 +129,13 @@ export default function SessionsDashboard({
       ),
     },
     {
+      field: "teacher",
+      headerName: "Teacher",
+      minWidth: 150,
+      flex: 1,
+      valueGetter: ({ row }) => row.teacher.person.name,
+    },
+    {
       field: "startTime",
       headerName: "Start Time",
       minWidth: 120,
@@ -136,6 +148,18 @@ export default function SessionsDashboard({
       minWidth: 120,
       flex: 1,
       valueFormatter: ({ value }) => (value ? formatLocalTime(value) : ""),
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      minWidth: 110,
+      flex: 1,
+      renderCell: ({ value }) =>
+        value === "Cancelled" ? (
+          <Chip label="Cancelled" size="small" color="warning" />
+        ) : (
+          value
+        ),
     },
     {
       field: "action",
@@ -164,13 +188,16 @@ export default function SessionsDashboard({
   );
 
   const renderFields = (
+    mode: "create" | "edit",
     values: SessionFormValues,
     setValues: React.Dispatch<React.SetStateAction<SessionFormValues>>,
   ) => (
     <SessionFormFields
+      mode={mode}
       session={values}
       setFormData={setValues}
       classes={classes}
+      teachers={teachers}
     />
   );
 
@@ -212,7 +239,7 @@ export default function SessionsDashboard({
           onClose={closeDialog}
           onSubmit={handleCreateSession}
         >
-          {renderFields}
+          {(values, setValues) => renderFields("create", values, setValues)}
         </FormDialog>
       )}
       {dialog?.type === "edit" && (
@@ -225,14 +252,14 @@ export default function SessionsDashboard({
           onClose={closeDialog}
           onSubmit={(values) => handleUpdateSession(dialog.session, values)}
         >
-          {renderFields}
+          {(values, setValues) => renderFields("edit", values, setValues)}
         </FormDialog>
       )}
       {dialog?.type === "delete" && (
         <ConfirmDialog
           open={open}
           title="Delete session"
-          message="Permanently delete this session and remove it from its corresponding class? You cannot undo this action."
+          message="Permanently delete this session? Only delete a session created by mistake; you cannot undo this. A session with attendance can't be deleted: edit it and set its status to Cancelled instead."
           confirmLabel="Delete"
           onClose={closeDialog}
           onConfirm={() => handleDeleteSession(dialog.session)}

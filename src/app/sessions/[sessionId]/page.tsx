@@ -97,7 +97,15 @@ export default async function SessionPage({
               <Typography variant="h6" gutterBottom>
                 Details
               </Typography>
+              {details.status === "Cancelled" && (
+                <Chip label="Cancelled" color="warning" />
+              )}
             </Grid>
+            {details.status === "Cancelled" && details.cancellationReason && (
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Cancellation reason: {details.cancellationReason}
+              </Typography>
+            )}
             <Grid container spacing={{ xs: 1, sm: 2, md: 2, lg: 3 }}>
               <Grid item xs={12} sm={12} md={6} lg={3}>
                 <StatCard icon={<EventIcon sx={{ fontSize: "2.8em" }} />}>
@@ -115,7 +123,7 @@ export default async function SessionPage({
                 <StatCard icon={<ClassIcon sx={{ fontSize: "2.8em" }} />}>
                   <Typography>{details.class.name}</Typography>
                   <Typography variant="caption">
-                    {details.class.teacherName}
+                    {details.teacher.name}
                   </Typography>
                 </StatCard>
               </Grid>
@@ -150,6 +158,48 @@ export default async function SessionPage({
             <StudentChips students={details.absent} variant="outlined" />
           </Box>
         </Grid>
+        {details.timeChanges.length > 0 && (
+          <Grid item xs={12}>
+            <Box sx={panelSx}>
+              <Typography variant="h6" gutterBottom>
+                Time Changes
+              </Typography>
+              <Stack spacing={1.5}>
+                {details.timeChanges.map((change, index) => (
+                  <Box key={index}>
+                    <Typography variant="body2">
+                      Moved from{" "}
+                      <LocalDateTime
+                        value={change.previousStartTime}
+                        format="YYYY-MM-DD HH:mm"
+                      />
+                      {"–"}
+                      <LocalDateTime
+                        value={change.previousEndTime}
+                        format="HH:mm"
+                      />{" "}
+                      to{" "}
+                      <LocalDateTime
+                        value={change.newStartTime}
+                        format="YYYY-MM-DD HH:mm"
+                      />
+                      {"–"}
+                      <LocalDateTime value={change.newEndTime} format="HH:mm" />
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      <LocalDateTime
+                        value={change.changedAt}
+                        format="YYYY-MM-DD HH:mm"
+                      />
+                      {change.changedBy && ` by ${change.changedBy}`}
+                      {change.reason && ` · ${change.reason}`}
+                    </Typography>
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          </Grid>
+        )}
       </Grid>
     </>
   );

@@ -12,7 +12,8 @@ dayjs.extend(utc);
 export class AttendanceService {
   /**
    * Attendance for every student enrolled in the class during the week that
-   * starts on `weekStart`, across that week's sessions.
+   * starts on `weekStart`, across that week's sessions. Cancelled sessions
+   * are left out, so nobody shows as absent from them.
    */
   async getWeek(
     classId: string,
@@ -38,7 +39,10 @@ export class AttendanceService {
           orderBy: { student: { person: { name: "asc" } } },
         },
         sessions: {
-          where: { startTime: { gte: weekStart, lt: weekEnd } },
+          where: {
+            startTime: { gte: weekStart, lt: weekEnd },
+            status: "Scheduled",
+          },
           select: {
             startTime: true,
             attendances: { select: { studentId: true } },
